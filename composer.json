@@ -19,7 +19,11 @@
         "drupal/core-composer-scaffold": "^9",
         "drupal/core-project-message": "^9",
         "drupal/core-recommended": "^9",
-        "drupal/druxt": "^0.4.1"
+        "drupal/devel_generate": "^4.0",
+        "drupal/druxt": "^0.4.1",
+        "drupal/jsonapi_views": "1.x-dev",
+        "drupal/paragraphs": "^1.12",
+        "drupal/youtube": "^1.2"
     },
     "conflict": {
         "drupal/drupal": "*"
