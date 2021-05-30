@@ -10,7 +10,7 @@
       <DruxtMenu class="ml-auto">
         <template #default="{ items }">
           <ul class="flex">
-            <li v-for="item of items" class="mr-4" :key="item.entity.id">
+            <li v-for="item of items" :key="item.entity.id" class="mr-4">
               <NuxtLink
                 v-if="item.entity.attributes.url.startsWith('/')"
                 class="text-blue-500"

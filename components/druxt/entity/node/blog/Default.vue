@@ -35,14 +35,23 @@
               v-html="changed"
             />
           </div>
+          <div>
+            <p
+              class="bg-black bg-opacity-40 inline-block my-4 px-2 py-1"
+              v-html="$attrs.entity.attributes.field_description.processed"
+            />
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="container mt-10 mx-auto rounded-sm w-full">
-      <p
-        class="my-4"
-        v-html="$attrs.entity.attributes.field_description.processed"
+    <div class="mt-10">
+      <DruxtEntity
+        v-for="include of (blog.included || []).filter((o) => o)"
+        :class="classes[include.type.split('--')[1]] || []"
+        :key="include.id"
+        :type="include.type"
+        :uuid="include.id"
       />
     </div>
   </div>
@@ -53,22 +62,38 @@ import { DrupalJsonApiParams } from 'drupal-jsonapi-params'
 
 export default {
   data: () => ({
+    blog: false,
     media: false,
   }),
 
   async fetch() {
-    if (!this.$attrs.entity.relationships.field_image.data) {
-      return
+    if (
+      this.$attrs.entity.relationships.field_content.data &&
+      this.$attrs.mode !== 'teaser'
+    ) {
+      this.blog = await this.$store.dispatch('druxt/getResource', {
+        type: this.$attrs.entity.type,
+        id: this.$attrs.entity.id,
+        query: new DrupalJsonApiParams()
+          .addFields(this.$attrs.entity.type, [
+            'changed',
+            'field_description',
+            'title',
+          ])
+          .addInclude('field_content'),
+      })
     }
 
-    const { type } = this.$attrs.value.relationships.field_image.data
-    this.media = await this.$store.dispatch('druxt/getResource', {
-      ...this.$attrs.value.relationships.field_image.data,
-      query: new DrupalJsonApiParams()
-        .addInclude('field_media_image')
-        .addFields(type, [])
-        .addFields('file--file', ['uri']),
-    })
+    if (this.$attrs.entity.relationships.field_image.data) {
+      const { type } = this.$attrs.value.relationships.field_image.data
+      this.media = await this.$store.dispatch('druxt/getResource', {
+        ...this.$attrs.value.relationships.field_image.data,
+        query: new DrupalJsonApiParams()
+          .addInclude('field_media_image')
+          .addFields(type, [])
+          .addFields('file--file', ['uri']),
+      })
+    }
   },
 
   computed: {
@@ -77,6 +102,11 @@ export default {
         new Date($attrs.entity.attributes.changed),
         'MMM dd, yyyy'
       ),
+
+    classes: () => ({
+      code: ['my-8'],
+      text_markdown: ['container', 'mb-4', 'mx-auto'],
+    }),
 
     src: ({ media }) =>
       ((((media.included || [])[0] || {}).attributes || {}).uri || {}).url,

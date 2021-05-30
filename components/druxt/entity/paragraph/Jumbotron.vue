@@ -16,11 +16,11 @@
         :type="media.type"
       />
 
-      <h2 class="text-5xl mb-3">{{ $attrs.entity.attributes.field_title }}</h2>
+      <h2 class="mb-3 text-5xl">{{ $attrs.entity.attributes.field_title }}</h2>
 
       <DruxtEntity
         v-if="text"
-        class="text-xl mx-auto sm:w-100"
+        class="text-xl mb-4 mx-auto sm:w-100"
         :uuid="text.id"
         :type="text.type"
       />

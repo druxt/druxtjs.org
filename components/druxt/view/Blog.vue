@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto mt-25">
-    <h1 class="mb-10 text-3xl">DruxtJS Blog</h1>
+    <h1 class="mb-10 text-3xl">Blog</h1>
 
     <DruxtEntity
       v-for="result of $attrs.results"
