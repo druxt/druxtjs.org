@@ -165,9 +165,9 @@ Every deployment builds from a git branch head, so a rollback is a git
 operation followed by a deployment, smallest first.
 
 - **A bad release of this site.** Revert the release commit on `main` and
-  push: Lagoon builds `main` again from the reverted tree. The services are
-  unchanged, so the environment takes it without recreation.
-- **Checking an older release first.** Push a branch at its tag, for example
+  push, and Lagoon builds `main` again from the reverted tree. The services
+  are unchanged, so the environment takes it without recreation.
+- **Checking an older release first.** Push a branch at a tag like
   `release/0.9.0`, and the project's branch rule deploys it as its own
   environment beside production.
 - **Back to the site before the relaunch.** Production used to build from
