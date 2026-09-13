@@ -102,6 +102,21 @@ ensure('filter_format', 'docs_markdown', fn() => FilterFormat::create([
       // tables, and standard CommonMark has no table syntax at all.
       'settings' => ['flavor' => 'github'],
     ],
+    // Markdown Easy 2.x requires an HTML allowlist filter to run after it,
+    // and without one the format cannot be saved from the UI at all. The
+    // allowlist is what GitHub-flavoured CommonMark emits, including the
+    // table alignment styles and task-list checkboxes it adds.
+    'filter_html' => [
+      'id' => 'filter_html',
+      'provider' => 'filter',
+      'status' => TRUE,
+      'weight' => 5,
+      'settings' => [
+        'allowed_html' => '<a href hreflang title> <em> <strong> <del> <code> <pre> <blockquote cite> <ul type> <ol start type> <li> <h1 id> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <p> <hr> <br> <table> <caption> <thead> <tbody> <tfoot> <tr> <th colspan rowspan scope style> <td colspan rowspan style> <img src alt title width height loading> <input type checked disabled>',
+        'filter_html_help' => TRUE,
+        'filter_html_nofollow' => FALSE,
+      ],
+    ],
     // Runs after the markdown filter, on the HTML it produced.
     'filter_html_image_secure' => [
       'id' => 'filter_html_image_secure',
