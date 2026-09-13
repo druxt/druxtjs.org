@@ -15,7 +15,7 @@
     />
 
     <!-- Documentation pages: sidebar / content / on-this-page -->
-    <div v-if="isDocs" class="docs-grid flex-grow w-full max-w-[110rem] mx-auto">
+    <div v-if="isDocs" class="docs-grid flex-grow w-full max-w-[110rem] mx-auto" :class="{ 'docs-grid-wide': wide }">
       <AppSidebar :open="sidebar" @close="sidebar = false" @open-search="searchOpen = true" />
 
       <main id="main" class="min-w-0 px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
@@ -24,13 +24,14 @@
              between a module's pages. On other routes it renders only the
              slot. -->
         <AppModuleHeader>
-          <div class="mx-auto max-w-content">
+          <div class="mx-auto" :class="wide ? '' : 'max-w-content'">
             <Nuxt />
           </div>
         </AppModuleHeader>
       </main>
 
-      <aside class="hidden xl:block py-12 pr-8">
+      <!-- Wide pages have no headings to list, and take the column instead. -->
+      <aside v-if="!wide" class="hidden xl:block py-12 pr-8">
         <AppToc class="sticky top-24" />
       </aside>
     </div>
@@ -64,6 +65,8 @@ export default {
 
   computed: {
     isDocs: ({ $route }) => $route.path !== '/',
+    /** The playground has no prose to cap and no headings to list. */
+    wide: ({ $route }) => $route.path.replace(/\/$/, '') === '/playground',
   },
 
   watch: {
@@ -134,6 +137,10 @@ export default {
 @media (min-width: 1280px) {
   .docs-grid {
     grid-template-columns: 17rem minmax(0, 1fr) 15rem;
+  }
+
+  .docs-grid-wide {
+    grid-template-columns: 17rem minmax(0, 1fr);
   }
 }
 </style>

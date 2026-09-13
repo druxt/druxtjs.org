@@ -15,6 +15,9 @@
       </a>
     </AppPageHeader>
 
+    <!-- A component's page opens with the component itself, live. -->
+    <DruxtExample v-if="example" :component="example" />
+
     <AppProse :document="document" />
   </article>
 </template>
@@ -23,6 +26,7 @@
 import { seoHead } from '~/utils/seo'
 import { apiSourceUrl } from '~/utils/api-source'
 import { documentDescription } from '~/utils/content'
+import { knowsComponent } from '~/utils/live-examples'
 import { isPackageRoot } from '~/components/app/icon/module'
 export default {
   name: 'AppApiDocument',
@@ -67,6 +71,8 @@ export default {
 
     source: ({ document }) => apiSourceUrl(document.dir, document.slug),
 
+    /** The component this page documents, when it has a live card. */
+    example: ({ document }) => (/\/components$/.test(document.dir || '') && knowsComponent(document.slug) ? document.slug : null),
   },
 }
 </script>

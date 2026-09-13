@@ -1,6 +1,7 @@
 <template>
   <!-- .nuxt-content so content-links.client.js routes internal links, as it does for markdown. -->
-  <div class="nuxt-content">
+  <!-- Only once every paragraph is in: the layout keeps the children it is first given. -->
+  <div v-if="!$fetchState.pending" class="nuxt-content">
     <template v-for="paragraph in roots">
       <DruxtLayoutParagraph
         v-if="layoutOf(paragraph).layout"
@@ -22,6 +23,7 @@ const layoutOf = (paragraph) => ((paragraph.attributes || {}).behavior_settings 
  * Read from the paragraphs the page was fetched with, which the Druxt store
  * already holds, rather than through DruxtFieldLayoutParagraphs, which fetches
  * them again and renders nothing until that fetch settles in the browser.
+ * A node fetched on its own, as the live examples do, gets them fetched here.
  */
 export default {
   // DruxtEntity's other props (fields, schema, value) are not HTML attributes.
@@ -29,17 +31,16 @@ export default {
   props: {
     entity: { type: Object, default: undefined },
   },
+  async fetch() {
+    const missing = this.refs.filter((ref) => !this.stored(ref))
+    await Promise.all(missing.map((ref) => this.$store.dispatch('druxt/getResource', { type: ref.type, id: ref.id })))
+  },
   computed: {
+    refs() {
+      return ((((this.entity || {}).relationships || {}).field_content || {}).data) || []
+    },
     paragraphs() {
-      const refs = ((((this.entity || {}).relationships || {}).field_content || {}).data) || []
-      const resources = this.$store.state.druxt.resources
-      return refs
-        .map((ref) => {
-          const stored = (resources[ref.type] || {})[ref.id] || {}
-          const resource = stored[undefined] || stored[''] || Object.values(stored)[0]
-          return resource && resource.data
-        })
-        .filter(Boolean)
+      return this.refs.map((ref) => this.stored(ref)).filter(Boolean)
     },
     roots() {
       return this.paragraphs.filter((paragraph) => layoutOf(paragraph).layout || !layoutOf(paragraph).parent_uuid)
@@ -47,6 +48,12 @@ export default {
   },
   methods: {
     layoutOf,
+    /** The paragraph's data in the store, whatever prefix it was stored under. */
+    stored(ref) {
+      const stored = ((this.$store.state.druxt.resources[ref.type] || {})[ref.id]) || {}
+      const resource = stored[undefined] || stored[''] || Object.values(stored)[0]
+      return resource && resource.data
+    },
     childrenOf(section) {
       return this.paragraphs.filter((paragraph) => layoutOf(paragraph).parent_uuid === section.id)
     },

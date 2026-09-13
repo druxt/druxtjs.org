@@ -11,7 +11,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const { normalisePath, titleFromPath } = require('./site')
+const { PAGES, normalisePath, titleFromPath } = require('./site')
 
 /** A leading `---` fence, which is the only place frontmatter is frontmatter. */
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/
@@ -143,7 +143,8 @@ const walk = (dir, root) => {
 const readContent = (contentDir) => {
   if (!fs.existsSync(contentDir)) return []
 
-  return walk(contentDir, contentDir)
+  // The site's own pages ride along, so every list built from here has them.
+  return [...PAGES, ...walk(contentDir, contentDir)
     .map((relative) => {
       const absolute = path.join(contentDir, relative)
       const raw = fs.readFileSync(absolute, 'utf8')
@@ -157,7 +158,7 @@ const readContent = (contentDir) => {
         weight: typeof data.weight === 'number' ? data.weight : 0,
         section: route.split('/').filter(Boolean)[0] || null,
       }
-    })
+    })]
     .sort((a, b) => a.route.localeCompare(b.route))
 }
 

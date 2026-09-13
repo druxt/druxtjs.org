@@ -30,7 +30,16 @@ const SITE_DESCRIPTION
  * `description` is reused by llms.txt and the section pages' og:description;
  * `priority` and `changefreq` feed sitemap.xml.
  */
+/** What the playground page says about itself; its share card and sitemap entry come from PAGES. */
+const PLAYGROUND_DESCRIPTION = 'Render every Druxt component live against a Drupal backend, change its props, read the requests it makes, and copy the markup.'
+
 const SECTIONS = {
+  playground: {
+    label: 'Playground',
+    description: PLAYGROUND_DESCRIPTION,
+    priority: 0.8,
+    changefreq: 'monthly',
+  },
   tutorials: {
     label: 'Tutorials',
     description: 'Lessons that take you from nothing to a working Druxt site, one step at a time.',
@@ -187,7 +196,17 @@ const docTypeExpression = () => {
     + `return s?(${known}.indexOf(s)>-1?s:'other'):'home'})()`
 }
 
+/**
+ * Pages that are not documents but belong in the sitemap, the share cards and
+ * llms.txt all the same, in the shape readContent() gives a document.
+ */
+const PAGES = [
+  { route: '/playground', title: 'Live component playground', description: PLAYGROUND_DESCRIPTION, weight: 0, section: 'playground' },
+]
+
 module.exports = {
+  PAGES,
+  PLAYGROUND_DESCRIPTION,
   SITE_ORIGIN,
   SITE_NAME,
   TITLE_SUFFIX,

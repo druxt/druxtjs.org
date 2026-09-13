@@ -28,7 +28,7 @@
       <!-- Wide enough for the longest shortcut bubble, so the label truncates instead of pushing it out. -->
       <button
         type="button"
-        class="hidden sm:flex items-center gap-2 h-9 pl-3 pr-2 w-48 xl:w-56 rounded-btn border border-base-300 bg-base-200 text-sm text-base-content/70 hover:border-primary hover:text-base-content transition-colors"
+        class="hidden sm:flex items-center gap-2 h-9 pl-3 pr-2 w-44 rounded-btn border border-base-300 bg-base-200 text-sm text-base-content/70 hover:border-primary hover:text-base-content transition-colors"
         @click="$emit('open-search')"
       >
         <AppIconSearch class="w-4 h-4 flex-shrink-0" />

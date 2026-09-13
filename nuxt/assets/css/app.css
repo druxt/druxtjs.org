@@ -37,6 +37,14 @@ button:focus-visible,
   color: hsl(var(--bc) / 0.7);
 }
 
+/* And again for padding: `.menu li>:where(a)` sets 1.25rem sides and beats the
+   `px-*` utilities on the item. Seven header items at 1.25rem overflow a
+   1280px viewport by 28px; .75rem fits with room for the search box. */
+.menu.menu-horizontal :where(li) > a {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
 /* Smooth in-page scrolling: anchor jumps, TOC links and programmatic
    scrolls glide site-wide. Route changes opt out in layouts/default.vue,
    and the reduced-motion block below forces this back to instant. */
@@ -527,4 +535,139 @@ html {
 }
 .prose :is(s, del) a {
   color: inherit;
+}
+
+/* Live example, raw output: Druxt's own unwrapped rendering, only tidied.
+   In development Druxt's debug details show; in production they render
+   nothing, and the card says so. */
+.druxt-raw > div > div > * + * {
+  margin-top: 0.75rem;
+}
+.druxt-raw details {
+  border: 1px dashed hsl(var(--b3));
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+}
+.druxt-raw details summary {
+  cursor: pointer;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: hsl(var(--bc) / 0.68);
+}
+.druxt-raw details pre {
+  margin-top: 8px;
+  font-size: 11px;
+  max-height: 240px;
+  overflow: auto;
+}
+.druxt-raw details small {
+  display: block;
+  margin-top: 8px;
+  color: hsl(var(--bc) / 0.5);
+}
+
+/* The live example's markup line borrows the prose code styling, copy button
+   included, without the prose margins around it. */
+.prose.druxt-markup .docs-code,
+.prose.druxt-markup pre {
+  margin: 0;
+}
+
+/* Props rows: label over control on a phone, side by side from `sm`. Plain
+   CSS because this Tailwind version drops multi-token arbitrary values. */
+.druxt-props-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 640px) {
+  .druxt-props-row {
+    grid-template-columns: 176px minmax(0, 1fr);
+  }
+}
+
+/* Live example, entity wrappers: Druxt's own field output, spaced and with
+   form controls in the site's style. Nested forms (references) sit in a
+   closed details, so a form stays readable. */
+.druxt-entity-fields > div + div {
+  margin-top: 0.75rem;
+}
+.druxt-entity-fields strong {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: hsl(var(--bc) / 0.7);
+}
+.druxt-entity-fields img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+.druxt-entity-form input:not([type='checkbox']):not([type='submit']),
+.druxt-entity-form textarea,
+.druxt-entity-form select {
+  display: block;
+  width: 100%;
+  border: 1px solid hsl(var(--b3));
+  border-radius: 6px;
+  background: hsl(var(--b1));
+  padding: 0.35rem 0.6rem;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.druxt-entity-form textarea {
+  min-height: 5rem;
+}
+.druxt-entity-form input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+  vertical-align: middle;
+}
+.druxt-entity-form button {
+  margin: 0.25rem 0.5rem 0 0;
+  border: 1px solid hsl(var(--b3));
+  border-radius: 6px;
+  padding: 0.3rem 0.8rem;
+  font-size: 13px;
+  font-weight: 500;
+  background: hsl(var(--b2));
+}
+.druxt-entity-form details {
+  border: 1px dashed hsl(var(--b3));
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+.druxt-entity-form details > summary {
+  cursor: pointer;
+  font-size: 12.5px;
+  color: hsl(var(--bc) / 0.7);
+}
+
+/* Live example, site wrapper: the theme's regions as labelled boxes. */
+.druxt-site-region {
+  position: relative;
+  margin-bottom: 0.75rem;
+  padding: 1.25rem 0.75rem 0.75rem;
+  border: 1px dashed hsl(var(--b3));
+  border-radius: 6px;
+}
+.druxt-site-region-name {
+  position: absolute;
+  top: 0.35rem;
+  left: 0.75rem;
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: hsl(var(--bc) / 0.55);
+}
+
+/* Live example, preview: a rendered page's code blocks scroll in place, as
+   they do in the prose, instead of past the card. */
+.druxt-preview pre {
+  max-width: 100%;
+  overflow-x: auto;
 }

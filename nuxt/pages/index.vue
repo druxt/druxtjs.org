@@ -19,6 +19,9 @@
           <NuxtLink class="btn btn-ghost gap-2" to="/modules">
             <AppIconModules class="w-5 h-5" /> Browse modules
           </NuxtLink>
+          <NuxtLink class="btn btn-ghost gap-2" to="/playground">
+            <AppIconPlayground class="w-5 h-5" /> Try the playground
+          </NuxtLink>
         </div>
         <!-- The advanced panel rewrites this command for the chosen starter kit and runner. -->
         <div class="mt-8 w-full max-w-2xl">

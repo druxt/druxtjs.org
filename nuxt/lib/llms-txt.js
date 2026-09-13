@@ -74,7 +74,7 @@ const buildLlmsTxt = (docs, options) => {
     ...PREAMBLE,
   ]
 
-  ;['tutorials', 'how-to', 'explanation', 'modules'].forEach((section) => {
+  ;['tutorials', 'how-to', 'explanation', 'modules', 'playground'].forEach((section) => {
     const entries = inSection(section)
     if (!entries.length) return
     lines.push('', '## ' + SECTIONS[section].label, '')

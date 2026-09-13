@@ -1,7 +1,7 @@
 <template>
   <section v-if="groups.length">
     <div class="flex items-baseline justify-between gap-4 mb-4">
-      <h2 class="text-xl font-semibold">API reference</h2>
+      <h2 id="api-reference" class="text-xl font-semibold">API reference</h2>
       <NuxtLink class="text-sm hover:text-primary-focus" :to="'/api/packages/' + pkg">
         All {{ total }} entries
       </NuxtLink>

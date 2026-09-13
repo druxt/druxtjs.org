@@ -51,6 +51,13 @@ export default () => ({
     children: [],
   },
   {
+    component: 'NuxtLink',
+    text: 'Playground',
+    icon: 'playground',
+    props: { to: '/playground' },
+    children: [],
+  },
+  {
     component: 'a',
     text: 'GitHub',
     icon: 'github',
