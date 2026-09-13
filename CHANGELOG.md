@@ -1,10 +1,15 @@
 # Changelog
 
 Changes to the druxtjs.org site are recorded here, newest first. The format is
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The site is deployed
-rather than released, so there are no version numbers yet.
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and, from the first
+numbered version on, the site follows [Semantic Versioning](https://semver.org/).
+Versions count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
+Druxt 1.0.0.
 
 ## Unreleased
+
+The relaunch of the site: what runs on Lagoon today. It ships as **0.9.0**,
+the first numbered version, once the relaunch stack merges.
 
 ### Added
 
@@ -78,3 +83,27 @@ rather than released, so there are no version numbers yet.
 
 - The private-host lint read a private address written as an IPv4-mapped IPv6
   literal as a public one. It now reads the IPv4 address inside.
+
+## History
+
+Before numbered versions, this repository lived one life already. The original
+site was never released or tagged, so its story is told here rather than under
+a version it never had.
+
+- **November 2020** — the repository was created as druxtjs.org's home, and
+  held little more than its issue templates for almost a year.
+- **October 2021** — the first site arrived (#3, merged as #4): a Drupal 9
+  site with the Druxt module configured, DDEV and Gitpod for development,
+  Tome for a databaseless build, and Lagoon files to deploy it. Modules,
+  a theme, site settings, pathauto and the Articles content followed within
+  the week. This is the site that served druxtjs.org until the relaunch.
+- **March 2022** — a month of care: the code of conduct, the project
+  management files and the MIT license (#5), Gitpod and DDEV script fixes
+  (#14, merged as #15), an update to Lagoon's foundry (#8, merged as #9),
+  and the first of the Renovate dependency updates (#10, #11, #19).
+- **April and May 2022** — Renovate kept the dependencies current (#20),
+  with a DDEV MTU fix alongside, until the last update on 30 May 2022 (#23).
+- **September 2026** — after four years standing still, the relaunch removed
+  the Drupal 9 site and built what now runs: the Drupal 11 documentation
+  backend, the Nuxt frontend, the playground, and the tooling described
+  above.

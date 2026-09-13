@@ -60,6 +60,16 @@ A change made through the admin UI stays in the database until you export it.
 Run `vendor/bin/drush config:export` in `drupal/`, and commit
 `drupal/config/sync/` with the change that needed it.
 
+## Releases
+
+The site is versioned by [Semantic Versioning](https://semver.org/), and
+`CHANGELOG.md` records every version. Releases before 1.0.0 count up toward
+the launch of Druxt 1.0.0, which the site will celebrate as its own 1.0.0.
+
+A release dates the changelog's Unreleased section, bumps the `version` in
+both `package.json` files, and tags the commit `v` followed by the number, for
+example `v0.9.0`.
+
 ## What not to put in a file
 
 This repository is public. Nothing that resolves only on a private network may
