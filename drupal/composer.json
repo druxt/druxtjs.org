@@ -1,0 +1,151 @@
+{
+    "name": "druxt/cms-druxtjs-org",
+    "description": "Drupal backend and content for the druxtjs.org documentation site.",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.3",
+        "codemirror/codemirror": "5.51.0",
+        "composer/installers": "^2.3",
+        "cweagans/composer-patches": "^2",
+        "drupal/admin_audit_trail": "^1.0.12",
+        "drupal/codemirror_editor": "^2.0",
+        "drupal/coffee": "^2.0",
+        "drupal/consumers": "^1.24",
+        "drupal/core-composer-scaffold": "^11",
+        "drupal/core-project-message": "^11",
+        "drupal/core-recommended": "^11",
+        "drupal/custom_formatters": "^4.1",
+        "drupal/decoupled_settings": "^1.0@beta",
+        "drupal/diff": "^2.1",
+        "drupal/druxt": "^1.3.1",
+        "drupal/environment_indicator": "^4.0",
+        "drupal/field_group": "^4.0",
+        "drupal/field_tokens": "^2.0",
+        "drupal/jsonapi_node_preview": "^1.0@beta",
+        "drupal/jsonapi_node_preview_tab": "^1.0.2",
+        "drupal/jsonapi_resources": "^1.8",
+        "drupal/layout_paragraphs": "^2.1",
+        "drupal/linkit": "^7.0",
+        "drupal/markdown_easy": "^2.0",
+        "drupal/maxlength": "^3.2",
+        "drupal/migrate_plus": "^6.0",
+        "drupal/migrate_tools": "^6.1",
+        "drupal/node_edit_protection": "^1.2",
+        "drupal/paragraphs": "^1.23",
+        "drupal/pathauto": "^1.15",
+        "drupal/redirect": "^1.13",
+        "drupal/simple_oauth": "^6.1",
+        "drupal/token": "^1.17",
+        "js-cookie/js-cookie": "3.0.5"
+    },
+    "require-dev": {
+        "drupal/core-dev": "^11",
+        "drush/drush": "^13"
+    },
+    "conflict": {
+        "drupal/drupal": "*"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "drupal/core-composer-scaffold": true,
+            "drupal/core-project-message": true,
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true,
+            "symfony/runtime": true,
+            "cweagans/composer-patches": true
+        },
+        "sort-packages": true,
+        "platform": {
+            "php": "8.3.0"
+        },
+        "preferred-install": {
+            "drupal/decoupled_settings": "source",
+            "drupal/jsonapi_node_preview": "source",
+            "*": "dist"
+        }
+    },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "codemirror/codemirror",
+                "version": "5.51.0",
+                "type": "drupal-library",
+                "dist": {
+                    "url": "https://registry.npmjs.org/codemirror/-/codemirror-5.51.0.tgz",
+                    "type": "tar",
+                    "shasum": "7746caaf5223e68f5c55ea11e2f3cc82a9a3929e"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "js-cookie/js-cookie",
+                "version": "3.0.5",
+                "type": "drupal-library",
+                "dist": {
+                    "url": "https://registry.npmjs.org/js-cookie/-/js-cookie-3.0.5.tgz",
+                    "type": "tar",
+                    "shasum": "0b7e2fd0c01552c58ba86e0841f94dc2557dcdbc"
+                }
+            }
+        },
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    ],
+    "extra": {
+        "drupal-scaffold": {
+            "locations": {
+                "web-root": "web/"
+            }
+        },
+        "installer-paths": {
+            "web/core": [
+                "type:drupal-core"
+            ],
+            "web/libraries/{$name}": [
+                "type:drupal-library"
+            ],
+            "web/modules/contrib/{$name}": [
+                "type:drupal-module"
+            ],
+            "web/profiles/contrib/{$name}": [
+                "type:drupal-profile"
+            ],
+            "web/themes/contrib/{$name}": [
+                "type:drupal-theme"
+            ],
+            "drush/Commands/contrib/{$name}": [
+                "type:drupal-drush"
+            ],
+            "web/modules/custom/{$name}": [
+                "type:drupal-custom-module"
+            ],
+            "web/themes/custom/{$name}": [
+                "type:drupal-custom-theme"
+            ]
+        },
+        "drupal-core-project-message": {
+            "include-keys": [
+                "homepage",
+                "support"
+            ]
+        },
+        "patches": {
+            "drupal/decoupled_settings": {
+                "Expose the theme's regions, and let a consumer select its theme": "https://github.com/Decipher/decoupled_settings/pull/15.diff"
+            },
+            "drupal/jsonapi_node_preview": {
+                "Issue #3367724: resolve includes from the previewed entity": "https://git.drupalcode.org/project/jsonapi_node_preview/-/merge_requests/4.diff"
+            }
+        }
+    }
+}

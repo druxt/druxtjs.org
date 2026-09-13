@@ -1,0 +1,440 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * @file
+ * Import the authored documentation from its pinned source.
+ *
+ * `../docs-source.json` names the documentation repository and the commit
+ * the site's content is built from. This fetches that commit, runs the IR
+ * builder in ../scripts over it, and imports the result into the
+ * provisioned site.
+ *
+ * The content lives in the database, not in the repository, so there is
+ * nothing to export and nothing to compare a committed copy against. What
+ * this asserts instead is that the site ends up holding a page for every
+ * document the source produced.
+ *
+ * --check refuses to build from anything but the pinned commit, which is
+ * what CI wants. Without it, DOCS_CHECKOUT can point the run at a working
+ * tree, which is what a developer iterating on the importer wants.
+ *
+ * --force seeds a site that already holds documentation this run did not
+ * create. It overwrites, so it is never what CI wants and rarely what a
+ * person wants.
+ *
+ * DOCS_CHECKOUT points this at a local clone instead of the pinned commit,
+ * for iterating on the documentation and the importer together. It is
+ * never honoured under --check, because a check that can be pointed at an
+ * uncommitted working tree is not checking the pin.
+ *
+ * DOCS_REPOSITORY replaces the clone URL alone, for a mirror that already
+ * holds the pinned commit. The commit stays the pinned one.
+ */
+
+declare(strict_types=1);
+
+namespace DocsDevTools;
+
+require_once __DIR__ . '/helpers.php';
+
+// -----------------------------------------------------------------------------
+// Variables.
+// -----------------------------------------------------------------------------
+
+$arguments = array_slice($argv, 1);
+$check = in_array('--check', $arguments, TRUE);
+$force = in_array('--force', $arguments, TRUE);
+$unknown = array_diff($arguments, ['--check', '--force']);
+if ($unknown !== []) {
+  FAIL('Unknown argument: %s.', implode(', ', $unknown));
+}
+
+/**
+ * The migrations, in the order their dependencies require.
+ */
+const MIGRATIONS = [
+  'docs_user',
+  'docs_consumer',
+  'docs_section',
+  'docs_file',
+  'docs_media',
+  'docs_paragraph_layout',
+  'docs_paragraph_text',
+  'docs_paragraph_code',
+  'docs_paragraph_diagram',
+  'docs_paragraph_callout',
+  'docs_paragraph_image',
+  'docs_page',
+  'docs_alias',
+  'docs_menu_section',
+  'docs_menu_page',
+  'docs_menu_footer',
+];
+$repo_root = dirname(getcwd());
+$pin_file = $repo_root . '/docs-source.json';
+$source_dir = $repo_root . '/.docs-source';
+$ir_dir = $repo_root . '/.docs-ir';
+
+// -----------------------------------------------------------------------------
+
+echo '===============================' . PHP_EOL;
+echo '          📥 IMPORT            ' . PHP_EOL;
+echo '===============================' . PHP_EOL;
+echo PHP_EOL;
+
+// -----------------------------------------------------------------------------
+// The pin.
+// -----------------------------------------------------------------------------
+
+TASK('Reading the documentation source pin at %s.', $pin_file);
+$pin = read_pin($pin_file);
+PASS('Pinned to %s at %s.', $pin['repository'], $pin['ref']);
+
+// -----------------------------------------------------------------------------
+// The checkout.
+// -----------------------------------------------------------------------------
+
+$from_pin = FALSE;
+$checkout = resolve_env_value('DOCS_CHECKOUT', '')[0];
+if ($checkout !== '' && $check) {
+  FAIL('DOCS_CHECKOUT is set, and --check only ever builds from the pinned commit. Unset it to check the pin, or drop --check to build from the working tree.');
+}
+
+if ($checkout !== '') {
+  TASK('Using the documentation checkout at %s.', $checkout);
+  if (!is_dir($checkout . '/.git') && !is_file($checkout . '/.git')) {
+    FAIL('DOCS_CHECKOUT %s is not a git checkout. The IR builder lists the corpus with git, so it needs one.', $checkout);
+  }
+  $head = git_output($checkout, 'rev-parse HEAD');
+  if ($head === $pin['ref']) {
+    PASS('The checkout is at the pinned commit.');
+  }
+  else {
+    NOTE('The checkout is at %s, not the pinned %s. The content this produces belongs to the working tree, not the pin.', substr($head, 0, 12), substr($pin['ref'], 0, 12));
+  }
+}
+else {
+  $repository = resolve_env_value('DOCS_REPOSITORY', $pin['repository'])[0];
+  command_must_exist('git');
+  TASK('Fetching the pinned commit into %s.', $source_dir);
+  fetch_pinned($source_dir, $repository, $pin['ref']);
+  $checkout = $source_dir;
+  $from_pin = TRUE;
+  PASS('Checked out %s.', $pin['ref']);
+}
+
+// -----------------------------------------------------------------------------
+// The intermediate representation.
+// -----------------------------------------------------------------------------
+
+$builder = $repo_root . '/scripts/build-ir.mjs';
+TASK('Building the intermediate representation with %s.', $builder);
+if (!is_file($builder)) {
+  FAIL('The IR builder is missing: %s.', $builder);
+}
+command_must_exist('node');
+// Checked here because the builder's own failure would name a module, not
+// the step that installs it.
+$node_modules = $repo_root . '/node_modules';
+if (!is_dir($node_modules . '/github-slugger')) {
+  FAIL('github-slugger is not installed under %s. Run `npm ci` in %s first.', $node_modules, $repo_root);
+}
+if (is_dir($ir_dir)) {
+  remove_directory($ir_dir);
+}
+passthru_or_fail(
+  sprintf('node %s --source %s --out %s', escapeshellarg($builder), escapeshellarg($checkout), escapeshellarg($ir_dir)),
+  'The IR builder failed. Nothing was imported.',
+);
+$documents = glob($ir_dir . '/*.json') ?: [];
+if ($documents === []) {
+  FAIL('The IR builder exited 0 but wrote no documents to %s.', $ir_dir);
+}
+PASS('%d documents written to %s.', count($documents), $ir_dir);
+
+// The import below counts pages against this document count, and both come
+// from the build above, so a build that quietly produced fewer documents
+// would agree with itself. This compares the documents against the pinned
+// checkout's tracked files and against the committed baseline, which are
+// two sources the builder does not control. Skipped for DOCS_CHECKOUT,
+// where the baseline legitimately describes a different commit.
+if ($from_pin) {
+  TASK('Checking the documents against the pinned corpus and the baseline.');
+  passthru_or_fail(
+    sprintf(
+      'node %s --corpus --root %s --ir %s --source %s',
+      escapeshellarg($repo_root . '/scripts/validate-content.mjs'),
+      escapeshellarg($repo_root),
+      escapeshellarg($ir_dir),
+      escapeshellarg($checkout),
+    ),
+    'The corpus check failed. Nothing was imported.',
+  );
+  PASS('The documents match the pinned corpus.');
+}
+else {
+  NOTE('Skipping the corpus check: the baseline describes the pinned commit, not this checkout.');
+}
+
+// -----------------------------------------------------------------------------
+// The import.
+// -----------------------------------------------------------------------------
+
+if (!is_file('vendor/bin/drush')) {
+  FAIL('vendor/bin/drush is missing. Run .devtools/assemble and .devtools/provision first.');
+}
+
+// Block previews style code with a copy of the frontend's stylesheet, so a
+// copy that has drifted from the pinned frontend stops the run.
+TASK('Checking the preview stylesheet against the frontend at %s.', $checkout);
+$frontend_css = $checkout . '/docs/nuxt/assets/css/code.css';
+$preview_css = 'web/modules/custom/druxt_docs/css/code.css';
+if (!is_file($frontend_css)) {
+  NOTE('The checkout has no docs/nuxt/assets/css/code.css, so there is nothing to compare.');
+}
+elseif (file_get_contents($frontend_css) === file_get_contents($preview_css)) {
+  PASS('Identical.');
+}
+elseif ($from_pin) {
+  FAIL('%s differs from the frontend at the pinned commit. Copy it over: cp %s %s', $preview_css, $frontend_css, $preview_css);
+}
+else {
+  NOTE('%s differs from the frontend in DOCS_CHECKOUT, which may be ahead of the pin.', $preview_css);
+}
+
+// The database is the source of truth, so seeding is not a thing to do
+// twice by accident. Migrate skips rows already in its map, so a plain
+// re-run leaves alone anything an editor has changed since. What it cannot
+// see is documentation the site got some other way, and writing over that
+// would be silent. Counted rather than assumed, and refused rather than
+// warned about.
+TASK('Checking the site holds no documentation this run did not create.');
+$expression = <<<'PHP'
+$db = \Drupal::database();
+$pages = (int) $db->select('node_field_data', 'n')->condition('n.type', 'doc_page')->countQuery()->execute()->fetchField();
+$seeded = 0;
+if ($db->schema()->tableExists('migrate_map_docs_page')) {
+  $seeded = (int) $db->select('migrate_map_docs_page', 'm')->isNotNull('m.destid1')->countQuery()->execute()->fetchField();
+}
+echo $pages - $seeded;
+PHP;
+$unaccounted = trim(drush('php:eval %s', [$expression]));
+if (!preg_match('/(-?\d+)\s*$/', $unaccounted, $matches)) {
+  FAIL('Could not count the documentation already on the site. Drush answered: %s', $unaccounted);
+}
+$unaccounted = (int) $matches[1];
+if ($unaccounted > 0 && !$force) {
+  FAIL('The site holds %d documentation page(s) this run did not create. Seeding over them would overwrite whoever wrote them. Roll the migrations back, or pass --force to overwrite deliberately.', $unaccounted);
+}
+if ($unaccounted > 0) {
+  NOTE('Overwriting %d documentation page(s) this run did not create, because --force was given.', $unaccounted);
+}
+else {
+  PASS('Nothing to overwrite.');
+}
+
+TASK('Pointing the migrations at %s.', $ir_dir);
+drush('state:set %s %s', ['druxt_docs.ir_directory', $ir_dir]);
+PASS('Set.');
+
+foreach (MIGRATIONS as $migration) {
+  TASK('Running %s.', $migration);
+  $output = drush('migrate:import %s', [$migration], $exit_code);
+  if ($exit_code !== 0 || preg_match('/\b([1-9]\d*) failed\b/', $output)) {
+    // Migrate reports a failed row and still exits zero, so the count is
+    // read as well as the status. A run that imports nothing also exits
+    // zero, which the page count below is what catches.
+    FAIL_NO_EXIT('%s did not import cleanly:', $migration);
+    echo trim($output) . PHP_EOL;
+    echo trim(drush('migrate:messages %s', [$migration], $ignored)) . PHP_EOL;
+    quit(1);
+  }
+  PASS('Done.');
+}
+
+// -----------------------------------------------------------------------------
+// What the site ends up holding.
+// -----------------------------------------------------------------------------
+
+// Migrate has no notion of a source row that disappears: it imports what
+// it finds and leaves behind what it made earlier. The importer's own
+// prune deleted any page not in the corpus, which was right when the
+// repository was authoritative and is wrong now, because it would also
+// delete a page an editor wrote. So this reports rather than deletes, and
+// removing a page from the corpus becomes a deliberate act.
+TASK('Checking for pages the corpus no longer has.');
+$sources = array_map(
+  static fn(string $file): string => (string) (json_decode((string) file_get_contents($file), TRUE)['source'] ?? ''),
+  $documents,
+);
+$sources_file = $ir_dir . '/.sources.json';
+file_put_contents($sources_file, json_encode(array_values(array_filter($sources))));
+$expression = sprintf(
+  '$k = array_flip(json_decode(file_get_contents(%s), TRUE)); $s = []; foreach (\Drupal::database()->select("migrate_map_docs_page", "m")->fields("m", ["sourceid1"])->isNotNull("m.destid1")->execute()->fetchCol() as $id) { if (!isset($k[$id])) { $s[] = $id; } } echo implode("|", $s);',
+  var_export($sources_file, TRUE),
+);
+$stale = trim(drush('php:eval %s', [$expression]));
+unlink($sources_file);
+if ($stale !== '') {
+  $names = explode('|', $stale);
+  FAIL_NO_EXIT('The site holds %d page(s) this migration created that the corpus no longer has:', count($names));
+  foreach ($names as $name) {
+    echo '  ' . $name . PHP_EOL;
+  }
+  NOTE('Roll the migrations back and seed again, so the removal is deliberate. Nothing is deleted here, because a page an editor wrote would look the same from a query.');
+  quit(1);
+}
+PASS('None.');
+
+// A run that imports nothing exits 0 just as happily as one that imports
+// everything, so this counts the result rather than trusting the exit code.
+TASK('Counting the documentation pages the site now holds.');
+$expression = "echo \\Drupal::entityQuery('node')->accessCheck(FALSE)->condition('type', 'doc_page')->count()->execute();";
+$counted = drush('php:eval %s', [$expression]);
+if (!preg_match('/(\d+)\s*$/', trim($counted), $matches)) {
+  FAIL('Could not read a page count from drush. It answered: %s', trim($counted));
+}
+$imported = (int) $matches[1];
+if ($imported !== count($documents)) {
+  FAIL('The source produced %d documents and the site holds %d documentation pages. The import did not write what it read.', count($documents), $imported);
+}
+PASS('%d documentation pages.', $imported);
+
+// field_toc is computed from a page's paragraphs whenever it is read, and
+// build-ir.mjs computes the same headings from the markdown. They are two
+// implementations of one rule, so a page they disagree about stops the run,
+// the way a drifted stylesheet does above.
+TASK('Checking every page\'s computed table of contents against the IR.');
+$toc_file = $ir_dir . '/.toc.json';
+$expression = sprintf(
+  '$t = []; foreach (\Drupal::entityTypeManager()->getStorage("node")->loadByProperties(["type" => "doc_page"]) as $n) { $t[$n->get("field_source_path")->value] = $n->get("field_toc")->getValue(); } file_put_contents(%s, json_encode($t));',
+  var_export($toc_file, TRUE),
+);
+drush('php:eval %s', [$expression]);
+$computed = json_decode((string) @file_get_contents($toc_file), TRUE);
+@unlink($toc_file);
+if (!is_array($computed)) {
+  FAIL('Could not read the computed tables of contents back from the site.');
+}
+$show = static fn(?array $entry): string => $entry === NULL ? 'nothing' : (string) json_encode($entry, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+$drifted = [];
+$entries = 0;
+foreach ($documents as $file) {
+  $document = json_decode((string) file_get_contents($file), TRUE);
+  $expected = $document['toc'] ?? [];
+  $actual = $computed[$document['source']] ?? [];
+  $entries += count($expected);
+  for ($i = 0; $i < max(count($expected), count($actual)); $i++) {
+    if (($expected[$i] ?? NULL) !== ($actual[$i] ?? NULL)) {
+      $drifted[] = sprintf('%s, entry %d: the IR has %s, the site computes %s', $document['source'], $i + 1, $show($expected[$i] ?? NULL), $show($actual[$i] ?? NULL));
+      break;
+    }
+  }
+}
+if ($drifted !== []) {
+  FAIL_NO_EXIT('The site computes a different table of contents from the IR on %d page(s):', count($drifted));
+  foreach ($drifted as $line) {
+    echo '  ' . $line . PHP_EOL;
+  }
+  NOTE('TableOfContents in druxt_docs and buildToc() in scripts/build-ir.mjs have to change together. On a site an editor has worked in, their edits show here too.');
+  quit(1);
+}
+PASS('%d pages, %d entries, all as the IR has them.', count($documents), $entries);
+
+echo PHP_EOL;
+echo '===============================' . PHP_EOL;
+echo '     📥 IMPORT COMPLETE  ✅   ' . PHP_EOL;
+echo '===============================' . PHP_EOL;
+echo PHP_EOL;
+echo 'Source:    ' . $checkout . PHP_EOL;
+echo 'Documents: ' . count($documents) . PHP_EOL;
+echo 'Pages:     ' . $imported . PHP_EOL;
+echo PHP_EOL;
+
+// -----------------------------------------------------------------------------
+// Helpers local to this script.
+// -----------------------------------------------------------------------------
+
+/**
+ * Read and validate the pin file.
+ *
+ * @return array{repository: string, ref: string}
+ *   The pin.
+ */
+function read_pin(string $file): array {
+  if (!is_file($file)) {
+    FAIL('No pin file at %s. It names the documentation repository and commit this content is built from.', $file);
+  }
+  $raw = (string) file_get_contents($file);
+  $pin = json_decode($raw, TRUE);
+  if (!is_array($pin)) {
+    FAIL('%s is not a JSON object.', $file);
+  }
+  foreach (['repository', 'ref'] as $key) {
+    if (!isset($pin[$key]) || !is_string($pin[$key]) || $pin[$key] === '') {
+      FAIL('%s is missing "%s".', $file, $key);
+    }
+  }
+  if (!preg_match('/^[0-9a-f]{40}$/', $pin['ref'])) {
+    FAIL('%s pins "%s", which is not a full commit sha. Branch names and tags move; the pin has to name exactly one commit.', $file, $pin['ref']);
+  }
+  return $pin;
+}
+
+/**
+ * Check out exactly one commit of a repository, reusing it when present.
+ */
+function fetch_pinned(string $dir, string $repository, string $ref): void {
+  if (is_dir($dir . '/.git')) {
+    $head = git_output($dir, 'rev-parse HEAD', FALSE);
+    $dirty = git_output($dir, 'status --porcelain', FALSE);
+    // A checkout fetched before page dates came from history is shallow,
+    // and reusing it would stop the build at the full-history check.
+    $shallow = git_output($dir, 'rev-parse --is-shallow-repository', FALSE);
+    if ($head === $ref && $dirty === '' && $shallow !== 'true') {
+      NOTE('Already checked out.');
+      return;
+    }
+    remove_directory($dir);
+  }
+  if (!mkdir($dir, 0777, TRUE) && !is_dir($dir)) {
+    FAIL('Unable to create %s.', $dir);
+  }
+  git_run($dir, 'init -q');
+  // The whole history, not --depth 1: page dates come from it, and a shallow
+  // fetch dates every page to the fetch itself.
+  git_run($dir, sprintf('fetch -q %s %s', escapeshellarg($repository), $ref), sprintf('Could not fetch %s from %s. If the commit lives on a mirror, set DOCS_REPOSITORY to the mirror URL.', $ref, $repository));
+  git_run($dir, 'checkout -q FETCH_HEAD');
+}
+
+/**
+ * Run a git command in a directory, failing on error.
+ */
+function git_run(string $dir, string $arguments, string $failure = ''): void {
+  passthru(sprintf('git -C %s %s', escapeshellarg($dir), $arguments), $exit_code);
+  if ($exit_code !== 0) {
+    FAIL($failure !== '' ? $failure : sprintf('git %s failed in %s.', $arguments, $dir));
+  }
+}
+
+/**
+ * Capture a git command's trimmed output.
+ */
+function git_output(string $dir, string $arguments, bool $must_succeed = TRUE): string {
+  exec(sprintf('git -C %s %s 2>/dev/null', escapeshellarg($dir), $arguments), $output, $exit_code);
+  if ($exit_code !== 0 && $must_succeed) {
+    FAIL('git %s failed in %s.', $arguments, $dir);
+  }
+  return trim(implode(PHP_EOL, $output));
+}
+
+/**
+ * Delete a directory this script created.
+ */
+function remove_directory(string $dir): void {
+  passthru(sprintf('rm -rf %s', escapeshellarg($dir)), $exit_code);
+  if ($exit_code !== 0) {
+    FAIL('Unable to remove %s.', $dir);
+  }
+}
