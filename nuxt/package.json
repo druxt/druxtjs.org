@@ -48,7 +48,8 @@
     "tailwindcss": "^2.2.19"
   },
   "resolutions": {
-    "vue-template-compiler": "2.7.16"
+    "vue-template-compiler": "2.7.16",
+    "ws": "7.5.11"
   },
   "packageManager": "yarn@3.8.7",
   "engines": {
