@@ -1,0 +1,15 @@
+{
+  "name": "cms.druxtjs.org",
+  "private": true,
+  "description": "Drupal backend and content for the druxtjs.org documentation site",
+  "license": "MIT",
+  "scripts": {
+    "lint:private": "node scripts/lint-private-refs.mjs",
+    "survey:content": "node scripts/survey-content.mjs --source .docs-source --json scripts/content-baseline.json",
+    "test:unit": "node --test \"tests/*.test.mjs\"",
+    "validate:content": "node scripts/validate-content.mjs"
+  },
+  "devDependencies": {
+    "github-slugger": "1.5.0"
+  }
+}

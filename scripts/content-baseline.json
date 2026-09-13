@@ -1,0 +1,1484 @@
+{
+  "measuredAt": "2026-09-07",
+  "ref": "e7bddfe32f5c00083a4eb650f1106414279442d3",
+  "totals": {
+    "pages": 38,
+    "sections": 4,
+    "internalLinkInstances": 300,
+    "distinctInternalTargets": 65,
+    "distinctImages": 16
+  },
+  "bySection": {
+    "explanation": 11,
+    "how-to": 16,
+    "modules": 5,
+    "tutorials": 6
+  },
+  "frontmatterKeys": {
+    "description": 38,
+    "title": 38,
+    "weight": 37
+  },
+  "blockKinds": {
+    "paragraph": 409,
+    "heading": 212,
+    "code": 94,
+    "list": 85,
+    "table": 26,
+    "image": 16,
+    "callout": 14,
+    "output": 9,
+    "diagram": 6,
+    "blockquote": 3,
+    "html": 1,
+    "rule": 1
+  },
+  "fenceLanguages": {
+    "js": 38,
+    "sh": 29,
+    "vue": 17,
+    "mermaid": 6,
+    "text": 5,
+    "nginx": 2,
+    "html": 1,
+    "json": 1,
+    "yaml": 1
+  },
+  "nestedFenceLanguages": {
+    "vue": 4,
+    "js": 2,
+    "sh": 2,
+    "text": 1
+  },
+  "calloutLeads": {
+    "Before you start": 14
+  },
+  "htmlBlocks": [
+    {
+      "file": "docs/nuxt/content/explanation/deployment-models.md",
+      "line": 21,
+      "opening": "<div class=\"docs-diagram-row\">"
+    }
+  ],
+  "images": [
+    {
+      "src": "/images/backend-consumers.png",
+      "refs": 1,
+      "alt": [
+        "The Consumers administration screen listing one client with its Client ID, label and per-environment callback redirect URIs"
+      ]
+    },
+    {
+      "src": "/images/backend-jsonapi-settings.png",
+      "refs": 1,
+      "alt": [
+        "Drupal's JSON:API settings form with the accept-all-operations option selected"
+      ]
+    },
+    {
+      "src": "/images/backend-permissions.png",
+      "refs": 1,
+      "alt": [
+        "The Drupal permissions table filtered to DruxtJS, with Access DruxtJS JSON:API resources checked for the Anonymous user role"
+      ]
+    },
+    {
+      "src": "/images/backend-scopes.png",
+      "refs": 1,
+      "alt": [
+        "The Add scope form: machine-readable name, description, grant type checkboxes, and the field mapping the scope to a role"
+      ]
+    },
+    {
+      "src": "/images/devtools-inspector.png",
+      "refs": 1,
+      "alt": [
+        "The DruxtJS inspector's Connection details node, showing the configured baseUrl and endpoint and the computed JSON:API address"
+      ]
+    },
+    {
+      "src": "/images/devtools-scaffold.png",
+      "refs": 1,
+      "alt": [
+        "The recipe's $theme list with the save action revealed beside the unregistered DruxtEntityNodeRecipeFullViewEn suggestion"
+      ]
+    },
+    {
+      "src": "/images/devtools-theme.png",
+      "refs": 1,
+      "alt": [
+        "A recipe's DruxtEntity selected in the component tree above its DruxtField children, with the state pane's druxt section showing $theme resolved to DruxtEntityNodeRecipe above its ordered suggestion list"
+      ]
+    },
+    {
+      "src": "/images/examples-content-ops-console.png",
+      "refs": 1,
+      "alt": [
+        "Content Ops Console: a dark sidebar next to a dense editorial table with inline difficulty/prep-time editing and a \"needs attention\" filter, showing real content from the backend"
+      ]
+    },
+    {
+      "src": "/images/examples-druxt-site.png",
+      "refs": 1,
+      "alt": [
+        "The druxt-site /examples index, listing ten technical pattern pages"
+      ]
+    },
+    {
+      "src": "/images/examples-meal-planner.png",
+      "refs": 1,
+      "alt": [
+        "Meal Planner: a recipe library on the left and a seven-day drag-and-drop planning grid on the right, with live totals"
+      ]
+    },
+    {
+      "src": "/images/examples-recipe-box.png",
+      "refs": 1,
+      "alt": [
+        "Recipe Box: a mobile discovery deck showing a recipe card with category filter chips and a saved-count badge"
+      ]
+    },
+    {
+      "src": "/images/getting-started-fresh-site.png",
+      "refs": 1,
+      "alt": [
+        "The fresh quickstart frontend, with the site name and menu above dashed dev-mode placeholders and Drupal's no-front-page-content message"
+      ]
+    },
+    {
+      "src": "/images/storybook-entity-story.png",
+      "refs": 1,
+      "alt": [
+        "A recipe's full display story rendering live Umami content, its summary, category, tags and timing fields, with the uuid control set to a real recipe"
+      ]
+    },
+    {
+      "src": "/images/storybook-tree.png",
+      "refs": 1,
+      "alt": [
+        "The Storybook sidebar with generated groups for Blocks, Entity, Menu and Views, each expanded to show components and stories built from the backend"
+      ]
+    },
+    {
+      "src": "/images/theming-druxt-wrapper.png",
+      "refs": 1,
+      "alt": [
+        "Example DruxtWrapper in Vue dev tools"
+      ]
+    },
+    {
+      "src": "/images/vuejs-devtools.png",
+      "refs": 1,
+      "alt": [
+        "Vue.js Devtools showing the DruxtJS integration"
+      ]
+    }
+  ],
+  "links": {
+    "internalMigrated": [
+      {
+        "target": "/explanation/component-resolution",
+        "count": 20,
+        "sources": [
+          "docs/nuxt/content/explanation/README.md",
+          "docs/nuxt/content/explanation/architecture.md",
+          "docs/nuxt/content/explanation/nuxt-for-drupal-developers.md",
+          "docs/nuxt/content/explanation/schemas.md",
+          "docs/nuxt/content/how-to/devtools.md",
+          "docs/nuxt/content/how-to/multilingual.md",
+          "docs/nuxt/content/how-to/storybook.md",
+          "docs/nuxt/content/how-to/theming.md",
+          "docs/nuxt/content/modules/druxt/deprecations.md",
+          "docs/nuxt/content/modules/entity/deprecations.md",
+          "docs/nuxt/content/modules/menu/deprecations.md",
+          "docs/nuxt/content/tutorials/first-custom-module.md",
+          "docs/nuxt/content/tutorials/theme-your-front-page.md"
+        ]
+      },
+      {
+        "target": "/tutorials/getting-started",
+        "count": 20,
+        "sources": [
+          "docs/nuxt/content/explanation/drupal-for-nuxt-developers.md",
+          "docs/nuxt/content/explanation/nuxt-for-drupal-developers.md",
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/devtools.md",
+          "docs/nuxt/content/how-to/multilingual.md",
+          "docs/nuxt/content/how-to/prepare-the-backend.md",
+          "docs/nuxt/content/how-to/proxy.md",
+          "docs/nuxt/content/how-to/storybook.md",
+          "docs/nuxt/content/how-to/theming.md",
+          "docs/nuxt/content/how-to/troubleshooting.md",
+          "docs/nuxt/content/how-to/use-the-druxt-client.md",
+          "docs/nuxt/content/tutorials/README.md",
+          "docs/nuxt/content/tutorials/authentication.md",
+          "docs/nuxt/content/tutorials/deploy-your-site.md",
+          "docs/nuxt/content/tutorials/first-custom-module.md",
+          "docs/nuxt/content/tutorials/theme-your-front-page.md"
+        ]
+      },
+      {
+        "target": "/how-to/theming",
+        "count": 18,
+        "sources": [
+          "docs/nuxt/content/explanation/architecture.md",
+          "docs/nuxt/content/explanation/component-resolution.md",
+          "docs/nuxt/content/explanation/nuxt-for-drupal-developers.md",
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/devtools.md",
+          "docs/nuxt/content/how-to/example-apps.md",
+          "docs/nuxt/content/how-to/prepare-the-backend.md",
+          "docs/nuxt/content/how-to/storybook.md",
+          "docs/nuxt/content/how-to/troubleshooting.md",
+          "docs/nuxt/content/modules/entity/deprecations.md",
+          "docs/nuxt/content/tutorials/first-custom-module.md",
+          "docs/nuxt/content/tutorials/getting-started.md",
+          "docs/nuxt/content/tutorials/theme-your-front-page.md"
+        ]
+      },
+      {
+        "target": "/how-to/configure-cors",
+        "count": 18,
+        "sources": [
+          "docs/nuxt/content/explanation/deployment-models.md",
+          "docs/nuxt/content/explanation/drupal-for-nuxt-developers.md",
+          "docs/nuxt/content/explanation/request-topology.md",
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/authentication.md",
+          "docs/nuxt/content/how-to/deploy-static.md",
+          "docs/nuxt/content/how-to/prepare-the-backend.md",
+          "docs/nuxt/content/how-to/proxy.md",
+          "docs/nuxt/content/how-to/storybook.md",
+          "docs/nuxt/content/how-to/troubleshooting.md",
+          "docs/nuxt/content/tutorials/deploy-your-site.md"
+        ]
+      },
+      {
+        "target": "/how-to/proxy",
+        "count": 16,
+        "sources": [
+          "docs/nuxt/content/explanation/deployment-models.md",
+          "docs/nuxt/content/explanation/request-topology.md",
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/authentication.md",
+          "docs/nuxt/content/how-to/configure-cors.md",
+          "docs/nuxt/content/how-to/deploy-server.md",
+          "docs/nuxt/content/how-to/deploy-static.md",
+          "docs/nuxt/content/how-to/prepare-the-backend.md",
+          "docs/nuxt/content/how-to/troubleshooting.md",
+          "docs/nuxt/content/tutorials/theme-your-front-page.md"
+        ]
+      },
+      {
+        "target": "/explanation/request-topology",
+        "count": 12,
+        "sources": [
+          "docs/nuxt/content/explanation/README.md",
+          "docs/nuxt/content/explanation/deployment-models.md",
+          "docs/nuxt/content/explanation/nuxt-for-drupal-developers.md",
+          "docs/nuxt/content/how-to/configure-cors.md",
+          "docs/nuxt/content/how-to/prepare-the-backend.md",
+          "docs/nuxt/content/how-to/proxy.md",
+          "docs/nuxt/content/how-to/troubleshooting.md"
+        ]
+      },
+      {
+        "target": "/explanation/schemas",
+        "count": 11,
+        "sources": [
+          "docs/nuxt/content/explanation/README.md",
+          "docs/nuxt/content/explanation/architecture.md",
+          "docs/nuxt/content/explanation/drupal-for-nuxt-developers.md",
+          "docs/nuxt/content/explanation/nuxt-for-drupal-developers.md",
+          "docs/nuxt/content/explanation/request-topology.md",
+          "docs/nuxt/content/explanation/routing.md",
+          "docs/nuxt/content/how-to/prepare-the-backend.md",
+          "docs/nuxt/content/how-to/troubleshooting.md",
+          "docs/nuxt/content/how-to/use-the-druxt-client.md"
+        ]
+      },
+      {
+        "target": "/explanation/druxt-store",
+        "count": 10,
+        "sources": [
+          "docs/nuxt/content/explanation/README.md",
+          "docs/nuxt/content/explanation/architecture.md",
+          "docs/nuxt/content/explanation/nuxt-for-drupal-developers.md",
+          "docs/nuxt/content/explanation/request-topology.md",
+          "docs/nuxt/content/explanation/routing.md",
+          "docs/nuxt/content/explanation/schemas.md",
+          "docs/nuxt/content/how-to/authentication.md",
+          "docs/nuxt/content/modules/router/deprecations.md"
+        ]
+      },
+      {
+        "target": "/explanation/routing",
+        "count": 9,
+        "sources": [
+          "docs/nuxt/content/explanation/README.md",
+          "docs/nuxt/content/explanation/architecture.md",
+          "docs/nuxt/content/explanation/druxt-store.md",
+          "docs/nuxt/content/explanation/nuxt-for-drupal-developers.md",
+          "docs/nuxt/content/how-to/authentication.md",
+          "docs/nuxt/content/how-to/multilingual.md",
+          "docs/nuxt/content/how-to/troubleshooting.md"
+        ]
+      },
+      {
+        "target": "/explanation/deployment-models",
+        "count": 8,
+        "sources": [
+          "docs/nuxt/content/explanation/README.md",
+          "docs/nuxt/content/explanation/request-topology.md",
+          "docs/nuxt/content/how-to/deploy-server.md",
+          "docs/nuxt/content/how-to/deploy-static.md",
+          "docs/nuxt/content/tutorials/deploy-your-site.md"
+        ]
+      },
+      {
+        "target": "/how-to/prepare-the-backend",
+        "count": 8,
+        "sources": [
+          "docs/nuxt/content/explanation/architecture.md",
+          "docs/nuxt/content/explanation/drupal-for-nuxt-developers.md",
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/environment-variables.md",
+          "docs/nuxt/content/how-to/troubleshooting.md",
+          "docs/nuxt/content/tutorials/deploy-your-site.md"
+        ]
+      },
+      {
+        "target": "/how-to/troubleshooting",
+        "count": 8,
+        "sources": [
+          "docs/nuxt/content/explanation/request-topology.md",
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/configure-cors.md",
+          "docs/nuxt/content/how-to/upgrade.md",
+          "docs/nuxt/content/tutorials/deploy-your-site.md",
+          "docs/nuxt/content/tutorials/getting-started.md"
+        ]
+      },
+      {
+        "target": "/how-to/environment-variables",
+        "count": 7,
+        "sources": [
+          "docs/nuxt/content/explanation/deployment-models.md",
+          "docs/nuxt/content/explanation/request-topology.md",
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/deploy-server.md",
+          "docs/nuxt/content/how-to/deploy-static.md"
+        ]
+      },
+      {
+        "target": "/explanation/drupal-for-nuxt-developers",
+        "count": 6,
+        "sources": [
+          "docs/nuxt/content/explanation/README.md",
+          "docs/nuxt/content/explanation/nuxt-for-drupal-developers.md",
+          "docs/nuxt/content/how-to/authentication.md",
+          "docs/nuxt/content/how-to/prepare-the-backend.md",
+          "docs/nuxt/content/tutorials/getting-started.md"
+        ]
+      },
+      {
+        "target": "/how-to/deploy-static",
+        "count": 6,
+        "sources": [
+          "docs/nuxt/content/explanation/deployment-models.md",
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/environment-variables.md",
+          "docs/nuxt/content/how-to/proxy.md",
+          "docs/nuxt/content/how-to/storybook.md",
+          "docs/nuxt/content/tutorials/deploy-your-site.md"
+        ]
+      },
+      {
+        "target": "/tutorials/deploy-your-site",
+        "count": 6,
+        "sources": [
+          "docs/nuxt/content/explanation/deployment-models.md",
+          "docs/nuxt/content/how-to/deploy-static.md",
+          "docs/nuxt/content/tutorials/README.md",
+          "docs/nuxt/content/tutorials/authentication.md",
+          "docs/nuxt/content/tutorials/getting-started.md",
+          "docs/nuxt/content/tutorials/theme-your-front-page.md"
+        ]
+      },
+      {
+        "target": "/tutorials/authentication",
+        "count": 6,
+        "sources": [
+          "docs/nuxt/content/how-to/authentication.md",
+          "docs/nuxt/content/how-to/example-apps.md",
+          "docs/nuxt/content/tutorials/README.md",
+          "docs/nuxt/content/tutorials/getting-started.md",
+          "docs/nuxt/content/tutorials/theme-your-front-page.md"
+        ]
+      },
+      {
+        "target": "/explanation/architecture",
+        "count": 5,
+        "sources": [
+          "docs/nuxt/content/explanation/README.md",
+          "docs/nuxt/content/explanation/nuxt-for-drupal-developers.md",
+          "docs/nuxt/content/how-to/example-apps.md",
+          "docs/nuxt/content/tutorials/authentication.md",
+          "docs/nuxt/content/tutorials/getting-started.md"
+        ]
+      },
+      {
+        "target": "/how-to/devtools",
+        "count": 5,
+        "sources": [
+          "docs/nuxt/content/explanation/component-resolution.md",
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/theming.md",
+          "docs/nuxt/content/tutorials/theme-your-front-page.md"
+        ]
+      },
+      {
+        "target": "/how-to/deploy-server",
+        "count": 5,
+        "sources": [
+          "docs/nuxt/content/explanation/deployment-models.md",
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/authentication.md",
+          "docs/nuxt/content/how-to/deploy-static.md"
+        ]
+      },
+      {
+        "target": "/how-to/use-the-druxt-client",
+        "count": 5,
+        "sources": [
+          "docs/nuxt/content/explanation/deployment-models.md",
+          "docs/nuxt/content/explanation/druxt-store.md",
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/multilingual.md"
+        ]
+      },
+      {
+        "target": "/how-to/upgrade",
+        "count": 5,
+        "sources": [
+          "docs/nuxt/content/explanation/support-and-versioning.md",
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/modules/druxt/deprecations.md",
+          "docs/nuxt/content/modules/entity/deprecations.md",
+          "docs/nuxt/content/modules/router/deprecations.md"
+        ]
+      },
+      {
+        "target": "/how-to/example-apps",
+        "count": 5,
+        "sources": [
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/theming.md",
+          "docs/nuxt/content/tutorials/authentication.md",
+          "docs/nuxt/content/tutorials/theme-your-front-page.md"
+        ]
+      },
+      {
+        "target": "/tutorials/first-custom-module",
+        "count": 5,
+        "sources": [
+          "docs/nuxt/content/how-to/theming.md",
+          "docs/nuxt/content/modules/entity/deprecations.md",
+          "docs/nuxt/content/tutorials/README.md",
+          "docs/nuxt/content/tutorials/deploy-your-site.md",
+          "docs/nuxt/content/tutorials/theme-your-front-page.md"
+        ]
+      },
+      {
+        "target": "/tutorials/theme-your-front-page",
+        "count": 4,
+        "sources": [
+          "docs/nuxt/content/explanation/component-resolution.md",
+          "docs/nuxt/content/how-to/theming.md",
+          "docs/nuxt/content/tutorials/README.md",
+          "docs/nuxt/content/tutorials/getting-started.md"
+        ]
+      },
+      {
+        "target": "/modules/druxt/deprecations",
+        "count": 4,
+        "sources": [
+          "docs/nuxt/content/explanation/druxt-store.md",
+          "docs/nuxt/content/explanation/support-and-versioning.md",
+          "docs/nuxt/content/how-to/upgrade.md"
+        ]
+      },
+      {
+        "target": "/explanation/nuxt-for-drupal-developers",
+        "count": 3,
+        "sources": [
+          "docs/nuxt/content/explanation/README.md",
+          "docs/nuxt/content/explanation/drupal-for-nuxt-developers.md",
+          "docs/nuxt/content/tutorials/getting-started.md"
+        ]
+      },
+      {
+        "target": "/how-to/storybook",
+        "count": 3,
+        "sources": [
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/devtools.md",
+          "docs/nuxt/content/how-to/example-apps.md"
+        ]
+      },
+      {
+        "target": "/how-to/authentication",
+        "count": 3,
+        "sources": [
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/how-to/deploy-server.md",
+          "docs/nuxt/content/how-to/proxy.md"
+        ]
+      },
+      {
+        "target": "/explanation/request-topology#baseurl-rules",
+        "count": 3,
+        "sources": [
+          "docs/nuxt/content/how-to/environment-variables.md",
+          "docs/nuxt/content/how-to/troubleshooting.md"
+        ]
+      },
+      {
+        "target": "/how-to",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/explanation/README.md",
+          "docs/nuxt/content/tutorials/README.md"
+        ]
+      },
+      {
+        "target": "/explanation/support-and-versioning",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/explanation/README.md",
+          "docs/nuxt/content/how-to/upgrade.md"
+        ]
+      },
+      {
+        "target": "/how-to/multilingual",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/explanation/routing.md",
+          "docs/nuxt/content/how-to/README.md"
+        ]
+      },
+      {
+        "target": "/modules/entity/deprecations",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/explanation/support-and-versioning.md",
+          "docs/nuxt/content/how-to/upgrade.md"
+        ]
+      },
+      {
+        "target": "/modules/menu/deprecations",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/explanation/support-and-versioning.md",
+          "docs/nuxt/content/how-to/upgrade.md"
+        ]
+      },
+      {
+        "target": "/modules/router/deprecations",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/explanation/support-and-versioning.md",
+          "docs/nuxt/content/how-to/upgrade.md"
+        ]
+      },
+      {
+        "target": "/tutorials",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/tutorials/deploy-your-site.md"
+        ]
+      },
+      {
+        "target": "/explanation",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/how-to/README.md",
+          "docs/nuxt/content/tutorials/README.md"
+        ]
+      },
+      {
+        "target": "/explanation/request-topology#cookies-and-sessions",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/how-to/authentication.md",
+          "docs/nuxt/content/how-to/prepare-the-backend.md"
+        ]
+      },
+      {
+        "target": "/modules",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/tutorials/first-custom-module.md",
+          "docs/nuxt/content/tutorials/getting-started.md"
+        ]
+      },
+      {
+        "target": "/how-to/prepare-the-backend#check-the-jsonapi-settings",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/authentication.md"
+        ]
+      },
+      {
+        "target": "/tutorials/authentication#known-limitations",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/authentication.md"
+        ]
+      },
+      {
+        "target": "/how-to/deploy-static#after-the-first-deploy",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/deploy-server.md"
+        ]
+      },
+      {
+        "target": "/explanation/deployment-models#the-models",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/deploy-static.md"
+        ]
+      },
+      {
+        "target": "/how-to/troubleshooting#the-build-fails-reaching-the-backend-econnrefused-timeouts-400s",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/deploy-static.md"
+        ]
+      },
+      {
+        "target": "/how-to/troubleshooting#error0308010cdigital-envelope-routines-on-node-17-or-later",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/environment-variables.md"
+        ]
+      },
+      {
+        "target": "/how-to/troubleshooting#routes-and-views-paths-stop-resolving-after-a-composer-update",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/prepare-the-backend.md"
+        ]
+      },
+      {
+        "target": "/how-to/troubleshooting#every-jsonapi-request-403s-even-for-content-that-should-be-public",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/prepare-the-backend.md"
+        ]
+      },
+      {
+        "target": "/how-to/troubleshooting#i-changed-a-drupal-display-and-nothing-happened-on-the-frontend",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/prepare-the-backend.md"
+        ]
+      },
+      {
+        "target": "/how-to/theming#missing-vue-template-box",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/troubleshooting.md"
+        ]
+      },
+      {
+        "target": "/explanation/schemas#schemas-are-generated-once-at-startup",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/troubleshooting.md"
+        ]
+      },
+      {
+        "target": "/how-to/deploy-static#node-version",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/troubleshooting.md"
+        ]
+      },
+      {
+        "target": "/how-to/authentication#keep-the-session-alive",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/tutorials/authentication.md"
+        ]
+      }
+    ],
+    "internalGenerated": [
+      {
+        "target": "/modules/druxt",
+        "count": 6,
+        "sources": [
+          "docs/nuxt/content/explanation/nuxt-for-drupal-developers.md",
+          "docs/nuxt/content/explanation/support-and-versioning.md",
+          "docs/nuxt/content/how-to/troubleshooting.md",
+          "docs/nuxt/content/modules/druxt/deprecations.md"
+        ]
+      },
+      {
+        "target": "/api/packages/druxt/components/DruxtModule",
+        "count": 4,
+        "sources": [
+          "docs/nuxt/content/explanation/component-resolution.md",
+          "docs/nuxt/content/how-to/theming.md",
+          "docs/nuxt/content/modules/druxt/deprecations.md",
+          "docs/nuxt/content/tutorials/first-custom-module.md"
+        ]
+      },
+      {
+        "target": "/modules/site",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/explanation/architecture.md",
+          "docs/nuxt/content/modules/README.md"
+        ]
+      },
+      {
+        "target": "/modules/entity",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/how-to/prepare-the-backend.md",
+          "docs/nuxt/content/modules/entity/deprecations.md"
+        ]
+      },
+      {
+        "target": "/api/packages/druxt/client",
+        "count": 2,
+        "sources": [
+          "docs/nuxt/content/how-to/use-the-druxt-client.md"
+        ]
+      },
+      {
+        "target": "/api/packages/druxt/stores/druxt",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/explanation/druxt-store.md"
+        ]
+      },
+      {
+        "target": "/api/packages/router",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/explanation/routing.md"
+        ]
+      },
+      {
+        "target": "/api/packages/schema",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/explanation/schemas.md"
+        ]
+      },
+      {
+        "target": "/how-to/contributing",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/README.md"
+        ]
+      },
+      {
+        "target": "/modules/druxt#installation",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/how-to/troubleshooting.md"
+        ]
+      },
+      {
+        "target": "/modules/menu",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/modules/menu/deprecations.md"
+        ]
+      },
+      {
+        "target": "/modules/router",
+        "count": 1,
+        "sources": [
+          "docs/nuxt/content/modules/router/deprecations.md"
+        ]
+      }
+    ],
+    "internalUnknown": [],
+    "externalCount": 59,
+    "distinctExternal": 45,
+    "anchorCount": 2
+  },
+  "blockquotesNotCallouts": [
+    {
+      "file": "docs/nuxt/content/tutorials/getting-started.md",
+      "line": 34,
+      "first": "> If you'd rather watch the pieces being assembled by hand, the"
+    },
+    {
+      "file": "docs/nuxt/content/tutorials/theme-your-front-page.md",
+      "line": 143,
+      "first": "> The image works because Druxt proxies Drupal's files directory through"
+    },
+    {
+      "file": "docs/nuxt/content/tutorials/theme-your-front-page.md",
+      "line": 239,
+      "first": "> A **new** wrapper file appears on the next page load. A **renamed** one"
+    }
+  ],
+  "anomalies": [],
+  "pages": [
+    {
+      "file": "docs/nuxt/content/explanation/README.md",
+      "url": "/explanation",
+      "section": "explanation",
+      "isLanding": true,
+      "title": "Concepts",
+      "description": "Understanding-oriented explanations of how Druxt works and why, from the architecture and data flow to deployment shapes and the vocabulary of both sides of the stack.",
+      "weight": -10,
+      "blocks": {
+        "paragraph": 1,
+        "heading": 1,
+        "list": 1
+      },
+      "headings": 1
+    },
+    {
+      "file": "docs/nuxt/content/explanation/architecture.md",
+      "url": "/explanation/architecture",
+      "section": "explanation",
+      "isLanding": false,
+      "title": "Architecture",
+      "description": "How Drupal, JSON:API and Nuxt fit together in a fully decoupled Druxt site.",
+      "weight": -9,
+      "blocks": {
+        "paragraph": 8,
+        "list": 5,
+        "heading": 5,
+        "diagram": 1,
+        "table": 1
+      },
+      "headings": 5
+    },
+    {
+      "file": "docs/nuxt/content/explanation/component-resolution.md",
+      "url": "/explanation/component-resolution",
+      "section": "explanation",
+      "isLanding": false,
+      "title": "Component resolution",
+      "description": "Druxt finds a wrapper component by ranking candidate names from the render context, then hands it the props, slots and attributes it needs.",
+      "weight": -3,
+      "blocks": {
+        "paragraph": 11,
+        "heading": 6,
+        "code": 3,
+        "list": 2
+      },
+      "headings": 6
+    },
+    {
+      "file": "docs/nuxt/content/explanation/deployment-models.md",
+      "url": "/explanation/deployment-models",
+      "section": "explanation",
+      "isLanding": false,
+      "title": "Deployment models",
+      "description": "How a Druxt site goes to production, from fully static files through a server-rendered node service, and how to choose between the models.",
+      "weight": -1,
+      "blocks": {
+        "paragraph": 9,
+        "heading": 4,
+        "table": 1,
+        "html": 1,
+        "diagram": 3,
+        "list": 2
+      },
+      "headings": 4
+    },
+    {
+      "file": "docs/nuxt/content/explanation/drupal-for-nuxt-developers.md",
+      "url": "/explanation/drupal-for-nuxt-developers",
+      "section": "explanation",
+      "isLanding": false,
+      "title": "Drupal for Nuxt developers",
+      "description": "The Drupal vocabulary, tools and commands the rest of these docs assume, explained for developers coming from the JavaScript side.",
+      "weight": -8,
+      "blocks": {
+        "paragraph": 11,
+        "heading": 7,
+        "table": 2,
+        "list": 2
+      },
+      "headings": 7
+    },
+    {
+      "file": "docs/nuxt/content/explanation/druxt-store.md",
+      "url": "/explanation/druxt-store",
+      "section": "explanation",
+      "isLanding": false,
+      "title": "The DruxtStore",
+      "description": "The DruxtStore caches Drupal collections and resources as shared references, so two components asking for the same article hit Drupal once.",
+      "weight": -6,
+      "blocks": {
+        "paragraph": 13,
+        "heading": 9,
+        "code": 2,
+        "list": 3
+      },
+      "headings": 9
+    },
+    {
+      "file": "docs/nuxt/content/explanation/nuxt-for-drupal-developers.md",
+      "url": "/explanation/nuxt-for-drupal-developers",
+      "section": "explanation",
+      "isLanding": false,
+      "title": "Nuxt for Drupal developers",
+      "description": "The Nuxt and Vue concepts behind a Druxt frontend, mapped to the Drupal ideas they replace.",
+      "weight": -7,
+      "blocks": {
+        "paragraph": 5,
+        "heading": 7,
+        "table": 2,
+        "list": 1
+      },
+      "headings": 7
+    },
+    {
+      "file": "docs/nuxt/content/explanation/request-topology.md",
+      "url": "/explanation/request-topology",
+      "section": "explanation",
+      "isLanding": false,
+      "title": "Request topology",
+      "description": "Which requests happen at build time, during server rendering and in the browser, and what that means for CORS, the proxy and your hosting layout.",
+      "weight": -2,
+      "blocks": {
+        "paragraph": 11,
+        "heading": 7,
+        "table": 3,
+        "diagram": 1,
+        "list": 2
+      },
+      "headings": 7
+    },
+    {
+      "file": "docs/nuxt/content/explanation/routing.md",
+      "url": "/explanation/routing",
+      "section": "explanation",
+      "isLanding": false,
+      "title": "Decoupled routing",
+      "description": "Only Drupal knows which entity serves a path, so Druxt asks it, then turns that answer into a resource request and follows any redirect.",
+      "weight": -5,
+      "blocks": {
+        "paragraph": 7,
+        "heading": 6,
+        "code": 1,
+        "list": 2
+      },
+      "headings": 6
+    },
+    {
+      "file": "docs/nuxt/content/explanation/schemas.md",
+      "url": "/explanation/schemas",
+      "section": "explanation",
+      "isLanding": false,
+      "title": "The schema system",
+      "description": "Drupal display modes become schemas that drive field rendering, generated once at startup and reused to narrow the JSON:API query.",
+      "weight": -4,
+      "blocks": {
+        "paragraph": 12,
+        "heading": 7,
+        "code": 2,
+        "list": 1
+      },
+      "headings": 7
+    },
+    {
+      "file": "docs/nuxt/content/explanation/support-and-versioning.md",
+      "url": "/explanation/support-and-versioning",
+      "section": "explanation",
+      "isLanding": false,
+      "title": "Support and versioning",
+      "description": "Druxt follows semantic versioning on a deliberately held stack. The promise, the end-of-life reality, and the path an API takes out of the framework.",
+      "weight": 0,
+      "blocks": {
+        "paragraph": 7,
+        "heading": 5,
+        "table": 1,
+        "list": 3,
+        "code": 1
+      },
+      "headings": 5
+    },
+    {
+      "file": "docs/nuxt/content/how-to/README.md",
+      "url": "/how-to",
+      "section": "how-to",
+      "isLanding": true,
+      "title": "How-to guides",
+      "description": "Goal-oriented recipes for specific tasks, assuming a working Druxt site.",
+      "weight": -10,
+      "blocks": {
+        "paragraph": 2,
+        "heading": 1,
+        "list": 1
+      },
+      "headings": 1
+    },
+    {
+      "file": "docs/nuxt/content/how-to/authentication.md",
+      "url": "/how-to/authentication",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Authenticate users with OAuth",
+      "description": "The full OAuth setup from scratch: Simple OAuth keys, scopes and a consumer in Drupal, druxt-auth in Nuxt, and the traps on both sides.",
+      "weight": 0,
+      "blocks": {
+        "callout": 1,
+        "paragraph": 24,
+        "diagram": 1,
+        "heading": 11,
+        "code": 6,
+        "image": 2,
+        "table": 1,
+        "list": 2
+      },
+      "headings": 11
+    },
+    {
+      "file": "docs/nuxt/content/how-to/configure-cors.md",
+      "url": "/how-to/configure-cors",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Configure CORS in Drupal",
+      "description": "Allow the browser to talk to the backend directly by serving CORS headers from Drupal, instead of proxying through the frontend.",
+      "weight": -7,
+      "blocks": {
+        "callout": 1,
+        "paragraph": 9,
+        "heading": 5,
+        "code": 4,
+        "list": 2,
+        "table": 1
+      },
+      "headings": 5
+    },
+    {
+      "file": "docs/nuxt/content/how-to/deploy-server.md",
+      "url": "/how-to/deploy-server",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Deploy a server-rendered site",
+      "description": "Run the built app as a node service behind a web server, on your own host or a container platform like Lagoon.",
+      "weight": 4,
+      "blocks": {
+        "callout": 1,
+        "paragraph": 9,
+        "code": 3,
+        "heading": 5,
+        "list": 2
+      },
+      "headings": 5
+    },
+    {
+      "file": "docs/nuxt/content/how-to/deploy-static.md",
+      "url": "/how-to/deploy-static",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Deploy a static site",
+      "description": "Generate the site and host the files anywhere static. Netlify is the worked example.",
+      "weight": 3,
+      "blocks": {
+        "callout": 1,
+        "paragraph": 15,
+        "heading": 7,
+        "code": 5,
+        "list": 7
+      },
+      "headings": 7
+    },
+    {
+      "file": "docs/nuxt/content/how-to/devtools.md",
+      "url": "/how-to/devtools",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Debug Druxt with the Vue Devtools",
+      "description": "The DruxtJS devtools inspector shows connection details and live theme suggestions, and scaffolds wrapper components in one click.",
+      "weight": -1,
+      "blocks": {
+        "callout": 1,
+        "image": 4,
+        "paragraph": 5,
+        "heading": 5,
+        "list": 2
+      },
+      "headings": 5
+    },
+    {
+      "file": "docs/nuxt/content/how-to/environment-variables.md",
+      "url": "/how-to/environment-variables",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Environment variables",
+      "description": "Every variable a Druxt build reads, where it comes from, and the build-time vs runtime distinction that catches people out.",
+      "weight": 2,
+      "blocks": {
+        "paragraph": 6,
+        "heading": 3,
+        "table": 1,
+        "code": 1,
+        "list": 2
+      },
+      "headings": 5
+    },
+    {
+      "file": "docs/nuxt/content/how-to/example-apps.md",
+      "url": "/how-to/example-apps",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Explore the example apps",
+      "description": "Reference apps sharing one Umami backend, from an unstyled pattern index through daisyUI and Tailwind themes to a BootstrapVue editorial console.",
+      "weight": 1,
+      "blocks": {
+        "paragraph": 7,
+        "callout": 1,
+        "rule": 1,
+        "heading": 6,
+        "image": 4,
+        "table": 1,
+        "list": 1
+      },
+      "headings": 6
+    },
+    {
+      "file": "docs/nuxt/content/how-to/multilingual.md",
+      "url": "/how-to/multilingual",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Serve content in multiple languages",
+      "description": "Fetch and render translated Drupal content with langcode prefixes, from the route to the store to language-specific theme components.",
+      "weight": -4,
+      "blocks": {
+        "callout": 1,
+        "paragraph": 13,
+        "heading": 5,
+        "table": 1,
+        "code": 3,
+        "list": 1
+      },
+      "headings": 5
+    },
+    {
+      "file": "docs/nuxt/content/how-to/prepare-the-backend.md",
+      "url": "/how-to/prepare-the-backend",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Prepare the Drupal backend",
+      "description": "Make an existing Drupal site Druxt-ready: modules, JSON:API settings, permissions and the minimum content the frontend needs.",
+      "weight": -8,
+      "blocks": {
+        "callout": 1,
+        "paragraph": 15,
+        "heading": 8,
+        "code": 3,
+        "image": 2,
+        "table": 2,
+        "list": 1
+      },
+      "headings": 8
+    },
+    {
+      "file": "docs/nuxt/content/how-to/proxy.md",
+      "url": "/how-to/proxy",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Proxy the Drupal backend through Nuxt",
+      "description": "Route API and file requests through the frontend origin, so browser traffic never crosses the CORS boundary.",
+      "weight": -6,
+      "blocks": {
+        "callout": 1,
+        "paragraph": 9,
+        "heading": 4,
+        "code": 4,
+        "list": 1
+      },
+      "headings": 4
+    },
+    {
+      "file": "docs/nuxt/content/how-to/storybook.md",
+      "url": "/how-to/storybook",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Browse and develop components in Storybook",
+      "description": "Storybook stories generated from live Drupal data, with a story tree that mirrors your backend and controls driven by real content.",
+      "weight": -2,
+      "blocks": {
+        "callout": 1,
+        "paragraph": 12,
+        "heading": 6,
+        "list": 4,
+        "image": 2,
+        "table": 1
+      },
+      "headings": 6
+    },
+    {
+      "file": "docs/nuxt/content/how-to/theming.md",
+      "url": "/how-to/theming",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Theme Druxt components",
+      "description": "Change Druxt component output with wrapper components, the default template, slots and props, without forking or patching the framework.",
+      "weight": -5,
+      "blocks": {
+        "callout": 1,
+        "paragraph": 11,
+        "heading": 5,
+        "list": 5,
+        "image": 1,
+        "code": 2,
+        "output": 1
+      },
+      "headings": 5
+    },
+    {
+      "file": "docs/nuxt/content/how-to/troubleshooting.md",
+      "url": "/how-to/troubleshooting",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Troubleshoot common issues",
+      "description": "Quick answers to the problems reported most often by real users, from the missing Vue template box to site-wide JSON:API 403 failures.",
+      "weight": 7,
+      "blocks": {
+        "callout": 1,
+        "paragraph": 18,
+        "heading": 13,
+        "code": 3,
+        "list": 1
+      },
+      "headings": 13
+    },
+    {
+      "file": "docs/nuxt/content/how-to/upgrade.md",
+      "url": "/how-to/upgrade",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Upgrade a Druxt site",
+      "description": "Move a 0.x site to Druxt 1.0.0, then use deprecation warnings as the working to-do list for 2.0.0.",
+      "weight": 8,
+      "blocks": {
+        "callout": 1,
+        "heading": 4,
+        "paragraph": 5,
+        "code": 3,
+        "list": 2
+      },
+      "headings": 4
+    },
+    {
+      "file": "docs/nuxt/content/how-to/use-the-druxt-client.md",
+      "url": "/how-to/use-the-druxt-client",
+      "section": "how-to",
+      "isLanding": false,
+      "title": "Use the Druxt client directly",
+      "description": "Fetch resources and collections with DruxtClient, with or without Nuxt.",
+      "weight": -3,
+      "blocks": {
+        "callout": 1,
+        "paragraph": 18,
+        "code": 10,
+        "heading": 7,
+        "list": 1
+      },
+      "headings": 7
+    },
+    {
+      "file": "docs/nuxt/content/modules/README.md",
+      "url": "/modules",
+      "section": "modules",
+      "isLanding": true,
+      "title": "Druxt modules",
+      "description": "The Druxt packages, what each one renders, and how they fit together.",
+      "weight": null,
+      "blocks": {
+        "paragraph": 3
+      },
+      "headings": 0
+    },
+    {
+      "file": "docs/nuxt/content/modules/druxt/deprecations.md",
+      "url": "/modules/druxt/deprecations",
+      "section": "modules",
+      "isLanding": false,
+      "title": "Druxt core deprecations",
+      "description": "Retired DruxtStore signatures and internal classes, with their replacements.",
+      "weight": 10,
+      "blocks": {
+        "heading": 3,
+        "output": 2,
+        "paragraph": 6,
+        "code": 2,
+        "table": 1,
+        "list": 1
+      },
+      "headings": 3
+    },
+    {
+      "file": "docs/nuxt/content/modules/entity/deprecations.md",
+      "url": "/modules/entity/deprecations",
+      "section": "modules",
+      "isLanding": false,
+      "title": "DruxtEntity deprecations",
+      "description": "Retired DruxtField default components and props, with their replacements.",
+      "weight": 10,
+      "blocks": {
+        "heading": 5,
+        "output": 3,
+        "paragraph": 13,
+        "code": 1,
+        "list": 4,
+        "table": 1
+      },
+      "headings": 5
+    },
+    {
+      "file": "docs/nuxt/content/modules/menu/deprecations.md",
+      "url": "/modules/menu/deprecations",
+      "section": "modules",
+      "isLanding": false,
+      "title": "DruxtMenu deprecations",
+      "description": "The retired DruxtMenu items computed property, and what replaces it.",
+      "weight": 10,
+      "blocks": {
+        "heading": 4,
+        "output": 1,
+        "paragraph": 5,
+        "code": 4,
+        "list": 1
+      },
+      "headings": 4
+    },
+    {
+      "file": "docs/nuxt/content/modules/router/deprecations.md",
+      "url": "/modules/router/deprecations",
+      "section": "modules",
+      "isLanding": false,
+      "title": "DruxtRouter deprecations",
+      "description": "Retired DruxtRouter client and store members, with their replacements.",
+      "weight": 10,
+      "blocks": {
+        "heading": 3,
+        "output": 2,
+        "paragraph": 5,
+        "table": 2,
+        "code": 1,
+        "list": 1
+      },
+      "headings": 3
+    },
+    {
+      "file": "docs/nuxt/content/tutorials/README.md",
+      "url": "/tutorials",
+      "section": "tutorials",
+      "isLanding": true,
+      "title": "Tutorials",
+      "description": "Learning-oriented lessons that take you from zero to a working Druxt site.",
+      "weight": -10,
+      "blocks": {
+        "paragraph": 2,
+        "heading": 1,
+        "list": 1
+      },
+      "headings": 1
+    },
+    {
+      "file": "docs/nuxt/content/tutorials/authentication.md",
+      "url": "/tutorials/authentication",
+      "section": "tutorials",
+      "isLanding": false,
+      "title": "Add a login flow",
+      "description": "Turn the quickstart's already-configured OAuth setup into a real, working login.",
+      "weight": -7,
+      "blocks": {
+        "paragraph": 13,
+        "heading": 8,
+        "list": 3,
+        "code": 3,
+        "table": 1
+      },
+      "headings": 8
+    },
+    {
+      "file": "docs/nuxt/content/tutorials/deploy-your-site.md",
+      "url": "/tutorials/deploy-your-site",
+      "section": "tutorials",
+      "isLanding": false,
+      "title": "Deploy your site",
+      "description": "Generate the quickstart as static files, prove why the backend still matters, and put a working Druxt site on a live URL.",
+      "weight": -6,
+      "blocks": {
+        "paragraph": 21,
+        "heading": 6,
+        "list": 3,
+        "code": 8
+      },
+      "headings": 6
+    },
+    {
+      "file": "docs/nuxt/content/tutorials/first-custom-module.md",
+      "url": "/tutorials/first-custom-module",
+      "section": "tutorials",
+      "isLanding": false,
+      "title": "Building a custom Druxt module",
+      "description": "Extend DruxtModule to build your own Druxt-powered, themeable component backed by Drupal data.",
+      "weight": -5,
+      "blocks": {
+        "paragraph": 15,
+        "list": 5,
+        "heading": 6,
+        "code": 6
+      },
+      "headings": 6
+    },
+    {
+      "file": "docs/nuxt/content/tutorials/getting-started.md",
+      "url": "/tutorials/getting-started",
+      "section": "tutorials",
+      "isLanding": false,
+      "title": "Getting started with Druxt",
+      "description": "From an empty machine to a running fully decoupled Drupal and Nuxt site.",
+      "weight": -9,
+      "blocks": {
+        "paragraph": 22,
+        "list": 4,
+        "heading": 8,
+        "blockquote": 1,
+        "code": 4,
+        "table": 2,
+        "image": 1
+      },
+      "headings": 8
+    },
+    {
+      "file": "docs/nuxt/content/tutorials/theme-your-front-page.md",
+      "url": "/tutorials/theme-your-front-page",
+      "section": "tutorials",
+      "isLanding": false,
+      "title": "Theme your front page",
+      "description": "Take over the front page view and its teasers with two wrapper components, and learn the naming rule the whole Druxt theme layer runs on.",
+      "weight": -8,
+      "blocks": {
+        "paragraph": 31,
+        "heading": 9,
+        "list": 3,
+        "code": 9,
+        "blockquote": 2,
+        "table": 1
+      },
+      "headings": 9
+    }
+  ]
+}

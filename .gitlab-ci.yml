@@ -1,0 +1,135 @@
+# Provisioning runs on the same entry points a developer runs locally
+# (drupal/.devtools/*), so there is no CI-only install path that can drift
+# away from the one people actually use.
+
+stages:
+  - lint
+  - test
+  - provision
+  - import
+
+default:
+  interruptible: true
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+variables:
+  COMPOSER_MEMORY_LIMIT: "-1"
+  DB_FILE: "$CI_PROJECT_DIR/drupal/ci.sqlite"
+
+lint:private-refs:
+  stage: lint
+  image: node:22-alpine
+  before_script:
+    - apk add --no-cache git
+  script:
+    - node scripts/lint-private-refs.mjs
+
+lint:php:
+  stage: lint
+  image: php:8.3-cli-alpine
+  script:
+    - find drupal/.devtools -type f -exec sh -c 'head -c2 "$1" | grep -q "#!" && php -l "$1"' _ {} \; -print
+
+test:unit:
+  stage: test
+  image: node:22-alpine
+  script:
+    - npm run test:unit
+
+# Needs only PHP, bash and python3: both guarded cases fail before Drupal is
+# touched, so this skips assemble and provision entirely.
+test:start-guardrails:
+  stage: test
+  image: php:8.3-cli-alpine
+  before_script:
+    - apk add --no-cache bash python3
+  script:
+    - bash tests/start-guardrails.sh
+
+# Every guarded case fails before Drupal is touched, so this needs PHP, node
+# and git but no composer install and no provision.
+test:import-guardrails:
+  stage: test
+  image: php:8.3-cli-alpine
+  before_script:
+    - apk add --no-cache bash git nodejs npm
+    - npm ci --ignore-scripts
+  script:
+    - bash tests/import-guardrails.sh
+
+# The fixture is written by the test itself, so this needs node, git and
+# bash but no checkout of the documentation and no provision.
+test:validate-guardrails:
+  stage: test
+  image: node:22-alpine
+  before_script:
+    - apk add --no-cache bash git
+  script:
+    - bash tests/validate-guardrails.sh
+
+# Every job that runs composer install needs the extensions core requires
+# (gd) and the database driver provision uses (pdo_sqlite). The lock is
+# resolved against PHP 8.3, so this image is the floor, not a coincidence.
+.drupal:
+  image: php:8.3-cli-alpine
+  cache:
+    key: composer
+    paths:
+      - drupal/vendor/
+  before_script:
+    - apk add --no-cache git unzip sqlite-dev libpng-dev libjpeg-turbo-dev libwebp-dev freetype-dev $PHPIZE_DEPS
+    - docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype
+    - docker-php-ext-install pdo_sqlite gd
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+test:phpunit:
+  extends: .drupal
+  stage: test
+  script:
+    - cd drupal
+    - .devtools/assemble
+    - ./vendor/bin/phpunit
+
+provision:
+  extends: .drupal
+  stage: provision
+  script:
+    - cd drupal
+    - .devtools/assemble
+    - .devtools/provision
+    - .devtools/info
+  artifacts:
+    when: on_failure
+    paths:
+      - drupal/web/sites/default/files/
+    expire_in: 1 day
+
+# Rebuilds the content from the pinned documentation commit, imports it into
+# a provisioned site, and fails when the site does not end up holding a page
+# for every document the source produced. The pinned commit is fetched from
+# the documentation project on this GitLab with the job token, so that
+# project has to allow this one in its CI/CD job token allowlist.
+import:
+  extends: .drupal
+  stage: import
+  variables:
+    DOCS_REPOSITORY: "${CI_SERVER_PROTOCOL}://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}:${CI_SERVER_PORT}/druxt/druxt.js.git"
+  before_script:
+    - !reference [.drupal, before_script]
+    - apk add --no-cache nodejs npm
+    - npm ci --ignore-scripts
+  script:
+    - cd drupal
+    - .devtools/assemble
+    - .devtools/provision
+    - .devtools/import --check
+  artifacts:
+    when: on_failure
+    paths:
+      - drupal/web/sites/default/files/
+      - .docs-ir/
+    expire_in: 1 day
