@@ -14,9 +14,8 @@
       <NuxtLink class="btn btn-ghost" to="/api">API reference</NuxtLink>
     </div>
 
-    <!-- Own dialog, not the default layout's: layouts/error.vue renders
-         instead of that layout, so in most contexts where this component
-         shows there is no other dialog mounted to reach. -->
+    <!-- Its own dialog: the error layout replaces the default one, so no
+         other search dialog is mounted. -->
     <AppSearch :open="searchOpen" @close="searchOpen = false" />
   </div>
 </template>
@@ -47,15 +46,8 @@ export default {
   /** @returns {void} */
   mounted() {
     if (this.statusCode !== 404) return
-    // window.location, not $route: this component also renders from the
-    // statically generated dist/404/index.html, and the path the reader
-    // actually asked for is the one worth recording.
-    //
-    // The referrer is the half that makes this actionable. A 404 alone says a
-    // URL is dead; the referrer says whether it is a broken internal link, a
-    // stale external one, or a search engine holding an index entry that
-    // should have been redirected - which is the failure mode a URL
-    // restructure produces.
+    // window.location, not $route: this also renders from the generated 404
+    // page. The referrer says whether the dead link was internal or external.
     this.$track(...notFoundEvent(window.location.pathname, document.referrer))
   },
 }

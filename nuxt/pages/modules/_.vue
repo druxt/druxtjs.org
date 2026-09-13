@@ -1,9 +1,6 @@
 <template>
   <div>
-    <!-- The page's own title, for the tab pages under a module. Skipped on
-         the module's own route, where the layout's module header is already
-         the page header: rendering both printed the identity block twice,
-         icon and package name included. -->
+    <!-- On the module's own route the layout header already names it. -->
     <AppPageHeader v-if="document && !inModuleHeader" :title="document.title" :description="document.description" />
 
     <!-- Every module README opens with a screenshot; it becomes the hero. -->
@@ -31,10 +28,7 @@ export default {
   },
 
   async asyncData({ $content, error, params, store, route }) {
-    // Trailing slashes are trimmed first: `/modules/entity/` arrives as
-    // `entity/`, which the `includes('/')` test below read as "already a
-    // sub-page path" and queried verbatim, so the route 404'd while
-    // `/modules/entity` resolved.
+    // Trim the trailing slash, so `/modules/entity/` resolves like `/modules/entity`.
     const match = (params.pathMatch || '').replace(/\/+$/, '')
     const slug = match
       ? (match.includes('/') ? match : match + '/README')
@@ -43,9 +37,7 @@ export default {
     let document
     try {
       document = await $content('modules/', slug).fetch()
-      // A directory-index target (e.g. `readme/index.md`) resolves
-      // ambiguously and returns the directory listing instead of the
-      // document; retry against the index file explicitly.
+      // A directory returns its listing, so ask for the index file instead.
       if (Array.isArray(document)) {
         document = await $content('modules/', slug + '/index').fetch()
       }
@@ -72,15 +64,7 @@ export default {
   computed: {
     editPath: ({ slug }) => 'modules/' + slug + '.md',
 
-    /**
-     * Whether the layout's module header is already serving as this page's
-     * header, in which case repeating it here prints the module identity
-     * twice.
-     *
-     * @param {object} vm - The component ViewModel.
-     * @param {object} vm.$route - The current route.
-     * @returns {boolean} True when the header above already names this page.
-     */
+    /** Whether the layout header above already names this page. */
     inModuleHeader: ({ $route }) => isPackageRoot($route.path),
   },
 }

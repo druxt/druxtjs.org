@@ -3,7 +3,7 @@ _core:
 langcode: en
 uuid: c6b169a7-4bdb-4c29-ad93-ee14c9cbdd11
 name: DruxtJS
-mail: admin@example.com
+mail: noreply@druxtjs.org
 slogan: ''
 page:
   403: ''

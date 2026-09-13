@@ -24,12 +24,11 @@ const findImage = (node, parent) => {
 }
 
 /**
- * Every module README opens with a screenshot of the module in use. Pulled out
- * of the body here so the page can render it as a hero figure rather than an
- * unstyled inline image halfway down the prose.
+ * Pull a module README's opening screenshot out of the body, so the page can
+ * render it as a hero figure.
  *
- * Returns { hero, body } - body is a copy with the image (and its wrapping
- * paragraph, if that is all the paragraph held) removed.
+ * `body` comes back as a copy with the image, and any paragraph that only
+ * wrapped it, removed.
  *
  * @param {object} document - The content document.
  * @returns {object} The hero image and remaining body, as { hero, body }.
@@ -57,11 +56,8 @@ export const extractHero = (document) => {
     ...n,
     children: (n.children || [])
       .filter((child) => child !== node)
-      // Drop the paragraph that only wrapped the hero image, but keep one
-      // that also carries its own content. The sibling test counts text as
-      // well as elements: markdown puts `![img](x) caption` in a single
-      // paragraph whose caption is a text node, and an element-only test
-      // discarded that text along with the image.
+      // Drop the paragraph that only wrapped the hero image, keeping one that
+      // carries its own content. Text nodes count: a caption is one.
       .filter((child) => !(
         isElement(child, 'p')
         && (child.children || []).includes(node)
@@ -91,16 +87,9 @@ const textOf = (node) => {
 /**
  * A one-line summary of a document, for `<meta name="description">`.
  *
- * @nuxt/content v1 only surfaces frontmatter fields, and almost nothing in
- * `content/` sets a `description`, so `document.description` is undefined on
- * nearly every page. The first paragraph is the same thing a reader would skim
- * to decide whether the page is relevant.
- *
- * This deliberately mirrors the rules in lib/content-index.js `excerpt()`,
- * which does the same job at build time for sitemap.xml and llms.txt. Two
- * implementations because the inputs differ: this walks the parsed AST, that
- * one reads raw Markdown off disk before Nuxt exists. Keep the skip rules in
- * step.
+ * Almost nothing in `content/` sets a frontmatter description, so the first
+ * paragraph stands in. lib/content-index.js `excerpt()` does the same job at
+ * build time from raw Markdown; keep the skip rules in step.
  *
  * @param {object} document - A @nuxt/content document.
  * @returns {string} A plain-text summary, or an empty string.
@@ -116,7 +105,7 @@ export const documentDescription = (document) => {
 
     const text = textOf(node).replace(/\s+/g, ' ').trim()
     if (!text) continue
-    // A note to a maintainer, not a summary. See content/modules/druxt/deprecations.md.
+    // A note to a maintainer, not a summary.
     if (/^(TODO|FIXME|NOTE|XXX)\b[:\s]/i.test(text)) continue
 
     return text
@@ -138,17 +127,14 @@ export const sections = (document) => (document.toc || [])
 /**
  * Where a document sits, for disambiguating a bare title.
  *
- * Several documents legitimately share a title - every module has its own
- * "Deprecations" page, for instance - so a recent-documents list showing
- * only titles renders three identical rows. This returns the path segments
- * above the leaf, title-cased, capped at the last two so it stays short in
- * a 17rem sidebar:
+ * Documents can share a title, so this returns the path segments above the
+ * leaf, title-cased and capped at the last two:
  *
  *   /modules/entity/deprecations -> 'Modules / Entity'
  *   /guide/theming               -> 'Guide'
  *   /api/packages/druxt/client   -> 'Packages / Druxt'
  *
- * Returns '' for a top-level path, where the title is already unambiguous.
+ * Returns '' for a top-level path.
  *
  * @param {string} path - The document's route path.
  * @returns {string} A short human-readable location, or an empty string.

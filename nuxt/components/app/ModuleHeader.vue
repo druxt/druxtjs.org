@@ -1,22 +1,16 @@
 <template>
   <!--
-    Wraps the page slot: position sticky only holds within the element's
-    parent, so the bar's containing block must span the page content. The
-    first layout-mounted version ended at the bar itself, and the "sticky"
-    bar simply scrolled away under the site header.
+    Wraps the page slot: a sticky element only sticks within its parent, so
+    this wrapper has to span the page content.
   -->
   <div>
     <template v-if="pkg">
-      <!-- Full header: identity, description, Source. Pill-free per the
-           approved boards; the package name is plain mono, not a badge. -->
+      <!-- Full header: identity, description, Source. -->
       <header class="mx-auto max-w-content pb-5">
         <!--
           On a package's own route this block is the page header, so it owns
-          the h1. It cannot be the visible title: that is the dropdown
-          trigger, and a trigger is a <button>, whose content model is
-          phrasing content only - an h1 inside it is invalid and its heading
-          semantics are not reliably exposed. So the heading is here,
-          carrying the same text, and the visible title stays a span.
+          the h1. The visible title is a dropdown trigger, and a button cannot
+          hold a heading, so the h1 sits here with the same text.
         -->
         <h1 v-if="isRoot" class="sr-only" v-text="title" />
 
@@ -24,8 +18,7 @@
           <span class="w-11 h-11 sm:w-14 sm:h-14 rounded-btn bg-base-200 text-primary-focus grid place-items-center flex-shrink-0">
             <component :is="icon" class="w-6 h-6 sm:w-8 sm:h-8" />
           </span>
-          <!-- The whole identity is the module switcher, caret after the
-               machine name; menu behavior lives in AppDropdown. -->
+          <!-- The whole identity is the module switcher; the menu lives in AppDropdown. -->
           <AppDropdown :items="siblings" button-class="min-w-0 px-1 -mx-1 hover:bg-base-200">
             <span class="min-w-0 flex flex-col text-left sm:flex-row sm:items-baseline sm:gap-3">
               <span class="text-2xl sm:text-3xl font-bold tracking-tight" v-text="title" />
@@ -40,19 +33,14 @@
         <p v-if="description" class="mt-3 text-[15px] text-base-content/70" v-text="description" />
       </header>
 
-      <!-- The bar's stuck state flips when this sentinel passes under the
-           sticky site header (the observer compensates for its 4rem). -->
+      <!-- The bar's stuck state flips when this sentinel passes under the site header. -->
       <div ref="sentinel" aria-hidden="true" />
 
       <!--
-        The tab row is the sticky element, taking AppSubheader's slot under
-        the site header on module-tied pages. It survives tab navigation
-        between /modules/<pkg> and /api/packages/<pkg> pages: switching
-        tabs swaps only the slot content below. Once stuck it condenses
-        per the approved boards.
+        The tab row is the sticky element, and switching tabs swaps only the
+        slot content below it. The background is unconditional, so the bar
+        always covers what it overlaps.
       -->
-      <!-- Background is unconditional: sticking is pure CSS, so if stuck
-           detection ever misses, the bar must still cover what it overlaps. -->
       <div
         class="sticky top-[108px] z-30 mb-8 bg-base-100/95 backdrop-blur"
         :class="stuck ? '-mx-5 sm:-mx-8 lg:-mx-12 border-b border-base-300' : ''"
@@ -143,11 +131,9 @@ export default {
   }),
 
   /**
-   * Nuxt's fetch hook; SSR-awaited so the header arrives rendered.
-   *
-   * Captured-and-recheck guard as in AppModulesParent: this instance lives
-   * in the layout and survives every route change, so a slow fetch from a
-   * previous module must not overwrite the current one.
+   * Nuxt's fetch hook; SSR-awaited so the header arrives rendered. This
+   * instance lives in the layout and survives route changes, so a slow fetch
+   * is discarded once the module has changed.
    */
   async fetch() {
     const pkg = this.pkg
@@ -170,9 +156,8 @@ export default {
 
   computed: {
     /**
-     * The module a route is tied to: /modules/<pkg>... or
-     * /api/packages/<pkg>..., gated to the public module packages so
-     * private packages (docgen, test-utils) keep their plain pages.
+     * The module a route is tied to, from /modules/<pkg> or
+     * /api/packages/<pkg>, limited to the public module packages.
      *
      * @param {object} vm - The component ViewModel.
      * @param {object} vm.$route - The current route.
@@ -188,9 +173,8 @@ export default {
     },
 
     /**
-     * Whether this block is the page header for the current route, i.e. a
-     * package's own page rather than one of the tabs beneath it. The page
-     * components read the same test to skip their own header.
+     * Whether this block is the page header, i.e. a package's own page rather
+     * than one of the tabs beneath it. Page components read the same test.
      *
      * @param {object} vm - The component ViewModel.
      * @param {object} vm.$route - The current route.
@@ -200,13 +184,8 @@ export default {
 
     /**
      * The module's display title, falling back to the package name when the
-     * generated README is missing.
-     *
-     * The fallback is load-bearing, not cosmetic: on a package root the page
-     * component suppresses its own header because this one is showing, so a
-     * header that declined to render would leave the page with no title and
-     * no source link at all. Rendering on `pkg` alone keeps that invariant
-     * true rather than hoping the README fetch succeeded.
+     * generated README is missing. The page component hides its own header
+     * here, so this one always renders a title.
      *
      * @param {object} vm - The component ViewModel.
      * @param {?object} vm.module - The module's README document, or null.
@@ -252,8 +231,7 @@ export default {
     repo: ({ pkg }) => 'https://github.com/druxt/druxt.js/tree/develop/packages/' + pkg,
 
     /**
-     * The other modules, for the switcher; same source and shape as the
-     * Subheader's sibling dropdown.
+     * The other modules, for the switcher.
      *
      * @param {object} vm - The component ViewModel.
      * @param {object} vm.$store - The Vuex store.
@@ -262,8 +240,8 @@ export default {
     siblings: ({ $store }) => ($store.state.modules || []).map((m) => ({ text: m.title, to: m.dir })),
 
     /**
-     * Tab order per the approved boards: Overview, API, Changelog, then the
-     * module's own content documents (Deprecations and any others).
+     * Tab order: README, API, Changelog, then the module's own content
+     * documents.
      *
      * @param {object} vm - The component ViewModel.
      * @param {string} vm.pkg - The package directory name.
@@ -295,10 +273,8 @@ export default {
     },
 
     /**
-     * Tab-row visibility. Mobile hides the row while stuck unless the
-     * disclosure opened it, in which case it drops below the bar. Written
-     * as exclusive branches because Tailwind 2 has no `!important`
-     * modifier to override `hidden`.
+     * Tab-row visibility. While stuck, mobile hides the row until the
+     * disclosure drops it below the bar.
      *
      * @param {object} vm - The component ViewModel.
      * @param {boolean} vm.stuck - Whether the bar is stuck.
@@ -315,13 +291,9 @@ export default {
   },
 
   watch: {
-    // Refetch only when the module changes; switching tabs within one
-    // module keeps the header exactly as it is - that is the point.
-    //
-    // The sentinel is rebound here rather than on `module`, because the
-    // header renders on `pkg` alone: arriving at a package whose README
-    // fails to load leaves `module` null, so a `module` watcher never
-    // fires and the sticky bar would never engage.
+    // Refetch only when the module changes; switching tabs leaves the header
+    // as it is. The header renders on `pkg` alone, so the sentinel is rebound
+    // here too.
     pkg() {
       this.open = false
       this.$fetch()
@@ -329,11 +301,8 @@ export default {
     },
 
     $route() {
-      // A tab clicked while the bar was stuck lands with the bar still
-      // stuck: scroll to the engage point instead of the page top. Runs
-      // after Nuxt's own scroll-to-top (double rAF outlasts its
-      // triggerScroll handling), so the reader never watches the full
-      // header re-expand mid-navigation.
+      // A tab clicked while stuck scrolls to the engage point, not the page
+      // top. The double rAF runs after Nuxt's own scroll to top.
       if (this.fromStuckTab) {
         this.fromStuckTab = false
         this.$nextTick(() => {
@@ -341,9 +310,7 @@ export default {
             const sentinel = this.$refs.sentinel
             if (!sentinel) return
             const engage = sentinel.getBoundingClientRect().top + window.scrollY - 63
-            // Instant even under the site-wide smooth scrolling: this runs
-            // right after the layout's jump to top, and animating the
-            // correction would play the two scrolls as a visible stutter.
+            // Instant, so the correction does not animate over the jump to top.
             window.scrollTo({ top: Math.max(engage, 0), behavior: 'instant' })
           }))
         })
@@ -361,9 +328,8 @@ export default {
 
   methods: {
     /**
-     * (Re)binds the stuck observer to the sentinel. Stuck exactly while
-     * the sentinel sits above the site header plus breadcrumb bar's 108px band;
-     * rootMargin shifts the observed top edge down to match.
+     * (Re)binds the stuck observer to the sentinel. The rootMargin matches the
+     * 108px band the site header and breadcrumb bar occupy.
      */
     observe() {
       if (this.observer) this.observer.disconnect()
@@ -385,10 +351,8 @@ export default {
     },
 
     /**
-     * Whether a tab matches the current route. Content tabs match
-     * exactly; the API tab also claims every deeper page under the
-     * package's API tree, so the header stays anchored while browsing
-     * component and store references.
+     * Whether a tab matches the current route. Content tabs match exactly;
+     * the API tab also claims the reference pages beneath it.
      *
      * @param {object} tab - The tab as a { text, to } object.
      * @returns {boolean} True when the tab is the current page.
@@ -396,8 +360,8 @@ export default {
     isActive(tab) {
       const path = this.$route.path.replace(/\/+$/, '')
       if (path === tab.to) return true
-      // Keyed on the tab's route, not its label: only the package's API
-      // root claims the deeper reference pages under it.
+      // Keyed on the route, not the label: only the API root claims the
+      // pages beneath it.
       return (
         tab.to === '/api/packages/' + this.pkg &&
         path.startsWith(tab.to + '/') &&

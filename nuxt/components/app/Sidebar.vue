@@ -1,22 +1,15 @@
 <template>
   <div>
-    <!-- Mobile backdrop. On docs pages this only needs to cover the range
-         below the sidebar's own lg:sticky breakpoint; on full-bleed pages
-         (docs=false) the sidebar never goes sticky, so it must stay in
-         overlay mode as long as the header's hamburger trigger is visible
-         (xl:hidden) - otherwise there's a width range with a trigger but
-         no backdrop or close button to dismiss it. -->
+    <!-- Mobile backdrop, shown wherever the drawer is: documentation pages
+         keep a sidebar from `lg`, full-bleed pages from `xl`. -->
     <div v-if="open" class="fixed inset-0 z-40 bg-neutral/60" :class="docs ? 'lg:hidden' : 'xl:hidden'" @click="$emit('close')" />
 
     <aside
       class="bg-base-100 border-r border-base-300 w-[17rem] flex-shrink-0 overflow-y-auto
              fixed inset-y-0 left-0 z-50 h-full transition-transform duration-200 ease-out"
       :class="[
-        // `invisible` when closed, not just translated off-screen: a
-        // transform still leaves the drawer in the tab order, so keyboard
-        // users tabbed into 10 focusable controls sitting at x=-272 with no
-        // way to see them (WCAG 2.4.3, measured). visibility:hidden removes
-        // them from the tab order, and the sticky breakpoint restores it.
+        // `invisible` when closed, not only translated off-screen: a
+        // transform alone would leave the drawer's links in the tab order.
         open ? 'translate-x-0' : '-translate-x-full invisible',
         docs ? 'lg:sticky lg:top-16 lg:z-auto lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:visible' : '',
       ]"
@@ -86,9 +79,7 @@ export default {
   data: () => ({ shortcut: MAC_SHORTCUT }),
 
   computed: {
-    // Excludes the page you are on: it was always the first entry, spending a
-    // row of a five-row list on the one document you certainly don't need a
-    // link to.
+    // Excludes the page you are on, which would always be the first entry.
     recent: ({ $store, $route }) => $store.state.recent
       .filter((o) => o.to !== $route.path)
       .slice(0, 5),

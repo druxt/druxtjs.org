@@ -1,15 +1,13 @@
 /**
  * Renders fenced ```mermaid blocks into SVG diagrams.
  *
- * Client-side by design: mermaid 8 is the last major that bundles under
- * webpack 4. Styling is deliberately NOT mermaid's: assets/css/app.css
- * restyles the SVG classes from the site's daisyUI tokens, so diagrams
- * follow the colour mode live with no re-render. Until JavaScript runs,
- * the page shows the diagram source, which reads as a text description.
+ * Client-side, and styled by assets/css/app.css rather than by mermaid, so
+ * diagrams follow the colour mode. Before JavaScript runs the page shows the
+ * diagram source.
  *
- * Authoring contract: a first line of `%% <text>` becomes the figure's
- * caption and the SVG's accessible name. Consecutive fences inside
- * <div class="docs-diagram-row"> render as a row of cards (app.css).
+ * Authoring: a first line of `%% <text>` becomes the figure's caption and the
+ * SVG's accessible name. Consecutive fences inside
+ * <div class="docs-diagram-row"> render as a row of cards.
  */
 
 let uid = 0
@@ -159,16 +157,14 @@ const renderInto = (mermaid, container, source) => {
       // Drop mermaid's embedded stylesheet: its #id-prefixed rules outrank
       // the site styles that give diagrams their colour-mode palette.
       el.querySelectorAll('style').forEach((style) => style.remove())
-      // useMaxWidth scales the diagram to its column; on a phone that
-      // shrank 14px labels to 4px. app.css reads this floor below 640px,
-      // where the diagram then scrolls in its frame instead.
+      // useMaxWidth scales the diagram to its column, which shrinks labels on
+      // a phone. app.css reads this floor below 640px and scrolls instead.
       const natural = parseFloat((el.getAttribute('viewBox') || '').split(/\s+/)[2])
       if (natural) el.style.setProperty('--docs-diagram-floor', `${Math.round(natural * 0.85)}px`)
       wrap(container, el, label)
     })
   } catch (e) {
-    // Leave the readable source in place; a broken diagram must not take
-    // the page down with it.
+    // Leave the readable source in place.
     container.textContent = source
   }
 }

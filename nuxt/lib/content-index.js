@@ -1,15 +1,11 @@
 /**
  * Build-time index of the `content/` tree.
  *
- * `@nuxt/content` v1 has no supported way to query the collection from a
- * nuxt.config.js hook: the package exports `Database`, and instantiating one
- * starts a file watcher that never releases the event loop, so a `generate`
- * using it never exits. Reading the tree directly is deterministic, needs no
- * running Nuxt, and is straightforward to unit test.
+ * `@nuxt/content` v1 cannot be queried from a nuxt.config.js hook: its
+ * Database holds a file watcher open, so `generate` never exits.
  *
- * Only the frontmatter is parsed. Nothing here renders Markdown; the fields
- * this module returns (path, title, description) are exactly what sitemap.xml
- * and llms.txt consume.
+ * Only the frontmatter is parsed. The fields returned (route, title,
+ * description) are what sitemap.xml and llms.txt consume.
  */
 
 const fs = require('fs')
@@ -26,20 +22,9 @@ const FIELD = /^([A-Za-z_][\w-]*)[ \t]*:[ \t]*(.*)$/
 /**
  * Split a document into its frontmatter fields and its body.
  *
- * Hand-rolled rather than using gray-matter, which this did use. The docs site
- * is not a yarn workspace of the repository root, so a root `yarn install` does
- * not provide its dependencies, yet the root jest and knip both read this file:
- * jest could not resolve gray-matter and the suite failed to load, and knip
- * reported it unlisted. Declaring it at the root fixed both and cost 50 minutes
- * of CI, because the cache is keyed on the root yarn.lock and every node job
- * then reinstalled 2193 packages from cold and hit the one-hour timeout.
- *
- * Handling three scalar keys is not worth a dependency in either tree. This
- * parses exactly what `content/` uses: title, weight and description, all
- * single-line scalars. It deliberately does not implement YAML. Anything it
- * does not recognise is ignored rather than guessed at, so a document that
- * grows a nested or multi-line value degrades to the same route-derived title
- * and excerpted description a document with no frontmatter already gets.
+ * Hand-rolled rather than a YAML dependency, because `content/` uses only
+ * single-line scalars: title, weight and description. Anything else is ignored,
+ * and the document falls back to a route-derived title.
  *
  * @param {string} raw - The complete file contents.
  * @returns {{data: object, content: string}} Fields and the remaining body.
@@ -95,15 +80,9 @@ const isSkippableLine = (line) => (
   || line.startsWith('```') // fence
   || line.startsWith('<') // raw html / component
   || /^[-*_]{3,}$/.test(line) // rule
-  // List items, matching utils/content.js documentDescription, which only
-  // accepts p and blockquote nodes. Without this the two disagree on a document
-  // whose first prose is a list: the build wrote "- first bullet item" into
-  // llms.txt while the page's own meta description fell back to the section
-  // blurb. A leading bullet is not a summary either way.
+  // List items, matching utils/content.js documentDescription.
   || /^([-*+]|\d+\.)\s/.test(line)
-  // A note to a maintainer, not a summary. content/guide/deprecations.md opens
-  // with "TODO: Move to API documentation", which would otherwise become that
-  // page's meta description and its llms.txt entry.
+  // A note to a maintainer, not a summary.
   || /^(TODO|FIXME|NOTE|XXX)\b[:\s]/i.test(line)
 )
 
@@ -111,11 +90,8 @@ const isSkippableLine = (line) => (
  * A one-line summary of a document, for `<meta name="description">` and for the
  * llms.txt entry.
  *
- * Almost no page in `content/` sets a `description` in its frontmatter, which
- * is why every page currently ships the empty site-wide default. The first real
- * line of prose is a far better answer than nothing, and most module READMEs
- * and guide pages already open with exactly that: a one-sentence blockquote
- * summary.
+ * Almost nothing in `content/` sets a frontmatter description, so the first
+ * line of prose stands in.
  *
  * @param {string} body - Markdown body, frontmatter already stripped.
  * @returns {string} A plain-text summary, or an empty string.
@@ -125,12 +101,8 @@ const excerpt = (body) => {
     .split('\n')
     .map((raw) => raw.replace(/^>\s?/, '').trim())
 
-  // Pages under content/api are jsdoc2md output: a heading, then a <dl> of
-  // every symbol in the package. Excerpting those line by line yields sentence
-  // fragments torn out of the middle of the markup ("wrapper component.</p>"),
-  // which is worse than saying nothing and letting the caller supply a real
-  // description. Detected by structure rather than by path so it holds for any
-  // generated page.
+  // Generated pages (content/api is jsdoc2md output) open with markup rather
+  // than prose, and excerpting those yields fragments. Say nothing instead.
   const firstMeaningful = lines.find((line) => line !== '' && !line.startsWith('#'))
   if (!firstMeaningful || firstMeaningful.startsWith('<')) return ''
 

@@ -20,11 +20,7 @@
             <AppIconModules class="w-5 h-5" /> Browse modules
           </NuxtLink>
         </div>
-        <!--
-          Quickstart command. The advanced panel (collapsed by default) swaps
-          between the four quickstart repositories and between the Gitpod URL
-          and the DevPod CLI, rewriting this one command in place.
-        -->
+        <!-- The advanced panel rewrites this command for the chosen starter kit and runner. -->
         <div class="mt-8 w-full max-w-2xl">
           <div class="flex items-center gap-2 rounded-btn bg-base-100 border border-base-300 px-4 py-2 text-left">
             <code class="flex-1 min-w-0 overflow-x-auto text-sm font-mono whitespace-nowrap">{{ command }}</code>
@@ -52,8 +48,7 @@
             id="quickstart-advanced"
             class="mt-3 rounded-box border border-base-300 bg-base-100 p-4 text-left flex flex-col gap-4"
           >
-            <!-- Hidden while only one starter kit is enabled: a radio group
-                 with a single option is noise, not a choice. -->
+            <!-- Hidden while only one starter kit is enabled. -->
             <fieldset v-if="starterKits.length > 1">
               <legend class="text-xs font-semibold uppercase tracking-wider text-base-content/70 mb-2">Starter kit</legend>
               <div class="grid gap-2 sm:grid-cols-2">
@@ -63,13 +58,7 @@
                   class="flex gap-3 items-start rounded-btn border p-3 cursor-pointer transition-colors"
                   :class="repo === option.repo ? 'border-primary bg-base-200' : 'border-base-300 hover:border-primary'"
                 >
-                  <!--
-                    flex-shrink-0, not the v3 spelling `shrink-0`: this is
-                    Tailwind 2, where `shrink-0` generates nothing at all.
-                    Without it a long enough sibling label (Commerce's is the
-                    longest) squeezes the radio below 20px wide and it renders
-                    as an oval.
-                  -->
+                  <!-- Tailwind 2 spells this `flex-shrink-0`; `shrink-0` generates nothing. -->
                   <input
                     v-model="repo"
                     type="radio"
@@ -181,11 +170,8 @@ export default {
       { value: 'giget', label: 'giget' },
       { value: 'devpod', label: 'DevPod' },
     ],
-    // Only the entries marked `enabled` are offered. The rest stay listed
-    // here, rather than being deleted, because they are expected back once
-    // they are working again - flipping the flag is the whole change. The
-    // picker hides itself while only one is enabled (see `starterKits`),
-    // so a single-option radio group is never rendered.
+    // Only the entries marked `enabled` are offered; the rest wait here until
+    // they are ready again.
     quickstarts: [
       { repo: 'quickstart', title: 'Druxt Quickstart', description: 'Drupal 11, Nuxt 2 and Druxt in one repository.', enabled: true },
       { repo: 'quickstart-druxt-site-tome', title: 'Tome', description: 'Databaseless: static Drupal via Tome.', enabled: false },
@@ -219,9 +205,7 @@ export default {
   }),
   head() {
     return {
-      // The homepage is the one page whose title should not be suffixed: it is
-      // already the site name, and head.titleTemplate would make it
-      // "DruxtJS - DruxtJS".
+      // The homepage sets its own title: the site-wide suffix would repeat the name.
       titleTemplate: 'DruxtJS - The Fully Decoupled Drupal Framework',
       ...seoHead({
         title: null,
@@ -238,7 +222,7 @@ export default {
     // The starter kits currently offered.
     starterKits: ({ quickstarts }) => quickstarts.filter((o) => o.enabled),
 
-    // Copy button label, including the failure the catch used to swallow.
+    // Copy button label.
     copyLabel: ({ copied, copyFailed }) => {
       if (copyFailed) return 'Copy failed'
       return copied ? 'Copied' : 'Copy'
@@ -247,9 +231,8 @@ export default {
     /**
      * One command block, rewritten by the repo and runner pickers.
      *
-     * `--install` matches what the quickstart's own README prescribes:
-     * without it giget only downloads the tree, leaving the reader with no
-     * dependencies, no provisioned Drupal, and nothing to run.
+     * `--install` matches the quickstart's own README; giget otherwise only
+     * downloads the tree.
      */
     command() {
       return this.runner === 'devpod'
@@ -270,17 +253,11 @@ export default {
       try {
         await navigator.clipboard.writeText(this.command)
         this.copied = true
-        // gtag(), not a raw dataLayer.push of an array: gtag.js reads the
-        // Arguments object gtag() pushes, whereas a literal array is the GTM
-        // convention and is not processed as a GA4 event. window.gtag is a
-        // global (top-level function declaration in the classic inline
-        // snippet), and optional-chaining keeps this a silent no-op wherever
-        // the production-gated snippet isn't present - dev, preview, SSR.
+        // gtag() is defined only by the production analytics snippet, so this
+        // is a no-op in dev, preview and SSR.
         window.gtag?.('event', 'copy_quickstart_command', { repo: this.repo, runner: this.runner })
       } catch (e) {
-        // Say so, rather than leaving the button silent. navigator.clipboard
-        // is undefined on non-secure origins and writeText can be denied, and
-        // this is the site's most important command to copy.
+        // navigator.clipboard is absent on non-secure origins, and can be denied.
         this.copyFailed = true
         setTimeout(() => { this.copyFailed = false }, 2000)
       }

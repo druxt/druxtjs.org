@@ -1,15 +1,9 @@
 <template>
   <!--
-    The unified sticky breadcrumb. Second sticky layer under the site header:
-    the trail carries the current section, every crumb with siblings opens
-    them through AppDropdown, and the trail ends in a live crumb for the
-    heading currently in view, whose menu is the on-this-page list. On module
-    detail pages the module tab bar stacks beneath as the third layer.
-
-    On short viewports (under 800px tall, half the desktop audience is
-    1366x768) the bar hides on downward scroll and returns on upward scroll -
-    except where the module tab bar stacks beneath it, whose static 108px pin
-    would otherwise expose a see-through band where this bar was.
+    The sticky breadcrumb, under the site header. Crumbs with siblings open
+    them through AppDropdown, and the trail ends in a crumb for the heading
+    currently in view. On short viewports the bar hides on downward scroll,
+    except where the module tab bar stacks beneath it.
   -->
   <div
     v-if="crumbs.length > 1"
@@ -92,8 +86,7 @@ export default {
   computed: {
     parts: ({ $route }) => $route.path.split('/').filter(Boolean),
 
-    /** Component reference pages belong to the Components section, per the
-     * same rule the sidebar applies. */
+    /** Component reference pages belong to the Components section, as in the sidebar. */
     isComponentRef() {
       const [first, second, , fourth] = this.parts
       return first === 'api' && second === 'packages' && fourth === 'components'
@@ -129,10 +122,7 @@ export default {
       }))
     },
 
-    /**
-     * Sibling documents of the current section, from the menu children
-     * nuxtServerInit indexes. The section root itself is not a sibling.
-     */
+    /** Sibling documents of the current section; the section root is not one. */
     sectionDocItems() {
       const sectionTo = (((this.sectionItem || {}).props || {}).to || '').replace(/\/$/, '')
       return (((this.sectionItem || {}).children) || [])
@@ -149,11 +139,8 @@ export default {
 
     /**
      * The trail. Every entry: { key, label, to?, items?, current? }.
-     * Intermediate API directories render unlinked on purpose: they have no
-     * documents behind them, and linking them is how crawlers used to reach
-     * generated error pages. When the document has headings, the trail ends
-     * one level deeper than the page: a crumb for the heading currently in
-     * view, whose menu is the on-this-page list.
+     * Intermediate API directories render unlinked, having no document behind
+     * them. A document with headings ends the trail with the heading in view.
      */
     crumbs() {
       const parts = this.parts
@@ -190,10 +177,8 @@ export default {
         const pkg = parts[2]
         const slug = pkg.replace(/^druxt-/, '')
         const known = modulePkgs.includes(slug)
-        // The API menu tree already knows each package's real landing page:
-        // a package without an index (test-utils) points at its first
-        // reference page there, and linking the bare root here handed the
-        // crawler a generated error page.
+        // The API menu knows each package's real landing page: a package
+        // without an index points at its first reference page instead.
         const apiItem = this.$store.state.menu.find((item) => ((item.props || {}).to || '') === '/api')
         const pkgEntry = ((apiItem || {}).children || []).find((child) => {
           const to = ((child.props || {}).to || '')
@@ -229,9 +214,8 @@ export default {
     },
 
     /**
-     * The current document's title. Pages record themselves into the
-     * recent-documents store as they load, which carries the frontmatter
-     * title; the route segment is the fallback for anything that has not.
+     * The current document's title, from the recent-documents store each page
+     * records itself into. The route segment is the fallback.
      */
     leafTitle() {
       const path = this.$route.path.replace(/\/$/, '')

@@ -1,0 +1,86 @@
+---
+# The services Lagoon builds and runs. Lagoon reads the labels; the
+# environment blocks only apply when this runs under docker compose.
+
+x-environment: &default-environment
+  LAGOON_ENVIRONMENT_TYPE: local
+  LAGOON_ROUTES: http://localhost:3000,http://localhost:8080
+  DRUXT_FRONTEND_URL: http://localhost:3000
+
+volumes:
+  files: {}
+  db: {}
+
+services:
+  cli:
+    build:
+      context: .
+      dockerfile: lagoon/cli.dockerfile
+    image: &cli-image ${COMPOSE_PROJECT_NAME:-druxtjs-org}-cli
+    labels:
+      lagoon.type: cli-persistent
+      lagoon.persistent.name: nginx
+      lagoon.persistent: /app/drupal/web/sites/default/files/
+    volumes:
+      - files:/app/drupal/web/sites/default/files
+    environment:
+      <<: *default-environment
+
+  nginx:
+    build:
+      context: .
+      dockerfile: lagoon/nginx.dockerfile
+      args:
+        CLI_IMAGE: *cli-image
+      additional_contexts:
+        cli: 'service:cli'
+    labels:
+      lagoon.type: nginx-php-persistent
+      lagoon.persistent: /app/drupal/web/sites/default/files/
+    ports:
+      - '8080:8080'
+    volumes:
+      - files:/app/drupal/web/sites/default/files
+    depends_on:
+      - cli
+    environment:
+      <<: *default-environment
+
+  php:
+    build:
+      context: .
+      dockerfile: lagoon/php.dockerfile
+      args:
+        CLI_IMAGE: *cli-image
+      additional_contexts:
+        cli: 'service:cli'
+    labels:
+      lagoon.type: nginx-php-persistent
+      lagoon.name: nginx
+      lagoon.persistent: /app/drupal/web/sites/default/files/
+    volumes:
+      - files:/app/drupal/web/sites/default/files
+    depends_on:
+      - cli
+    environment:
+      <<: *default-environment
+
+  mariadb:
+    image: uselagoon/mariadb-10.11-drupal:26.8.1
+    labels:
+      lagoon.type: mariadb
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      <<: *default-environment
+
+  nuxt:
+    build:
+      context: .
+      dockerfile: lagoon/nuxt.dockerfile
+    labels:
+      lagoon.type: node
+    ports:
+      - '3000:3000'
+    environment:
+      <<: *default-environment

@@ -1,11 +1,8 @@
 <template>
   <!--
-    The one jump-menu implementation: the Subheader, the module header and
-    the breadcrumbs all render their sibling/heading menus through this, so
-    trigger affordance, panel styling and dismissal behave identically
-    everywhere. Dismissed on outside click, Escape, route change and page
-    scroll - the panel is absolutely positioned, so a scrolled page would
-    otherwise carry an open panel off screen.
+    The one jump menu: the module header and the breadcrumbs both use it, so
+    every sibling and heading menu looks and behaves the same. Dismissed on
+    outside click, Escape, route change and page scroll.
   -->
   <div class="relative inline-flex">
     <button
@@ -75,8 +72,8 @@ export default {
     this.onKey = (e) => {
       if (e.key === 'Escape') this.open = false
     }
-    // Panel-internal scrolling is a separate event target and never
-    // reaches the window, so this only fires for real page scrolls.
+    // Scrolling inside the panel never reaches the window, so this fires
+    // only for page scrolls.
     this.onScroll = () => {
       this.open = false
     }

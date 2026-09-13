@@ -1,0 +1,17 @@
+---
+docker-compose-yaml: docker-compose.yml
+
+environment_variables:
+  git_sha: 'true'
+
+routes:
+  autogenerate:
+    insecure: Redirect
+
+tasks:
+  post-rollout:
+    - run:
+        name: Install or update Drupal, and seed a new site's documentation
+        command: sh /app/lagoon/post-rollout.sh
+        service: cli
+        shell: sh

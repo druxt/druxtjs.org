@@ -3,9 +3,7 @@
  * https://llmstxt.org: an H1, a blockquote summary, optional orienting prose,
  * then H2 sections of `- [name](url): notes` links.
  *
- * Distinct from sitemap.xml, which is the same URLs with no descriptions. An
- * assistant answering "how do I override a Druxt field component" needs to know
- * which URL covers that; a crawler scheduling a recrawl does not.
+ * Unlike sitemap.xml, each URL carries a description of what it covers.
  *
  * Pure and side-effect free, so it can be unit tested without a build.
  */
@@ -15,18 +13,13 @@ const { SITE_ORIGIN, SITE_NAME, SITE_DESCRIPTION, SECTIONS } = require('./site')
 /**
  * UTM params identifying assistant-sourced clicks.
  *
- * The llms.txt convention is not settled, and tagging is the only way to learn
- * whether the file earns its keep rather than guessing later. Per-page
- * `<link rel="canonical">` means the extra params cost nothing in search.
- * Delete this constant and the `withUtm` call if clean cited URLs ever matter
- * more than the measurement.
+ * The per-page `<link rel="canonical">` keeps the extra params out of search.
  */
 const UTM = 'utm_source=llms-txt&utm_medium=ai&utm_campaign=syndication'
 
 /**
- * Orienting prose. The section list alone does not explain that Druxt spans two
- * ecosystems, which is the single most useful fact for answering questions
- * about it correctly.
+ * Orienting prose: the section list alone does not say that Druxt spans two
+ * ecosystems.
  */
 const PREAMBLE = [
   'Druxt connects a Drupal backend to a Nuxt frontend. It spans two ecosystems: Drupal modules (PHP) that expose JSON:API resources, and Nuxt/Vue packages (JavaScript) that render them.',
@@ -57,12 +50,8 @@ const listItem = (title, url, notes) => (
 /**
  * Render `/llms.txt`.
  *
- * The guide sections (tutorials, how-to, concepts) and module pages are
- * listed in full. The API reference is not: it
- * is 100+ generated pages, one per component or mixin, and listing them all
- * buries what the project actually is under a wall of near-identical entries.
- * The per-package API index URLs go under `## Optional` instead, which is what
- * that section is for in the format.
+ * The guide sections and module pages are listed in full. The API reference is
+ * 100+ generated pages, so only its per-package indexes go under `## Optional`.
  *
  * @param {Array<object>} docs - Documents from readContent().
  * @param {object} [options] - Overrides, for tests.
@@ -92,9 +81,8 @@ const buildLlmsTxt = (docs, options) => {
     entries.forEach((doc) => lines.push(listItem(doc.title, url(doc.route), doc.description)))
   })
 
-  // One entry per package rather than per generated page. `content/api` is a
-  // docgen build artifact and is absent from a fresh checkout, so this section
-  // disappears entirely rather than emitting dead URLs.
+  // One entry per package. `content/api` is a docgen artifact, absent from a
+  // fresh checkout, so the section disappears rather than emitting dead URLs.
   const packages = docs
     .filter((doc) => /^\/api\/packages\/[^/]+$/.test(doc.route))
     .sort((a, b) => a.route.localeCompare(b.route))
@@ -103,11 +91,8 @@ const buildLlmsTxt = (docs, options) => {
     lines.push('', '## Optional', '')
     lines.push(listItem('API reference', url('/api'), SECTIONS.api.description))
     packages.forEach((doc) => {
-      // Labelled from the route, not the document title. docgen titles each
-      // package index after the first symbol it happens to document, so
-      // /api/packages/blocks is titled "DruxtBlocksModule" and
-      // /api/packages/site is titled "DruxtSiteMixin" - names that point at one
-      // export rather than the package a reader is looking for.
+      // Labelled from the route: docgen titles each package index after the
+      // first symbol it documents, not after the package.
       const name = doc.route.split('/').pop()
       const label = name.charAt(0).toUpperCase() + name.slice(1)
       lines.push(listItem(

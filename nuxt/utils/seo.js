@@ -1,11 +1,7 @@
 /**
  * Per-page SEO head fragments.
  *
- * The site used to run `nuxt-social-meta`, which set one set of Open Graph tags
- * in nuxt.config.js for all 130 routes: every page shared the homepage's title,
- * description and share image, and none declared a canonical URL. That module
- * has been removed and this is now the only place any of it is decided, so the
- * share card and the canonical URL cannot drift apart.
+ * The only place the site's Open Graph, Twitter and canonical tags are decided.
  */
 
 import { SITE_ORIGIN, SITE_NAME, SITE_DESCRIPTION, TITLE_SUFFIX, TWITTER_HANDLE, SECTIONS, canonicalUrl, ogImageUrl, sectionFor, titleFromPath } from '~/lib/site'
@@ -29,13 +25,11 @@ export const clampDescription = (text) => {
 }
 
 /**
- * The description for a page, falling back through progressively less specific
- * sources rather than to an empty string.
+ * The description for a page, falling back to the section's and then the
+ * site's rather than to an empty string.
  *
- * The generated API pages are the reason for the section fallback: they are
- * jsdoc output with no prose to excerpt, so a page-level description does not
- * exist for most of them. Saying what the section is beats repeating the
- * site-wide blurb on 98 pages.
+ * The generated API pages have no prose to excerpt, which is what the section
+ * fallback is for.
  *
  * @param {object} context - The page context.
  * @param {string} [context.description] - The document's own description.
@@ -52,8 +46,7 @@ export const descriptionFor = ({ description, path }) => {
  * A complete `head()` fragment for a documentation page.
  *
  * Returns `title`, `meta` and `link`, ready to spread into a page's own
- * `head()`. Every tag is keyed by `hid` so that a page, or a layout, can
- * override one of them by name without emitting a second copy alongside it.
+ * `head()`. Every tag is keyed by `hid`, so a page can override one by name.
  *
  * @param {object} context - The page context.
  * @param {string} context.title - The document title, without the site suffix.
@@ -65,18 +58,14 @@ export const descriptionFor = ({ description, path }) => {
  */
 export const seoHead = ({ title, description, path, image, type }) => {
   const url = canonicalUrl(path)
-  // A document with no frontmatter title would otherwise render the site name
-  // as its own title, on the page and in the share card alike. The homepage
-  // passes none deliberately and is the one page where that is correct.
+  // A document with no frontmatter title falls back to its path. The homepage
+  // passes none deliberately.
   const heading = title || (path === '/' ? '' : titleFromPath(path))
   const summary = descriptionFor({ description, path })
-  // og:title carries the suffix because it stands alone in a share card, with
-  // no browser chrome to say which site it came from. The <title> tag gets the
-  // suffix from head.titleTemplate, so passing it here would double it.
+  // og:title carries the suffix because a share card has no browser chrome;
+  // <title> gets it from head.titleTemplate instead.
   const shareTitle = heading ? heading + TITLE_SUFFIX : SITE_NAME
-  // Section pages get their generated card; everything else falls back to
-  // the generated site card. Both derive from the same content index, so a
-  // page that generates also gets a card.
+  // Section pages get their generated card; everything else the site card.
   const shareImage = image || ogImageUrl(path) || SITE_ORIGIN + '/og/site.png'
 
   return {
@@ -91,10 +80,8 @@ export const seoHead = ({ title, description, path, image, type }) => {
       { hid: 'og:image', property: 'og:image', content: shareImage },
       { hid: 'og:site_name', property: 'og:site_name', content: SITE_NAME },
 
-      // Dimensions let a scraper reserve the right space before fetching the
-      // image, and several crawlers will not render a card without them. They
-      // describe the site's own 1200x630 cards, so a caller-supplied image of
-      // unknown size gets no claim rather than a wrong one.
+      // Dimensions for the site's own 1200x630 cards. A caller-supplied image
+      // is of unknown size, so it gets no claim rather than a wrong one.
       ...(image ? [] : [
         { hid: 'og:image:width', property: 'og:image:width', content: '1200' },
         { hid: 'og:image:height', property: 'og:image:height', content: '630' },
@@ -107,8 +94,7 @@ export const seoHead = ({ title, description, path, image, type }) => {
       { hid: 'twitter:image', name: 'twitter:image', content: shareImage },
     ],
     link: [
-      // The one tag that makes the trailing-slash and UTM-tagged variants of a
-      // URL collapse onto a single indexed page.
+      // Collapses the trailing-slash and UTM-tagged variants onto one indexed URL.
       { hid: 'canonical', rel: 'canonical', href: url },
     ],
   }

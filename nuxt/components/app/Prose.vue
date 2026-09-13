@@ -1,26 +1,15 @@
 <template>
   <div ref="prose" class="prose">
     <!--
-      Keyed on the document path so each document gets a brand-new subtree.
-      enhance() below rewrites DOM that NuxtContent owns - figures() wraps
-      each <img> in a <figure> and re-parents it - which leaves Vue patching
-      against a tree that no longer matches its vnodes. Measured without the
-      key, navigating blocks -> entity -> blocks: an orphaned empty <figure>
-      persisted onto pages with no images at all, and returning to a
-      two-image page rendered only one. Re-creating the subtree keeps the
-      imperative enhancement from ever meeting a stale patch.
+      Keyed on the document path: enhance() rewrites the DOM NuxtContent
+      renders, so each document needs a fresh subtree.
     -->
     <NuxtContent v-if="document" :key="document.path" :document="document" />
     <!-- Content rendered elsewhere, such as a Drupal page, keyed by the caller. -->
     <slot v-else />
 
-    <!--
-      Lightbox for prose images. figures() gives every image a cursor-zoom-in
-      frame and a click handler; this renders the result locally rather than
-      emitting to a parent, because the only consumer (pages/modules/_.vue)
-      never listened for it - the affordance was there but the click did
-      nothing. Mirrors AppFigure's own lightbox.
-    -->
+    <!-- Lightbox for prose images, opened by the frames figures() adds.
+         Mirrors AppFigure's own lightbox. -->
     <div
       v-if="zoom"
       ref="dialog"
@@ -51,17 +40,14 @@ import { trapTab } from '~/utils/focus'
 /**
  * NuxtContent with the module-page conventions applied.
  *
- * @nuxt/content v1 has no prose component overrides, so the rendered output is
- * enhanced after mount. Everything here is a treatment of markdown the modules
- * already write - no content changes required:
+ * @nuxt/content v1 has no prose component overrides, so the rendered markdown
+ * is enhanced after mount:
  *
  * - images become captioned, click-to-enlarge figures (alt text is the caption)
  * - code blocks get a copy button
  * - tables get a keyboard-reachable scroll region and per-cell column labels
- * - the "For more details, refer to the … API documentation" lines the modules
- *   end each component section with become buttons rather than bullet points
- * - the `* * *` rules between sections are hidden; the headings already
- *   separate them, and eight per page is noise
+ * - the "For more details, refer to the … API documentation" lines become buttons
+ * - the `* * *` rules between sections are hidden
  */
 export default {
   props: {
@@ -162,9 +148,8 @@ export default {
         const figure = document.createElement('figure')
         figure.className = 'docs-figure not-prose my-8'
 
-        // A button, not a div: it was click-only, so the enlarge affordance
-        // existed for a mouse and for nothing else. Keyboard users could not
-        // reach it and screen readers were not told it did anything.
+        // A button, so the enlarge frame is reachable by keyboard and named
+        // for screen readers.
         const frame = document.createElement('button')
         frame.type = 'button'
         frame.className = 'docs-figure-frame cursor-[zoom-in]'
@@ -186,13 +171,12 @@ export default {
     copyButtons(root) {
       root.querySelectorAll('pre:not([data-enhanced])').forEach((pre) => {
         pre.setAttribute('data-enhanced', '')
-        // Focusable, as a scrollable region should be, and so a tap or Tab
-        // reveals the copy button where there is no hover.
+        // Focusable, so the scroll region is reachable and the copy button
+        // appears where there is no hover.
         pre.tabIndex = 0
 
-        // The button anchors to a wrapper, not the pre: the pre scrolls, and
-        // an absolutely positioned child of a scroll container scrolls with
-        // the code.
+        // The button anchors to the wrapper, not the pre, so it does not
+        // scroll away with the code.
         const wrapper = document.createElement('div')
         wrapper.className = 'docs-code'
         pre.parentNode.insertBefore(wrapper, pre)
@@ -201,17 +185,14 @@ export default {
         const button = document.createElement('button')
         button.type = 'button'
         button.className = 'docs-copy'
-        // A label, because every one of these otherwise reads as a bare
-        // "Copy". The visible text is a span so code.css can reserve the
-        // wider "Copied" width behind it.
+        // Named for screen readers; the visible text is a span so code.css
+        // can reserve the wider "Copied" width behind it.
         button.setAttribute('aria-label', 'Copy code to clipboard')
         const label = document.createElement('span')
         label.textContent = 'Copy'
         button.appendChild(label)
 
-        // The state change is announced here, not by the button text: the
-        // button keeps its name, and the live region reaches screen readers
-        // whether or not focus is still on the button.
+        // A live region announces the result, so the button keeps its name.
         const status = document.createElement('span')
         status.className = 'sr-only'
         status.setAttribute('role', 'status')
@@ -226,17 +207,13 @@ export default {
           if (state) button.dataset.state = state
           else delete button.dataset.state
         }
-        // navigator.clipboard is undefined on non-secure origins (a preview
-        // served over plain HTTP), and writeText can reject on a permission
-        // denial - without this the button silently never reacts and the
-        // rejection goes unhandled.
+        // navigator.clipboard is undefined on non-secure origins and can
+        // reject, so the click is guarded.
         button.addEventListener('click', async () => {
           try {
             await navigator.clipboard.writeText(code.innerText)
             setState('copied', 'Copied', 'Copied to clipboard')
-            // Only a successful copy counts. A clipboard rejection means the
-            // reader did not get the snippet, and recording it as usage would
-            // overstate exactly the metric this exists to measure.
+            // Only a successful copy is tracked.
             this.$track(...copyCodeEvent(
               this.$route.path,
               languageFromClass(pre.className) || languageFromClass(code.className),

@@ -1,6 +1,6 @@
 export default () => ({
-  // Main menu items. Unchanged from the current site: components/app/Menu.vue
-  // derives its active and open state from the route instead.
+  // Main menu items. components/app/Menu.vue derives active and open state
+  // from the route.
   menu: [{
     component: 'NuxtLink',
     text: 'Home',
@@ -61,8 +61,7 @@ export default () => ({
     component: 'a',
     text: 'Discord',
     icon: 'discord',
-    // The branded host: its certificate is valid again, and it is the one
-    // URL that survives invite rotation.
+    // The branded host, which survives invite rotation.
     props: { href: 'https://discord.druxtjs.org', target: '_blank' },
     children: [],
   }],

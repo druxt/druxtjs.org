@@ -20,11 +20,9 @@
 
       <main id="main" class="min-w-0 px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
         <AppBreadcrumbBar />
-        <!-- Module identity chrome; lives here (not in a page) so it
-             survives tab navigation between /modules/<pkg> and its
-             /api/packages/<pkg> pages. It wraps the page slot because its
-             sticky bar needs the page's height to stick within; on other
-             routes it renders only the slot. -->
+        <!-- Module identity chrome, in the layout so it survives navigation
+             between a module's pages. On other routes it renders only the
+             slot. -->
         <AppModuleHeader>
           <div class="mx-auto max-w-content">
             <Nuxt />
@@ -46,8 +44,7 @@
       </main>
     </template>
 
-    <!-- After the content container, not inside the header or sidebar, so it
-         renders on every route including the full-bleed homepage. -->
+    <!-- Outside both layouts above, so it renders on every route. -->
     <AppSiteFooter :version="$config.druxtVersion ? 'v' + $config.druxtVersion : null" />
 
     <AppSearch :open="searchOpen" @close="searchOpen = false" />
@@ -70,15 +67,8 @@ export default {
   },
 
   watch: {
-    // Fallback for Nuxt's own scroll-to-top: its scrollBehavior resolves via
-    // a `triggerScroll` event Nuxt emits after the page transition
-    // completes, but that signal never fires when a navigation crosses the
-    // isDocs boundary above - leaving/entering the full-bleed home template
-    // swaps this layout's entire surrounding markup (sidebar, TOC aside),
-    // not just the <Nuxt/> page slot, which the transition mechanism isn't
-    // built to handle. Path-gated (not hash) so TOC anchor jumps still work.
-    // 'instant' opts route changes out of the html { scroll-behavior: smooth }
-    // in app.css, which is for in-page scrolls only.
+    // Nuxt's own scroll-to-top does not fire when a navigation crosses the
+    // isDocs boundary. Path-gated, so table of contents jumps still work.
     $route(to, from) {
       this.sidebar = false
       this.searchOpen = false
@@ -86,10 +76,8 @@ export default {
     },
 
     /**
-     * Drawer focus handling. Opening moves focus to the drawer's close
-     * button so keyboard and screen-reader users land inside the overlay
-     * rather than behind it; closing returns focus to whatever opened it
-     * (the header hamburger), instead of dropping it on <body>.
+     * Drawer focus handling: opening moves focus into the drawer, closing
+     * returns it to whatever opened it.
      *
      * @param {boolean} open - Whether the drawer is now open.
      */
@@ -117,13 +105,10 @@ export default {
         e.preventDefault()
         this.searchOpen = true
       }
-      // The drawer is a modal overlay on mobile; Escape is the expected way
-      // out and the backdrop is not reachable by keyboard.
+      // The drawer is a modal overlay; Escape is the keyboard way out.
       if (e.key === 'Escape' && this.sidebar) this.sidebar = false
 
-      // While it is open it should behave like one: without this, Tab walked
-      // out of the drawer into the page behind the backdrop and left the
-      // drawer open over content the user was now editing focus in.
+      // Keep Tab inside the drawer while it is open.
       if (this.sidebar) trapTab(document.querySelector('aside'), e)
     }
     window.addEventListener('keydown', this.onKey)
@@ -136,11 +121,9 @@ export default {
 </script>
 
 <style scoped>
-/* Tailwind's JIT engine here doesn't convert the underscore-as-space in
-   multi-token arbitrary values (e.g. grid-cols-[17rem_minmax(0,1fr)]) - it
-   compiles to the literal, invalid `17rem_minmax(0,1fr)`, which the browser
-   ignores, silently collapsing this to a single-column grid (sidebar, then
-   content, stacked). Plain CSS avoids the arbitrary-value parser entirely. */
+/* Plain CSS, because this Tailwind version does not convert the
+   underscore-as-space in a multi-token arbitrary value such as
+   grid-cols-[17rem_minmax(0,1fr)]. */
 @media (min-width: 1024px) {
   .docs-grid {
     display: grid;

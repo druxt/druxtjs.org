@@ -1,13 +1,9 @@
 /**
  * The search shortcut label for the current platform.
  *
- * Shared because the header and the sidebar both advertise it and had drifted:
- * the header detected the platform while the sidebar hard-coded `⌘K`, so on a
- * non-Mac both were on screen together at >=1024px showing different keys for
- * the same shortcut.
- *
- * Must be called client-side only - it reads `navigator`, so components use it
- * from `mounted()` and start from the default below during SSR.
+ * Shared by the header and the sidebar, which both advertise it. Client-side
+ * only: it reads `navigator`, so components call it from `mounted()` and start
+ * from the default below during SSR.
  */
 export const MAC_SHORTCUT = '⌘K'
 

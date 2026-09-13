@@ -1,17 +1,13 @@
 /**
  * The module icon geometry, in one place.
  *
- * Consumed by the icon components (rendered as theme-variable strokes), by
- * lib/og-card.js (rendered with literal hexes through Satori), and by any
- * generator producing the packages' standalone icon.svg files. Change a mark
- * here and every consumer follows.
+ * Consumed by the icon components, by lib/og-card.js through Satori, and by
+ * the generator for the packages' standalone icon.svg files.
  *
- * Every entry is [d, tone]: pure path data (rects and circles are
- * re-expressed as paths, which is the one form Satori renders reliably) and
- * the brand tone. 'pf' is the Drupal blue, 'sf' the Nuxt green.
+ * Every entry is [d, tone]: pure path data, because Satori renders only paths
+ * reliably, and the brand tone. 'pf' is the Drupal blue, 'sf' the Nuxt green.
  *
- * CommonJS so nuxt.config.js's generate hook can require it; webpack interop
- * lets the components import from it just as well.
+ * CommonJS so nuxt.config.js's generate hook can require it.
  */
 module.exports = {
   druxt: [

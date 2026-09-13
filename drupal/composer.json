@@ -37,11 +37,11 @@
         "drupal/redirect": "^1.13",
         "drupal/simple_oauth": "^6.1",
         "drupal/token": "^1.17",
+        "drush/drush": "^13",
         "js-cookie/js-cookie": "3.0.5"
     },
     "require-dev": {
-        "drupal/core-dev": "^11",
-        "drush/drush": "^13"
+        "drupal/core-dev": "^11"
     },
     "conflict": {
         "drupal/drupal": "*"

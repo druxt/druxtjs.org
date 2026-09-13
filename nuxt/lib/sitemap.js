@@ -1,10 +1,6 @@
 /**
  * Builder for `/sitemap.xml`.
  *
- * The site has never had one. Every URL below the homepage was discoverable
- * only by crawling links, and the generated API reference is the part of the
- * site least likely to be linked from anywhere external.
- *
  * Pure and side-effect free, so it can be unit tested without a build.
  */
 
@@ -16,9 +12,7 @@ const HOME = { priority: 1.0, changefreq: 'weekly' }
 /**
  * Escape the five XML predefined entities.
  *
- * URLs here are built from file paths, so an ampersand is unlikely, but a
- * sitemap that is not well-formed XML is rejected wholesale rather than
- * partially, which makes silent breakage expensive.
+ * A sitemap that is not well-formed XML is rejected whole.
  *
  * @param {string} value - Raw text.
  * @returns {string} XML-safe text.
@@ -36,8 +30,7 @@ const escapeXml = (value) => String(value)
  * @param {object} entry - The URL, changefreq and priority.
  * @returns {string} The XML fragment.
  */
-// No <lastmod>: file modification times are checkout time in CI, so every URL would
-// claim fresh modification on every build - worse than omitting it.
+// No <lastmod>: file modification times are checkout time in CI.
 const urlEntry = (entry) => [
   '  <url>',
   '    <loc>' + escapeXml(entry.loc) + '</loc>',
@@ -49,10 +42,7 @@ const urlEntry = (entry) => [
 /**
  * Render `/sitemap.xml`.
  *
- * Priority is per section rather than per page: the hand-written guide and the
- * module docs are what the site is for, and the generated API reference is
- * reference material that should not outrank them. It is a relative hint
- * between this site's own URLs, not a claim about the site as a whole.
+ * Priority is per section, as a relative hint between this site's own URLs.
  *
  * @param {Array<object>} docs - Documents from readContent().
  * @param {object} [options] - Overrides, for tests.
@@ -68,15 +58,12 @@ const buildSitemap = (docs, options) => {
 
   const entries = [{
     loc: origin + '/',
-    // last changed in a way a crawler would care about.
     changefreq: HOME.changefreq,
     priority: HOME.priority,
   }]
 
   docs.forEach((doc) => {
-    // The homepage is added above and is not a content document. A root
-    // content/README.md would collapse to route '/' and be emitted a second
-    // time, giving the sitemap two entries for one URL.
+    // The homepage is added above; a root content/README.md would duplicate it.
     if (doc.route === '/') return
 
     const section = SECTIONS[doc.section]

@@ -15,6 +15,9 @@ import { seoHead } from '~/utils/seo'
 import { documentDescription } from '~/utils/content'
 import { fetchDrupalPage, sectionOf } from '~/lib/drupal-document'
 
+/** Pages docgen writes into the authored sections; they come from its corpus, not Drupal. */
+const GENERATED = ['/how-to/contributing']
+
 /**
  * A page in one of the authored sections: tutorials, how-to or explanation.
  *
@@ -27,7 +30,7 @@ export default {
     const section = sectionOf(route.path)
     const path = route.path.replace(/\/$/, '') || '/'
 
-    if ($config.docsSource !== 'markdown') {
+    if ($config.docsSource !== 'markdown' && !GENERATED.includes(path)) {
       const document = await fetchDrupalPage(store, path)
       if (!document) return error({ statusCode: 404, message: 'Document not found' })
       // Siblings in the docs menu's order, the section landing first.

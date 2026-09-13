@@ -12,21 +12,12 @@
       @keydown.tab="onTab"
     >
       <div class="w-full max-w-xl rounded-box bg-base-100 border border-base-300 shadow-2xl overflow-hidden">
-        <!--
-          `search-row` moves the focus ring onto this whole row rather than
-          the bare <input>. The input is only the middle of three flex
-          children, so a ring on the input alone drew an inset rectangle that
-          excluded the search icon and the esc key - it read as a box inside
-          the box. See assets/css/app.css.
-        -->
+        <!-- `search-row` puts the focus ring around the whole row rather than
+             the bare input. See assets/css/app.css. -->
         <div class="search-row flex items-center gap-3 px-4 border-b border-base-300">
           <AppIconSearch class="w-5 h-5 opacity-70 flex-shrink-0" />
-          <!--
-            Combobox semantics: the arrow-key cursor was visual only, so a
-            screen reader had no way to know which result was selected.
-            aria-activedescendant points at the highlighted option's id
-            while focus stays in the input.
-          -->
+          <!-- Combobox semantics: aria-activedescendant points at the
+               highlighted result while focus stays in the input. -->
           <input
             ref="input"
             v-model="query"
@@ -46,13 +37,9 @@
           >
           <button v-if="query" type="button" class="btn btn-ghost btn-xs" @click="query = ''">Clear</button>
           <!--
-            A button, not a bare <kbd>. It sits in the same slot as the Clear
-            button above and looks just as clickable, so a mouse user reads it
-            as the close control and clicks it, and nothing happened. The
-            <kbd> stays as the visible label so it still reads as the keyboard
-            hint it also is; the sr-only text supplies the meaning, and keeping
-            "esc" inside the accessible name leaves the control addressable by
-            voice (WCAG 2.5.3).
+            A button, not a bare <kbd>: it sits where Clear does, so a reader
+            takes it for the close control. The <kbd> stays as the visible
+            keyboard hint, and the sr-only text names it.
           -->
           <button
             v-else
@@ -66,12 +53,8 @@
           </button>
         </div>
 
-        <!--
-          Results arrive 180ms after typing and were announced nowhere: a
-          screen reader user got silence whether the search found 20 matches
-          or none (WCAG 4.1.3). Visually hidden because the count is already
-          obvious to a sighted user from the list itself.
-        -->
+        <!-- Announces the result count, which a sighted reader takes from
+             the list itself. -->
         <p class="sr-only" role="status" aria-live="polite">{{ resultsMessage }}</p>
 
         <!-- Results -->
@@ -216,8 +199,7 @@ export default {
      */
     flat: ({ groups, results }) => groups.reduce((acc, group) => acc.concat(results[group.type]), []),
 
-    // Excludes the page you are on, matching AppSidebar: offering a link to
-    // the document already open wastes one of five rows.
+    // Excludes the page you are on, matching AppSidebar.
     recent: ({ $store, $route }) => $store.state.recent
       .filter((o) => o.to !== $route.path)
       .slice(0, 5),
@@ -242,14 +224,12 @@ export default {
 
   watch: {
     open(open) {
-      // Matches the lightboxes in AppFigure and AppProse, which already lock
-      // scroll while they are open; the dialog was the one overlay that let
-      // the page scroll behind it.
+      // Locks page scroll while the dialog is open, as the AppFigure and
+      // AppProse lightboxes do.
       document.documentElement.style.overflow = open ? 'hidden' : ''
 
       if (open) {
-        // Restored when the dialog closes, so focus does not fall to <body>
-        // on a node that no longer exists.
+        // Restored when the dialog closes, so focus does not fall to <body>.
         this.restoreFocusTo = document.activeElement
         this.$nextTick(() => this.$refs.input && this.$refs.input.focus())
         return
@@ -270,9 +250,8 @@ export default {
       this.loading = true
       this.debounce = setTimeout(this.search, 180)
 
-      // Reported on a longer, separate debounce than the search itself.
-      // Sharing the 180ms one would file every prefix of a half-typed word as
-      // its own search and bury the term the reader actually meant.
+      // A longer debounce than the search, so half-typed prefixes are not
+      // reported as searches of their own.
       clearTimeout(this.reportDebounce)
       this.reportDebounce = setTimeout(this.reportSearch, 1200)
     },
@@ -309,11 +288,7 @@ export default {
     },
 
     /**
-     * Keep Tab inside the dialog.
-     *
-     * It declares `aria-modal="true"`, which tells assistive technology the
-     * rest of the page is hidden - so letting focus walk out into content the
-     * AT is actively suppressing is worse than not claiming modality at all.
+     * Keep Tab inside the dialog, which declares `aria-modal="true"`.
      *
      * @param {KeyboardEvent} e - The Tab keydown event.
      */
@@ -369,22 +344,16 @@ export default {
     },
 
     /**
-     * Report the settled query to GA4.
-     *
-     * Runs after results have resolved, so `flat.length` is the count the
-     * reader actually saw. A zero-result query reports as `search_no_results`,
-     * which is the signal worth having: it is a content backlog written by the
-     * audience rather than guessed at.
+     * Report the settled query to GA4. Runs after the results resolve, so the
+     * count is the one the reader saw; a query with none reports as
+     * `search_no_results`.
      *
      * @returns {void}
      */
     reportSearch() {
       if (!isReportableTerm(this.query)) return
-      // Results have not settled yet. Re-arm rather than return: returning
-      // drops the term permanently, and biases the loss toward slow and
-      // first-visit sessions - exactly the ones `search_no_results` exists to
-      // catch. `beforeDestroy` clears this same slot, so a retry cannot
-      // outlive the dialog.
+      // Results have not settled yet, so re-arm rather than drop the term.
+      // `beforeDestroy` clears this timer, so a retry cannot outlive the dialog.
       if (this.loading) {
         clearTimeout(this.reportDebounce)
         this.reportDebounce = setTimeout(this.reportSearch, 400)
@@ -395,16 +364,13 @@ export default {
 
     go(item) {
       if (!item) return
-      // Resolved before tracking, not after: navigation strips the /README
-      // suffix, so recording the raw item.path would file a link_path that
-      // never reconciles with the page_path GA4 reports for the page the
-      // reader actually lands on.
+      // Resolved before tracking: navigation strips the /README suffix, so
+      // the tracked path matches the page the reader lands on.
       const path = (item.path || '').replace(/\/README$/, '')
       if (this.query) {
         this.$store.commit('addRecentSearch', this.query)
         const index = this.flat.findIndex((o) => o.path === item.path)
-        // A miss yields -1, which would report as position 0 and be
-        // indistinguishable from a real rank. Drop it instead.
+        // A miss yields -1, which would report as a real rank, so drop it.
         // Fires before the route change so it is not lost to the navigation.
         if (index > -1) this.$track(...searchSelectEvent(this.query, path, index))
       }

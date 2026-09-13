@@ -1,10 +1,8 @@
 /**
  * Hard-reloads to the destination when a route's chunk fails to load.
  *
- * A tab left open across a redeploy holds a router whose hashed chunk URLs
- * no longer exist on the server; without this, clicking a link fails the
- * chunk fetch and the navigation silently dies, leaving a page where links
- * do nothing. A full load of the destination gets the current build.
+ * A tab left open across a redeploy asks for chunk URLs that no longer exist;
+ * a full load of the destination gets the current build.
  *
  * @param {object} context - The Nuxt context.
  * @param {object} context.app - The root Vue app options, carrying the router.

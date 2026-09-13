@@ -1,16 +1,7 @@
 <template>
   <header class="w-full border-b border-base-300 bg-base-100/90 backdrop-blur">
     <div class="max-w-[110rem] mx-auto h-16 px-4 sm:px-6 flex items-center gap-3">
-      <!--
-        The hamburger opens the drawer, so it must disappear exactly where the
-        drawer does. On documentation pages the sidebar becomes sticky at `lg`,
-        so above that the button had nothing to open: between 1024 and 1279px
-        it was visible but inert - the drawer's own backdrop and close button
-        are `lg:hidden`, and the click handler only ever sets `sidebar = true`,
-        so it could not even be undone. The homepage has no sticky sidebar, so
-        there the drawer (and this button) stay useful until `xl`, where the
-        inline section nav takes over.
-      -->
+      <!-- Hidden wherever the drawer is: documentation pages keep a sidebar from `lg`, the home page from `xl`. -->
       <button
         type="button"
         class="btn btn-ghost btn-square btn-sm -ml-1"
@@ -21,17 +12,10 @@
         <AppIconMenu class="w-5 h-5" />
       </button>
 
-      <!-- The branding and section nav are Drupal blocks, placed in the header region of the consumer's theme. -->
+      <!-- The branding and section nav are Drupal blocks, in the header region of the consumer's theme. -->
       <DruxtBlockRegion v-if="theme" name="header" :theme="theme" />
 
-      <!--
-        Links to the release notes, following the convention in this
-        ecosystem: Vite, VitePress and Pinia all make the version in the nav
-        a link to their changelog. The target is the site's own generated
-        page (docgen writes api/packages/<pkg>/CHANGELOG from the package's
-        CHANGELOG.md) rather than GitHub, so the reader stays in the docs -
-        it is the same page the module pages already call "Release notes".
-      -->
+      <!-- The version links to its release notes, the generated page from the package's changelog. -->
       <NuxtLink
         v-if="version"
         class="badge badge-sm badge-outline hidden sm:inline-flex hover:border-primary hover:text-primary-focus"
@@ -41,14 +25,7 @@
 
       <div class="flex-1" />
 
-      <!--
-        Search trigger. `w-48`, not `w-44`: the label was `whitespace-nowrap`
-        and would not shrink, so on a non-Mac the wider "Ctrl K" bubble was
-        pushed 7.4px past the button's right edge (measured at 768 and
-        1152px; "⌘K" happened to fit, so it only showed on non-Mac). The
-        label now truncates instead of shoving, which also holds for any
-        future shortcut string.
-      -->
+      <!-- Wide enough for the longest shortcut bubble, so the label truncates instead of pushing it out. -->
       <button
         type="button"
         class="hidden sm:flex items-center gap-2 h-9 pl-3 pr-2 w-48 xl:w-56 rounded-btn border border-base-300 bg-base-200 text-sm text-base-content/70 hover:border-primary hover:text-base-content transition-colors"
@@ -93,7 +70,7 @@ import { MAC_SHORTCUT, searchShortcut } from '~/utils/platform'
 export default {
   props: {
     version: { type: String, default: null },
-    /** true on documentation pages, where the sidebar goes sticky at `lg`. */
+    /** True on documentation pages, which keep a sidebar from `lg`. */
     docs: { type: Boolean, default: true },
   },
 
@@ -110,7 +87,7 @@ export default {
   },
 
   methods: {
-    // GitHub and Discord get their own marks; anything else falls back.
+    // GitHub and Discord have their own marks; anything else falls back.
     iconFor(link) {
       return 'app-icon-' + (link.icon || 'external')
     },

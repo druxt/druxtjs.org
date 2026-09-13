@@ -93,9 +93,8 @@ export default {
     },
 
     /**
-     * A section's index document is discovered alongside its siblings, which
-     * previously produced "Tutorials › Tutorials" in the trail. The parent
-     * link already goes there, so drop any child pointing at the same route.
+     * The item's children, minus any pointing at the same route as the parent,
+     * such as a section's own index document.
      *
      * @param {object} item - The menu item.
      * @returns {object[]} The item's linkable children.
@@ -107,11 +106,6 @@ export default {
 
     /**
      * The item's route, trailing slash removed, with the root kept as '/'.
-     *
-     * Trimming used to reduce Home's '/' to an empty string, which the
-     * empty-value guards in isActive and isCurrent then read as "no route",
-     * so Home could never be marked active or current, on the one page it
-     * points at, and the `to === ''` branch below was unreachable.
      *
      * @param {object} item - The menu item.
      * @returns {?string} The normalised route, or null without one.
@@ -136,13 +130,11 @@ export default {
       const to = this.to(item)
       if (!to) return false
       const path = this.currentPath()
-      // Home matches only itself; every other section also matches its
-      // descendants. Compared segment-wise so /guide does not light up on
-      // a sibling route that merely shares its prefix.
+      // Home matches only itself; every other section also matches the
+      // routes beneath it, compared segment by segment.
       if (to === '/') return path === '/'
-      // Component reference pages live under /api/packages/*/components/,
-      // but they belong to the Components section: it claims them, and the
-      // API section stands down for them.
+      // Component reference pages sit under /api, but belong to the
+      // Components section.
       const onComponent = /^\/api\/packages\/[^/]+\/components(\/|$)/.test(path)
       if (to === '/components' && onComponent) return true
       if (to === '/api' && onComponent) return false

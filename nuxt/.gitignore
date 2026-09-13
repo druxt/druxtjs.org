@@ -110,3 +110,7 @@ styles/
 
 # The markdown and docgen output, read from the pinned druxt.js clone.
 /content
+
+# Written into static/ by server/start.js as the server starts.
+/static/sitemap.xml
+/static/llms.txt

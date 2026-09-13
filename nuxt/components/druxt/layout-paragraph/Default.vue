@@ -7,7 +7,7 @@
 <script>
 /**
  * A layout section's regions, in reading order. A section of diagrams in
- * columns is the row an author once wrote as `<div class="docs-diagram-row">`.
+ * columns renders as a row.
  */
 export default {
   props: {

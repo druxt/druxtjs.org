@@ -5,6 +5,8 @@
 <script>
 /** A code block, highlighted by its declared language. */
 export default {
+  // DruxtEntity's other props (fields, schema, value) are not HTML attributes.
+  inheritAttrs: false,
   props: {
     entity: { type: Object, default: undefined },
   },

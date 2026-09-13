@@ -32,10 +32,7 @@
 
 <script>
 // Keys are directory segments docgen emits under api/packages/<pkg>/.
-// `package` is for entries at the package root (the Nuxt module, the client,
-// the schema) and `other` is the genuine fallback - before these were added,
-// everything that was not a component/mixin/store landed in "Other", which
-// made it a grab-bag of unrelated things rather than a category.
+// `package` covers entries at the package root; `other` is the fallback.
 const LABELS = {
   components: 'Components',
   mixins: 'Mixins',
@@ -66,9 +63,8 @@ export default {
       entries.forEach((entry) => {
         const dir = entry.dir || ''
         const parts = dir.split('/')
-        // Root-level entries have no directory segment to classify them, so
-        // match the package root explicitly rather than letting them fall
-        // through to 'other'.
+        // Root-level entries have no directory segment, so match the package
+        // root explicitly.
         const type = Object.keys(LABELS).find((key) => parts.includes(key))
           || (dir.replace(/^\/+|\/+$/g, '').endsWith(root) ? 'package' : 'other')
         buckets[type] = buckets[type] || []
@@ -95,23 +91,16 @@ export default {
 
   methods: {
     async fetch() {
-      // The parent component instance is reused across /modules/<pkg> route
-      // changes, so a quick move between modules can leave two queries in
-      // flight. Without this, an earlier one resolving later would overwrite
-      // the current package's entries with the previous package's. Same
-      // guard AppSearch uses for its debounced queries.
+      // This instance is reused across route changes, so discard a response
+      // for a package that is no longer the current one.
       const pkg = this.pkg
       try {
         const entries = await this.$content('api/packages/' + pkg, { deep: true })
           .only(['title', 'path', 'dir', 'deprecated'])
           .fetch()
         if (pkg !== this.pkg) return
-        // Matched on the filename, not the title. docgen gives these
-        // friendly titles - CHANGELOG.md becomes "Release notes" and
-        // index.md takes the module's own name - so a title-based test
-        // never matched and both leaked into the listing: "Release notes"
-        // duplicated the button already in the module header, and index.md
-        // sat beside nuxtModule.md under the identical title.
+        // Matched on the filename, not the title: docgen retitles these
+        // pages, so a title test would miss them.
         this.entries = (Array.isArray(entries) ? entries : [entries])
           .filter((o) => o && !/^(README|CHANGELOG|index)$/i.test((o.path || '').split('/').pop()))
       } catch (e) {

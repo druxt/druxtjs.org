@@ -1,6 +1,7 @@
 <template>
   <NuxtLink to="/" class="flex items-center gap-2 flex-shrink-0 rounded-btn px-1 py-1 hover:opacity-80">
-    <img v-if="settings.use_site_logo && logo" :src="logo" alt="" class="w-7 h-7" />
+    <!-- The logo is not square, so only its height is set. -->
+    <img v-if="settings.use_site_logo && logo" :src="logo" alt="" class="h-7 w-auto flex-shrink-0" />
     <span v-if="settings.use_site_name" class="text-lg sm:text-xl font-semibold tracking-tight whitespace-nowrap">{{ site.name }}</span>
   </NuxtLink>
 </template>

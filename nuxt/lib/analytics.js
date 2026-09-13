@@ -1,22 +1,11 @@
 /**
  * Event payload builders for the docs site's GA4 instrumentation.
  *
- * Kept pure and separate from the dispatcher so the payloads can be asserted
- * directly. Every builder returns `[eventName, params]`, ready to spread into
- * `$track`.
- *
- * The event set is deliberately small. Each one answers a question the docs
- * team actually has, and nothing here is collected because it was easy:
- *
- * - `search` / `search_no_results` - what readers look for, and what they look
- *   for and do not find. The second is the highest-value signal the site can
- *   produce: it is a content backlog written by the audience.
- * - `search_select` - whether search answered, and which result won.
- * - `copy_code` - which snippets are actually used, as opposed to scrolled past.
- * - `page_not_found` - broken inbound links, with the referrer that sent them.
+ * Each returns `[eventName, params]`, ready to spread into `$track`. Kept
+ * separate from the dispatcher so the payloads can be asserted directly.
  */
 
-/** GA4 rejects oversized values, and a long query is a typo, not a search. */
+/** GA4 rejects oversized values. */
 const MAX_TERM = 100
 
 /**
@@ -37,8 +26,7 @@ export const normaliseTerm = (query) => String(query || '')
 /**
  * Whether a query is worth reporting.
  *
- * Two characters and under are almost always a prefix caught mid-typing, and
- * reporting them buries the real terms under "d", "dr", "dru".
+ * Two characters and under are usually a prefix caught mid-typing.
  *
  * @param {string} query - Raw query as typed.
  * @returns {boolean} True when the term should be sent.
@@ -48,11 +36,8 @@ export const isReportableTerm = (query) => normaliseTerm(query).length >= 3
 /**
  * Build the search event.
  *
- * Uses GA4's own `search` event name and `search_term` parameter rather than a
- * custom pair, so the built-in site-search reporting picks it up without a
- * custom dimension. A zero-result search reports as `search_no_results`
- * instead: same shape, but it earns its own row in every report rather than
- * hiding inside the `search` total.
+ * Uses GA4's own `search` name and `search_term` parameter, so the built-in
+ * site-search reporting picks it up. A zero-result search gets its own name.
  *
  * @param {string} query - Raw query as typed.
  * @param {number} resultsCount - Number of results the query returned.
@@ -66,8 +51,7 @@ export const searchEvent = (query, resultsCount) => [
 /**
  * Build the search-result selection event.
  *
- * `position` is 1-based and counts across the flattened result list, so a
- * consistently-chosen fifth result is visible as a ranking problem.
+ * `position` is 1-based, across the flattened result list.
  *
  * @param {string} query - Raw query as typed.
  * @param {string} path - Path of the chosen result.
@@ -83,9 +67,8 @@ export const searchSelectEvent = (query, path, index) => ['search_select', {
 /**
  * Build the code-copy event.
  *
- * The language comes from the highlighter's `language-*` class when present.
- * Unlabelled blocks report `unknown` rather than being dropped, so the total
- * still reconciles against the page's block count.
+ * The language comes from the highlighter's `language-*` class; unlabelled
+ * blocks report `unknown`.
  *
  * @param {string} pagePath - Path of the page holding the block.
  * @param {string} language - Fenced-block language, or a falsy value.
@@ -110,10 +93,8 @@ export const languageFromClass = (className) => {
 /**
  * Build the 404 event.
  *
- * The referrer is the load-bearing half: a 404 on its own says a URL is dead,
- * while the referrer says whether that is a broken internal link, a stale
- * external one, or a search engine holding an index entry that should have
- * been redirected.
+ * The referrer says whether the dead URL came from an internal link, an
+ * external one, or a search result.
  *
  * @param {string} pagePath - The path that was not found.
  * @param {string} referrer - document.referrer, or an empty string.

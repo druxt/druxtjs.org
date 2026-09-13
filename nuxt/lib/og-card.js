@@ -1,15 +1,11 @@
 /**
  * Open Graph card layout, as a Satori element tree.
  *
- * The card is components/app/PageHeader.vue enlarged to 1200x630 and nothing
- * else: same eyebrow row, same bold tracking-tight title, same muted
- * description, same border-b rule, on base-200. One template, one accent;
- * sections differ by icon and label, not colour. Module pages carry their own
- * two-tone module icon from components/app/icon/module/.
+ * The card is components/app/PageHeader.vue at 1200x630. Sections differ by
+ * icon and label, not colour; module pages carry their own module icon.
  *
- * Satori takes React-shaped objects, not JSX, so this file stays build-free
- * and loads from the generate hook with a plain require. Every colour is a literal from
- * tailwind.config.js.
+ * Satori takes React-shaped objects, not JSX, so the generate hook can require
+ * this file directly. Every colour is a literal from tailwind.config.js.
  */
 
 const INK = '#1f2937' //                base-content
@@ -22,17 +18,10 @@ const SECONDARY_FOCUS = '#3b8070'
 const SANS = 'Source Sans 3'
 const MONO = 'IBM Plex Mono'
 
-/**
- * The section icon geometry, shared with the section icon components the
- * same way the module geometry is below.
- */
+/** The section icon geometry, shared with the section icon components. */
 const SECTION_ICON_PATHS = require('./icon-paths')
 
-/**
- * The module icon geometry, shared with the icon components so a mark is
- * only ever drawn in one place. pf/sf mirror the theme variables the
- * components render with; here they resolve to literal hexes for Satori.
- */
+/** The module icon geometry, shared with the icon components. */
 const MODULE_ICON_PATHS = require('./module-icon-paths')
 
 /** components/app/Logo.vue, verbatim. Two brand chevrons plus the ink one. */
@@ -95,9 +84,7 @@ const logo = (height) => ({
 })
 
 /**
- * Package name, set plain in mono after the section label. The module icon
- * carries the visual identity, so the name needs no box of its own.
- * #036397 on #f4f7fa is 5.8:1.
+ * Package name, set plain in mono after the section label.
  *
  * @param {string} text - The package name.
  * @returns {object} Satori node.
@@ -116,9 +103,7 @@ const pkgName = (text) =>
   )
 
 /**
- * Title sizes are fixed per variant rather than measured; Satori has no text
- * measurement. The caps hold the longest real strings in the content tree:
- * 'Getting started with Druxt.js' (29ch) and 'DruxtEntityFormButtons' (22ch).
+ * Title sizes are fixed per variant, because Satori cannot measure text.
  *
  * @param {boolean} mono - Symbol titles set in mono.
  * @param {string} text - The title.
@@ -238,9 +223,8 @@ function ogCard(page) {
 }
 
 /**
- * The site-wide share card, used as the fallback for every page without a
- * generated card of its own: the brand lockup over a strip of the nine
- * module marks, per the approved share-image board.
+ * The site-wide share card: the brand lockup over a strip of the module marks.
+ * Used for every page without a generated card of its own.
  *
  * @returns {object} Satori element tree, 1200x630.
  */

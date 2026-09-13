@@ -21,6 +21,7 @@
 
 <script>
 import { seoHead } from '~/utils/seo'
+import { apiSourceUrl } from '~/utils/api-source'
 import { documentDescription } from '~/utils/content'
 import { isPackageRoot } from '~/components/app/icon/module'
 export default {
@@ -56,8 +57,7 @@ export default {
 
   computed: {
     /**
-     * Whether the layout's module header is already this page's header,
-     * carrying the same title and the same source link.
+     * Whether the layout's module header above already names this page.
      *
      * @param {object} vm - The component ViewModel.
      * @param {object} vm.$route - The current route.
@@ -65,9 +65,7 @@ export default {
      */
     inModuleHeader: ({ $route }) => isPackageRoot($route.path),
 
-    source: ({ document }) => (document.dir
-      ? 'https://github.com/druxt/druxt.js/tree/develop' + document.dir.replace('/api/packages', '/packages')
-      : null),
+    source: ({ document }) => apiSourceUrl(document.dir, document.slug),
 
   },
 }

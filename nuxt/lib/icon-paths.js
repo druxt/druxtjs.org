@@ -1,15 +1,13 @@
 /**
  * The section icon geometry, in one place.
  *
- * Consumed by the section icon components and by lib/og-card.js, so a
- * section's mark is only ever drawn once. Single-tone Heroicons-outline
- * paths; the consumers pick the colour.
+ * Consumed by the section icon components and by lib/og-card.js. Single-tone
+ * Heroicons-outline paths; the consumers pick the colour.
  *
- * CommonJS so nuxt.config.js's generate hook can require it; webpack
- * interop lets the components import from it just as well.
+ * CommonJS so nuxt.config.js's generate hook can require it.
  *
- * Lives in lib/, not components/: the components tree is auto-registered,
- * and Vue rejects this map's `components` key as a component definition.
+ * In lib/, not components/, because the auto-registered components tree would
+ * read the `components` key here as a component definition.
  */
 module.exports = {
   guide: [

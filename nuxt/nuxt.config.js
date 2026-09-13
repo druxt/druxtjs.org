@@ -1,24 +1,14 @@
-// GA4. @nuxtjs/google-analytics (the module this used to run through) only
-// ever spoke the Universal Analytics protocol via vue-analytics/analytics.js -
-// UA stopped processing hits in July 2023, so it was silently collecting
-// nothing. Nuxt 3+'s replacement, nuxt-gtag, depends on @nuxt/kit and can't
-// run on this frozen Nuxt 2 stack, so this is a plain gtag.js snippet
-// instead - no new runtime dependency, same head.script mechanism the
-// colour-mode bridge already uses below.
+// GA4, as a plain gtag.js snippet: the Nuxt analytics modules need either
+// Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
 
-// The id is interpolated into an inline script; the shape assertion keeps
-// any other character class off the page.
+// The id is interpolated into an inline script, so check its shape first.
 if (!/^G-[A-Z0-9]+$/.test(GA_MEASUREMENT_ID)) {
   throw new Error('GA_MEASUREMENT_ID must match G-[A-Z0-9]+')
 }
 
-// LAGOON_ENVIRONMENT_TYPE is 'production' only for the environment matching
-// .lagoon.yml's `main` branch (druxtjs.org itself); every preview/branch
-// build gets 'development'. yarn generate runs inside Lagoon's own build
-// container (see docs/nuxt/Dockerfile), so this is set at generate time and
-// bakes the right answer into the static output per environment - preview
-// deploys never send hits into the real property.
+// Lagoon sets this to 'production' for druxtjs.org itself and 'development'
+// for preview builds, so previews never send hits to the real property.
 const isProduction = process.env.LAGOON_ENVIRONMENT_TYPE === 'production'
 
 // Routes generate:routeFailed reported; generate:done refuses to ship them.
@@ -35,8 +25,8 @@ const druxtVersion = JSON.parse(
 const DRUXT_BASE_URL = process.env.DRUXT_BASE_URL || 'http://127.0.0.1:8899'
 
 export default {
-  // Pages render live from Drupal. Generating them, with live rendering as
-  // the fallback, comes with the Lagoon deployment.
+  // Pages render live from Drupal. In production, server/start.js serves
+  // pre-rendered copies first and falls back to live rendering.
   target: 'server',
 
   publicRuntimeConfig: {
@@ -54,35 +44,19 @@ export default {
       { hid: 'description', name: 'description', content: '' },
       { name: 'format-detection', content: 'telephone=no' },
     ],
-    // static/ ships icon.png, not a .ico - the old href 404s (on the live
-    // site too, so this predates the redesign). @nuxtjs/pwa generates the
-    // rest of the icon set from this same source image.
+    // static/ ships icon.png, not a .ico. @nuxtjs/pwa generates the rest of
+    // the icon set from it.
     link: [{ rel: 'icon', type: 'image/png', href: '/icon.png' }],
     script: [
-      // Sets data-theme before first paint, mirroring the localStorage/OS
-      // preference logic @nuxtjs/color-mode runs internally. Needed because
-      // 2.1.1 (the last Nuxt-2-compatible release) only supports writing a
-      // CSS class, not a data-theme attribute - see plugins/color-mode-
-      // theme.client.js for the reactive half of this bridge.
+      // Sets data-theme before first paint, from the stored or OS preference.
+      // plugins/color-mode-theme.client.js keeps it in sync after that.
       {
         hid: 'druxt-theme-init',
         innerHTML: "(function(){try{var k='druxt-color-mode';var p=localStorage.getItem(k)||'system';var v=p==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;document.documentElement.setAttribute('data-theme',v)}catch(e){}})()",
         pbody: true,
       },
-      // vue-meta re-executes this inline script on every client-side
-      // navigation, so gtag('config') re-fires and reports the destination
-      // page. That means client-side routing is already counted and a
-      // router.afterEach page_view plugin would double-count them - measured
-      // on a production-gated `yarn generate`, where one document load
-      // produced js/config, then js/config again after a NuxtLink click.
-      // Don't add one without re-measuring this first.
-      //
-      // That same re-execution is what carries `doc_type`: the expression
-      // reads location.pathname at call time, so each re-fired config reports
-      // the Diataxis section of the page just navigated to. Registering
-      // `doc_type` as an event-scoped custom dimension in GA4 is what makes it
-      // visible in reports; until that is done the parameter is collected and
-      // simply not surfaced.
+      // vue-meta re-runs this script on every client-side navigation, so each
+      // page re-fires gtag('config'); adding a page_view plugin double-counts.
       ...(isProduction ? [
         { hid: 'ga-src', src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`, async: true },
         {
@@ -120,11 +94,8 @@ export default {
     '@nuxtjs/color-mode',
   ],
 
-  // The daisyUI themes in tailwind.config.js are named 'light' and 'dark'.
-  // color-mode@2.1.1 only toggles a CSS class (no data-theme support until
-  // v3, which requires Nuxt 3/4) - classSuffix: '' makes that class match
-  // the theme name; plugins/color-mode-theme.client.js + the head.script
-  // above bridge it to the data-theme attribute daisyUI actually reads.
+  // classSuffix: '' makes the class color-mode sets match the daisyUI theme
+  // names in tailwind.config.js.
   colorMode: {
     preference: 'system',
     fallback: 'light',
@@ -133,30 +104,16 @@ export default {
   },
 
   pwa: {
-    // No service worker: a worker caching a docs site serves stale
-    // documentation, and it pins open tabs to dead builds whose chunks are
-    // gone, leaving links that silently do nothing. enabled: false ships
-    // @nuxtjs/pwa's self-destroying sw.js plus a client script that
-    // unregisters existing workers and clears their caches, so browsers
-    // that installed the old worker heal on their next visit.
+    // No service worker: a cached docs site serves stale pages. enabled: false
+    // also ships a worker that unregisters any already installed.
     workbox: {
       enabled: false,
     },
 
-    // @nuxtjs/pwa's meta module also emits Open Graph and Twitter tags, built
-    // from this site's package.json. That made it a third source of share
-    // metadata, and the values were wrong: og:title came out as "druxtjs-org",
-    // the npm package name. It was invisible while nuxt-social-meta's hid-keyed
-    // tags sat on top of it, and surfaced on the error pages the moment that
-    // module was removed.
-    //
-    // utils/seo.js owns every og:* and twitter:* tag now. The manifest, icons
-    // and theme-color this module also provides are still wanted, so it stays
-    // registered with only its share tags turned off.
+    // utils/seo.js owns every og:* and twitter:* tag, so @nuxtjs/pwa's own
+    // share tags are turned off here. Its manifest and icons are still used.
     meta: {
-      // Without these, @nuxtjs/pwa names the app from package.json and the iOS
-      // home-screen title reads "druxtjs-org". Same package-name leak as the
-      // og:title above, in a place a share-tag audit does not look.
+      // Otherwise @nuxtjs/pwa names the app from package.json.
       name: SITE_NAME,
       description: SITE_DESCRIPTION,
 
@@ -176,12 +133,6 @@ export default {
     },
   },
 
-  // nuxt-social-meta used to live here, injecting one site-wide Open Graph set
-  // across all 130 routes. utils/seo.js now emits the full set per page, so the
-  // module was a second source of truth for the share title and image that
-  // could drift from it. Its tags were hid-keyed and so were being replaced
-  // rather than duplicated, but everything it contributed (image dimensions,
-  // the Twitter handle) has moved into seoHead.
   modules: [
     '@nuxt/content',
     'druxt',
@@ -192,8 +143,7 @@ export default {
     'druxt-menu',
     'druxt-blocks',
     // The consumer's decoupled settings and theme manifest, baked in at build.
-    // The WIP @druxt-contrib/decoupled-settings module, carried here until it
-    // is released.
+    // A copy of the unreleased @druxt-contrib/decoupled-settings module.
     '~/modules/decoupled-settings',
   ],
 
@@ -220,10 +170,8 @@ export default {
     },
   },
 
-  // Druxt's proxies send Drupal its own host, so behind TLS its JSON:API links
-  // came back as https://<backend host> and failed in the browser. Keeping the
-  // browser's host makes Drupal link to the frontend's origin. Registered
-  // before Druxt's own entries, so these answer first.
+  // changeOrigin: false keeps the browser's host, so Drupal's JSON:API links
+  // point at this origin. Registered before Druxt's own proxy entries.
   proxy: ['/jsonapi', '/router/translate-path', '/sites/default/files'].map((context) => [
     context,
     { target: DRUXT_BASE_URL, changeOrigin: false },
@@ -241,13 +189,7 @@ export default {
     /**
      * Every content route, given to the generator explicitly.
      *
-     * Nuxt discovers dynamic routes by crawling links out of the pages it has
-     * already generated. The API reference is listed by AppApiIndex, which
-     * fetches its entries client side, so most of those links do not exist in
-     * the generated HTML for the crawler to follow. Measured before this: 50 of
-     * 109 API pages were written to dist, and the other 59 existed only as the
-     * SPA fallback - served by 200.html, invisible to a crawler, and impossible
-     * to list in a sitemap honestly.
+     * Nuxt's crawler cannot reach the API pages, which AppApiIndex lists client side.
      *
      * @returns {string[]} Route paths to generate.
      */
@@ -260,11 +202,7 @@ export default {
 
   hooks: {
     /**
-     * Collects routes whose generation failed, so the build can refuse to
-     * ship them. Without this, `nuxt generate` logs the error, writes the
-     * error page as real HTML at the route, and exits 0 - the page then
-     * serves as a live 200. Measured on production before the guard: seven
-     * such pages, together taking 17% of sessions.
+     * Collects routes whose generation failed, so the build can refuse to ship them.
      *
      * @param {object} failure - The failed route.
      * @param {string} failure.route - The route path.
@@ -276,22 +214,14 @@ export default {
     /**
      * Write the machine-readable indexes into the static export.
      *
-     * `generate:done` rather than a build step so these run against the same
-     * content the pages were just generated from, including `content/api`,
-     * which docgen writes and which is absent from a fresh checkout. If it has
-     * not been built, the API entries are simply missing rather than pointing
-     * at URLs that were never generated.
+     * Runs on `generate:done`, against the same content the pages were generated from.
      *
      * @param {object} generator - The Nuxt generator instance.
      * @param {object[]} errors - Handled route failures the generator collected.
      */
     async 'generate:done'(generator, errors) {
-      // Before the index writes: a rejected build must not leave a
-      // sitemap or llms.txt on disk describing pages it refused to ship.
-      // `errors` carries the "handled" failures (a route rendering the
-      // error page, e.g. Document not found) that never fire
-      // generate:routeFailed; the generator still writes those pages as
-      // real HTML, so they count as failures here all the same.
+      // Checked first, so a rejected build leaves no sitemap describing pages
+      // it refused to ship. `errors` holds routes that rendered the error page.
       const handled = (errors || []).map((e) => e.route)
       const failed = [...new Set([...failedRoutes, ...handled])]
       if (failed.length) {
@@ -313,8 +243,8 @@ export default {
       await fs.promises.writeFile(path.join(generate.dir, 'llms.txt'), buildLlmsTxt(docs))
       await fs.promises.writeFile(path.join(generate.dir, 'sitemap.xml'), buildSitemap(docs))
 
-      // A child process, not a require: satori and resvg crash inside this
-      // process, where the esm config loader has patched the module system.
+      // A child process, not a require: satori and resvg crash under the esm
+      // config loader's patched module system.
       const cards = execFileSync(process.execPath, [
         path.join(srcDir, 'scripts', 'og-render.js'),
         path.join(srcDir, 'content'),

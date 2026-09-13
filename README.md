@@ -126,8 +126,10 @@ To change how something looks, find the wrapper name Druxt looked for (the Vue d
 
 ## Deployment
 
-Planned. The site will run on Lagoon as one environment. Nuxt will serve
-static pages, and render live any page that is newer than the static build.
+The site runs on Lagoon as one environment, Drupal beside Nuxt. Nuxt serves
+pre-rendered pages first, and renders live any page it has not stored or
+that has aged past its time to live. [docs/hosting.md](docs/hosting.md)
+covers what a deployment does.
 
 ## Commands
 

@@ -1,12 +1,7 @@
 <template>
   <!--
-    Site-wide footer. Named SiteFooter rather than Footer because AppDocFooter
-    already exists and is a different thing: that one is per-document
-    (edit-on-GitHub, prev/next), this one is the site's own.
-
-    Colours come from theme tokens only - base-200 ground, base-300 top
-    border, primary links - so a palette change carries through here without
-    touching this file.
+    The site-wide footer; AppDocFooter is the per-document one. Colours come
+    from theme tokens, so a palette change carries through here.
   -->
   <footer class="border-t border-base-300 bg-base-200 text-base-content">
     <div class="max-w-[110rem] mx-auto px-4 sm:px-6 py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
