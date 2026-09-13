@@ -1,15 +1,16 @@
 # Changelog
 
-Changes to the druxtjs.org site are recorded here, newest first. The format is
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and, from the first
-numbered version on, the site follows [Semantic Versioning](https://semver.org/).
-Versions count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
+All notable changes to the druxtjs.org site are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/). Versions
+count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
 Druxt 1.0.0.
 
-## Unreleased
+## [Unreleased]
 
-The relaunch of the site: what runs on Lagoon today. It ships as **0.9.0**,
-the first numbered version, once the relaunch stack merges.
+The relaunch of the site: what runs on Lagoon today. It ships as 0.9.0, the
+first numbered version, once the relaunch stack merges.
 
 ### Added
 
