@@ -195,6 +195,12 @@ export default {
         target: 'https://api.umami.demo.druxtjs.org',
         pathRewrite: { '^/umami': '' },
         changeOrigin: true,
+        // Another origin's backend gets no first-party credentials: this
+        // site's cookies and Authorization headers stay on this origin.
+        onProxyReq: (proxyReq) => {
+          proxyReq.removeHeader('cookie')
+          proxyReq.removeHeader('authorization')
+        },
       },
     ],
   ],

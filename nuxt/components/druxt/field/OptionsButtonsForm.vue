@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { allowedOptions, entityOptions, referenceItems, referenceTypes, single } from '~/utils/form-widgets'
+import { allowedOptions, entityOptions, referenceItems, referenceTypes, single, unrestrictedReference } from '~/utils/form-widgets'
 
 export default {
   props: {
@@ -22,7 +22,10 @@ export default {
   data: () => ({ entities: [] }),
   async fetch() {
     // A reference lists what it can point at: each target bundle's entities.
-    const collections = await Promise.all(referenceTypes(this.schema).map((type) => this.$store.dispatch('druxt/getCollection', { type })))
+    // One bundle's failure keeps the others selectable.
+    const collections = await Promise.all((await this.referenceTypes()).map((type) =>
+      this.$store.dispatch('druxt/getCollection', { type }).catch(() => null)
+    ))
     this.entities = collections.flatMap((c) => (c || {}).data || [])
   },
   computed: {
@@ -34,6 +37,13 @@ export default {
     chosen: ({ value, relationship }) => (relationship || referenceItems(value).length ? referenceItems(value).map((o) => o.id) : [].concat(value == null ? [] : value).map((v) => (v && typeof v === 'object' ? v.value : String(v)))),
   },
   methods: {
+    /** The referenceable resource types: the handler's bundles, or every bundle the backend's index names when the field is unrestricted. */
+    async referenceTypes() {
+      if (!unrestrictedReference(this.schema)) return referenceTypes(this.schema)
+      const type = this.schema.settings.storage.target_type
+      const index = await this.$druxt.getIndex().catch(() => ({}))
+      return Object.keys(index).filter((t) => t.startsWith(`${type}--`))
+    },
     pick(o, checked) {
       const item = o.type ? { type: o.type, id: o.value } : o.value
       if (!this.multiple) return this.$emit('input', item)

@@ -394,6 +394,12 @@ export default {
 
     dirtyChain: ({ schema, values }) => ((schema.chain || {}).steps || []).some((s) => values[s.name]),
 
+    /** Every option list the current backend has filled, flat: a value from another backend's list is not this card's. */
+    backendOptions: ({ options, backendId }) => Object.entries(options)
+      .filter(([key]) => key.startsWith(backendId + ':'))
+      .map(([, list]) => list)
+      .flat(),
+
     /**
      * The Umami Storybook link, to the story of the very instance shown: the
      * Druxt modules write one story per entity display, block, region, menu
@@ -405,7 +411,7 @@ export default {
       const host = b.storybook || (this.backend === 'site' ? this.$config.storybookUrl : '')
       if (!host || !this.name) return null
       const slug = (...parts) => parts.filter(Boolean).join('/').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
-      const option = (value) => Object.values(this.options).flat().find((o) => o.value === value) || {}
+      const option = (value) => this.backendOptions.find((o) => o.value === value) || {}
       const v = this.values
       const label = (value) => (option(value).label || '').replace(/ \([^)]*\)$/, '')
       // Storybook reads only letters, digits, spaces, underscores and dashes from
@@ -455,6 +461,9 @@ export default {
   created() {
     // A Vue instance, kept off the reactive data.
     this.sandbox = null
+    // The generation of the fill in flight: every await checks it, so a
+    // reset that has been superseded stops instead of overwriting the newer one.
+    this.resetKey = 0
     // What a shared playground URL asks for, applied on the first fill and then dropped.
     this.initial = {}
   },
@@ -592,9 +601,10 @@ export default {
 
     /** Back to the component as documented: defaults, wrapper on. */
     async reset() {
+      const key = ++this.resetKey
       if (!this.available(this.backend)) {
         // The watcher brings us back here.
-        this.backend = Object.keys(this.backends).find((key) => this.available(key)) || 'site'
+        this.backend = Object.keys(this.backends).find((k) => this.available(k)) || 'site'
         return
       }
       this.error = null
@@ -605,27 +615,29 @@ export default {
       if (!this.live) return
       try {
         // Every select in the panel, the shared rows included.
-        for (const prop of this.rows) if (prop.source) await this.loadOptions(prop.source, {})
-        await this.autoFill()
+        for (const prop of this.rows) if (prop.source) await this.loadOptions(prop.source, {}, key)
+        if (key !== this.resetKey) return
+        await this.autoFill(key)
       } catch (e) {
-        this.error = e.message
+        if (key === this.resetKey) this.error = e.message
       }
     },
 
+    /** Option lists are keyed per backend: a list from one backend never answers for another. */
     optionsKey(source, deps) {
-      return source + JSON.stringify(deps)
+      return this.backendId + ':' + source + JSON.stringify(deps)
     },
 
-    async loadOptions(source, deps) {
-      const key = this.optionsKey(source, deps)
+    async loadOptions(source, deps, key = this.resetKey) {
+      const k = this.optionsKey(source, deps)
       this.$set(this.loading, source, true)
       try {
         const b = this.backends[this.backend]
-        const list = await cached(`${this.backendId}:${key}`, () => SOURCES[source](b.api, deps, b))
-        this.$set(this.options, key, list)
+        const list = await cached(k, () => SOURCES[source](b.api, deps, b))
+        if (key === this.resetKey) this.$set(this.options, k, list)
         return list
       } finally {
-        this.$set(this.loading, source, false)
+        if (key === this.resetKey) this.$set(this.loading, source, false)
       }
     },
 
@@ -644,10 +656,10 @@ export default {
       return (step.needs || []).every((n) => n === 'schemaType' || this.values[n])
     },
 
-    async loadStep(i) {
+    async loadStep(key, i) {
       const step = ((this.schema.chain || {}).steps || [])[i]
       if (!step || !this.stepEnabled(step)) return []
-      return this.loadOptions(step.source, this.depsOf(step))
+      return this.loadOptions(step.source, this.depsOf(step), key)
     },
 
     /** What a select prefers on its own: `prefer` (a value, or a function of the card), else its documented default. */
@@ -668,14 +680,15 @@ export default {
       this.$set(this.values, steps[i].name, value || undefined)
       for (let j = i + 1; j < steps.length; j++) this.$set(this.values, steps[j].name, undefined)
       this.track('example_prop', { prop: steps[i].name })
-      await this.fillFrom(i + 1)
+      await this.fillFrom(this.resetKey, i + 1)
       this.rerender()
     },
 
-    async fillFrom(start) {
+    async fillFrom(key, start) {
       const steps = (this.schema.chain || {}).steps || []
       for (let i = start; i < steps.length; i++) {
-        await this.loadStep(i)
+        await this.loadStep(key, i)
+        if (key !== this.resetKey) return
         const pick = this.pickFor(steps[i], this.optionsOf(steps[i]))
         if (!pick) break
         this.$set(this.values, steps[i].name, pick)
@@ -683,8 +696,9 @@ export default {
     },
 
     /** First load: walk the chain, then give each select a value that renders something. */
-    async autoFill() {
-      await this.fillFrom(0)
+    async autoFill(key) {
+      await this.fillFrom(key, 0)
+      if (key !== this.resetKey) return
       for (const prop of this.schema.props || []) {
         if (prop.source && !this.values[prop.name]) {
           const list = this.options[this.optionsKey(prop.source, {})] || []
@@ -693,12 +707,18 @@ export default {
         }
       }
       // The rest of a shared URL: plain props, the shared rows, the wrapper.
-      for (const [key, value] of Object.entries(this.initial)) {
-        if (key === 'wrapper') this.wrapper = value !== false
-        else if (this.values[key] === undefined && this.rows.some((r) => r.name === key)) this.$set(this.values, key, value)
+      // Values arrive as strings, so each goes back to its row's type.
+      for (const [name, value] of Object.entries(this.initial)) {
+        if (name === 'wrapper') this.wrapper = value !== false
+        else if (this.values[name] === undefined) {
+          const row = this.rows.find((r) => r.name === name)
+          if (!row) continue
+          const typed = row.type === 'number' ? Number(value) : row.type === 'boolean' ? value !== 'false' : value
+          if (row.type !== 'number' || Number.isFinite(typed)) this.$set(this.values, name, typed)
+        }
       }
       this.initial = {}
-      this.rerender()
+      if (key === this.resetKey) this.rerender()
     },
 
     async setValue(prop, value) {
@@ -710,7 +730,7 @@ export default {
         const i = this.schema.chain.steps.findIndex((s) => s.name === 'mode')
         if (i >= 0) {
           this.$set(this.values, 'mode', undefined)
-          await this.fillFrom(i)
+          await this.fillFrom(this.resetKey, i)
         }
       }
       this.rerender()
