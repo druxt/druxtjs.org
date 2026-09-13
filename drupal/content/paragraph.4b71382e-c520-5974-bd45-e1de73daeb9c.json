@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "4b71382e-c520-5974-bd45-e1de73daeb9c"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "The UUIDs in the examples below are illustrative: the demo backend is\nreinstalled on every rollout, so its IDs change. List\n`https:\/\/api.umami.demo.druxtjs.org\/jsonapi\/node\/page` and take an `id` from\nthe response before running them. Query a resource's fields rather than\nassuming names; Umami's body field, for one, is `field_body`, not\n`body`.\n\nIt also provides an options object to configure the client:",
+            "format": "docs_markdown",
+            "processed": "<p>The UUIDs in the examples below are illustrative: the demo backend is\nreinstalled on every rollout, so its IDs change. List\n<code>https:\/\/api.umami.demo.druxtjs.org\/jsonapi\/node\/page<\/code> and take an <code>id<\/code> from\nthe response before running them. Query a resource's fields rather than\nassuming names; Umami's body field, for one, is <code>field_body<\/code>, not\n<code>body<\/code>.<\/p>\n<p>It also provides an options object to configure the client:<\/p>\n"
+        }
+    ]
+}

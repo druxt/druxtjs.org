@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "578bbdd5-817e-5b83-930d-9fd0b1960265"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## DruxtRouter pass-through methods",
+            "format": "docs_markdown",
+            "processed": "<h2>DruxtRouter pass-through methods<\/h2>\n"
+        }
+    ]
+}

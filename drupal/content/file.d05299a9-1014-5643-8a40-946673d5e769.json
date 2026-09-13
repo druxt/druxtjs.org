@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "d05299a9-1014-5643-8a40-946673d5e769"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "storybook-tree.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/storybook-tree.png",
+            "url": "\/sites\/default\/files\/documentation\/storybook-tree.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 40575
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

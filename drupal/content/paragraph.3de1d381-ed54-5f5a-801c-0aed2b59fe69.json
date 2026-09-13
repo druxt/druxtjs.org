@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "3de1d381-ed54-5f5a-801c-0aed2b59fe69"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "For a field, the wording differs slightly (`Missing Vue template for\n'<schema.id> (<schema.type>)'`), since each component authors its own\nfallback rather than inheriting one from `DruxtModule`. Other modules don't\ncurrently have this box at all; a missing wrapper there just renders the\nplain `DruxtWrapper` default output described above, with nothing to expand.\n\nEither way, this is expected, not an error, and it **only renders when Nuxt\nis in development mode** (`$nuxt.context.isDev`); production builds show\nnothing there instead. Expand it and you'll find a dropdown of every valid\nwrapper name for that component (from `component.options`, the same list\ndescribed under [Find the right wrapper name](#find-the-right-wrapper-name) above) plus a **Create**\nbutton that scaffolds the file for you, wrapper path already filled in.\n\n## Where to go next\n\n- [Component resolution](\/explanation\/component-resolution): the naming\n  rules behind the wrapper system.\n- [Build your first custom module](\/tutorials\/first-custom-module): the\n  same mechanism from the module author's side.\n- [Debug Druxt with the Vue Devtools](\/how-to\/devtools): inspect\n  `component.options` live.\n- [Explore the example apps](\/how-to\/example-apps): the `druxt-site`\n  example includes a wrapper-theming pattern page, the wrapper system\n  running against real content.",
+            "format": "docs_markdown",
+            "processed": "<p>For a field, the wording differs slightly (<code>Missing Vue template for '&lt;schema.id&gt; (&lt;schema.type&gt;)'<\/code>), since each component authors its own\nfallback rather than inheriting one from <code>DruxtModule<\/code>. Other modules don't\ncurrently have this box at all; a missing wrapper there just renders the\nplain <code>DruxtWrapper<\/code> default output described above, with nothing to expand.<\/p>\n<p>Either way, this is expected, not an error, and it <strong>only renders when Nuxt\nis in development mode<\/strong> (<code>$nuxt.context.isDev<\/code>); production builds show\nnothing there instead. Expand it and you'll find a dropdown of every valid\nwrapper name for that component (from <code>component.options<\/code>, the same list\ndescribed under <a href=\"#find-the-right-wrapper-name\">Find the right wrapper name<\/a> above) plus a <strong>Create<\/strong>\nbutton that scaffolds the file for you, wrapper path already filled in.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/explanation\/component-resolution\">Component resolution<\/a>: the naming\nrules behind the wrapper system.<\/li>\n<li><a href=\"\/tutorials\/first-custom-module\">Build your first custom module<\/a>: the\nsame mechanism from the module author's side.<\/li>\n<li><a href=\"\/how-to\/devtools\">Debug Druxt with the Vue Devtools<\/a>: inspect\n<code>component.options<\/code> live.<\/li>\n<li><a href=\"\/how-to\/example-apps\">Explore the example apps<\/a>: the <code>druxt-site<\/code>\nexample includes a wrapper-theming pattern page, the wrapper system\nrunning against real content.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

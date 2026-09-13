@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "0aeeb46b-3757-507f-a6e7-1fdffde90b60"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "When the frontend and backend are on different origins, the browser blocks\ncross-origin JSON:API requests unless Drupal answers with CORS headers.\nThis is the direct fix. The alternative, [proxying through the\nfrontend](\/how-to\/proxy), avoids CORS but only works while a Nuxt server\nis running. A generated static site needs CORS.\n\nThe Druxt Drupal module enables CORS when it is otherwise disabled,\nwhich covers anonymous reads because Drupal core's stock configuration\nallows every origin. The module does not set the allowed methods, so\npreflighted requests (form submissions, and any request carrying an\n`Authorization` header) can still fail until you configure the block\nbelow explicitly. Explicit configuration always wins, and is what\nproduction sites should run.\n\n## Enable cors.config\n\nDrupal core includes the configuration, disabled, in\n`sites\/default\/default.services.yml`. Copy the file to\n`sites\/default\/services.yml` if it does not exist, and set the\n`cors.config` block:",
+            "format": "docs_markdown",
+            "processed": "<p>When the frontend and backend are on different origins, the browser blocks\ncross-origin JSON:API requests unless Drupal answers with CORS headers.\nThis is the direct fix. The alternative, <a href=\"\/how-to\/proxy\">proxying through the\nfrontend<\/a>, avoids CORS but only works while a Nuxt server\nis running. A generated static site needs CORS.<\/p>\n<p>The Druxt Drupal module enables CORS when it is otherwise disabled,\nwhich covers anonymous reads because Drupal core's stock configuration\nallows every origin. The module does not set the allowed methods, so\npreflighted requests (form submissions, and any request carrying an\n<code>Authorization<\/code> header) can still fail until you configure the block\nbelow explicitly. Explicit configuration always wins, and is what\nproduction sites should run.<\/p>\n<h2>Enable cors.config<\/h2>\n<p>Drupal core includes the configuration, disabled, in\n<code>sites\/default\/default.services.yml<\/code>. Copy the file to\n<code>sites\/default\/services.yml<\/code> if it does not exist, and set the\n<code>cors.config<\/code> block:<\/p>\n"
+        }
+    ]
+}

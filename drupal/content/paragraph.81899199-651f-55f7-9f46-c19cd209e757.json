@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "81899199-651f-55f7-9f46-c19cd209e757"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "`DefaultEs.vue` wins for `langcode: 'es'`. Every other language renders\n`Default.vue`. Use it for the cases where translation\nchanges the design: reversed text direction, longer labels, a\nlanguage-specific asset.\n\n## Where to go next\n\n- [Component resolution](\/explanation\/component-resolution): where the\n  langcode suffix sits in the full lookup order.\n- [Decoupled routing](\/explanation\/routing): how prefixed paths reach\n  Drupal at all.\n- [Use the Druxt client directly](\/how-to\/use-the-druxt-client): the\n  `prefix` parameter on every method.",
+            "format": "docs_markdown",
+            "processed": "<p><code>DefaultEs.vue<\/code> wins for <code>langcode: 'es'<\/code>. Every other language renders\n<code>Default.vue<\/code>. Use it for the cases where translation\nchanges the design: reversed text direction, longer labels, a\nlanguage-specific asset.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/explanation\/component-resolution\">Component resolution<\/a>: where the\nlangcode suffix sits in the full lookup order.<\/li>\n<li><a href=\"\/explanation\/routing\">Decoupled routing<\/a>: how prefixed paths reach\nDrupal at all.<\/li>\n<li><a href=\"\/how-to\/use-the-druxt-client\">Use the Druxt client directly<\/a>: the\n<code>prefix<\/code> parameter on every method.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "4263c52c-cec0-510b-bfea-526b88ccd545"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/ce369928-077e-5db2-a4f8-3252348e1b49"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/explanation\/druxt-store"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

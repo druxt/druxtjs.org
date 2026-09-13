@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "74887179-ef7d-5d94-a7a7-1384af6bd149"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "`nuxt generate` renders every page to plain files in `dist\/`. Any static\nhost serves them; this guide uses Netlify for the worked example, and\nevery step has an equivalent on Vercel, GitHub Pages or a plain web\nserver.\n\nOne thing static hosting does not change: **the deployed site still\ntalks to Drupal.** Route lookups on client-side navigation, forms and\nauthenticated content are live browser requests, so the backend you generate\nagainst must stay reachable from visitors' browsers, with\n[CORS configured](\/how-to\/configure-cors). Generating a site that needs\nno backend at all is the [fully static\nmodel](\/explanation\/deployment-models#the-models), a deliberate\nconfiguration of its own.\n\n## Generate the site locally first\n\nProve the build before involving a host. Set Nuxt's target to `static`\n(`target: 'static'` in `nuxt.config.js`, or the `NUXT_TARGET` variable\nwhere the project reads one, as the quickstart does). If the project\nenables the [API proxy](\/how-to\/proxy) (`druxt.proxy.api`, on by\ndefault in the quickstart), turn it off for static builds. The proxy is server middleware that no\nstatic host can run, so leaving it enabled sends the browser's API\nrequests to the static host instead of Drupal. Tying it to the target keeps one config serving both modes:",
+            "format": "docs_markdown",
+            "processed": "<p><code>nuxt generate<\/code> renders every page to plain files in <code>dist\/<\/code>. Any static\nhost serves them; this guide uses Netlify for the worked example, and\nevery step has an equivalent on Vercel, GitHub Pages or a plain web\nserver.<\/p>\n<p>One thing static hosting does not change: <strong>the deployed site still\ntalks to Drupal.<\/strong> Route lookups on client-side navigation, forms and\nauthenticated content are live browser requests, so the backend you generate\nagainst must stay reachable from visitors' browsers, with\n<a href=\"\/how-to\/configure-cors\">CORS configured<\/a>. Generating a site that needs\nno backend at all is the <a href=\"\/explanation\/deployment-models#the-models\">fully static\nmodel<\/a>, a deliberate\nconfiguration of its own.<\/p>\n<h2>Generate the site locally first<\/h2>\n<p>Prove the build before involving a host. Set Nuxt's target to <code>static<\/code>\n(<code>target: 'static'<\/code> in <code>nuxt.config.js<\/code>, or the <code>NUXT_TARGET<\/code> variable\nwhere the project reads one, as the quickstart does). If the project\nenables the <a href=\"\/how-to\/proxy\">API proxy<\/a> (<code>druxt.proxy.api<\/code>, on by\ndefault in the quickstart), turn it off for static builds. The proxy is server middleware that no\nstatic host can run, so leaving it enabled sends the browser's API\nrequests to the static host instead of Drupal. Tying it to the target keeps one config serving both modes:<\/p>\n"
+        }
+    ]
+}

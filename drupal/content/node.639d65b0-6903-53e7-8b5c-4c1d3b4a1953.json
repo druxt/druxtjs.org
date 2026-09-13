@@ -1,0 +1,151 @@
+{
+    "uuid": [
+        {
+            "value": "639d65b0-6903-53e7-8b5c-4c1d3b4a1953"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Getting started with Druxt"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "39798d83-e71f-53be-a889-cd704103e4d9"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0a1ed98c-3f0d-5a36-801f-8cec4ffff0f0"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "d32f211a-ae3b-5e87-9712-eb5fef266f23"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "86adfa53-e3ae-5f47-97cb-f57da161f901"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "c989b1eb-52f4-5eae-b471-ecde65db2059"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "27748677-79d8-534c-99ed-d6ee24e71ef5"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "c38f9856-b307-57be-ab14-12d07ea1a81e"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "28ef0c4a-2339-5362-9774-1d73eb1a7617"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "faf34934-db43-507c-92a3-c7162994aec0"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "2f4f7572-f8ce-5872-998d-69533b64dadc"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "d69f17e2-21fd-5ba4-997f-1465a9d27205"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "From an empty machine to a running fully decoupled Drupal and Nuxt site."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "5f1bbf70-8b03-5759-8f2a-5ec8ec14f60e"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/tutorials\/getting-started.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"prerequisites\",\"depth\":2,\"text\":\"Prerequisites\"},{\"id\":\"step-1-create-your-project\",\"depth\":2,\"text\":\"Step 1: Create your project\"},{\"id\":\"step-2-set-everything-up\",\"depth\":2,\"text\":\"Step 2: Set everything up\"},{\"id\":\"step-3-start-the-frontend\",\"depth\":2,\"text\":\"Step 3: Start the frontend\"},{\"id\":\"step-4-create-your-first-content\",\"depth\":2,\"text\":\"Step 4: Create your first content\"},{\"id\":\"step-5-see-it-on-the-frontend\",\"depth\":2,\"text\":\"Step 5: See it on the frontend\"},{\"id\":\"what-youve-got\",\"depth\":2,\"text\":\"What you've got\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -9
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "56a42329-8e9f-5954-b7f5-8c7aadea9731"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Deprecated in:** `druxt-menu:0.11.0`\n**Removed in:** `druxt-menu:2.0.0`\n\n`0.11.0` added `v-model` support to `DruxtMenu`. The processed menu items\nmoved to the standard `model` property, and the `items` computed stayed\nbehind as a pass-through:",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Deprecated in:<\/strong> <code>druxt-menu:0.11.0<\/code>\n<strong>Removed in:<\/strong> <code>druxt-menu:2.0.0<\/code><\/p>\n<p><code>0.11.0<\/code> added <code>v-model<\/code> support to <code>DruxtMenu<\/code>. The processed menu items\nmoved to the standard <code>model<\/code> property, and the <code>items<\/code> computed stayed\nbehind as a pass-through:<\/p>\n"
+        }
+    ]
+}

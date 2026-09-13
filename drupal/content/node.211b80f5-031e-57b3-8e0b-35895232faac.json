@@ -1,0 +1,147 @@
+{
+    "uuid": [
+        {
+            "value": "211b80f5-031e-57b3-8e0b-35895232faac"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Proxy the Drupal backend through Nuxt"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "c7bf3a5c-7cd8-5a37-ba63-46c9aabe5399"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "ddce5765-0132-5c67-be0c-35d1c3eb5cfb"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "c06d584f-706a-50fc-9f7a-081007769233"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "3212f000-d2f5-5835-9d3d-c831894e748d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "8d8c7437-86a6-5186-9ad7-3acb21f5d3cf"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0140809d-7af0-5e20-be26-a7d62244a895"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "6e37fc29-d9d1-5740-80ab-2ff660214b3c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "b5126be8-be08-512f-813e-e47bec92ff76"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "02f798b0-26f9-5189-8f9c-b13f49f9618a"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "a98617fc-c707-54e3-b468-08b48f77fc9a"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Route API and file requests through the frontend origin, so browser traffic never crosses the CORS boundary."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "540fd949-ce24-5411-b703-1d1e76de2802"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/how-to\/proxy.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"api-proxy\",\"depth\":2,\"text\":\"API proxy\"},{\"id\":\"files-proxy\",\"depth\":2,\"text\":\"Files proxy\"},{\"id\":\"additional-proxy-routes\",\"depth\":2,\"text\":\"Additional proxy routes\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -6
+        }
+    ]
+}

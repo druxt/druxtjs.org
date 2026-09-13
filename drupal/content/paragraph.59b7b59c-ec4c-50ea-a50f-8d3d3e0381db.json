@@ -1,0 +1,54 @@
+{
+    "uuid": [
+        {
+            "value": "59b7b59c-ec4c-50ea-a50f-8d3d3e0381db"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_code",
+            "target_type": "paragraphs_type",
+            "target_uuid": "eafde3f2-1572-48f8-a6ae-4d1ce17d56ee"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_code": [
+        {
+            "value": "<script>\nimport DruxtModule from 'druxt\/dist\/components\/DruxtModule.vue';\n\nexport default {\n  name: 'DruxtCustomModule',\n\n  extends: DruxtModule,\n\n  data: () => ({\n    articles: [],\n  }),\n\n  async fetch() {\n    const collection = await this.$store.dispatch('druxt\/getCollection', {\n      type: 'node--article',\n    });\n    this.articles = collection.data;\n    \/\/ Overriding fetch() replaces the base hook that resolves the theme\n    \/\/ component, so invoke it manually. Without this line the druxt block\n    \/\/ below never runs.\n    await DruxtModule.fetch.call(this);\n  },\n\n  druxt: {\n    componentOptions: () => [['Default']],\n    propsData: ({ articles }) => ({ articles }),\n    slots(h) {\n      return {\n        default: (attrs) =>\n          h(\n            'ul',\n            attrs,\n            this.articles.map((article) => h('li', [article.attributes.title])),\n          ),\n      };\n    },\n  },\n};\n<\/script>"
+        }
+    ],
+    "field_language": [
+        {
+            "value": "vue"
+        }
+    ]
+}

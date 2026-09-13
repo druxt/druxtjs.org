@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "ff732176-b707-58b5-ace7-c522daffbacf"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/0c250a44-d0a9-5c82-b8e6-f81721b285a7"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

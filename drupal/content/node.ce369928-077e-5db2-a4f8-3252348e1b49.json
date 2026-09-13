@@ -1,0 +1,127 @@
+{
+    "uuid": [
+        {
+            "value": "ce369928-077e-5db2-a4f8-3252348e1b49"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "The DruxtStore"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "ac0090d8-c468-592f-91eb-1998fdba7a90"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "113df367-ecb1-584f-9b7a-0e8881d5041f"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "a0b6897a-35a2-5195-b02d-0dbb0eab3346"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "a01f804c-bc8c-5697-9a84-e220dcc9f087"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "15178eb7-fa72-57ab-9ecd-e0ca4bc7e5f6"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "The DruxtStore caches Drupal collections and resources as shared references, so two components asking for the same article hit Drupal once."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "4f80265c-02fd-5652-8970-c0bf9eaf5e5b"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/explanation\/druxt-store.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"two-maps-not-one\",\"depth\":2,\"text\":\"Two maps, not one\"},{\"id\":\"dehydration-collections-store-references\",\"depth\":2,\"text\":\"Dehydration: collections store references\"},{\"id\":\"caching-rules\",\"depth\":2,\"text\":\"Caching rules\"},{\"id\":\"collections-the-query-hash\",\"depth\":3,\"text\":\"Collections: the query hash\"},{\"id\":\"resources-full-and-partial-flags\",\"depth\":3,\"text\":\"Resources: full and partial flags\"},{\"id\":\"includes-are-recursive\",\"depth\":3,\"text\":\"Includes are recursive\"},{\"id\":\"using-the-store\",\"depth\":2,\"text\":\"Using the store\"},{\"id\":\"the-case-for-a-store\",\"depth\":2,\"text\":\"The case for a store\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -6
+        }
+    ]
+}

@@ -1,0 +1,147 @@
+{
+    "uuid": [
+        {
+            "value": "202dd7c7-50f9-54d8-ab31-dce3deeaa4b9"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Configure CORS in Drupal"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "eef4e688-2dd1-50a8-b9a4-1fe87762e141"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0aeeb46b-3757-507f-a6e7-1fdffde90b60"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "4300456d-2e95-54f9-a4a4-ba512651e659"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "8a7271c3-eef6-503c-81a6-a6b576c4e3c3"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "cc94322e-2f69-576c-b92e-f3b1aa0f891f"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "97795a83-bc5a-5740-a8d7-3ee923df61c9"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "7a8a03c0-a5c4-5d71-b601-8862dd79e7e0"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "8e65bc82-1491-5281-b921-80349dce814e"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "94848de3-0e76-5546-885e-bc26dbb5c3b5"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "e2ef40e7-9117-5aec-9134-44f8980d5407"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Allow the browser to talk to the backend directly by serving CORS headers from Drupal, instead of proxying through the frontend."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "540fd949-ce24-5411-b703-1d1e76de2802"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/how-to\/configure-cors.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"enable-corsconfig\",\"depth\":2,\"text\":\"Enable cors.config\"},{\"id\":\"verify\",\"depth\":2,\"text\":\"Verify\"},{\"id\":\"per-environment-configuration\",\"depth\":2,\"text\":\"Per-environment configuration\"},{\"id\":\"when-to-prefer-the-proxy\",\"depth\":2,\"text\":\"When to prefer the proxy\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -7
+        }
+    ]
+}

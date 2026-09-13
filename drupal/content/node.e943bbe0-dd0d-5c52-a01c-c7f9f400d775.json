@@ -1,0 +1,135 @@
+{
+    "uuid": [
+        {
+            "value": "e943bbe0-dd0d-5c52-a01c-c7f9f400d775"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "DruxtRouter deprecations"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "578bbdd5-817e-5b83-930d-9fd0b1960265"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "6be71b4a-cf40-5d8f-8406-fe0fa171f6b3"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "9822d930-9e96-59dd-ac5d-a7f9e4569752"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "6773d412-2c71-5313-ad9d-97088b6531f4"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "5259ad61-1f9c-50da-8353-4fcbcaf977cd"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "9eccec51-2191-525e-a9b7-48fabf347203"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "c2ecfaae-5f24-5744-9b43-26113b798ec1"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Retired DruxtRouter client and store members, with their replacements."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "e3e5a067-aa03-52c7-9806-563396663220"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/modules\/router\/deprecations.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"druxtrouter-pass-through-methods\",\"depth\":2,\"text\":\"DruxtRouter pass-through methods\"},{\"id\":\"druxtrouter-store-resource-members\",\"depth\":2,\"text\":\"DruxtRouter store resource members\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": 10
+        }
+    ]
+}

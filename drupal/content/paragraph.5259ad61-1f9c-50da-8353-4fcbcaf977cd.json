@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "5259ad61-1f9c-50da-8353-4fcbcaf977cd"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Deprecated in:** `druxt-router:0.18.0`\n**Removed in:** `druxt-router:2.0.0`\n\nThe same release deprecated the `druxtRouter` store's generic resource\nmembers. Routing state (`route`, `routes`, `redirects`) stays in\n`druxtRouter`; resources belong in the\n[DruxtStore](\/explanation\/druxt-store), which caches and de-duplicates them\nfor every module:\n\n| Deprecated                          | Replacement                  |\n| ----------------------------------- | ---------------------------- |\n| `druxtRouter\/addEntity` (mutation)  | `druxt\/addResource` mutation |\n| `druxtRouter\/getEntity` (action)    | `druxt\/getResource` action   |\n| `druxtRouter\/getResources` (action) | `druxt\/getCollection` action |",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Deprecated in:<\/strong> <code>druxt-router:0.18.0<\/code>\n<strong>Removed in:<\/strong> <code>druxt-router:2.0.0<\/code><\/p>\n<p>The same release deprecated the <code>druxtRouter<\/code> store's generic resource\nmembers. Routing state (<code>route<\/code>, <code>routes<\/code>, <code>redirects<\/code>) stays in\n<code>druxtRouter<\/code>; resources belong in the\n<a href=\"\/explanation\/druxt-store\">DruxtStore<\/a>, which caches and de-duplicates them\nfor every module:<\/p>\n<table>\n<thead>\n<tr>\n<th>Deprecated<\/th>\n<th>Replacement<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td><code>druxtRouter\/addEntity<\/code> (mutation)<\/td>\n<td><code>druxt\/addResource<\/code> mutation<\/td>\n<\/tr>\n<tr>\n<td><code>druxtRouter\/getEntity<\/code> (action)<\/td>\n<td><code>druxt\/getResource<\/code> action<\/td>\n<\/tr>\n<tr>\n<td><code>druxtRouter\/getResources<\/code> (action)<\/td>\n<td><code>druxt\/getCollection<\/code> action<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n"
+        }
+    ]
+}

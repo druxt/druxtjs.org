@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "d9fc3a51-157d-557f-ac08-6764725d01f7"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/d0134c34-edf0-5ba8-848c-b0f592b1bb1b"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/modules\/menu\/deprecations"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

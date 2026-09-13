@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "b114fe67-53fb-5681-a4e6-0635138fe444"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "The key pair belongs **outside the web root**; `..\/keys` here sits next\nto Drupal's `web\/` directory, not inside it. The directory must exist\nbefore the command runs, and the keys never go in git. If a key file\nmust live under a served path for platform reasons, commit only a\nweb-server deny rule for the directory (an `.htaccess` stub on Apache;\nan equivalent server rule on nginx). If key generation fails on Windows,\ngenerate under WSL2; native OpenSSL setups there have repeatedly\nproduced broken keys that surface later as opaque frontend errors.\n\nSet the token lifetimes on the settings form at\n`\/admin\/config\/people\/simple_oauth`: short access tokens with longer\nrefresh tokens (minutes and hours respectively) limit the damage of a\nleaked token while keeping sessions usable.\n\n## Drupal: create a scope\n\nSimple OAuth 6 refuses any authorization request it cannot resolve a\nscope for, and **a fresh site has an empty scope list**, so every login fails\nwith \"Check the `scope` parameter\" until one exists. Create one at\n`\/admin\/config\/people\/simple_oauth\/oauth2_scope\/dynamic\/add`: grant\ntypes `authorization_code` and `refresh_token`, with the `granularity`\nfield set to **role** and mapped to the role your users hold;\n`authenticated` is the usual mapping here.\n\nThat same role also needs the **Grant simple_oauth codes** permission\n(`grant simple_oauth codes`). Without it the consent screen returns to\nitself with \"The 'grant simple_oauth codes' permission is required.\"\nand no login completes. The administrator account bypasses permission\nchecks, so test with a regular user.",
+            "format": "docs_markdown",
+            "processed": "<p>The key pair belongs <strong>outside the web root<\/strong>; <code>..\/keys<\/code> here sits next\nto Drupal's <code>web\/<\/code> directory, not inside it. The directory must exist\nbefore the command runs, and the keys never go in git. If a key file\nmust live under a served path for platform reasons, commit only a\nweb-server deny rule for the directory (an <code>.htaccess<\/code> stub on Apache;\nan equivalent server rule on nginx). If key generation fails on Windows,\ngenerate under WSL2; native OpenSSL setups there have repeatedly\nproduced broken keys that surface later as opaque frontend errors.<\/p>\n<p>Set the token lifetimes on the settings form at\n<code>\/admin\/config\/people\/simple_oauth<\/code>: short access tokens with longer\nrefresh tokens (minutes and hours respectively) limit the damage of a\nleaked token while keeping sessions usable.<\/p>\n<h2>Drupal: create a scope<\/h2>\n<p>Simple OAuth 6 refuses any authorization request it cannot resolve a\nscope for, and <strong>a fresh site has an empty scope list<\/strong>, so every login fails\nwith \"Check the <code>scope<\/code> parameter\" until one exists. Create one at\n<code>\/admin\/config\/people\/simple_oauth\/oauth2_scope\/dynamic\/add<\/code>: grant\ntypes <code>authorization_code<\/code> and <code>refresh_token<\/code>, with the <code>granularity<\/code>\nfield set to <strong>role<\/strong> and mapped to the role your users hold;\n<code>authenticated<\/code> is the usual mapping here.<\/p>\n<p>That same role also needs the <strong>Grant simple_oauth codes<\/strong> permission\n(<code>grant simple_oauth codes<\/code>). Without it the consent screen returns to\nitself with \"The 'grant simple_oauth codes' permission is required.\"\nand no login completes. The administrator account bypasses permission\nchecks, so test with a regular user.<\/p>\n"
+        }
+    ]
+}

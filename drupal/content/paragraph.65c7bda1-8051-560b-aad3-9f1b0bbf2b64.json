@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "65c7bda1-8051-560b-aad3-9f1b0bbf2b64"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "### What replaces them\n\nField rendering is intended to be handled by **your own theme components**,\nresolved per field via the\n[component suggestion system](\/explanation\/component-resolution):\n\n1. **Field wrapper components**: DruxtField generates candidates from the\n   field's formatter and field name, most specific first, e.g. for an\n   `image` formatter on `field_image`:\n\n   ```text\n   DruxtFieldImageFieldImage   (formatter + field name)\n   DruxtFieldImage             (formatter only, same name as the deprecated default)\n   ```\n\n   Create the file, and auto-discovery does the rest:\n   `components\/druxt\/field\/Image.vue` (all image fields) or\n   `components\/druxt\/field\/image\/FieldImage.vue` (one field). The wrapper\n   receives `value`, `schema` (including formatter `settings`),\n   `relationship` and `errors` as props:\n\n   ```vue\n   <!-- components\/druxt\/field\/Image.vue -->\n   <template>\n     <img :src=\"value.url\" :alt=\"value.alt || schema.label.text\" \/>\n   <\/template>\n\n   <script>\n   export default {\n     props: {\n       value: { type: [Object, Array], default: undefined },\n       schema: { type: Object, default: undefined },\n     },\n   };\n   <\/script>\n   ```\n\n2. **Slot rendering**: render the entity yourself and place fields\n   directly, as covered in the [theming guide](\/how-to\/theming):\n\n   ```vue\n   <DruxtEntity type=\"node--article\" :uuid=\"uuid\">\n     <template #default=\"{ entity }\">\n       <article>\n         <h1>{{ entity.attributes.title }}<\/h1>\n       <\/article>\n     <\/template>\n   <\/DruxtEntity>\n   ```\n\n3. **Keep the defaults for now**: the deprecated components still render,\n   since deprecation just marks them for future removal. Tree-shake them\n   only when your own components cover the fields in use.\n\nThe [custom module tutorial](\/tutorials\/first-custom-module) covers the\nsuggestion-system mechanics from scratch.\n\n## DruxtField \/ options prop",
+            "format": "docs_markdown",
+            "processed": "<h3>What replaces them<\/h3>\n<p>Field rendering is intended to be handled by <strong>your own theme components<\/strong>,\nresolved per field via the\n<a href=\"\/explanation\/component-resolution\">component suggestion system<\/a>:<\/p>\n<ol>\n<li>\n<p><strong>Field wrapper components<\/strong>: DruxtField generates candidates from the\nfield's formatter and field name, most specific first, e.g. for an\n<code>image<\/code> formatter on <code>field_image<\/code>:<\/p>\n<pre><code class=\"language-text\">DruxtFieldImageFieldImage   (formatter + field name)\nDruxtFieldImage             (formatter only, same name as the deprecated default)\n<\/code><\/pre>\n<p>Create the file, and auto-discovery does the rest:\n<code>components\/druxt\/field\/Image.vue<\/code> (all image fields) or\n<code>components\/druxt\/field\/image\/FieldImage.vue<\/code> (one field). The wrapper\nreceives <code>value<\/code>, <code>schema<\/code> (including formatter <code>settings<\/code>),\n<code>relationship<\/code> and <code>errors<\/code> as props:<\/p>\n<pre><code class=\"language-vue\">&lt;!-- components\/druxt\/field\/Image.vue --&gt;\n&lt;template&gt;\n  &lt;img :src=\"value.url\" :alt=\"value.alt || schema.label.text\" \/&gt;\n&lt;\/template&gt;\n\n&lt;script&gt;\nexport default {\n  props: {\n    value: { type: [Object, Array], default: undefined },\n    schema: { type: Object, default: undefined },\n  },\n};\n&lt;\/script&gt;\n<\/code><\/pre>\n<\/li>\n<li>\n<p><strong>Slot rendering<\/strong>: render the entity yourself and place fields\ndirectly, as covered in the <a href=\"\/how-to\/theming\">theming guide<\/a>:<\/p>\n<pre><code class=\"language-vue\">&lt;DruxtEntity type=\"node--article\" :uuid=\"uuid\"&gt;\n  &lt;template #default=\"{ entity }\"&gt;\n    &lt;article&gt;\n      &lt;h1&gt;{{ entity.attributes.title }}&lt;\/h1&gt;\n    &lt;\/article&gt;\n  &lt;\/template&gt;\n&lt;\/DruxtEntity&gt;\n<\/code><\/pre>\n<\/li>\n<li>\n<p><strong>Keep the defaults for now<\/strong>: the deprecated components still render,\nsince deprecation just marks them for future removal. Tree-shake them\nonly when your own components cover the fields in use.<\/p>\n<\/li>\n<\/ol>\n<p>The <a href=\"\/tutorials\/first-custom-module\">custom module tutorial<\/a> covers the\nsuggestion-system mechanics from scratch.<\/p>\n<h2>DruxtField \/ options prop<\/h2>\n"
+        }
+    ]
+}

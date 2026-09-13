@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "67e48769-f5d0-5621-9aee-b2fc78f8f77b"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/eff36ac8-7a13-54e2-b399-1883790f08e0"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/explanation\/schemas"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

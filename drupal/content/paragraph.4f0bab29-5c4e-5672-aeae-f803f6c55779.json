@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "4f0bab29-5c4e-5672-aeae-f803f6c55779"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Save it. Registration, imports and configuration are all handled by the\nfile's location.\n\n**Outcome:** reload http:\/\/localhost:3000 and the listing now has your\n\"Latest posts\" heading above the articles.\n\nThe path did that. Nuxt turns every file under `components\/` into a\ncomponent named after its path, so\n`components\/druxt\/view\/frontpage\/Page1.vue` becomes\n**`DruxtViewFrontpage`**`Page1`, and that is exactly the name `DruxtView`\nlooks for when it renders the `frontpage` view's `page_1` display. The\nfile's location does the wiring.\n\nThe `results` and `pager` slots are the view's own output, handed to you to\nplace. A view wrapper is also given `header`, `filters`, `sorts`,\n`attachments_before` and `attachments_after`; a slot with nothing behind it\nrenders nothing, so you only place the ones you want.\n\n## Step 3: Write the teaser component\n\nSame idea, one level down. Each result is a node in the `teaser` display\nmode:",
+            "format": "docs_markdown",
+            "processed": "<p>Save it. Registration, imports and configuration are all handled by the\nfile's location.<\/p>\n<p><strong>Outcome:<\/strong> reload <a href=\"http:\/\/localhost:3000\">http:\/\/localhost:3000<\/a> and the listing now has your\n\"Latest posts\" heading above the articles.<\/p>\n<p>The path did that. Nuxt turns every file under <code>components\/<\/code> into a\ncomponent named after its path, so\n<code>components\/druxt\/view\/frontpage\/Page1.vue<\/code> becomes\n<strong><code>DruxtViewFrontpage<\/code><\/strong><code>Page1<\/code>, and that is exactly the name <code>DruxtView<\/code>\nlooks for when it renders the <code>frontpage<\/code> view's <code>page_1<\/code> display. The\nfile's location does the wiring.<\/p>\n<p>The <code>results<\/code> and <code>pager<\/code> slots are the view's own output, handed to you to\nplace. A view wrapper is also given <code>header<\/code>, <code>filters<\/code>, <code>sorts<\/code>,\n<code>attachments_before<\/code> and <code>attachments_after<\/code>; a slot with nothing behind it\nrenders nothing, so you only place the ones you want.<\/p>\n<h2>Step 3: Write the teaser component<\/h2>\n<p>Same idea, one level down. Each result is a node in the <code>teaser<\/code> display\nmode:<\/p>\n"
+        }
+    ]
+}

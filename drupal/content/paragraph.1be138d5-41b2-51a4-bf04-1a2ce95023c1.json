@@ -1,0 +1,59 @@
+{
+    "uuid": [
+        {
+            "value": "1be138d5-41b2-51a4-bf04-1a2ce95023c1"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_diagram",
+            "target_type": "paragraphs_type",
+            "target_uuid": "3c91ca27-0983-444c-a6bf-236eea8124d3"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_diagram": [
+        {
+            "value": "%% Fully static\nflowchart TB\n  V1[Visitors] --> H1[Static host]"
+        }
+    ],
+    "field_group": [
+        {
+            "value": "group-1"
+        }
+    ],
+    "field_syntax": [
+        {
+            "value": "mermaid"
+        }
+    ]
+}

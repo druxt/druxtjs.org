@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "0da13f44-dc50-5217-9b09-cca309ab6129"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/d4f16e89-7225-50de-97aa-d684c37596bd"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/explanation\/component-resolution"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

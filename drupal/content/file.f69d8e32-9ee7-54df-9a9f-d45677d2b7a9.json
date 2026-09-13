@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "f69d8e32-9ee7-54df-9a9f-d45677d2b7a9"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "backend-consumers.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/backend-consumers.png",
+            "url": "\/sites\/default\/files\/documentation\/backend-consumers.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 11742
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "a0b6897a-35a2-5195-b02d-0dbb0eab3346"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "- **`resources`** is keyed by identity: resource `type` and `id`. A resource\n  has exactly one home here, no matter how many different queries returned\n  it.\n- **`collections`** is keyed by query: the resource `type`, a `hash` derived\n  from the query, and the language `prefix`.\n\nThe `prefix` key is the JSON:API language prefix (such as `es`), so\ntranslated variants of the same resource coexist rather than overwrite each\nother.\n\n## Dehydration: collections store references\n\nWhen a collection arrives from Drupal, `addCollection` does something that\nsurprises people the first time: it strips the resource data out of the\ncollection. Each item is committed individually to `resources`, and the\ncollection's `data` array is left holding only `{ id, type }` references.\n\nIf an article appears in both a listing and a fetch of the same article by\nUUID, its attributes and relationships are stored **once**. That's the\npayoff.\nIncluded resources (`?include=...`) go through the same path: a query that\nbrings in an article's image also populates `resources` for the image and\nits file, ready for whichever component needs them next.\n\nRehydrating reverses the trick: `getCollection` reads the references back\nout of the collection and joins them against `resources` before returning.\n\n## Caching rules\n\n### Collections: the query hash\n\n`getCollection` hashes the query (everything except `fields` and `include`)\nwith MD5 to form the cache key. Calls with the same filter, sort and\npagination share an entry. Adding `bypassCache: true` skips the check and\nre-requests.\n\n### Resources: full and partial flags\n\nResources are cached with a **completeness flag**. When a `fields[...]`\nfilter narrowed the query, the stored resource is marked `_druxt_partial`\nwith a timestamp; a full fetch is marked `_druxt_full`. This distinction\nlets `getResource` serve a cached partial when only those fields are needed,\nwhile recognizing that a complete render needs more.\n\n### Includes are recursive\n\n`getResource` hydrates `?include=` relationships by dispatching `getResource`\nfor each related resource, including nested includes\n(`include=media,media.image`). Missing pieces are fetched; present ones are\nreused.\n\n## Using the store\n\nComponents rarely talk to the client directly; they dispatch actions:",
+            "format": "docs_markdown",
+            "processed": "<ul>\n<li><strong><code>resources<\/code><\/strong> is keyed by identity: resource <code>type<\/code> and <code>id<\/code>. A resource\nhas exactly one home here, no matter how many different queries returned\nit.<\/li>\n<li><strong><code>collections<\/code><\/strong> is keyed by query: the resource <code>type<\/code>, a <code>hash<\/code> derived\nfrom the query, and the language <code>prefix<\/code>.<\/li>\n<\/ul>\n<p>The <code>prefix<\/code> key is the JSON:API language prefix (such as <code>es<\/code>), so\ntranslated variants of the same resource coexist rather than overwrite each\nother.<\/p>\n<h2>Dehydration: collections store references<\/h2>\n<p>When a collection arrives from Drupal, <code>addCollection<\/code> does something that\nsurprises people the first time: it strips the resource data out of the\ncollection. Each item is committed individually to <code>resources<\/code>, and the\ncollection's <code>data<\/code> array is left holding only <code>{ id, type }<\/code> references.<\/p>\n<p>If an article appears in both a listing and a fetch of the same article by\nUUID, its attributes and relationships are stored <strong>once<\/strong>. That's the\npayoff.\nIncluded resources (<code>?include=...<\/code>) go through the same path: a query that\nbrings in an article's image also populates <code>resources<\/code> for the image and\nits file, ready for whichever component needs them next.<\/p>\n<p>Rehydrating reverses the trick: <code>getCollection<\/code> reads the references back\nout of the collection and joins them against <code>resources<\/code> before returning.<\/p>\n<h2>Caching rules<\/h2>\n<h3>Collections: the query hash<\/h3>\n<p><code>getCollection<\/code> hashes the query (everything except <code>fields<\/code> and <code>include<\/code>)\nwith MD5 to form the cache key. Calls with the same filter, sort and\npagination share an entry. Adding <code>bypassCache: true<\/code> skips the check and\nre-requests.<\/p>\n<h3>Resources: full and partial flags<\/h3>\n<p>Resources are cached with a <strong>completeness flag<\/strong>. When a <code>fields[...]<\/code>\nfilter narrowed the query, the stored resource is marked <code>_druxt_partial<\/code>\nwith a timestamp; a full fetch is marked <code>_druxt_full<\/code>. This distinction\nlets <code>getResource<\/code> serve a cached partial when only those fields are needed,\nwhile recognizing that a complete render needs more.<\/p>\n<h3>Includes are recursive<\/h3>\n<p><code>getResource<\/code> hydrates <code>?include=<\/code> relationships by dispatching <code>getResource<\/code>\nfor each related resource, including nested includes\n(<code>include=media,media.image<\/code>). Missing pieces are fetched; present ones are\nreused.<\/p>\n<h2>Using the store<\/h2>\n<p>Components rarely talk to the client directly; they dispatch actions:<\/p>\n"
+        }
+    ]
+}

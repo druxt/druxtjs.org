@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "71186e64-3902-5499-a883-3545606e750b"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Druxt registers a plugin with the\n[Vue.js Devtools](https:\/\/devtools-v6.vuejs.org) that turns the browser\nextension into a theming companion. Every Druxt component on the page\nshows which wrapper it resolved and which names it would have accepted,\nwith a scaffold action on each.\n\n## Install\n\n1. [Install the Vue.js Devtools v6](https:\/\/devtools-v6.vuejs.org\/guide\/installation.html)\n   browser extension; v6 is the line that supports Vue 2, and the\n   current v7 line does not.\n2. Run your site with `nuxt dev` and open the devtools panel. A\n   **DruxtJS** inspector appears alongside the standard Vue panes.\n\n## The DruxtJS inspector\n\nThe inspector's **Connection details** node shows the `baseUrl` and\n`endpoint` the site is configured with, and the JSON:API address they\ncombine into. When a page renders nothing, this is the two-second check\nthat the frontend points at the backend you think it does.",
+            "format": "docs_markdown",
+            "processed": "<p>Druxt registers a plugin with the\n<a href=\"https:\/\/devtools-v6.vuejs.org\">Vue.js Devtools<\/a> that turns the browser\nextension into a theming companion. Every Druxt component on the page\nshows which wrapper it resolved and which names it would have accepted,\nwith a scaffold action on each.<\/p>\n<h2>Install<\/h2>\n<ol>\n<li><a href=\"https:\/\/devtools-v6.vuejs.org\/guide\/installation.html\">Install the Vue.js Devtools v6<\/a>\nbrowser extension; v6 is the line that supports Vue 2, and the\ncurrent v7 line does not.<\/li>\n<li>Run your site with <code>nuxt dev<\/code> and open the devtools panel. A\n<strong>DruxtJS<\/strong> inspector appears alongside the standard Vue panes.<\/li>\n<\/ol>\n<h2>The DruxtJS inspector<\/h2>\n<p>The inspector's <strong>Connection details<\/strong> node shows the <code>baseUrl<\/code> and\n<code>endpoint<\/code> the site is configured with, and the JSON:API address they\ncombine into. When a page renders nothing, this is the two-second check\nthat the frontend points at the backend you think it does.<\/p>\n"
+        }
+    ]
+}

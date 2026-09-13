@@ -1,0 +1,54 @@
+{
+    "uuid": [
+        {
+            "value": "d18f36e9-3d9c-5863-bbad-a741c3d28355"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_code",
+            "target_type": "paragraphs_type",
+            "target_uuid": "eafde3f2-1572-48f8-a6ae-4d1ce17d56ee"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_code": [
+        {
+            "value": "{\n  \"resolved\": \"http:\/\/127.0.0.1:8888\/node\",\n  \"isHomePath\": true,\n  \"view\": { \"view_id\": \"frontpage\", \"display_id\": \"page_1\" },\n  \"jsonapi\": { \"resourceName\": \"view--view\" }\n}"
+        }
+    ],
+    "field_language": [
+        {
+            "value": "json"
+        }
+    ]
+}

@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "e026ec3b-c1b0-5594-915d-e3c86472001c"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/6b0412ca-4c72-5b25-8fcc-88cf8c0fb682"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/modules\/druxt\/deprecations"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

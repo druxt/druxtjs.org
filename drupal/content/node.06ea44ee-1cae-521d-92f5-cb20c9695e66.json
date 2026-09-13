@@ -1,0 +1,143 @@
+{
+    "uuid": [
+        {
+            "value": "06ea44ee-1cae-521d-92f5-cb20c9695e66"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "DruxtEntity deprecations"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "4dbf01a5-f54c-5279-8175-5120ec275003"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "10e5f626-3f88-5a1a-9ebd-8a5427901551"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "233d1178-295d-5970-9cba-4a8793d987a1"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "c7d8e336-da05-5465-b4e9-ed8b41b3592c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "65c7bda1-8051-560b-aad3-9f1b0bbf2b64"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "a6b4e55b-d16d-50ae-8e0e-0073c8c39783"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "2c393261-8989-558c-a4d3-9339e52e52d2"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "092e7e19-1073-5c7f-80cc-872a466341a2"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "9ed8e679-1439-57b6-9721-c654bbc0e08d"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Retired DruxtField default components and props, with their replacements."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "e3e5a067-aa03-52c7-9806-563396663220"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/modules\/entity\/deprecations.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"druxtfield-default-components\",\"depth\":2,\"text\":\"DruxtField default components\"},{\"id\":\"what-replaces-them\",\"depth\":3,\"text\":\"What replaces them\"},{\"id\":\"druxtfield--options-prop\",\"depth\":2,\"text\":\"DruxtField \/ options prop\"},{\"id\":\"internal-mixins\",\"depth\":2,\"text\":\"Internal mixins\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": 10
+        }
+    ]
+}

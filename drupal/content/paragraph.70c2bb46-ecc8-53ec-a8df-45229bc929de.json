@@ -1,0 +1,56 @@
+{
+    "uuid": [
+        {
+            "value": "70c2bb46-ecc8-53ec-a8df-45229bc929de"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_callout",
+            "target_type": "paragraphs_type",
+            "target_uuid": "1e924889-e030-4b91-811a-c906d05f0f0e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_callout": [
+        {
+            "value": "> **Before you start:** the [login flow\n> tutorial](\/tutorials\/authentication) uses the quickstart's ready-made\n> OAuth setup. This guide builds that setup from scratch on your own\n> backend. Drupal-side commands run in the Drupal project root, with\n> [drush](https:\/\/www.drush.org) installed\n> (`composer require drush\/drush`); if the backend runs in a container,\n> prefix them with your tool's exec command. New to the Drupal side?\n> Start with\n> [Drupal for Nuxt developers](\/explanation\/drupal-for-nuxt-developers).",
+            "format": "docs_markdown",
+            "processed": "<blockquote>\n<p><strong>Before you start:<\/strong> the <a href=\"\/tutorials\/authentication\">login flow\ntutorial<\/a> uses the quickstart's ready-made\nOAuth setup. This guide builds that setup from scratch on your own\nbackend. Drupal-side commands run in the Drupal project root, with\n<a href=\"https:\/\/www.drush.org\">drush<\/a> installed\n(<code>composer require drush\/drush<\/code>); if the backend runs in a container,\nprefix them with your tool's exec command. New to the Drupal side?\nStart with\n<a href=\"\/explanation\/drupal-for-nuxt-developers\">Drupal for Nuxt developers<\/a>.<\/p>\n<\/blockquote>\n"
+        }
+    ],
+    "field_callout_type": [
+        {
+            "value": "prerequisite"
+        }
+    ]
+}

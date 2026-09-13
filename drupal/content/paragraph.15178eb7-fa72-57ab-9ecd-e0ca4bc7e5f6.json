@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "15178eb7-fa72-57ab-9ecd-e0ca4bc7e5f6"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Both accept a `prefix` (language) and `bypassCache`. Mutations exist for the\nother direction (`addResource`, `addCollection`, `flushResource`,\n`flushCollection`) and are what custom cache-invalidation usually wants.\nThe [mutation and action reference](\/api\/packages\/druxt\/stores\/druxt) lists\nevery signature; retired signatures are tracked on the\n[deprecations page](\/modules\/druxt\/deprecations).\n\n## The case for a store\n\nA Nuxt component _could_ fetch JSON:API directly. Using a store instead pays\noff three ways:\n\n1. **Request deduplication** across components and modules: one Drupal hit\n   per unique resource, per render pass.\n2. **A stable identity** for data whose _representation_ varies by query:\n   the references model keeps partial and full views coherent.\n3. **A seam for SSR**: cached state serializes with the page, so hydration\n   doesn't refetch everything in the browser.\n\n## Where to go next\n\n- [Decoupled routing](\/explanation\/routing): how paths become the resource\n  requests the store serves.\n- [Use the Druxt client directly](\/how-to\/use-the-druxt-client): the layer\n  underneath, without Vuex.",
+            "format": "docs_markdown",
+            "processed": "<p>Both accept a <code>prefix<\/code> (language) and <code>bypassCache<\/code>. Mutations exist for the\nother direction (<code>addResource<\/code>, <code>addCollection<\/code>, <code>flushResource<\/code>,\n<code>flushCollection<\/code>) and are what custom cache-invalidation usually wants.\nThe <a href=\"\/api\/packages\/druxt\/stores\/druxt\">mutation and action reference<\/a> lists\nevery signature; retired signatures are tracked on the\n<a href=\"\/modules\/druxt\/deprecations\">deprecations page<\/a>.<\/p>\n<h2>The case for a store<\/h2>\n<p>A Nuxt component <em>could<\/em> fetch JSON:API directly. Using a store instead pays\noff three ways:<\/p>\n<ol>\n<li><strong>Request deduplication<\/strong> across components and modules: one Drupal hit\nper unique resource, per render pass.<\/li>\n<li><strong>A stable identity<\/strong> for data whose <em>representation<\/em> varies by query:\nthe references model keeps partial and full views coherent.<\/li>\n<li><strong>A seam for SSR<\/strong>: cached state serializes with the page, so hydration\ndoesn't refetch everything in the browser.<\/li>\n<\/ol>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/explanation\/routing\">Decoupled routing<\/a>: how paths become the resource\nrequests the store serves.<\/li>\n<li><a href=\"\/how-to\/use-the-druxt-client\">Use the Druxt client directly<\/a>: the layer\nunderneath, without Vuex.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

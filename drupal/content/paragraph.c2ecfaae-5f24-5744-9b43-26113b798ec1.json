@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "c2ecfaae-5f24-5744-9b43-26113b798ec1"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## Where to go next\n\n- [`druxt-router` module reference](\/modules\/router): options and components.\n- [Upgrade Druxt](\/how-to\/upgrade): the procedure these removals feed into.",
+            "format": "docs_markdown",
+            "processed": "<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/modules\/router\"><code>druxt-router<\/code> module reference<\/a>: options and components.<\/li>\n<li><a href=\"\/how-to\/upgrade\">Upgrade Druxt<\/a>: the procedure these removals feed into.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

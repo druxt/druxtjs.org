@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "b96f3f30-5115-55e3-aa17-01eb00ff0996"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Multilingual support runs through every layer: the router resolves\nprefixed paths, the client and store fetch translated resources, module\ncomponents take a `langcode` prop, and the theme layer resolves\nlanguage-specific components. This guide walks one translated page\nthrough all four.\n\n## Patch the backend\n\nPrefixed-path routing relies on fixes that are written and reviewed but not\nyet released, so a multilingual backend needs them applied:\n\n| Project | Issue | Without it |\n| ------- | ----- | ---------- |\n| decoupled_router | [#3111456](https:\/\/www.drupal.org\/i\/3111456) | Prefixed paths resolve, but always in the default language |\n| druxt | [#3273228](https:\/\/www.drupal.org\/i\/3273228) | Views routes, the front page among them, resolve in the default language and return no langcode |\n\nCopy the `extra.patches` block from\n[`docs\/drupal\/composer.json`](https:\/\/github.com\/druxt\/druxt.js\/blob\/develop\/docs\/drupal\/composer.json)\nin this repository. Both entries point at the merge request diff on\ndrupal.org, so you get whatever the branch currently holds rather than a\ncopy that has to be maintained. That is the set the reference backend runs.\n\nApplying them needs `cweagans\/composer-patches` in `require` and in\n`config.allow-plugins`. Both are in the same file. Without the plugin,\nComposer ignores `extra.patches` and installs the modules unpatched.\n\nTake the versions `composer.json` pins along with the patches. A merge\nrequest is written against one release, and applying its diff to another\nwill either fail or, worse, apply differently.\n\nWithout the patches, prefixed routes still resolve, but in the wrong\nlanguage, which looks like missing translations rather than a routing bug.\n\nMenus need `jsonapi_menu_items` 1.2.4 or later.\n\n## Fetch a translated resource\n\nThe DruxtClient resource methods (`getResource`, `getCollection`,\n`getCollectionAll`, `getIndex`) and the matching DruxtStore actions\ntake a langcode `prefix`, falling back to the backend's default\nlanguage when omitted:",
+            "format": "docs_markdown",
+            "processed": "<p>Multilingual support runs through every layer: the router resolves\nprefixed paths, the client and store fetch translated resources, module\ncomponents take a <code>langcode<\/code> prop, and the theme layer resolves\nlanguage-specific components. This guide walks one translated page\nthrough all four.<\/p>\n<h2>Patch the backend<\/h2>\n<p>Prefixed-path routing relies on fixes that are written and reviewed but not\nyet released, so a multilingual backend needs them applied:<\/p>\n<table>\n<thead>\n<tr>\n<th>Project<\/th>\n<th>Issue<\/th>\n<th>Without it<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td>decoupled_router<\/td>\n<td><a href=\"https:\/\/www.drupal.org\/i\/3111456\">#3111456<\/a><\/td>\n<td>Prefixed paths resolve, but always in the default language<\/td>\n<\/tr>\n<tr>\n<td>druxt<\/td>\n<td><a href=\"https:\/\/www.drupal.org\/i\/3273228\">#3273228<\/a><\/td>\n<td>Views routes, the front page among them, resolve in the default language and return no langcode<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<p>Copy the <code>extra.patches<\/code> block from\n<a href=\"https:\/\/github.com\/druxt\/druxt.js\/blob\/develop\/docs\/drupal\/composer.json\"><code>docs\/drupal\/composer.json<\/code><\/a>\nin this repository. Both entries point at the merge request diff on\ndrupal.org, so you get whatever the branch currently holds rather than a\ncopy that has to be maintained. That is the set the reference backend runs.<\/p>\n<p>Applying them needs <code>cweagans\/composer-patches<\/code> in <code>require<\/code> and in\n<code>config.allow-plugins<\/code>. Both are in the same file. Without the plugin,\nComposer ignores <code>extra.patches<\/code> and installs the modules unpatched.<\/p>\n<p>Take the versions <code>composer.json<\/code> pins along with the patches. A merge\nrequest is written against one release, and applying its diff to another\nwill either fail or, worse, apply differently.<\/p>\n<p>Without the patches, prefixed routes still resolve, but in the wrong\nlanguage, which looks like missing translations rather than a routing bug.<\/p>\n<p>Menus need <code>jsonapi_menu_items<\/code> 1.2.4 or later.<\/p>\n<h2>Fetch a translated resource<\/h2>\n<p>The DruxtClient resource methods (<code>getResource<\/code>, <code>getCollection<\/code>,\n<code>getCollectionAll<\/code>, <code>getIndex<\/code>) and the matching DruxtStore actions\ntake a langcode <code>prefix<\/code>, falling back to the backend's default\nlanguage when omitted:<\/p>\n"
+        }
+    ]
+}

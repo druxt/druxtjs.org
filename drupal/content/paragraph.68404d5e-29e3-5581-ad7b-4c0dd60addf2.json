@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "68404d5e-29e3-5581-ad7b-4c0dd60addf2"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Druxt is a layer on top of Nuxt and Drupal, and it deploys the way Nuxt\ndeploys: as generated static files, or as a node server. `nuxt generate`\nrenders every page to files at build time; `nuxt build` compiles an app\nthat a node server renders per request. The choice decides where you can\nhost, what it costs, and which features work. [Request\ntopology](\/explanation\/request-topology) explains the request mechanics\nbehind this page.\n\n## The models\n\n|                      | Fully static           | Static + live backend                | Server-rendered |\n| -------------------- | ---------------------- | ------------------------------------ | --------------- |\n| Build command        | `nuxt generate`        | `nuxt generate`                      | `nuxt build`    |\n| Frontend hosting     | Any static host or CDN | Any static host or CDN               | A node server   |\n| Drupal in production | Not required           | Required                             | Required        |\n| Content updates      | Rebuild                | Rebuild for pages, live for the rest | Live            |\n| Forms, auth, search  | No                     | Yes                                  | Yes             |\n| API proxy            | No (no server)         | No (no server)                       | Yes             |",
+            "format": "docs_markdown",
+            "processed": "<p>Druxt is a layer on top of Nuxt and Drupal, and it deploys the way Nuxt\ndeploys: as generated static files, or as a node server. <code>nuxt generate<\/code>\nrenders every page to files at build time; <code>nuxt build<\/code> compiles an app\nthat a node server renders per request. The choice decides where you can\nhost, what it costs, and which features work. <a href=\"\/explanation\/request-topology\">Request\ntopology<\/a> explains the request mechanics\nbehind this page.<\/p>\n<h2>The models<\/h2>\n<table>\n<thead>\n<tr>\n<th><\/th>\n<th>Fully static<\/th>\n<th>Static + live backend<\/th>\n<th>Server-rendered<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td>Build command<\/td>\n<td><code>nuxt generate<\/code><\/td>\n<td><code>nuxt generate<\/code><\/td>\n<td><code>nuxt build<\/code><\/td>\n<\/tr>\n<tr>\n<td>Frontend hosting<\/td>\n<td>Any static host or CDN<\/td>\n<td>Any static host or CDN<\/td>\n<td>A node server<\/td>\n<\/tr>\n<tr>\n<td>Drupal in production<\/td>\n<td>Not required<\/td>\n<td>Required<\/td>\n<td>Required<\/td>\n<\/tr>\n<tr>\n<td>Content updates<\/td>\n<td>Rebuild<\/td>\n<td>Rebuild for pages, live for the rest<\/td>\n<td>Live<\/td>\n<\/tr>\n<tr>\n<td>Forms, auth, search<\/td>\n<td>No<\/td>\n<td>Yes<\/td>\n<td>Yes<\/td>\n<\/tr>\n<tr>\n<td>API proxy<\/td>\n<td>No (no server)<\/td>\n<td>No (no server)<\/td>\n<td>Yes<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n"
+        }
+    ]
+}

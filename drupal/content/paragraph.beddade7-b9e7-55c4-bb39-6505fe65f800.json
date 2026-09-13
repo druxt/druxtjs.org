@@ -1,0 +1,56 @@
+{
+    "uuid": [
+        {
+            "value": "beddade7-b9e7-55c4-bb39-6505fe65f800"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_callout",
+            "target_type": "paragraphs_type",
+            "target_uuid": "1e924889-e030-4b91-811a-c906d05f0f0e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_callout": [
+        {
+            "value": "> Missing Vue template for the 'umami_search' block",
+            "format": "docs_markdown",
+            "processed": "<blockquote>\n<p>Missing Vue template for the 'umami_search' block<\/p>\n<\/blockquote>\n"
+        }
+    ],
+    "field_callout_type": [
+        {
+            "value": "output"
+        }
+    ]
+}

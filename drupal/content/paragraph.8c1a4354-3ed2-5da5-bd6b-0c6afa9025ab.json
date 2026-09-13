@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "8c1a4354-3ed2-5da5-bd6b-0c6afa9025ab"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Check the output before deploying:\n\n- **Every route you expect is in `dist\/`.** The generator crawls links\n  from the pages it renders, so a page no link points at is not\n  generated. List extra routes explicitly if you need to:\n\n  ```js\n  import { DruxtClient } from 'druxt';\n\n  export default {\n    generate: {\n      fallback: '404.html',\n      async routes() {\n        const druxt = new DruxtClient(process.env.BASE_URL);\n        const collections = await druxt.getCollectionAll('node--article', {\n          'fields[node--article]': 'path',\n        });\n        return collections\n          .flatMap((collection) => collection.data)\n          .map((entity) => entity.attributes.path.alias)\n          .filter(Boolean);\n      },\n    },\n  };\n  ```\n\n- **The 404 fallback exists.** `generate.fallback: '404.html'` writes\n  the not-found page where static hosts expect it. This replaces the\n  default `200.html` single-page-app fallback; with every route\n  generated, you will not miss it.\n\nIf the build fails reaching Drupal, see\n[the build-failure entry in Troubleshoot common issues](\/how-to\/troubleshooting#the-build-fails-reaching-the-backend-econnrefused-timeouts-400s).\n\n## Node version\n\nNuxt 2 builds cleanly on Node 16. On Node 17 or later, set the OpenSSL\nlegacy provider in the build command:",
+            "format": "docs_markdown",
+            "processed": "<p>Check the output before deploying:<\/p>\n<ul>\n<li>\n<p><strong>Every route you expect is in <code>dist\/<\/code>.<\/strong> The generator crawls links\nfrom the pages it renders, so a page no link points at is not\ngenerated. List extra routes explicitly if you need to:<\/p>\n<pre><code class=\"language-js\">import { DruxtClient } from 'druxt';\n\nexport default {\n  generate: {\n    fallback: '404.html',\n    async routes() {\n      const druxt = new DruxtClient(process.env.BASE_URL);\n      const collections = await druxt.getCollectionAll('node--article', {\n        'fields[node--article]': 'path',\n      });\n      return collections\n        .flatMap((collection) =&gt; collection.data)\n        .map((entity) =&gt; entity.attributes.path.alias)\n        .filter(Boolean);\n    },\n  },\n};\n<\/code><\/pre>\n<\/li>\n<li>\n<p><strong>The 404 fallback exists.<\/strong> <code>generate.fallback: '404.html'<\/code> writes\nthe not-found page where static hosts expect it. This replaces the\ndefault <code>200.html<\/code> single-page-app fallback; with every route\ngenerated, you will not miss it.<\/p>\n<\/li>\n<\/ul>\n<p>If the build fails reaching Drupal, see\n<a href=\"\/how-to\/troubleshooting#the-build-fails-reaching-the-backend-econnrefused-timeouts-400s\">the build-failure entry in Troubleshoot common issues<\/a>.<\/p>\n<h2>Node version<\/h2>\n<p>Nuxt 2 builds cleanly on Node 16. On Node 17 or later, set the OpenSSL\nlegacy provider in the build command:<\/p>\n"
+        }
+    ]
+}

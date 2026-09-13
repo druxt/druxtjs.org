@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "5b64d1de-6410-55c2-b922-ca51179228ad"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Outcome:** open http:\/\/localhost:3000\/custom. You see **Hello Custom\nModule** in bold. The `<Druxt>` component resolved `module=\"custom-module\"`\nto your `DruxtCustomModule` (registered automatically, because the `druxt`\nNuxt module enables component auto-discovery), which rendered through your\n`Default.vue` theme component. No manual component registration anywhere.\n\n## Step 2: Change the theme without touching the module\n\nDruxt components delegate their wrapper to the theme layer, and you can\nre-wrap them at the point of use. Edit `nuxt\/pages\/custom.vue`:",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Outcome:<\/strong> open <a href=\"http:\/\/localhost:3000\/custom\">http:\/\/localhost:3000\/custom<\/a>. You see <strong>Hello Custom\nModule<\/strong> in bold. The <code>&lt;Druxt&gt;<\/code> component resolved <code>module=\"custom-module\"<\/code>\nto your <code>DruxtCustomModule<\/code> (registered automatically, because the <code>druxt<\/code>\nNuxt module enables component auto-discovery), which rendered through your\n<code>Default.vue<\/code> theme component. No manual component registration anywhere.<\/p>\n<h2>Step 2: Change the theme without touching the module<\/h2>\n<p>Druxt components delegate their wrapper to the theme layer, and you can\nre-wrap them at the point of use. Edit <code>nuxt\/pages\/custom.vue<\/code>:<\/p>\n"
+        }
+    ]
+}

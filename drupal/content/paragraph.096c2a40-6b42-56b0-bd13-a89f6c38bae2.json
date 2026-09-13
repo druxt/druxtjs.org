@@ -1,0 +1,55 @@
+{
+    "uuid": [
+        {
+            "value": "096c2a40-6b42-56b0-bd13-a89f6c38bae2"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_diagram",
+            "target_type": "paragraphs_type",
+            "target_uuid": "3c91ca27-0983-444c-a6bf-236eea8124d3"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_diagram": [
+        {
+            "value": "%% One page request through the decoupled stack, from browser to hydration\nsequenceDiagram\n  participant B as Browser\n  participant N as Nuxt + Druxt\n  participant DR as decoupled_router\n  participant JA as JSON:API\n  B->>N: GET \/article-path\n  N->>DR: translate-path?path=\/article-path\n  DR-->>N: type, bundle, UUID\n  N->>JA: fetch the resource, schema fields only\n  JA-->>N: resource + includes\n  N-->>B: HTML + serialized store\n  Note over B,N: Hydration: Vue takes over the markup"
+        }
+    ],
+    "field_group": [],
+    "field_syntax": [
+        {
+            "value": "mermaid"
+        }
+    ]
+}

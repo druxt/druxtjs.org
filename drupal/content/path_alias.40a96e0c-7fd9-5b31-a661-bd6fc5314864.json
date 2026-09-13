@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "40a96e0c-7fd9-5b31-a661-bd6fc5314864"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/a74bbc20-b6a1-521f-a362-ae2d0880cf5b"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/use-the-druxt-client"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

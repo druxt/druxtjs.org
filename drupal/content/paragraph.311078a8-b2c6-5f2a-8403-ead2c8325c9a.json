@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "311078a8-b2c6-5f2a-8403-ead2c8325c9a"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Deprecated in:** `druxt:0.17.0`\n**Removed in:** `druxt:2.0.0`\n\nThese were internal building blocks (all marked `@private`) from before\n`DruxtModule` became the shared base component. They are superseded by it and\nhave no generated API page, so they are listed here for anyone who found them\nin the source:\n\n| Deprecated            | Replacement   |\n| --------------------- | ------------- |\n| `DruxtClass`          | `DruxtModule` |\n| `DruxtComponentMixin` | `DruxtModule` |\n\nIf you extended either directly, extend\n[`DruxtModule`](\/api\/packages\/druxt\/components\/DruxtModule) instead: it\nprovides the component suggestion system, the wrapper contract, and the\n`propsData` \/ `slots` callbacks described in\n[Component resolution](\/explanation\/component-resolution).\n\n## Where to go next\n\n- [`druxt` module reference](\/modules\/druxt): options and components.\n- [Upgrade Druxt](\/how-to\/upgrade): the procedure these removals feed into.",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Deprecated in:<\/strong> <code>druxt:0.17.0<\/code>\n<strong>Removed in:<\/strong> <code>druxt:2.0.0<\/code><\/p>\n<p>These were internal building blocks (all marked <code>@private<\/code>) from before\n<code>DruxtModule<\/code> became the shared base component. They are superseded by it and\nhave no generated API page, so they are listed here for anyone who found them\nin the source:<\/p>\n<table>\n<thead>\n<tr>\n<th>Deprecated<\/th>\n<th>Replacement<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td><code>DruxtClass<\/code><\/td>\n<td><code>DruxtModule<\/code><\/td>\n<\/tr>\n<tr>\n<td><code>DruxtComponentMixin<\/code><\/td>\n<td><code>DruxtModule<\/code><\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<p>If you extended either directly, extend\n<a href=\"\/api\/packages\/druxt\/components\/DruxtModule\"><code>DruxtModule<\/code><\/a> instead: it\nprovides the component suggestion system, the wrapper contract, and the\n<code>propsData<\/code> \/ <code>slots<\/code> callbacks described in\n<a href=\"\/explanation\/component-resolution\">Component resolution<\/a>.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/modules\/druxt\"><code>druxt<\/code> module reference<\/a>: options and components.<\/li>\n<li><a href=\"\/how-to\/upgrade\">Upgrade Druxt<\/a>: the procedure these removals feed into.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

@@ -1,0 +1,82 @@
+{
+    "uuid": [
+        {
+            "value": "9566dea5-646d-513f-ba03-5a21ab804ebb"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "bundle": [
+        {
+            "target_id": "image",
+            "target_type": "media_type",
+            "target_uuid": "d63708bd-0a02-4969-b4b3-0f37b585bdd4"
+        }
+    ],
+    "revision_created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_user": [],
+    "revision_log_message": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "name": [
+        {
+            "value": "vuejs-devtools.png"
+        }
+    ],
+    "thumbnail": [
+        {
+            "alt": "Vue.js Devtools showing the DruxtJS integration",
+            "title": null,
+            "width": 1024,
+            "height": 382,
+            "target_type": "file",
+            "target_uuid": "87b5d43f-b085-5f7f-b5bd-df4118c1ba8b"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_media_image": [
+        {
+            "alt": "Vue.js Devtools showing the DruxtJS integration",
+            "title": null,
+            "width": 1024,
+            "height": 382,
+            "target_type": "file",
+            "target_uuid": "87b5d43f-b085-5f7f-b5bd-df4118c1ba8b"
+        }
+    ]
+}

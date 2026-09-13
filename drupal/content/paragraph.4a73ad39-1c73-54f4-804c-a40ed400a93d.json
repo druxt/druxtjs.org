@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "4a73ad39-1c73-54f4-804c-a40ed400a93d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "The [`druxt.js` monorepo](https:\/\/github.com\/druxt\/druxt.js) includes a suite of\nfull reference apps under `examples\/`, all built against the same Drupal\nUmami demo content: a recipe magazine with articles, recipes, and a contact\nform. Screenshots below are real captures of the running apps.",
+            "format": "docs_markdown",
+            "processed": "<p>The <a href=\"https:\/\/github.com\/druxt\/druxt.js\"><code>druxt.js<\/code> monorepo<\/a> includes a suite of\nfull reference apps under <code>examples\/<\/code>, all built against the same Drupal\nUmami demo content: a recipe magazine with articles, recipes, and a contact\nform. Screenshots below are real captures of the running apps.<\/p>\n"
+        }
+    ]
+}

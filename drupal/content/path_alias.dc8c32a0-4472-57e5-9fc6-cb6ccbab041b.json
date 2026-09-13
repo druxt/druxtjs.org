@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "dc8c32a0-4472-57e5-9fc6-cb6ccbab041b"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/fc53fe50-257c-5ee8-b716-d33dba554231"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/tutorials\/first-custom-module"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

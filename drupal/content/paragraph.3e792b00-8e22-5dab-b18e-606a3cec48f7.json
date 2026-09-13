@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "3e792b00-8e22-5dab-b18e-606a3cec48f7"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## \"error:0308010C:digital envelope routines\" on Node 17 or later\n\nNode 17 moved to OpenSSL 3, which rejects the legacy hashing algorithms\nNuxt 2's webpack 4 relies on. Either build on Node 16, or enable the\nlegacy provider in the build environment:",
+            "format": "docs_markdown",
+            "processed": "<h2>\"error:0308010C:digital envelope routines\" on Node 17 or later<\/h2>\n<p>Node 17 moved to OpenSSL 3, which rejects the legacy hashing algorithms\nNuxt 2's webpack 4 relies on. Either build on Node 16, or enable the\nlegacy provider in the build environment:<\/p>\n"
+        }
+    ]
+}

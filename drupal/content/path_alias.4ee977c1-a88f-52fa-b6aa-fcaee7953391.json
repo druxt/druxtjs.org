@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "4ee977c1-a88f-52fa-b6aa-fcaee7953391"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/85e6c7fe-e1d0-5bd2-8c47-f56b28cfb3de"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/troubleshooting"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

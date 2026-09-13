@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "c989b1eb-52f4-5eae-b471-ecde65db2059"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "This one command:\n\n1. installs the frontend dependencies,\n2. provisions a fresh Drupal site with the Drupal Druxt module, Simple OAuth and an\n   OAuth consumer (SQLite, throwaway),\n3. starts the backend, and\n4. writes `BASE_URL` and `OAUTH_CLIENT_ID` to `.env`.\n\n**Outcome:** the setup script prints a series of `PASS` lines and ends with\nthe backend marked as running. Your `.env` file now contains a `BASE_URL`\npointing at `http:\/\/127.0.0.1:8888` (or the next free port; the script\npicks one and prints it).\n\n## Step 3: Start the frontend",
+            "format": "docs_markdown",
+            "processed": "<p>This one command:<\/p>\n<ol>\n<li>installs the frontend dependencies,<\/li>\n<li>provisions a fresh Drupal site with the Drupal Druxt module, Simple OAuth and an\nOAuth consumer (SQLite, throwaway),<\/li>\n<li>starts the backend, and<\/li>\n<li>writes <code>BASE_URL<\/code> and <code>OAUTH_CLIENT_ID<\/code> to <code>.env<\/code>.<\/li>\n<\/ol>\n<p><strong>Outcome:<\/strong> the setup script prints a series of <code>PASS<\/code> lines and ends with\nthe backend marked as running. Your <code>.env<\/code> file now contains a <code>BASE_URL<\/code>\npointing at <code>http:\/\/127.0.0.1:8888<\/code> (or the next free port; the script\npicks one and prints it).<\/p>\n<h2>Step 3: Start the frontend<\/h2>\n"
+        }
+    ]
+}

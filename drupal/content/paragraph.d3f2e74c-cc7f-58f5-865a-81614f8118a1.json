@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "d3f2e74c-cc7f-58f5-865a-81614f8118a1"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Outcome:** reload http:\/\/localhost:3000\/custom. Instead of the greeting\nyou now see a list of article titles, starting with the one you published in\nthe [Getting started](\/tutorials\/getting-started) tutorial. Publish another\narticle in Drupal and reload: it appears too.\n\nWhat just happened: the module's `fetch()` hook dispatched `getCollection` to\nthe DruxtStore, which asked your Drupal backend for all `node--article`\nresources, cached the result, and handed the data back. The slot render\nfunction turned each resource's `attributes.title` into list items, and the\nresolved theme component wrapped them.\n\n## How it works\n\n1. `<Druxt module=\"custom-module\">` resolves to the component named\n   `DruxtCustomModule`: Druxt modules are just auto-discovered Vue\n   components with a naming convention.\n2. The `druxt()` options drive the machinery: suggestions tell Druxt which\n   theme components to look for, `propsData` feeds them, `slots` provides\n   content.\n3. Wrapper components and `props`\/`slots`\/`$attrs` pass-through mean the\n   rendering is yours to override, whether per use, per site, or globally.\n\nThe same three ideas power every Druxt module in the\n[modules list](\/modules).\n\n## Where to go next\n\n- Go deeper on overriding: [Theme Druxt components](\/how-to\/theming).\n- Understand why the suggestion chain looks the way it does:\n  [Component resolution](\/explanation\/component-resolution).\n- Read the base class reference:\n  [DruxtModule API](\/api\/packages\/druxt\/components\/DruxtModule).",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Outcome:<\/strong> reload <a href=\"http:\/\/localhost:3000\/custom\">http:\/\/localhost:3000\/custom<\/a>. Instead of the greeting\nyou now see a list of article titles, starting with the one you published in\nthe <a href=\"\/tutorials\/getting-started\">Getting started<\/a> tutorial. Publish another\narticle in Drupal and reload: it appears too.<\/p>\n<p>What just happened: the module's <code>fetch()<\/code> hook dispatched <code>getCollection<\/code> to\nthe DruxtStore, which asked your Drupal backend for all <code>node--article<\/code>\nresources, cached the result, and handed the data back. The slot render\nfunction turned each resource's <code>attributes.title<\/code> into list items, and the\nresolved theme component wrapped them.<\/p>\n<h2>How it works<\/h2>\n<ol>\n<li><code>&lt;Druxt module=\"custom-module\"&gt;<\/code> resolves to the component named\n<code>DruxtCustomModule<\/code>: Druxt modules are just auto-discovered Vue\ncomponents with a naming convention.<\/li>\n<li>The <code>druxt()<\/code> options drive the machinery: suggestions tell Druxt which\ntheme components to look for, <code>propsData<\/code> feeds them, <code>slots<\/code> provides\ncontent.<\/li>\n<li>Wrapper components and <code>props<\/code>\/<code>slots<\/code>\/<code>$attrs<\/code> pass-through mean the\nrendering is yours to override, whether per use, per site, or globally.<\/li>\n<\/ol>\n<p>The same three ideas power every Druxt module in the\n<a href=\"\/modules\">modules list<\/a>.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li>Go deeper on overriding: <a href=\"\/how-to\/theming\">Theme Druxt components<\/a>.<\/li>\n<li>Understand why the suggestion chain looks the way it does:\n<a href=\"\/explanation\/component-resolution\">Component resolution<\/a>.<\/li>\n<li>Read the base class reference:\n<a href=\"\/api\/packages\/druxt\/components\/DruxtModule\">DruxtModule API<\/a>.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

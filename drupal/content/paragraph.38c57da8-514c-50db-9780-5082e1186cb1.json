@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "38c57da8-514c-50db-9780-5082e1186cb1"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "The [`druxt-auth`](https:\/\/github.com\/druxt\/druxt-auth) module is already\ninstalled and configured: `npm run setup` (back in Getting started)\nprovisioned a Drupal OAuth Consumer (Drupal's entity for one registered\nOAuth client) for you and wrote its ID to\n`OAUTH_CLIENT_ID` in `.env`. There's also already a page at\n`nuxt\/pages\/user\/login.vue` that starts the login flow:",
+            "format": "docs_markdown",
+            "processed": "<p>The <a href=\"https:\/\/github.com\/druxt\/druxt-auth\"><code>druxt-auth<\/code><\/a> module is already\ninstalled and configured: <code>npm run setup<\/code> (back in Getting started)\nprovisioned a Drupal OAuth Consumer (Drupal's entity for one registered\nOAuth client) for you and wrote its ID to\n<code>OAUTH_CLIENT_ID<\/code> in <code>.env<\/code>. There's also already a page at\n<code>nuxt\/pages\/user\/login.vue<\/code> that starts the login flow:<\/p>\n"
+        }
+    ]
+}

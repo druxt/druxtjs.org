@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "efb44447-e795-5885-8b97-fb1de01f9f85"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Druxt hands a wrapper a set of props. Anything you don't declare falls\nthrough to `$attrs`, and Vue writes `$attrs` onto your root element, so\nundeclared props become literal `[object Object]` attributes in the markup.\n\nDeclare them yourself, or take the module's mixin, which covers the whole\nset:",
+            "format": "docs_markdown",
+            "processed": "<p>Druxt hands a wrapper a set of props. Anything you don't declare falls\nthrough to <code>$attrs<\/code>, and Vue writes <code>$attrs<\/code> onto your root element, so\nundeclared props become literal <code>[object Object]<\/code> attributes in the markup.<\/p>\n<p>Declare them yourself, or take the module's mixin, which covers the whole\nset:<\/p>\n"
+        }
+    ]
+}

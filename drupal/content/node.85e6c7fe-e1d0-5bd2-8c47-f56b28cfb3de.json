@@ -1,0 +1,139 @@
+{
+    "uuid": [
+        {
+            "value": "85e6c7fe-e1d0-5bd2-8c47-f56b28cfb3de"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Troubleshoot common issues"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "5eedd9a6-6769-5c96-9ec8-303f5816c88a"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "d77e841f-6122-5748-84bc-b9bd4f771223"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "66fdfdaf-05be-5280-b8fb-579a226ab103"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "cac79678-90ae-5a8b-baba-22d503e49610"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "8775be22-c1cd-5a2c-b726-4612b06bbe06"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "3e792b00-8e22-5dab-b18e-606a3cec48f7"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "a82a516a-7b6d-5006-ad62-d973a5612762"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "daf6c22e-5596-515d-ae11-42c081934a67"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Quick answers to the problems reported most often by real users, from the missing Vue template box to site-wide JSON:API 403 failures."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "540fd949-ce24-5411-b703-1d1e76de2802"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/how-to\/troubleshooting.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"missing-vue-template-box\",\"depth\":2,\"text\":\"\\\"Missing Vue template\\\" box\"},{\"id\":\"i-changed-a-drupal-display-and-nothing-happened-on-the-frontend\",\"depth\":2,\"text\":\"I changed a Drupal display and nothing happened on the frontend\"},{\"id\":\"every-jsonapi-request-403s-even-for-content-that-should-be-public\",\"depth\":2,\"text\":\"Every JSON:API request 403s, even for content that should be public\"},{\"id\":\"has-been-blocked-by-cors-policy-in-the-browser-console\",\"depth\":2,\"text\":\"\\\"\u2026has been blocked by CORS policy\\\" in the browser console\"},{\"id\":\"the-build-fails-reaching-the-backend-econnrefused-timeouts-400s\",\"depth\":2,\"text\":\"The build fails reaching the backend (ECONNREFUSED, timeouts, 400s)\"},{\"id\":\"the-site-only-shows-welcome-to-nuxt\",\"depth\":2,\"text\":\"The site only shows \\\"Welcome to Nuxt\\\"\"},{\"id\":\"build-error-the-pages-directory-is-missing\",\"depth\":2,\"text\":\"Build error: the pages directory is missing\"},{\"id\":\"routes-and-views-paths-stop-resolving-after-a-composer-update\",\"depth\":2,\"text\":\"Routes and Views paths stop resolving after a composer update\"},{\"id\":\"composer-refuses-to-install-drupaldruxt\",\"depth\":2,\"text\":\"Composer refuses to install drupal\/druxt\"},{\"id\":\"require-of-es-module-axios-crash-on-a-fresh-install\",\"depth\":2,\"text\":\"\\\"require() of ES Module axios\\\" crash on a fresh install\"},{\"id\":\"error0308010cdigital-envelope-routines-on-node-17-or-later\",\"depth\":2,\"text\":\"\\\"error:0308010C:digital envelope routines\\\" on Node 17 or later\"},{\"id\":\"builds-fail-on-windows\",\"depth\":2,\"text\":\"Builds fail on Windows\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": 7
+        }
+    ]
+}

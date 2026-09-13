@@ -1,0 +1,127 @@
+{
+    "uuid": [
+        {
+            "value": "eff36ac8-7a13-54e2-b399-1883790f08e0"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "The schema system"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "f5212183-7a19-5bc3-92b6-758d08fadc21"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "00ec7907-af51-536e-bf2e-bae01c611861"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "dc15ecd0-7090-53da-b8b9-b0a23f3e6a36"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "fe6c9051-b5bc-5a90-bd4d-ec5a273bde0d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "2485f372-93bb-5e9c-a6dd-c0c20abbe10d"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Drupal display modes become schemas that drive field rendering, generated once at startup and reused to narrow the JSON:API query."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "4f80265c-02fd-5652-8970-c0bf9eaf5e5b"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/explanation\/schemas.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"an-example-schema\",\"depth\":2,\"text\":\"An example schema\"},{\"id\":\"where-schemas-come-from\",\"depth\":2,\"text\":\"Where schemas come from\"},{\"id\":\"schemas-are-generated-once-at-startup\",\"depth\":2,\"text\":\"Schemas are generated once, at startup\"},{\"id\":\"schemas-shape-the-queries-not-just-the-rendering\",\"depth\":2,\"text\":\"Schemas shape the queries, not just the rendering\"},{\"id\":\"field-components\",\"depth\":2,\"text\":\"Field components\"},{\"id\":\"why-display-modes\",\"depth\":2,\"text\":\"Why display modes?\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -4
+        }
+    ]
+}

@@ -1,0 +1,56 @@
+{
+    "uuid": [
+        {
+            "value": "76b14e9f-0543-5c40-8fa8-78982a21c9eb"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_callout",
+            "target_type": "paragraphs_type",
+            "target_uuid": "1e924889-e030-4b91-811a-c906d05f0f0e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_callout": [
+        {
+            "value": "> **Before you start:** read [Deployment\n> models](\/explanation\/deployment-models) to confirm static is your\n> model. The backend must be reachable from wherever the build runs,\n> and from visitors' browsers once deployed. In the quickstart layout\n> Nuxt lives in `nuxt\/`, so the equivalents of the commands below are\n> `npm run generate --prefix nuxt` and a `nuxt\/dist` publish directory.",
+            "format": "docs_markdown",
+            "processed": "<blockquote>\n<p><strong>Before you start:<\/strong> read <a href=\"\/explanation\/deployment-models\">Deployment\nmodels<\/a> to confirm static is your\nmodel. The backend must be reachable from wherever the build runs,\nand from visitors' browsers once deployed. In the quickstart layout\nNuxt lives in <code>nuxt\/<\/code>, so the equivalents of the commands below are\n<code>npm run generate --prefix nuxt<\/code> and a <code>nuxt\/dist<\/code> publish directory.<\/p>\n<\/blockquote>\n"
+        }
+    ],
+    "field_callout_type": [
+        {
+            "value": "prerequisite"
+        }
+    ]
+}

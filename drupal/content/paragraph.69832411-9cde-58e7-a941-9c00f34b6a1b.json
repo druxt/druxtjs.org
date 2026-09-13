@@ -1,0 +1,55 @@
+{
+    "uuid": [
+        {
+            "value": "69832411-9cde-58e7-a941-9c00f34b6a1b"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_diagram",
+            "target_type": "paragraphs_type",
+            "target_uuid": "3c91ca27-0983-444c-a6bf-236eea8124d3"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_diagram": [
+        {
+            "value": "%% The three request contexts. Only the browser's requests cross the CORS boundary.\nflowchart LR\n  subgraph server [Server side: no CORS]\n    G[Build step]\n    S[Node server]\n  end\n  subgraph browser [Browser: CORS applies]\n    V[Visitor's browser]\n  end\n  D[(\"Drupal<br>JSON:API\")]\n  G -->|\"schemas + content\"| D\n  S -->|\"routes + resources\"| D\n  V -.->|\"navigation + live data\"| D"
+        }
+    ],
+    "field_group": [],
+    "field_syntax": [
+        {
+            "value": "mermaid"
+        }
+    ]
+}

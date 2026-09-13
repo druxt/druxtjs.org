@@ -1,0 +1,50 @@
+{
+    "uuid": [
+        {
+            "value": "a576ddfc-074c-5e78-887f-fc5fc879597c"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_image",
+            "target_type": "paragraphs_type",
+            "target_uuid": "475e82f4-ab2c-46f4-b372-8331b9186c69"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_media": [
+        {
+            "target_type": "media",
+            "target_uuid": "0563195d-c0df-540e-87d3-669b8b65c9b2"
+        }
+    ]
+}

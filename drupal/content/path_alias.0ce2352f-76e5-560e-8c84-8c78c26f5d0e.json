@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "0ce2352f-76e5-560e-8c84-8c78c26f5d0e"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/87ae1335-aaa2-55fa-8470-e935f88b6ae4"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/explanation\/architecture"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

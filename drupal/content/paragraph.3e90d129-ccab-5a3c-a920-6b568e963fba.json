@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "3e90d129-ccab-5a3c-a920-6b568e963fba"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Outcome:** you've confirmed there's nothing left to install: the frontend\nis already wired for login, it just doesn't have a visible way to trigger it\nyet. This tutorial adds that visible trigger.\n\n## Step 2: Make sure you have an active Drupal session\n\nThe OAuth flow needs you to already be logged into Drupal, so it has someone\nto ask \"grant access to this app?\". Run:",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Outcome:<\/strong> you've confirmed there's nothing left to install: the frontend\nis already wired for login, it just doesn't have a visible way to trigger it\nyet. This tutorial adds that visible trigger.<\/p>\n<h2>Step 2: Make sure you have an active Drupal session<\/h2>\n<p>The OAuth flow needs you to already be logged into Drupal, so it has someone\nto ask \"grant access to this app?\". Run:<\/p>\n"
+        }
+    ]
+}

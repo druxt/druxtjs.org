@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "bc6bc5de-f739-5a9f-80d4-8a1e9b2680fa"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "examples-druxt-site.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/examples-druxt-site.png",
+            "url": "\/sites\/default\/files\/documentation\/examples-druxt-site.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 61435
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

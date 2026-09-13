@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "c616c1bc-74a1-57b1-9127-e4b2797d44fd"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Now stop the backend (`npm run stop`) and reload. The page you are on\nstill renders, and navigation breaks. Generated pages are baked files, but\nmoving between them still asks Drupal to resolve the route. That is the\ndependency the rest of this lesson works around, and the reason step 3\nuses a backend that browsers can reach.\n\nStart the backend again for good measure: `npm run dev`, then Ctrl+C\nonce it is up (the frontend stops; the backend keeps serving, which is\nwhat `npm run stop` is for).\n\n## Step 3: Deploy against the public demo backend\n\nThe Druxt demo backend at `https:\/\/api.umami.demo.druxtjs.org` is public,\nanswers browsers from any origin, and runs the Umami food-magazine demo\ncontent. Pointing your frontend at it takes a theme change and an\nenvironment override.\n\nFirst, its blocks and menus belong to Drupal's `umami` theme, and a\nDruxt frontend renders the block layout of whatever theme it is told\nabout. In `nuxt\/nuxt.config.js`, find the `site` block and change its\n`theme`:",
+            "format": "docs_markdown",
+            "processed": "<p>Now stop the backend (<code>npm run stop<\/code>) and reload. The page you are on\nstill renders, and navigation breaks. Generated pages are baked files, but\nmoving between them still asks Drupal to resolve the route. That is the\ndependency the rest of this lesson works around, and the reason step 3\nuses a backend that browsers can reach.<\/p>\n<p>Start the backend again for good measure: <code>npm run dev<\/code>, then Ctrl+C\nonce it is up (the frontend stops; the backend keeps serving, which is\nwhat <code>npm run stop<\/code> is for).<\/p>\n<h2>Step 3: Deploy against the public demo backend<\/h2>\n<p>The Druxt demo backend at <code>https:\/\/api.umami.demo.druxtjs.org<\/code> is public,\nanswers browsers from any origin, and runs the Umami food-magazine demo\ncontent. Pointing your frontend at it takes a theme change and an\nenvironment override.<\/p>\n<p>First, its blocks and menus belong to Drupal's <code>umami<\/code> theme, and a\nDruxt frontend renders the block layout of whatever theme it is told\nabout. In <code>nuxt\/nuxt.config.js<\/code>, find the <code>site<\/code> block and change its\n<code>theme<\/code>:<\/p>\n"
+        }
+    ]
+}

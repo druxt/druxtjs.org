@@ -1,0 +1,56 @@
+{
+    "uuid": [
+        {
+            "value": "655afd90-18ca-55b3-8812-4d6ba46b71b0"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_callout",
+            "target_type": "paragraphs_type",
+            "target_uuid": "1e924889-e030-4b91-811a-c906d05f0f0e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_callout": [
+        {
+            "value": "> [druxt] Use `DruxtModule` instead.",
+            "format": "docs_markdown",
+            "processed": "<blockquote>\n<p>[druxt] Use <code>DruxtModule<\/code> instead.<\/p>\n<\/blockquote>\n"
+        }
+    ],
+    "field_callout_type": [
+        {
+            "value": "output"
+        }
+    ]
+}

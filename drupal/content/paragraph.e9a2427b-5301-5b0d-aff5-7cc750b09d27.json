@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "e9a2427b-5301-5b0d-aff5-7cc750b09d27"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "A dense, sortable content table (recipes + articles) with single-cell\ninline editing via `DruxtEntityForm`'s PATCH path, optimistic UI (a cell\nupdates immediately, the row shows \"Saving\" \u2192 \"Saved\" without waiting on\nthe round trip), a \"needs attention\" filter for content missing fields,\nand a deliberately scripted failure case (editing one specific recipe\nfails on purpose) to prove the error-banner-plus-Retry\/Revert path\nactually works, not just the happy path.\n\nThis is the one app in the suite that needs a logged-in user: every write\ngoes through the same OAuth2 Authorization Code + PKCE flow covered in [Add\na login flow](\/tutorials\/authentication). Its `nuxt.config.js` is already\nwired with a committed Drupal Consumer (public, PKCE) dedicated to this\nexample, independent of the quickstart's own consumer.\n\n## Run them yourself\n\nEvery app expects a running Drupal backend (`BASE_URL`, default\n`http:\/\/127.0.0.1:8888`) with the demo Umami content. Provision it with\nthe monorepo's `docs\/drupal` tooling (`examples\/README.md` has the\ncommands), then from the monorepo root:\n\n| App                 | Directory                     | Dev command       |\n| ------------------- | ----------------------------- | ----------------- |\n| druxt-site          | `examples\/druxt-site`         | `yarn dev`        |\n| Recipe Box          | `examples\/druxt-daisyui`      | `yarn dev`        |\n| Meal Planner        | `examples\/druxt-tailwind`     | `yarn dev` (Vite) |\n| Content Ops Console | `examples\/druxt-bootstrapvue` | `yarn dev`        |\n\n## Where to go next\n\n- Log in before trying Content Ops Console yourself: [Add a login\n  flow](\/tutorials\/authentication).\n- See the underlying patterns without a themed app around them:\n  `druxt-site`'s `\/examples\/*` pages, above.\n- Understand the machine all four apps sit on top of:\n  [Architecture](\/explanation\/architecture).\n- Steal their patterns for your own site: [Theme Druxt\n  components](\/how-to\/theming) and [Browse and develop components in\n  Storybook](\/how-to\/storybook).",
+            "format": "docs_markdown",
+            "processed": "<p>A dense, sortable content table (recipes + articles) with single-cell\ninline editing via <code>DruxtEntityForm<\/code>'s PATCH path, optimistic UI (a cell\nupdates immediately, the row shows \"Saving\" \u2192 \"Saved\" without waiting on\nthe round trip), a \"needs attention\" filter for content missing fields,\nand a deliberately scripted failure case (editing one specific recipe\nfails on purpose) to prove the error-banner-plus-Retry\/Revert path\nactually works, not just the happy path.<\/p>\n<p>This is the one app in the suite that needs a logged-in user: every write\ngoes through the same OAuth2 Authorization Code + PKCE flow covered in <a href=\"\/tutorials\/authentication\">Add\na login flow<\/a>. Its <code>nuxt.config.js<\/code> is already\nwired with a committed Drupal Consumer (public, PKCE) dedicated to this\nexample, independent of the quickstart's own consumer.<\/p>\n<h2>Run them yourself<\/h2>\n<p>Every app expects a running Drupal backend (<code>BASE_URL<\/code>, default\n<code>http:\/\/127.0.0.1:8888<\/code>) with the demo Umami content. Provision it with\nthe monorepo's <code>docs\/drupal<\/code> tooling (<code>examples\/README.md<\/code> has the\ncommands), then from the monorepo root:<\/p>\n<table>\n<thead>\n<tr>\n<th>App<\/th>\n<th>Directory<\/th>\n<th>Dev command<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td>druxt-site<\/td>\n<td><code>examples\/druxt-site<\/code><\/td>\n<td><code>yarn dev<\/code><\/td>\n<\/tr>\n<tr>\n<td>Recipe Box<\/td>\n<td><code>examples\/druxt-daisyui<\/code><\/td>\n<td><code>yarn dev<\/code><\/td>\n<\/tr>\n<tr>\n<td>Meal Planner<\/td>\n<td><code>examples\/druxt-tailwind<\/code><\/td>\n<td><code>yarn dev<\/code> (Vite)<\/td>\n<\/tr>\n<tr>\n<td>Content Ops Console<\/td>\n<td><code>examples\/druxt-bootstrapvue<\/code><\/td>\n<td><code>yarn dev<\/code><\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<h2>Where to go next<\/h2>\n<ul>\n<li>Log in before trying Content Ops Console yourself: <a href=\"\/tutorials\/authentication\">Add a login\nflow<\/a>.<\/li>\n<li>See the underlying patterns without a themed app around them:\n<code>druxt-site<\/code>'s <code>\/examples\/*<\/code> pages, above.<\/li>\n<li>Understand the machine all four apps sit on top of:\n<a href=\"\/explanation\/architecture\">Architecture<\/a>.<\/li>\n<li>Steal their patterns for your own site: <a href=\"\/how-to\/theming\">Theme Druxt\ncomponents<\/a> and <a href=\"\/how-to\/storybook\">Browse and develop components in\nStorybook<\/a>.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

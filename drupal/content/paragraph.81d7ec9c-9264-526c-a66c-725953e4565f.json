@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "81d7ec9c-9264-526c-a66c-725953e4565f"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Each deprecation has a ledger entry stating what changed, the\nreplacement, and the removal version, in the package that owns it:\n\n- [Druxt core deprecations](\/modules\/druxt\/deprecations)\n- [DruxtEntity deprecations](\/modules\/entity\/deprecations)\n- [DruxtMenu deprecations](\/modules\/menu\/deprecations)\n- [DruxtRouter deprecations](\/modules\/router\/deprecations)\n\nA quiet console in development means nothing on the removal list applies\nto your site.\n\n## Security\n\nReport vulnerabilities privately through\n[GitHub security advisories](https:\/\/github.com\/druxt\/druxt.js\/security\/policy);\ndo not open a public issue for them. The policy, response time and\nsupported-versions statement live in the repository's SECURITY.md.\n\n## Where to go next\n\n- [Upgrade a Druxt site](\/how-to\/upgrade): moving to 1.0.0, and using\n  the warnings as your 2.0.0 to-do list.\n- [`druxt` module reference](\/modules\/druxt): the full compatibility\n  table.",
+            "format": "docs_markdown",
+            "processed": "<p>Each deprecation has a ledger entry stating what changed, the\nreplacement, and the removal version, in the package that owns it:<\/p>\n<ul>\n<li><a href=\"\/modules\/druxt\/deprecations\">Druxt core deprecations<\/a><\/li>\n<li><a href=\"\/modules\/entity\/deprecations\">DruxtEntity deprecations<\/a><\/li>\n<li><a href=\"\/modules\/menu\/deprecations\">DruxtMenu deprecations<\/a><\/li>\n<li><a href=\"\/modules\/router\/deprecations\">DruxtRouter deprecations<\/a><\/li>\n<\/ul>\n<p>A quiet console in development means nothing on the removal list applies\nto your site.<\/p>\n<h2>Security<\/h2>\n<p>Report vulnerabilities privately through\n<a href=\"https:\/\/github.com\/druxt\/druxt.js\/security\/policy\">GitHub security advisories<\/a>;\ndo not open a public issue for them. The policy, response time and\nsupported-versions statement live in the repository's SECURITY.md.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/how-to\/upgrade\">Upgrade a Druxt site<\/a>: moving to 1.0.0, and using\nthe warnings as your 2.0.0 to-do list.<\/li>\n<li><a href=\"\/modules\/druxt\"><code>druxt<\/code> module reference<\/a>: the full compatibility\ntable.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

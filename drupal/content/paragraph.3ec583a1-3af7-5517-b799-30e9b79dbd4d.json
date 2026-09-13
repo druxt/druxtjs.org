@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "3ec583a1-3af7-5517-b799-30e9b79dbd4d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Outcome:** reload http:\/\/localhost:3000\/custom. The same bold text now\nscrolls across the page. You just changed the rendered markup of a Druxt\ncomponent from the outside, without editing the component itself. This\nwrapper-resolution mechanism is how whole-site theming works in Druxt; the\n[theming guide](\/how-to\/theming) covers it in depth.\n\n## Step 3: Fetch data from Drupal\n\nSo far the module rendered a hard-coded string. Real Druxt modules source\ntheir data from the backend. The `DruxtStore` (the Vuex store that all\nDruxt modules share) does the fetching and caching for you.\n\nUpdate `nuxt\/components\/druxt\/CustomModule.vue`:",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Outcome:<\/strong> reload <a href=\"http:\/\/localhost:3000\/custom\">http:\/\/localhost:3000\/custom<\/a>. The same bold text now\nscrolls across the page. You just changed the rendered markup of a Druxt\ncomponent from the outside, without editing the component itself. This\nwrapper-resolution mechanism is how whole-site theming works in Druxt; the\n<a href=\"\/how-to\/theming\">theming guide<\/a> covers it in depth.<\/p>\n<h2>Step 3: Fetch data from Drupal<\/h2>\n<p>So far the module rendered a hard-coded string. Real Druxt modules source\ntheir data from the backend. The <code>DruxtStore<\/code> (the Vuex store that all\nDruxt modules share) does the fetching and caching for you.<\/p>\n<p>Update <code>nuxt\/components\/druxt\/CustomModule.vue<\/code>:<\/p>\n"
+        }
+    ]
+}

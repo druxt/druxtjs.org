@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "f193771d-0759-59cb-b39a-a9b832c41e4d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Every story renders through the same components the site uses, against\nlive data, and the Controls panel exposes the component's props. Entity\nstories list real entity ids in a dropdown, menu stories take depth and\nlangcode, and block stories offer the placements the backend actually\nhas.\nFlip a control and the component re-renders with real content, which\nmakes Storybook the fastest way to answer \"what does this display mode\nlook like\" without building a page.\n\nThe **Docs** tab on each component collects its props and stories on\none page. It comes with the bundled essentials addon.\n\n## Develop a theme component in isolation\n\nThe workshop loop pairs with [theming](\/how-to\/theming):\n\n1. Open the story for the thing you are theming, say a content type's\n   `card` display.\n2. Create the wrapper file at its suggestion path\n   (`components\/druxt\/entity\/node\/article\/Card.vue`).\n3. The story hot-reloads through your wrapper as you edit, with the\n   entity controls there to switch between real entities.\n\nThe wrapper gets styled against every real variant of the content the\nbackend holds.\n\n## Publish it\n\n`nuxt storybook build` writes a static Storybook\n(by default to `storybook-static\/`), deployable to any static host like any other\nbuild output. The stories still make live requests, so Drupal must\n[allow the Storybook origin through CORS](\/how-to\/configure-cors) when\nit is served from a different origin. The Umami demo publishes its Storybook at\n[storybook.umami.demo.druxtjs.org](https:\/\/storybook.umami.demo.druxtjs.org),\nwhich is this whole page in live form against the Umami demo content.\n\n## Where to go next\n\n- [Theme Druxt components](\/how-to\/theming): the wrapper system the\n  stories exercise.\n- [Component resolution](\/explanation\/component-resolution): why the\n  suggestion paths look the way they do.\n- [Deploy a static site](\/how-to\/deploy-static): the same hosting story\n  the built Storybook uses.",
+            "format": "docs_markdown",
+            "processed": "<p>Every story renders through the same components the site uses, against\nlive data, and the Controls panel exposes the component's props. Entity\nstories list real entity ids in a dropdown, menu stories take depth and\nlangcode, and block stories offer the placements the backend actually\nhas.\nFlip a control and the component re-renders with real content, which\nmakes Storybook the fastest way to answer \"what does this display mode\nlook like\" without building a page.<\/p>\n<p>The <strong>Docs<\/strong> tab on each component collects its props and stories on\none page. It comes with the bundled essentials addon.<\/p>\n<h2>Develop a theme component in isolation<\/h2>\n<p>The workshop loop pairs with <a href=\"\/how-to\/theming\">theming<\/a>:<\/p>\n<ol>\n<li>Open the story for the thing you are theming, say a content type's\n<code>card<\/code> display.<\/li>\n<li>Create the wrapper file at its suggestion path\n(<code>components\/druxt\/entity\/node\/article\/Card.vue<\/code>).<\/li>\n<li>The story hot-reloads through your wrapper as you edit, with the\nentity controls there to switch between real entities.<\/li>\n<\/ol>\n<p>The wrapper gets styled against every real variant of the content the\nbackend holds.<\/p>\n<h2>Publish it<\/h2>\n<p><code>nuxt storybook build<\/code> writes a static Storybook\n(by default to <code>storybook-static\/<\/code>), deployable to any static host like any other\nbuild output. The stories still make live requests, so Drupal must\n<a href=\"\/how-to\/configure-cors\">allow the Storybook origin through CORS<\/a> when\nit is served from a different origin. The Umami demo publishes its Storybook at\n<a href=\"https:\/\/storybook.umami.demo.druxtjs.org\">storybook.umami.demo.druxtjs.org<\/a>,\nwhich is this whole page in live form against the Umami demo content.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/how-to\/theming\">Theme Druxt components<\/a>: the wrapper system the\nstories exercise.<\/li>\n<li><a href=\"\/explanation\/component-resolution\">Component resolution<\/a>: why the\nsuggestion paths look the way they do.<\/li>\n<li><a href=\"\/how-to\/deploy-static\">Deploy a static site<\/a>: the same hosting story\nthe built Storybook uses.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

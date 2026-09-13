@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "3ba6c7fe-4e3a-5c65-9fae-b26a15771d34"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## Find the right wrapper name\n\nThe full candidate list for any component on the page is in its\n`component.options` data, visible in\n[Vue devtools](\/how-to\/devtools). In development mode, `DruxtBlock` and\n`DruxtField` also print the list in the debug box described below,\nwith a Create button that scaffolds the file for you. If no candidate\nmatches, the plain `DruxtWrapper` default output renders, so a site\nwith no wrappers still works.\n\n- Full lookup order and naming rules:\n  [Component resolution](\/explanation\/component-resolution).\n- Base class details:\n  [DruxtModule API](\/api\/packages\/druxt\/components\/DruxtModule).\n\n## Default template\n\nMost Druxt modules accept an inline default template, giving full control\nof the default slot without creating a file. The template scope receives the\nsame data the module would pass a wrapper:",
+            "format": "docs_markdown",
+            "processed": "<h2>Find the right wrapper name<\/h2>\n<p>The full candidate list for any component on the page is in its\n<code>component.options<\/code> data, visible in\n<a href=\"\/how-to\/devtools\">Vue devtools<\/a>. In development mode, <code>DruxtBlock<\/code> and\n<code>DruxtField<\/code> also print the list in the debug box described below,\nwith a Create button that scaffolds the file for you. If no candidate\nmatches, the plain <code>DruxtWrapper<\/code> default output renders, so a site\nwith no wrappers still works.<\/p>\n<ul>\n<li>Full lookup order and naming rules:\n<a href=\"\/explanation\/component-resolution\">Component resolution<\/a>.<\/li>\n<li>Base class details:\n<a href=\"\/api\/packages\/druxt\/components\/DruxtModule\">DruxtModule API<\/a>.<\/li>\n<\/ul>\n<h2>Default template<\/h2>\n<p>Most Druxt modules accept an inline default template, giving full control\nof the default slot without creating a file. The template scope receives the\nsame data the module would pass a wrapper:<\/p>\n"
+        }
+    ]
+}

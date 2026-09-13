@@ -1,0 +1,54 @@
+{
+    "uuid": [
+        {
+            "value": "df87f061-739b-539d-9873-e3270df44374"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_code",
+            "target_type": "paragraphs_type",
+            "target_uuid": "eafde3f2-1572-48f8-a6ae-4d1ce17d56ee"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_code": [
+        {
+            "value": "<!-- components\/druxt\/entity\/node\/article\/Teaser.vue -->\n<template>\n  <article class=\"prose\">\n    <slot name=\"field_image\" \/>\n    <slot \/>\n  <\/article>\n<\/template>\n\n<script>\nexport default {\n  props: { entity: { type: Object, default: undefined } },\n};\n<\/script>"
+        }
+    ],
+    "field_language": [
+        {
+            "value": "vue"
+        }
+    ]
+}

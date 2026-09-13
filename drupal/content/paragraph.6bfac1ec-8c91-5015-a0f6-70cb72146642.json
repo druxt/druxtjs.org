@@ -1,0 +1,54 @@
+{
+    "uuid": [
+        {
+            "value": "6bfac1ec-8c91-5015-a0f6-70cb72146642"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_code",
+            "target_type": "paragraphs_type",
+            "target_uuid": "eafde3f2-1572-48f8-a6ae-4d1ce17d56ee"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_code": [
+        {
+            "value": "proxy: {\n  '\/oauth\/logout': process.env.BASE_URL,\n},"
+        }
+    ],
+    "field_language": [
+        {
+            "value": "js"
+        }
+    ]
+}

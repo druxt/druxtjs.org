@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "493ecff2-04e3-5712-a176-4c87533a2ceb"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "`nuxt start` reads `HOST` and `PORT` (see [Environment\nvariables](\/how-to\/environment-variables)) and serves live-rendered\npages. Run it under a supervisor (systemd, PM2, or a container\nplatform's own runtime) so it restarts on failure, and put a web server\nor the platform's ingress in front for TLS.\n\nThe [API proxy](\/how-to\/proxy) works in this model, so browsers can talk\nonly to the frontend origin, and server middleware can hold secrets\n(mail delivery, search services) via `privateRuntimeConfig`.\n\n## Behind nginx\n\nA minimal reverse proxy:",
+            "format": "docs_markdown",
+            "processed": "<p><code>nuxt start<\/code> reads <code>HOST<\/code> and <code>PORT<\/code> (see <a href=\"\/how-to\/environment-variables\">Environment\nvariables<\/a>) and serves live-rendered\npages. Run it under a supervisor (systemd, PM2, or a container\nplatform's own runtime) so it restarts on failure, and put a web server\nor the platform's ingress in front for TLS.<\/p>\n<p>The <a href=\"\/how-to\/proxy\">API proxy<\/a> works in this model, so browsers can talk\nonly to the frontend origin, and server middleware can hold secrets\n(mail delivery, search services) via <code>privateRuntimeConfig<\/code>.<\/p>\n<h2>Behind nginx<\/h2>\n<p>A minimal reverse proxy:<\/p>\n"
+        }
+    ]
+}

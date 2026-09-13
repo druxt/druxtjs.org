@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "c80f86f4-54a1-539b-b303-e1a4c817a0ca"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## Getting a collection of resources\n\nThe `getCollection` method requires the resource type, and has an optional `query` and `prefix` parameter.\n\n_Get a collection of recipes._",
+            "format": "docs_markdown",
+            "processed": "<h2>Getting a collection of resources<\/h2>\n<p>The <code>getCollection<\/code> method requires the resource type, and has an optional <code>query<\/code> and <code>prefix<\/code> parameter.<\/p>\n<p><em>Get a collection of recipes.<\/em><\/p>\n"
+        }
+    ]
+}

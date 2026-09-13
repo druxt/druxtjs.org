@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "58996e3e-b6c0-5f2c-a499-e19be23fff1d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "So the front page is Drupal's **`frontpage`** view, display **`page_1`**.\nDruxt renders it with `DruxtView`, and the view's row configuration decides\nwhat each result looks like: `frontpage` renders nodes in the **`teaser`**\ndisplay mode, so each row is a `DruxtEntity` in `teaser` mode.\n\nThe listing and the teaser are the two things to theme.\n\n## Step 2: Write the listing component\n\nCreate this file:",
+            "format": "docs_markdown",
+            "processed": "<p>So the front page is Drupal's <strong><code>frontpage<\/code><\/strong> view, display <strong><code>page_1<\/code><\/strong>.\nDruxt renders it with <code>DruxtView<\/code>, and the view's row configuration decides\nwhat each result looks like: <code>frontpage<\/code> renders nodes in the <strong><code>teaser<\/code><\/strong>\ndisplay mode, so each row is a <code>DruxtEntity<\/code> in <code>teaser<\/code> mode.<\/p>\n<p>The listing and the teaser are the two things to theme.<\/p>\n<h2>Step 2: Write the listing component<\/h2>\n<p>Create this file:<\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,82 @@
+{
+    "uuid": [
+        {
+            "value": "c2b8cf17-a57d-55b8-b884-7783b7a1b176"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "bundle": [
+        {
+            "target_id": "image",
+            "target_type": "media_type",
+            "target_uuid": "d63708bd-0a02-4969-b4b3-0f37b585bdd4"
+        }
+    ],
+    "revision_created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_user": [],
+    "revision_log_message": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "name": [
+        {
+            "value": "devtools-scaffold.png"
+        }
+    ],
+    "thumbnail": [
+        {
+            "alt": "The recipe's $theme list with the save action revealed beside the unregistered DruxtEntityNodeRecipeFullViewEn suggestion",
+            "title": null,
+            "width": 547,
+            "height": 345,
+            "target_type": "file",
+            "target_uuid": "eb0ef1e8-73e5-50d6-9006-ba39cb24a8d9"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_media_image": [
+        {
+            "alt": "The recipe's $theme list with the save action revealed beside the unregistered DruxtEntityNodeRecipeFullViewEn suggestion",
+            "title": null,
+            "width": 547,
+            "height": 345,
+            "target_type": "file",
+            "target_uuid": "eb0ef1e8-73e5-50d6-9006-ba39cb24a8d9"
+        }
+    ]
+}

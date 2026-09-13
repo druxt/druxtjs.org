@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "d7535f6a-1485-51ec-b3a0-224fe5add953"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/ea63ca90-3269-58fd-841c-23f48ffde8e7"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/tutorials\/deploy-your-site"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

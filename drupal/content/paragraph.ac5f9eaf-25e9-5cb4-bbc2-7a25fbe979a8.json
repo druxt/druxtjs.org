@@ -1,0 +1,54 @@
+{
+    "uuid": [
+        {
+            "value": "ac5f9eaf-25e9-5cb4-bbc2-7a25fbe979a8"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_code",
+            "target_type": "paragraphs_type",
+            "target_uuid": "eafde3f2-1572-48f8-a6ae-4d1ce17d56ee"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_code": [
+        {
+            "value": "BASE_URL=$(grep '^BASE_URL=' .env | cut -d= -f2-)\ncurl \"$BASE_URL\/router\/translate-path?path=\/\""
+        }
+    ],
+    "field_language": [
+        {
+            "value": "sh"
+        }
+    ]
+}

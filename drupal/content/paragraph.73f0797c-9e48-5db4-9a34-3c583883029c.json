@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "73f0797c-9e48-5db4-9a34-3c583883029c"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Your Druxt site's front page is a Drupal View rendering node teasers.\nBoth are currently drawn by Druxt's plain fallback output. In this tutorial\nyou replace them with two components of your own, one for the listing and\none for each teaser. No framework code gets touched.\n\nBy the end you will have written those two files and learned the rule that\ndecides which file Druxt picks up. That rule is the whole of Druxt\ntheming.\n\n## Prerequisites\n\n- A running Druxt site from\n  [Getting started with Druxt](\/tutorials\/getting-started), with\n  `npm run dev` up.\n- **At least two published articles promoted to the front page.** Create\n  them the way Getting started did (**Content \u2192 Add content \u2192 Article**),\n  and on each one open **Promotion options** in the sidebar and tick\n  **Promoted to front page**. Add an image to one of them.\n\nNothing else. You will not install anything or change any configuration.\n\n**Outcome:** http:\/\/localhost:3000 shows your articles' images and body\ntext, one after another, and **no titles**. That is not a bug, and it is a\nuseful thing to understand before you theme anything: Drupal's article\nteaser display lists the image and the trimmed body, and nothing else. The\nheading you'd see on a Drupal site comes from Drupal's own node template,\nwhich a decoupled frontend does not have. Putting the title back is your\njob now, and Step 3 does it.\n\n## Step 1: Find out what is rendering the page\n\nBefore theming something, name it. Ask the backend what the front path\nresolves to:",
+            "format": "docs_markdown",
+            "processed": "<p>Your Druxt site's front page is a Drupal View rendering node teasers.\nBoth are currently drawn by Druxt's plain fallback output. In this tutorial\nyou replace them with two components of your own, one for the listing and\none for each teaser. No framework code gets touched.<\/p>\n<p>By the end you will have written those two files and learned the rule that\ndecides which file Druxt picks up. That rule is the whole of Druxt\ntheming.<\/p>\n<h2>Prerequisites<\/h2>\n<ul>\n<li>A running Druxt site from\n<a href=\"\/tutorials\/getting-started\">Getting started with Druxt<\/a>, with\n<code>npm run dev<\/code> up.<\/li>\n<li><strong>At least two published articles promoted to the front page.<\/strong> Create\nthem the way Getting started did (<strong>Content \u2192 Add content \u2192 Article<\/strong>),\nand on each one open <strong>Promotion options<\/strong> in the sidebar and tick\n<strong>Promoted to front page<\/strong>. Add an image to one of them.<\/li>\n<\/ul>\n<p>Nothing else. You will not install anything or change any configuration.<\/p>\n<p><strong>Outcome:<\/strong> <a href=\"http:\/\/localhost:3000\">http:\/\/localhost:3000<\/a> shows your articles' images and body\ntext, one after another, and <strong>no titles<\/strong>. That is not a bug, and it is a\nuseful thing to understand before you theme anything: Drupal's article\nteaser display lists the image and the trimmed body, and nothing else. The\nheading you'd see on a Drupal site comes from Drupal's own node template,\nwhich a decoupled frontend does not have. Putting the title back is your\njob now, and Step 3 does it.<\/p>\n<h2>Step 1: Find out what is rendering the page<\/h2>\n<p>Before theming something, name it. Ask the backend what the front path\nresolves to:<\/p>\n"
+        }
+    ]
+}

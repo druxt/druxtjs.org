@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "080694e4-6800-5cb7-b4b1-8bd5664d5a0e"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Outcome:** reload, and the element is `<article class=\"teaser\">`. Only\nyour own class remains.\n\n`druxt-views` provides the equivalent for view wrappers as\n`DruxtViewsViewMixin`, which declares `count`, `display`, `langcode`,\n`mode`, `pager`, `results` and `view`.\n\n## Step 5: Narrow the teaser's JSON:API request\n\nA wrapper can narrow the JSON:API request its own component makes. Add a\n`druxt` block to the teaser:",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Outcome:<\/strong> reload, and the element is <code>&lt;article class=\"teaser\"&gt;<\/code>. Only\nyour own class remains.<\/p>\n<p><code>druxt-views<\/code> provides the equivalent for view wrappers as\n<code>DruxtViewsViewMixin<\/code>, which declares <code>count<\/code>, <code>display<\/code>, <code>langcode<\/code>,\n<code>mode<\/code>, <code>pager<\/code>, <code>results<\/code> and <code>view<\/code>.<\/p>\n<h2>Step 5: Narrow the teaser's JSON:API request<\/h2>\n<p>A wrapper can narrow the JSON:API request its own component makes. Add a\n<code>druxt<\/code> block to the teaser:<\/p>\n"
+        }
+    ]
+}

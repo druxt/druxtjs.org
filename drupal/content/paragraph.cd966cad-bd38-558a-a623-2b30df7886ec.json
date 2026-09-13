@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "cd966cad-bd38-558a-a623-2b30df7886ec"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## Theme suggestions on every component\n\nSelect any Druxt component in the standard component inspector and its\nstate gains a `$theme` entry holding the wrapper it resolved, above the\nordered list of component names it tried. This is the live version of\nthe suggestion chain that\n[Component resolution](\/explanation\/component-resolution) describes,\nand Druxt components are easy to spot in the tree, tagged `druxt` in\nblue.",
+            "format": "docs_markdown",
+            "processed": "<h2>Theme suggestions on every component<\/h2>\n<p>Select any Druxt component in the standard component inspector and its\nstate gains a <code>$theme<\/code> entry holding the wrapper it resolved, above the\nordered list of component names it tried. This is the live version of\nthe suggestion chain that\n<a href=\"\/explanation\/component-resolution\">Component resolution<\/a> describes,\nand Druxt components are easy to spot in the tree, tagged <code>druxt<\/code> in\nblue.<\/p>\n"
+        }
+    ]
+}

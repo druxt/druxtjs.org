@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "7673f5fc-09ec-5bcb-9bfa-242b24b8f515"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "theming-druxt-wrapper.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/theming-druxt-wrapper.png",
+            "url": "\/sites\/default\/files\/documentation\/theming-druxt-wrapper.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 131090
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

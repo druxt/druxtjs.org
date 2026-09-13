@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "1ca504d6-eded-519e-bc7a-1ae174705524"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "That answer determines everything else: the entity's resource type and UUID\nbecome a [store](\/explanation\/druxt-store) request for the `druxt-entity`\ncomponent to render, and the route's language context travels with it.\n\n## Beyond entities: path translators\n\nNot every path maps to an entity. Drupal-side **path translator**\nsubscribers extend translation to other route types: the `druxt` Drupal\nmodule provides translators for **Views** pages (`jsonapi_views`), the\n**contact** form, and **wildcard** fallbacks, so the frontend can render\nviews pages and forms the same way it renders nodes.\n\n## Where routing happens\n\nThe `druxt-router` package provides:\n\n- **A Vuex store** (`druxtRouter`): the `get` action performs translation\n  and caches results per path; `route`, `routes`, `entities` and\n  `redirects` state keep the history.\n- **A `DruxtRouter` component**: renders the route's entity once resolved.\n- **Nuxt middleware**: translates the current path on server-side\n  navigation and **processes redirects** (a 301 from Drupal becomes a\n  frontend redirect, so URL changes on the backend propagate automatically).\n  The middleware can be disabled (`druxt.router.middleware: false`) when a\n  site needs fully static builds without a live backend.\n\n## Multilingual paths\n\nDrupal serves translated content under language prefixes (`\/es\/...`), and\nJSON:API exposes the same prefixes. The router and the store share the\n`prefix` concept, so a translated path resolves to the translated resource\nin one flow, with the caveat that translated route resolution currently\nneeds a `decoupled_router` patch, tracked in the\n[multilingual guide](\/how-to\/multilingual).\n\n## Why translation instead of frontend route definitions?\n\nThe alternative (duplicating Drupal's URL aliases, redirects and language\nrules as frontend route config) drifts the moment anything changes in\nDrupal. Translation keeps Drupal authoritative for _what serves\na path_, and the frontend authoritative for _how it renders_. The cost is a\nbackend round trip per unresolved path, which the route cache and SSR\nmitigate.\n\n## Where to go next\n\n- [The schema system](\/explanation\/schemas): what happens after the route\n  resolves.\n- [DruxtRouter API reference](\/api\/packages\/router).",
+            "format": "docs_markdown",
+            "processed": "<p>That answer determines everything else: the entity's resource type and UUID\nbecome a <a href=\"\/explanation\/druxt-store\">store<\/a> request for the <code>druxt-entity<\/code>\ncomponent to render, and the route's language context travels with it.<\/p>\n<h2>Beyond entities: path translators<\/h2>\n<p>Not every path maps to an entity. Drupal-side <strong>path translator<\/strong>\nsubscribers extend translation to other route types: the <code>druxt<\/code> Drupal\nmodule provides translators for <strong>Views<\/strong> pages (<code>jsonapi_views<\/code>), the\n<strong>contact<\/strong> form, and <strong>wildcard<\/strong> fallbacks, so the frontend can render\nviews pages and forms the same way it renders nodes.<\/p>\n<h2>Where routing happens<\/h2>\n<p>The <code>druxt-router<\/code> package provides:<\/p>\n<ul>\n<li><strong>A Vuex store<\/strong> (<code>druxtRouter<\/code>): the <code>get<\/code> action performs translation\nand caches results per path; <code>route<\/code>, <code>routes<\/code>, <code>entities<\/code> and\n<code>redirects<\/code> state keep the history.<\/li>\n<li><strong>A <code>DruxtRouter<\/code> component<\/strong>: renders the route's entity once resolved.<\/li>\n<li><strong>Nuxt middleware<\/strong>: translates the current path on server-side\nnavigation and <strong>processes redirects<\/strong> (a 301 from Drupal becomes a\nfrontend redirect, so URL changes on the backend propagate automatically).\nThe middleware can be disabled (<code>druxt.router.middleware: false<\/code>) when a\nsite needs fully static builds without a live backend.<\/li>\n<\/ul>\n<h2>Multilingual paths<\/h2>\n<p>Drupal serves translated content under language prefixes (<code>\/es\/...<\/code>), and\nJSON:API exposes the same prefixes. The router and the store share the\n<code>prefix<\/code> concept, so a translated path resolves to the translated resource\nin one flow, with the caveat that translated route resolution currently\nneeds a <code>decoupled_router<\/code> patch, tracked in the\n<a href=\"\/how-to\/multilingual\">multilingual guide<\/a>.<\/p>\n<h2>Why translation instead of frontend route definitions?<\/h2>\n<p>The alternative (duplicating Drupal's URL aliases, redirects and language\nrules as frontend route config) drifts the moment anything changes in\nDrupal. Translation keeps Drupal authoritative for <em>what serves\na path<\/em>, and the frontend authoritative for <em>how it renders<\/em>. The cost is a\nbackend round trip per unresolved path, which the route cache and SSR\nmitigate.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/explanation\/schemas\">The schema system<\/a>: what happens after the route\nresolves.<\/li>\n<li><a href=\"\/api\/packages\/router\">DruxtRouter API reference<\/a>.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

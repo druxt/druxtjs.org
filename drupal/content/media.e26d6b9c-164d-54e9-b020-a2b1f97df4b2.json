@@ -1,0 +1,82 @@
+{
+    "uuid": [
+        {
+            "value": "e26d6b9c-164d-54e9-b020-a2b1f97df4b2"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "bundle": [
+        {
+            "target_id": "image",
+            "target_type": "media_type",
+            "target_uuid": "d63708bd-0a02-4969-b4b3-0f37b585bdd4"
+        }
+    ],
+    "revision_created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_user": [],
+    "revision_log_message": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "name": [
+        {
+            "value": "devtools-theme.png"
+        }
+    ],
+    "thumbnail": [
+        {
+            "alt": "A recipe's DruxtEntity selected in the component tree above its DruxtField children, with the state pane's druxt section showing $theme resolved to DruxtEntityNodeRecipe above its ordered suggestion list",
+            "title": null,
+            "width": 1095,
+            "height": 690,
+            "target_type": "file",
+            "target_uuid": "795f951c-a276-573b-b3ed-f089c62fa2e5"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_media_image": [
+        {
+            "alt": "A recipe's DruxtEntity selected in the component tree above its DruxtField children, with the state pane's druxt section showing $theme resolved to DruxtEntityNodeRecipe above its ordered suggestion list",
+            "title": null,
+            "width": 1095,
+            "height": 690,
+            "target_type": "file",
+            "target_uuid": "795f951c-a276-573b-b3ed-f089c62fa2e5"
+        }
+    ]
+}

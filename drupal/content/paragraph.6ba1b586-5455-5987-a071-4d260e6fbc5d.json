@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "6ba1b586-5455-5987-a071-4d260e6fbc5d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "The module depends on core's `jsonapi` module and three contrib projects:\n[Decoupled Router](https:\/\/www.drupal.org\/project\/decoupled_router),\n[JSON:API Menu Items](https:\/\/www.drupal.org\/project\/jsonapi_menu_items)\nand [JSON:API Views](https:\/\/www.drupal.org\/project\/jsonapi_views).\nComposer downloads them with the module, and enabling `druxt` enables all\nof them.\n\nDrupal core 10 or 11: 1.2.2 ended support for 8 and 9, and declares 12\nahead of Decoupled Router and JSON:API Menu Items supporting it. Pin\n`^1.2.2` rather than `^1.2`, because Composer will otherwise pair an\nearlier release with a Decoupled Router it cannot run against\n([routes stop resolving](\/how-to\/troubleshooting#routes-and-views-paths-stop-resolving-after-a-composer-update)).\n\nIf composer refuses with a stability error, a dependency's current\nrelease is below your project's `minimum-stability` (set in the Drupal\nproject's `composer.json`). Allow the pre-release for that one package\nwith a stability flag, as in\n`composer require drupal\/jsonapi_views:^1.1@beta`, rather than lowering\n`minimum-stability` project-wide.\n\n## Grant the permission\n\nEvery Drupal site has the Anonymous and Authenticated roles (plus any\nyou create), and permissions attach to roles. Grant **Access DruxtJS JSON:API resources**\n(`access druxt resources`) to every role the frontend connects as, at\n`\/admin\/people\/permissions` or with drush. For a public site that is the\n**Anonymous** role:",
+            "format": "docs_markdown",
+            "processed": "<p>The module depends on core's <code>jsonapi<\/code> module and three contrib projects:\n<a href=\"https:\/\/www.drupal.org\/project\/decoupled_router\">Decoupled Router<\/a>,\n<a href=\"https:\/\/www.drupal.org\/project\/jsonapi_menu_items\">JSON:API Menu Items<\/a>\nand <a href=\"https:\/\/www.drupal.org\/project\/jsonapi_views\">JSON:API Views<\/a>.\nComposer downloads them with the module, and enabling <code>druxt<\/code> enables all\nof them.<\/p>\n<p>Drupal core 10 or 11: 1.2.2 ended support for 8 and 9, and declares 12\nahead of Decoupled Router and JSON:API Menu Items supporting it. Pin\n<code>^1.2.2<\/code> rather than <code>^1.2<\/code>, because Composer will otherwise pair an\nearlier release with a Decoupled Router it cannot run against\n(<a href=\"\/how-to\/troubleshooting#routes-and-views-paths-stop-resolving-after-a-composer-update\">routes stop resolving<\/a>).<\/p>\n<p>If composer refuses with a stability error, a dependency's current\nrelease is below your project's <code>minimum-stability<\/code> (set in the Drupal\nproject's <code>composer.json<\/code>). Allow the pre-release for that one package\nwith a stability flag, as in\n<code>composer require drupal\/jsonapi_views:^1.1@beta<\/code>, rather than lowering\n<code>minimum-stability<\/code> project-wide.<\/p>\n<h2>Grant the permission<\/h2>\n<p>Every Drupal site has the Anonymous and Authenticated roles (plus any\nyou create), and permissions attach to roles. Grant <strong>Access DruxtJS JSON:API resources<\/strong>\n(<code>access druxt resources<\/code>) to every role the frontend connects as, at\n<code>\/admin\/people\/permissions<\/code> or with drush. For a public site that is the\n<strong>Anonymous<\/strong> role:<\/p>\n"
+        }
+    ]
+}

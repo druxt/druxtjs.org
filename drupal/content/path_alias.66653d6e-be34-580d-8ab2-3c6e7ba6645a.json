@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "66653d6e-be34-580d-8ab2-3c6e7ba6645a"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/70af6ec5-9eb2-5890-bc4c-42b2e3809819"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/tutorials\/theme-your-front-page"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}
