@@ -7,10 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/). Versions
 count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
 Druxt 1.0.0.
 
-## [Unreleased]
+## [0.9.0] - 2026-09-13
 
-The relaunch of the site: what runs on Lagoon today. It ships as 0.9.0, the
-first numbered version, once the relaunch stack merges.
+The relaunch of the site: what runs on Lagoon today, and the first numbered
+version.
 
 ### Added
 

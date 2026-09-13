@@ -159,6 +159,43 @@ What the cutover from the druxt.js build needs, in order.
 6. Watch the first deployment's rollout: every restart serves errors for
    about a minute, then the starting page, until the app has built.
 
+## Rolling back
+
+Every deployment builds from a git branch head, so a rollback is a git
+operation followed by a deployment, smallest first.
+
+- **A bad release of this site.** Revert the release commit on `main` and
+  push: Lagoon builds `main` again from the reverted tree. The services are
+  unchanged, so the environment takes it without recreation.
+- **Checking an older release first.** Push a branch at its tag, for example
+  `release/0.9.0`, and the project's branch rule deploys it as its own
+  environment beside production.
+- **Back to the site before the relaunch.** Production used to build from
+  `druxt/druxt.js`, not from this repository. The project's settings are put
+  back exactly as they were, then production is rebuilt and the pre-cutover
+  backups are restored onto it:
+
+  ```sh
+  lagoon update project -p druxtjs-org \
+    --git-url git@github.com:druxt/druxt.js.git \
+    --branches '^feature/|^(develop|main)$' \
+    --pullrequests true
+  lagoon delete environment -p druxtjs-org -e main
+  lagoon deploy branch -p druxtjs-org -b main
+  ```
+
+  The deletion is required either way: the old site's `nginx` service and this
+  one's differ in type, and a Deployment's selector is immutable. It is real
+  downtime while `main` builds again, and if the routes or certificates do
+  not come back, amazee.io support restores them. The full story of the
+  switch, including the state to restore to, is the `lagoon git url` rollback
+  note kept with the project's artifacts.
+
+Before any of that: this agent cannot `lagoon ssh`, because the agent refuses
+to sign, so a command on an environment runs as a custom task through the
+API. The database dumps and files taken before the cutover were produced that
+way, with the platform's own backups beside them.
+
 ## Not done yet
 
 - The app builds each time the `nuxt` container starts, which takes a few
