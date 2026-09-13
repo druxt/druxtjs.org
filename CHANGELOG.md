@@ -1,16 +1,16 @@
 # Changelog
 
-All notable changes to the druxtjs.org site are documented in this file.
+Every change to the druxtjs.org site is documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/). Versions
 count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
 Druxt 1.0.0.
 
-## [Unreleased]
+## [0.9.0] - 2026-09-13
 
-The relaunch of the site: what runs on Lagoon today. It ships as 0.9.0, the
-first numbered version, once the relaunch stack merges.
+This release is the relaunch of the site, what runs on Lagoon today, and
+the first numbered version.
 
 ### Added
 
@@ -91,20 +91,20 @@ Before numbered versions, this repository lived one life already. The original
 site was never released or tagged, so its story is told here rather than under
 a version it never had.
 
-- **November 2020** — the repository was created as druxtjs.org's home, and
+- **November 2020.** The repository was created as druxtjs.org's home, and
   held little more than its issue templates for almost a year.
-- **October 2021** — the first site arrived (#3, merged as #4): a Drupal 9
+- **October 2021.** The first site arrived (#3, merged as #4): a Drupal 9
   site with the Druxt module configured, DDEV and Gitpod for development,
   Tome for a databaseless build, and Lagoon files to deploy it. Modules,
   a theme, site settings, pathauto and the Articles content followed within
   the week. This is the site that served druxtjs.org until the relaunch.
-- **March 2022** — a month of care: the code of conduct, the project
-  management files and the MIT license (#5), Gitpod and DDEV script fixes
-  (#14, merged as #15), an update to Lagoon's foundry (#8, merged as #9),
-  and the first of the Renovate dependency updates (#10, #11, #19).
-- **April and May 2022** — Renovate kept the dependencies current (#20),
+- **March 2022.** The code of conduct, the project management files and the
+  MIT license arrived (#5), with Gitpod and DDEV script fixes (#14, merged as
+  #15), an update to Lagoon's foundry (#8, merged as #9), and the first of
+  the Renovate dependency updates (#10, #11, #19).
+- **April and May 2022.** Renovate kept the dependencies current (#20),
   with a DDEV MTU fix alongside, until the last update on 30 May 2022 (#23).
-- **September 2026** — after four years standing still, the relaunch removed
+- **September 2026.** After four years standing still, the relaunch removed
   the Drupal 9 site and built what now runs: the Drupal 11 documentation
   backend, the Nuxt frontend, the playground, and the tooling described
   above.

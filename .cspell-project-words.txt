@@ -1,6 +1,7 @@
 # Add a term here rather than switching the check off for a file.
 # Words this project uses that the standard dictionaries do not carry.
 aarch
+amazee
 automerge
 bmewburn
 brotli
@@ -57,6 +58,7 @@ PCRE
 phpcodesniffer
 phpize
 pidfile
+pullrequests
 serialiser
 setuptools
 starterkit
