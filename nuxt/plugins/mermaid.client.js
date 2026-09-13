@@ -197,5 +197,7 @@ export default ({ app }) => {
       setTimeout(renderAll, 50)
       setTimeout(renderAll, 500)
     })
+    // Content that renders after its own fetch (Druxt entities) announces itself.
+    window.addEventListener('docs:content', () => renderAll())
   })
 }

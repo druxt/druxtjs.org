@@ -71,10 +71,12 @@ export default {
     external: { type: Boolean, default: true },
     /** Render item icons. */
     icons: { type: Boolean, default: true },
+    /** The items to render. The site menu in the store when not given. */
+    menu: { type: Array, default: null },
   },
 
   computed: {
-    items: ({ $store, home, external }) => $store.state.menu
+    items: ({ $store, menu, home, external }) => (menu || $store.state.menu)
       .filter((o) => home || o.icon !== 'home')
       .filter((o) => external || o.component !== 'a'),
   },

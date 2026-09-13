@@ -4,8 +4,36 @@ const sectionChildren = (index) => index.map((o) => ({
   props: { to: o.path.replace("/README", "") },
 }));
 
+/** The authored sections whose pages come from Drupal. */
+const DRUPAL_SECTIONS = ["/tutorials", "/how-to", "/explanation"];
+
+/**
+ * Each authored section's pages, from the Drupal docs menu in its order.
+ *
+ * @param {object} druxtMenu - The DruxtMenu client.
+ * @param {Function} commit - The store's commit.
+ */
+const addDrupalSectionChildren = async (druxtMenu, commit) => {
+  const { entities = [] } = (await druxtMenu.get("docs")) || {};
+  const items = entities.map((o) => ({ id: o.id, ...(o.attributes || o) }));
+  for (const section of items.filter((o) => !o.parent && DRUPAL_SECTIONS.includes(o.url))) {
+    const children = items
+      .filter((o) => o.parent === section.id)
+      .sort((a, b) => a.weight - b.weight)
+      .map((o) => ({ component: "NuxtLink", text: o.title, props: { to: o.url } }));
+    commit("addMenuChildren", { children, parent: section.url });
+  }
+};
+
 export const actions = {
-  async nuxtServerInit({ commit }, { $content }) {
+  async nuxtServerInit({ commit }, { $content, $config }) {
+    if ($config.docsSource !== "markdown") {
+      try {
+        await addDrupalSectionChildren(this.$druxtMenu, commit);
+      } catch (err) {
+        console.log(err);
+      }
+    }
     try {
       // Add Druxt modules to Vuex store.
       const modulesIndex = await $content("api/README").only("toc").fetch()

@@ -10,7 +10,9 @@
       two-image page rendered only one. Re-creating the subtree keeps the
       imperative enhancement from ever meeting a stale patch.
     -->
-    <NuxtContent :key="document.path" :document="document" />
+    <NuxtContent v-if="document" :key="document.path" :document="document" />
+    <!-- Content rendered elsewhere, such as a Drupal page, keyed by the caller. -->
+    <slot v-else />
 
     <!--
       Lightbox for prose images. figures() gives every image a cursor-zoom-in
@@ -63,7 +65,8 @@ import { trapTab } from '~/utils/focus'
  */
 export default {
   props: {
-    document: { type: Object, required: true },
+    // Null when the content comes through the slot.
+    document: { type: Object, default: null },
   },
 
   /** The image currently enlarged, as { src, alt }; null when closed. */
@@ -104,10 +107,25 @@ export default {
     this.$nextTick(this.enhance)
     this.onKey = (e) => { if (e.key === 'Escape') this.zoom = null }
     window.addEventListener('keydown', this.onKey)
+
+    // Druxt entities render after their own fetch, so content can land after
+    // mount. Enhance it as it lands, and tell the diagram plugin.
+    this.contentObserver = new MutationObserver(() => {
+      clearTimeout(this.contentTimer)
+      this.contentTimer = setTimeout(() => {
+        this.contentObserver.disconnect()
+        this.enhance()
+        window.dispatchEvent(new Event('docs:content'))
+        if (this.$refs.prose) this.contentObserver.observe(this.$refs.prose, { childList: true, subtree: true })
+      }, 50)
+    })
+    this.contentObserver.observe(this.$refs.prose, { childList: true, subtree: true })
   },
 
 
   beforeDestroy() {
+    this.contentObserver.disconnect()
+    clearTimeout(this.contentTimer)
     window.removeEventListener('keydown', this.onKey)
     document.documentElement.style.overflow = ''
     this.disconnectTables()
@@ -280,14 +298,17 @@ export default {
       })
     },
 
-    // The nearest heading above the table names its scroll region.
+    // The nearest heading above the table names its scroll region. Drupal
+    // pages wrap each block, so a heading can sit inside an earlier sibling.
     tableLabel(table, root) {
       for (let node = table; node && node !== root; node = node.parentElement) {
         for (let prev = node.previousElementSibling; prev; prev = prev.previousElementSibling) {
           if (/^H[1-6]$/.test(prev.tagName)) return prev.textContent.trim()
+          const headings = prev.querySelectorAll('h1, h2, h3, h4, h5, h6')
+          if (headings.length) return headings[headings.length - 1].textContent.trim()
         }
       }
-      return this.document.title || 'Table'
+      return (this.document ? this.document.title : this.title) || 'Table'
     },
 
     disconnectTables() {

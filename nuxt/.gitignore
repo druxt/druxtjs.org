@@ -107,3 +107,6 @@ styles/
 
 # Unlighthouse audit output
 .unlighthouse
+
+# The markdown and docgen output, read from the pinned druxt.js clone.
+/content

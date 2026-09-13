@@ -40,11 +40,8 @@
           <kbd class="kbd kbd-xs">{{ shortcut }}</kbd>
         </button>
 
-        <AppMenu :children="true">
-          <li slot="title" class="menu-title px-3 pb-1">
-            <span class="text-xs font-semibold uppercase tracking-wider text-base-content/70">Navigation</span>
-          </li>
-        </AppMenu>
+        <!-- The docs menu is a Drupal block, placed in the sidebar region of the consumer's theme. -->
+        <DruxtBlockRegion v-if="$config.decoupledTheme" name="sidebar" :theme="$config.decoupledTheme.default" />
 
         <ul v-if="recent.length" class="menu gap-0.5">
           <li class="menu-title px-3 pb-1">

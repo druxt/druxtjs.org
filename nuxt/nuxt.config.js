@@ -26,29 +26,23 @@ const failedRoutes = []
 
 import { SITE_NAME, SITE_DESCRIPTION, SITE_ORIGIN, docTypeExpression } from './lib/site'
 
-/** The `druxt` package version, or null where the monorepo root isn't present. */
-let druxtVersion = null
-try {
-  druxtVersion = require('../../packages/druxt/package.json').version
-} catch (e) {
-  druxtVersion = null
-}
+/** The installed `druxt` version, shown in the header badge. Read from disk: its `exports` hides package.json. */
+const druxtVersion = JSON.parse(
+  require('fs').readFileSync(require('path').join(__dirname, 'node_modules', 'druxt', 'package.json'), 'utf8'),
+).version
+
+/** The Drupal backend Druxt reads, and proxies onto this origin. */
+const DRUXT_BASE_URL = process.env.DRUXT_BASE_URL || 'http://127.0.0.1:8899'
 
 export default {
-  target: 'static',
+  // Pages render live from Drupal. Generating them, with live rendering as
+  // the fallback, comes with the Lagoon deployment.
+  target: 'server',
 
-  // Shown in the header badge. Sourced from the `druxt` core package rather
-  // than this site's own package.json (which doesn't track the framework).
-  //
-  // Guarded because the deploy image does not have the monorepo root:
-  // docs/nuxt/Dockerfile's final stage is `COPY --from=builder /app/docs/nuxt
-  // /app`, so this file lands at /app/nuxt.config.js and `../../packages`
-  // resolves outside the image. Verified: MODULE_NOT_FOUND in that layout,
-  // resolves fine from a repo checkout - which is why local and GitLab CI
-  // `yarn generate` never caught it and only Lagoon deploys would break.
-  // AppHeader's `v-if="version"` simply hides the badge when it is null.
   publicRuntimeConfig: {
     druxtVersion,
+    // "markdown" reads the authored pages from content/ instead of Drupal.
+    docsSource: process.env.DOCS_SOURCE || 'drupal',
   },
 
   head: {
@@ -190,7 +184,50 @@ export default {
   // the Twitter handle) has moved into seoHead.
   modules: [
     '@nuxt/content',
+    'druxt',
+    'druxt-router/nuxt',
+    'druxt-schema',
+    'druxt-entity',
+    'druxt-layout-paragraphs',
+    'druxt-menu',
+    'druxt-blocks',
+    // The consumer's decoupled settings and theme manifest, baked in at build.
+    // The WIP @druxt-contrib/decoupled-settings module, carried here until it
+    // is released.
+    '~/modules/decoupled-settings',
   ],
+
+  decoupledSettings: {
+    consumerId: process.env.DRUXT_CONSUMER_ID || 'druxtjs_org',
+    // Each page sets its own title and description.
+    applyHead: false,
+  },
+
+  druxt: {
+    baseUrl: DRUXT_BASE_URL,
+    // JSON:API, path lookups and files are served on this origin.
+    proxy: { api: true, files: true },
+    // The section pages resolve paths themselves; no catch-all route.
+    router: { wildcard: false },
+    menu: { jsonApiMenuItems: true },
+    // No deprecated default field components: fields render through
+    // DruxtField's item slots and this site's own wrappers.
+    entity: { components: { fields: false } },
+    // Display schemas, view and form, for what this site renders. Generated
+    // from Drupal's display configuration when the app builds.
+    schema: {
+      filter: ['node--doc_page--.*', 'paragraph--docs_.*', 'media--image--.*'],
+    },
+  },
+
+  // Druxt's proxies send Drupal its own host, so behind TLS its JSON:API links
+  // came back as https://<backend host> and failed in the browser. Keeping the
+  // browser's host makes Drupal link to the frontend's origin. Registered
+  // before Druxt's own entries, so these answer first.
+  proxy: ['/jsonapi', '/router/translate-path', '/sites/default/files'].map((context) => [
+    context,
+    { target: DRUXT_BASE_URL, changeOrigin: false },
+  ]),
 
   content: {
     markdown: {

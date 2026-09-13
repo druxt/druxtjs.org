@@ -21,10 +21,8 @@
         <AppIconMenu class="w-5 h-5" />
       </button>
 
-      <NuxtLink to="/" class="flex items-center gap-2 flex-shrink-0 rounded-btn px-1 py-1 hover:opacity-80">
-        <AppLogo class="w-7" title="DruxtJS" />
-        <span class="text-lg sm:text-xl font-semibold tracking-tight">{{ title }}</span>
-      </NuxtLink>
+      <!-- The branding and section nav are Drupal blocks, placed in the header region of the consumer's theme. -->
+      <DruxtBlockRegion v-if="theme" name="header" :theme="theme" />
 
       <!--
         Links to the release notes, following the convention in this
@@ -69,14 +67,6 @@
         <AppIconSearch class="w-5 h-5" />
       </button>
 
-      <!--
-        Six section links plus the search field need ~1280px before they stop
-        wrapping, so the inline nav starts at xl rather than lg.
-      -->
-      <nav class="hidden xl:block min-w-0">
-        <AppMenu horizontal :home="false" :external="false" :icons="false" />
-      </nav>
-
       <div class="flex items-center gap-1 xl:pl-2 xl:border-l border-base-300">
         <a
           v-for="link of external"
@@ -102,7 +92,6 @@ import { MAC_SHORTCUT, searchShortcut } from '~/utils/platform'
 
 export default {
   props: {
-    title: { type: String, required: true },
     version: { type: String, default: null },
     /** true on documentation pages, where the sidebar goes sticky at `lg`. */
     docs: { type: Boolean, default: true },
@@ -112,6 +101,8 @@ export default {
 
   computed: {
     external: ({ $store }) => $store.state.menu.filter((o) => o.component === 'a'),
+    /** The consumer's theme, from the decoupled settings theme manifest. */
+    theme: ({ $config }) => ($config.decoupledTheme || {}).default,
   },
 
   mounted() {
