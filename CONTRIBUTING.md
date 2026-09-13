@@ -68,5 +68,5 @@ description. `npm run lint:private` checks this and runs in the pipeline. To
 cite something internal, describe it without the URL. A public equivalent,
 such as a drupal.org issue, can be linked instead.
 
-No commit, pull request description or file may credit an AI tool as an author
-or co-author. `npm run lint:attribution` checks this.
+No commit, pull request or merge request description, or file may credit an
+AI tool as an author or co-author. `npm run lint:attribution` checks this.

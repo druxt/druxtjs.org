@@ -102,14 +102,27 @@ if [ "$files_only" -eq 0 ]; then
     && [ -n "${CI_PROJECT_ID:-}" ] && [ -n "${CI_MERGE_REQUEST_IID:-}" ]; then
     url="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}"
     payload="$(curl -sSf --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" "$url" 2>/dev/null || true)"
-    if [ -n "$payload" ]; then
-      if command -v python3 >/dev/null 2>&1; then
-        description="$(printf '%s' "$payload" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("description") or "")')"
-      elif command -v node >/dev/null 2>&1; then
-        description="$(printf '%s' "$payload" | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>process.stdout.write(JSON.parse(d).description||""))')"
-      fi
-      have_description=1
+    # Fail closed: a description the check could not read whole must not
+    # pass as a description it checked.
+    if [ -z "$payload" ]; then
+      echo "[ERROR] could not read the merge request from ${CI_API_V4_URL}; the token may be missing or expired." >&2
+      exit 2
     fi
+    if command -v python3 >/dev/null 2>&1; then
+      description="$(printf '%s' "$payload" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("description") or "")')" || {
+        echo "[ERROR] could not parse the merge request payload as JSON." >&2
+        exit 2
+      }
+    elif command -v node >/dev/null 2>&1; then
+      description="$(printf '%s' "$payload" | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>process.stdout.write(JSON.parse(d).description||""))')" || {
+        echo "[ERROR] could not parse the merge request payload as JSON." >&2
+        exit 2
+      }
+    else
+      echo "[ERROR] no JSON parser (python3 or node) to read the merge request description." >&2
+      exit 2
+    fi
+    have_description=1
   fi
 
   if [ "$have_description" -eq 0 ]; then
@@ -119,8 +132,10 @@ if [ "$files_only" -eq 0 ]; then
     elif [ -n "${CI_MERGE_REQUEST_DESCRIPTION+x}" ]; then
       description="$CI_MERGE_REQUEST_DESCRIPTION"
       have_description=1
-      if [ "${#description}" -ge 2700 ]; then
-        echo "[WARN] CI_MERGE_REQUEST_DESCRIPTION is cut at 2700 characters; set GITLAB_API_TOKEN so the full description is read." >&2
+      if [ "${CI_MERGE_REQUEST_DESCRIPTION_IS_TRUNCATED:-}" = "true" ] || [ "${#description}" -ge 2700 ]; then
+        echo "[ERROR] the merge request description is truncated at 2700 characters, and the part beyond goes unchecked." >&2
+        echo "        Set GITLAB_API_TOKEN so the full description is read." >&2
+        exit 2
       fi
     elif [ -n "${CI_MERGE_REQUEST_IID:-}" ]; then
       echo "[ERROR] merge request pipeline, but the description is not available." >&2

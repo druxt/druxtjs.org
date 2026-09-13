@@ -115,7 +115,22 @@ if [ -n "${MERGE_REQUEST_DESCRIPTION+x}" ]; then
   printf '%s\n' "$MERGE_REQUEST_DESCRIPTION" > "$inputs/merge-request.md"
   description_state="the merge request description"
 elif [ -n "${CI_MERGE_REQUEST_DESCRIPTION+x}" ]; then
-  printf '%s\n' "$CI_MERGE_REQUEST_DESCRIPTION" > "$inputs/merge-request.md"
+  if [ "${CI_MERGE_REQUEST_DESCRIPTION_IS_TRUNCATED:-}" != "true" ] && [ "${#CI_MERGE_REQUEST_DESCRIPTION}" -lt 2700 ]; then
+    printf '%s\n' "$CI_MERGE_REQUEST_DESCRIPTION" > "$inputs/merge-request.md"
+  elif [ -n "${GITLAB_API_TOKEN:-}" ] && [ -n "${CI_API_V4_URL:-}" ] \
+    && [ -n "${CI_PROJECT_ID:-}" ] && [ -n "${CI_MERGE_REQUEST_IID:-}" ] \
+    && command -v node >/dev/null 2>&1; then
+    # Truncated at 2700 characters: fetch the whole description, the way
+    # check-attribution.sh does. Linting half of it would put the rest
+    # beyond the check, so a fetch that cannot be made fails the job.
+    curl -sSf --header "PRIVATE-TOKEN: ${GITLAB_API_TOKEN}" \
+      "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/merge_requests/${CI_MERGE_REQUEST_IID}" \
+      | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>process.stdout.write(JSON.parse(d).description||""))' \
+      > "$inputs/merge-request.md" || exit 2
+  else
+    echo "[ERROR] the merge request description is truncated and the whole of it cannot be fetched; set GITLAB_API_TOKEN." >&2
+    exit 2
+  fi
   description_state="the merge request description"
 elif [ -n "${CI_MERGE_REQUEST_IID:-}" ]; then
   echo "[ERROR] merge request pipeline, but the description is not available." >&2
