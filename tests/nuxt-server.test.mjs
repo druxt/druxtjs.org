@@ -30,7 +30,7 @@ const withServer = async (listener, callback) => {
   try {
     return await callback(`http://127.0.0.1:${server.address().port}`)
   } finally {
-    server.closeAllConnections()
+    if (server.closeAllConnections) server.closeAllConnections()
     await new Promise((resolve) => server.close(resolve))
   }
 }
@@ -117,6 +117,8 @@ describe('createPageCache', () => {
       assert.ok(br.body.length < html.length)
       const gz = await cache.read('/c', 'gzip')
       assert.equal(gz.encoding, 'gzip')
+      const refused = await cache.read('/c', 'br;q=0, gzip')
+      assert.equal(refused.encoding, 'gzip')
       assert.equal(gunzipSync(gz.body).toString(), html)
       assert.equal((await cache.read('/c', '')).encoding, null)
     } finally {
@@ -229,6 +231,30 @@ describe('createHandler', () => {
     })
   })
 
+  test('bypasses the store for live=1 only, not for any query string', async () => {
+    const dir = tempDir()
+    try {
+      const cache = createPageCache({
+        dir,
+        ttl: 60000,
+        render: async () => ({ html: '<p>stored</p>' }),
+      })
+      await cache.store('/page')
+      await withServer(createHandler({ cache, live: live() }), async (base) => {
+        const tagged = await request(`${base}/page?utm_source=test`)
+        assert.equal(tagged.headers['x-docs-cache'], 'HIT')
+        assert.equal(tagged.body, '<p>stored</p>')
+        const fresh = await request(`${base}/page?live=1`)
+        assert.equal(fresh.headers['x-docs-cache'], undefined)
+        assert.equal(fresh.body, 'live')
+        const both = await request(`${base}/page?a=1&live=1`)
+        assert.equal(both.body, 'live')
+      })
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
   test('renders a missing page live, then serves it stored', async () => {
     const dir = tempDir()
     try {
@@ -339,19 +365,16 @@ describe('createHandler', () => {
     }
   })
 
-  test('renders a page with a query string live', async () => {
-    const dir = tempDir()
-    try {
-      const cache = createPageCache({ dir, ttl: 60000, render: async () => ({ html: 'stored' }) })
-      await cache.store('/page')
-      await withServer(createHandler({ cache, live: live() }), async (base) => {
-        const res = await request(`${base}/page?preview=1`)
-        assert.equal(res.body, 'live')
-        assert.equal(res.headers['x-docs-cache'], undefined)
-      })
-    } finally {
-      rmSync(dir, { recursive: true, force: true })
-    }
+  test('sends an old path on, before the store or a render is consulted', async () => {
+    await withServer(createHandler({ cache: null, live: live() }), async (base) => {
+      const res = await request(`${base}/guide/proxy/?utm_source=old`)
+      assert.equal(res.status, 301)
+      assert.equal(res.headers.location, '/how-to/proxy?utm_source=old')
+      assert.equal(
+        (await request(`${base}/api/components/DruxtEntity.html`)).headers.location,
+        '/api/packages/entity/components/DruxtEntity'
+      )
+    })
   })
 
   test('asks search engines to stay away only when told to', async () => {
@@ -435,6 +458,60 @@ describe('backend', () => {
     assert.equal(checks, 3)
     assert.equal(lines.length, 1)
     assert.match(lines[0], /^waiting for Drupal at http:\/\/drupal/)
+  })
+})
+
+describe('proxy', () => {
+  test('hands a request to the other server and streams its answer back', async () => {
+    const { createProxyHandler } = await import('../nuxt/server/proxy.js')
+    const target = http.createServer((req, res) => {
+      res.writeHead(201, {
+        'Content-Type': 'text/plain',
+        'X-Seen': req.url,
+        'X-Host': req.headers.host,
+      })
+      res.end(`hello from ${req.method}`)
+    })
+    await new Promise((resolve) => target.listen(0, '127.0.0.1', resolve))
+    try {
+      const url = `http://127.0.0.1:${target.address().port}`
+      await withServer(createProxyHandler(url), async (base) => {
+        const res = await request(`${base}/iframe.html?id=x`)
+        assert.equal(res.status, 201)
+        assert.equal(res.headers['x-seen'], '/iframe.html?id=x')
+        assert.equal(res.headers['x-host'], new URL(url).host)
+        assert.equal(res.body, 'hello from GET')
+      })
+      // Drupal writes links to the host it is asked for, so the browser's stays on.
+      await withServer(createProxyHandler(url, { keepHost: true }), async (base) => {
+        const res = await request(`${base}/jsonapi`, { headers: { host: 'storybook.example' } })
+        assert.equal(res.headers['x-host'], 'storybook.example')
+      })
+    } finally {
+      target.close()
+    }
+  })
+
+  test('answers 502 while the other server is not there', async () => {
+    const { createProxyHandler } = await import('../nuxt/server/proxy.js')
+    await withServer(createProxyHandler('http://127.0.0.1:1'), async (base) => {
+      assert.equal((await request(`${base}/`)).status, 502)
+    })
+  })
+
+  test("knows which paths are Drupal's", async () => {
+    const { isBackendPath } = await import('../nuxt/server/proxy.js')
+    for (const p of [
+      '/jsonapi',
+      '/jsonapi/node/article?x=1',
+      '/router/translate-path?path=/',
+      '/sites/default/files/a.png',
+      '/_decoupled/logo',
+    ]) {
+      assert.equal(isBackendPath(p), true, p)
+    }
+    for (const p of ['/', '/iframe.html', '/sb-manager/x.js', '/jsonapi-like'])
+      assert.equal(isBackendPath(p), false, p)
   })
 })
 

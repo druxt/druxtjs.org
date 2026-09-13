@@ -54,6 +54,15 @@ describe('findPrivateRefs', () => {
       'gitlab.example.local',
     ])
   })
+
+  test('reads the host from an scp-style remote, whatever the user', () => {
+    assert.deepEqual(hostsIn('deploy@gitlab.example.local:druxt/repo.git'), [
+      'gitlab.example.local',
+    ])
+    assert.deepEqual(hostsIn('git@10.0.0.8:druxt/repo.git'), ['10.0.0.8'])
+    // A prose email has no remote-path colon, so it is not a remote.
+    assert.deepEqual(hostsIn('write to bob@example.com about it'), [])
+  })
 })
 
 // The command itself, against a throwaway repository, in both directions.

@@ -10,7 +10,7 @@ for forwarded in "${LANG:-}" "${LC_ALL:-}" "${LC_ADDRESS:-}" "${LC_COLLATE:-}" \
   "${LC_MONETARY:-}" "${LC_NAME:-}" "${LC_NUMERIC:-}" "${LC_PAPER:-}" \
   "${LC_TELEPHONE:-}" "${LC_TIME:-}"; do
   case "$forwarded" in '' | C | C.* | POSIX) continue ;; esac
-  if ! printf '%s\n' "$available" | grep -qix "$(printf '%s' "$forwarded" | sed 's/UTF-8$/utf8/')"; then
+  if ! printf '%s\n' "$available" | grep -Fqix "$(printf '%s' "$forwarded" | sed 's/UTF-8$/utf8/')"; then
     export LANG=C.UTF-8
     unset LC_ALL LC_ADDRESS LC_COLLATE LC_CTYPE LC_IDENTIFICATION \
       LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER \

@@ -10,10 +10,9 @@
  * process cwd in a way that only matches the docroot under the built-in
  * server, not wherever the shell started.
  *
- * Unlike docs/drupal's `start`, this also writes `BASE_URL` (and, once
- * provisioned, `OAUTH_CLIENT_ID`) to the shared `../.env` — the Nuxt side
- * (`nuxt/nuxt.config.js`) reads both directly from that file, so the
- * developer never hand-copies a URL or client ID between terminals.
+ * Unlike docs/drupal's `start`, this also writes `BASE_URL` to the shared
+ * `../.env` for the Nuxt frontend, so the developer never hand-copies a
+ * URL between terminals.
  */
 
 declare(strict_types=1);

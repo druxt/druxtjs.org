@@ -50,6 +50,13 @@ describe('apiSourceUrl', () => {
     assert.equal(apiSourceUrl('/api/packages/entity', 'CHANGELOG'), `${REPO}/entity/CHANGELOG.md`)
   })
 
+  test('points a directory index page at the directory, which has no file of its own', () => {
+    assert.equal(
+      apiSourceUrl('/api/packages/router/components', 'index'),
+      'https://github.com/druxt/druxt.js/tree/develop/packages/router/src/components'
+    )
+  })
+
   test('has no link for a page outside the packages tree', () => {
     assert.equal(apiSourceUrl('/api', 'README'), null)
     assert.equal(apiSourceUrl('', 'README'), null)

@@ -5,5 +5,7 @@ import DruxtEntityDefault from './Default.vue'
 export default {
   name: 'DruxtEntityFull',
   extends: DruxtEntityDefault,
+  // Druxt reads a wrapper's own option, not the one it extends.
+  druxt: DruxtEntityDefault.druxt,
 }
 </script>

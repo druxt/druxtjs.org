@@ -6,13 +6,19 @@
 /** The one value a field holds, whatever its cardinality. */
 export const single = (value) => (Array.isArray(value) ? value[0] : value)
 
-/** The integers a number widget offers: its configured range, widened to hold the current value. */
+/**
+ * The integers a number widget offers: its configured range, widened to hold
+ * the current value. Null when the span is too broad to pick from, and the
+ * widget takes a typed value instead.
+ */
 export function numberRange(schema, value) {
   const config = ((schema || {}).settings || {}).config || {}
   const current = Number(single(value)) || 0
-  const min = Math.min(Number(config.min ?? -10), current)
-  const max = Math.max(Number(config.max ?? 10), current)
-  return Array.from({ length: max - min + 1 }, (_, i) => min + i)
+  const lo = Number(config.min ?? -10)
+  const hi = Number(config.max ?? 10)
+  if (Math.max(hi, current) - Math.min(lo, current) > 500) return null
+  const range = Array.from({ length: hi - lo + 1 }, (_, i) => lo + i)
+  return current >= lo && current <= hi ? range : [...range, current].sort((a, b) => a - b)
 }
 
 /** A list field's allowed values as options, from a list of { value, label } or a map of value to label. */
@@ -28,6 +34,17 @@ export function referenceTypes(schema) {
   const type = (s.storage || {}).target_type
   const bundles = Object.keys(((s.config || {}).handler_settings || {}).target_bundles || {})
   return type ? bundles.map((bundle) => `${type}--${bundle}`) : []
+}
+
+/**
+ * Whether a reference field allows every bundle of its target type: Drupal
+ * reads null or absent `target_bundles` as unrestricted, while an empty array
+ * or map allows none.
+ */
+export function unrestrictedReference(schema) {
+  const s = (schema || {}).settings || {}
+  const settings = (s.config || {}).handler_settings || {}
+  return !!(s.storage || {}).target_type && settings.target_bundles == null
 }
 
 /** Entities as options: their label, and the type a reference needs back. */

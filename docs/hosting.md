@@ -5,25 +5,36 @@ How druxtjs.org runs on [Lagoon](https://docs.lagoon.sh). The
 
 ## Status
 
-Ready for a first deployment to a development environment. The live site
-still runs from the druxt.js repository until the cutover.
+Lagoon builds `feature/lagoon` into a development environment and `main`
+into production. The checklist at the end is what the first production
+deployment needs.
 
 ## Services
 
 One environment runs the whole site. `docker-compose.yml` names the
 services, and `.lagoon.yml` adds the post-rollout task.
 
-| Service   | Built from                             | What it does                                        |
-| --------- | -------------------------------------- | --------------------------------------------------- |
-| `nuxt`    | `lagoon/nuxt.dockerfile`, Node 16      | Serves the site, and proxies Drupal's API and files |
-| `nginx`   | `lagoon/nginx.dockerfile`              | Serves Drupal, including its admin pages            |
-| `php`     | `lagoon/php.dockerfile`, PHP 8.3       | Runs Drupal for `nginx`, in the same pod            |
-| `cli`     | `lagoon/cli.dockerfile`                | Runs the post-rollout task, and `drush` over SSH    |
-| `mariadb` | `uselagoon/mariadb-10.11-drupal` image | Drupal's database, with no route                    |
+| Service     | Built from                             | What it does                                                                 |
+| ----------- | -------------------------------------- | ---------------------------------------------------------------------------- |
+| `nuxt`      | `lagoon/nuxt.dockerfile`, Node 16      | Serves the site, and proxies Drupal's API and files                          |
+| `storybook` | `lagoon/storybook.dockerfile`, Node 16 | Storybook for the site's components and Druxt's, started once Drupal answers |
+| `nginx`     | `lagoon/nginx.dockerfile`              | Serves Drupal, including its admin pages                                     |
+| `php`       | `lagoon/php.dockerfile`, PHP 8.3       | Runs Drupal for `nginx`, in the same pod                                     |
+| `cli`       | `lagoon/cli.dockerfile`                | Runs the post-rollout task, and `drush` over SSH                             |
+| `mariadb`   | `uselagoon/mariadb-10.11-drupal` image | Drupal's database, with no route                                             |
 
-`nuxt` and `nginx` each get a route, named after the service:
+Storybook writes its Druxt stories from Drupal when its container starts,
+and the task that runs after the rollout imports the configuration later. So
+a change to something those stories read, such as a menu's description,
+shows on the rollout after the one that imports it.
+
+`nuxt`, `nginx` and `storybook` each get a route, named after the service:
 `https://nuxt.<environment>.<project>.<cluster domain>` for the site, and
-the same with `nginx` for Drupal.
+the same with `nginx` for Drupal and `storybook` for Storybook. The site
+reads its Storybook's route from `LAGOON_ROUTES` and links to it from the
+footer and the playground. Production's hosts, `druxtjs.org`,
+`storybook.druxtjs.org`, `cms.druxtjs.org` for Drupal and the package
+subdomains, are set in `.lagoon.yml`.
 
 ## Deployment steps
 
@@ -77,7 +88,8 @@ runs it.
 | A stored page                                     | The stored HTML, with `X-Docs-Cache: HIT`              |
 | A stored page older than `DOCS_CACHE_TTL`         | The stored HTML (`STALE`), while a fresh copy renders  |
 | A page it has not stored                          | Rendered live (`MISS`), then stored if it answered 200 |
-| A page with a query string                        | Rendered live, and never stored                        |
+| A page with `?live=1`                             | Rendered live, and never stored                        |
+| A page with any other query string                | The stored copy for the path                           |
 | A page path with a trailing slash                 | A 301 to the same path without it                      |
 | `/jsonapi`, `/router/translate-path` and `/sites` | Proxied to Drupal                                      |
 
@@ -124,12 +136,35 @@ Lagoon, and `sqlite` for local sites and CI. Drupal refuses to uninstall the
 module that provides the database it runs on, so a configuration without
 the driver fails to install on that database.
 
+## Going to production
+
+What the cutover from the druxt.js build needs, in order.
+
+1. Point the production route at this project's `nuxt` service, with
+   `www.druxtjs.org` and the package subdomains (`blocks.druxtjs.org` and
+   the others) as routes on the same service; the server answers each
+   subdomain with a redirect to `druxtjs.org`.
+2. Give `storybook.druxtjs.org` and `cms.druxtjs.org` DNS records. The
+   other hosts are CNAME records to the platform's CDN, which answers TLS
+   only for hostnames it knows, so a new hostname is registered with the
+   platform first or its record points at the cluster's ingress instead.
+3. Set `LAGOON_ENVIRONMENT_TYPE=production` on that environment: it turns on
+   the GA4 tag and turns off the `noindex` header previews send.
+4. Confirm the Drupal environment variables the settings file reads, and that
+   the site mail address is one the domain's SPF record allows to send.
+5. After the first deployment, check `sitemap.xml`, `robots.txt`,
+   `llms.txt` and `llms-full.txt`, and that an old path such as
+   `/guide/getting-started` and a legacy reference path such as
+   `/api/components/DruxtEntity.html` redirect.
+6. Watch the first deployment's rollout: every restart serves errors for
+   about a minute, then the starting page, until the app has built.
+
 ## Not done yet
 
 - The app builds each time the `nuxt` container starts, which takes a few
   minutes behind the starting page. A deployment shows it for that long, and
-  so does a development environment waking from idle.
-- The redirects for the package subdomains are still served from the
-  druxt.js repository.
+  so does a development environment waking from idle. A prebuilt image would
+  close it.
+- A 404 is never stored, so a crawl of missing URLs renders each one live.
 - `docker-compose.yml` is written for Lagoon, and has not been run with
   `docker compose` yet.

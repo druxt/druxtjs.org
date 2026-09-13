@@ -16,6 +16,9 @@
 export default {
   // DruxtEntity's other props are not HTML attributes.
   inheritAttrs: false,
+  // The label is a base field, outside any display; ask for it with the
+  // display's fields. Drupal ignores the ones an entity type lacks.
+  druxt: { query: { fields: ['title', 'name', 'label', 'info'] } },
   props: {
     entity: { type: Object, default: () => ({}) },
     fields: { type: [Object, Boolean], default: () => ({}) },

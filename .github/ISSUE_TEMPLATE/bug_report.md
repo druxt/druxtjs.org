@@ -7,8 +7,8 @@ assignees: ''
 ---
 
 <!--
-A mistake in the text of a documentation page belongs in
-https://github.com/druxt/druxt.js/issues, where the pages are written.
+A mistake in the text of a documentation page belongs here too: name the
+page under Where.
 -->
 
 ## What happened

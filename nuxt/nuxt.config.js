@@ -1,6 +1,8 @@
 // GA4, as a plain gtag.js snippet: the Nuxt analytics modules need either
 // Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
+const { serviceRoute } = require('./server/backend')
+const { syncDruxtComponents } = require('./lib/sync-druxt-components')
 
 // The id is interpolated into an inline script, so check its shape first.
 if (!/^G-[A-Z0-9]+$/.test(GA_MEASUREMENT_ID)) {
@@ -33,6 +35,8 @@ export default {
     druxtVersion,
     // "markdown" reads the authored pages from content/ instead of Drupal.
     docsSource: process.env.DOCS_SOURCE || 'drupal',
+    // The environment's Storybook, when it has one: linked from the footer and the playground.
+    storybookUrl: serviceRoute(process.env.LAGOON_ROUTES, 'storybook') || process.env.STORYBOOK_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3030'),
   },
 
   head: {
@@ -80,7 +84,6 @@ export default {
     '~/plugins/mermaid.client.js',
   ],
   components: true,
-
   // Mirrors the SITE_ORIGIN override into the client bundle so hydration
   // recomputes the same absolute URLs the generated HTML carries.
   env: {
@@ -164,10 +167,12 @@ export default {
     proxy: { api: true, files: true },
     // The section pages resolve paths themselves; no catch-all route.
     router: { wildcard: false },
-    menu: { jsonApiMenuItems: true },
+    // Menus ask for the fields a menu needs, not every attribute of a link.
+    menu: { jsonApiMenuItems: true, query: { requiredOnly: true } },
     // No deprecated default field components: fields render through
-    // DruxtField's item slots and this site's own wrappers.
-    entity: { components: { fields: false } },
+    // DruxtField's item slots and this site's own wrappers. Each entity is
+    // asked for the fields its display renders, from the generated schema.
+    entity: { components: { fields: false }, query: { schema: true } },
     // Display schemas, view and form, for what this site renders. Generated
     // from Drupal's display configuration when the app builds.
     schema: {
@@ -187,9 +192,15 @@ export default {
     [
       '/umami',
       {
-        target: 'https://demo-api.druxtjs.org',
+        target: 'https://api.umami.demo.druxtjs.org',
         pathRewrite: { '^/umami': '' },
         changeOrigin: true,
+        // Another origin's backend gets no first-party credentials: this
+        // site's cookies and Authorization headers stay on this origin.
+        onProxyReq: (proxyReq) => {
+          proxyReq.removeHeader('cookie')
+          proxyReq.removeHeader('authorization')
+        },
       },
     ],
   ],
@@ -218,6 +229,9 @@ export default {
   },
 
   hooks: {
+    // Druxt's own components load with the page: see lib/sync-druxt-components.js.
+    'components:extend': (components) => syncDruxtComponents(components),
+
     /**
      * Collects routes whose generation failed, so the build can refuse to ship them.
      *
@@ -253,11 +267,13 @@ export default {
       const { readContent } = require('./lib/content-index')
       const { buildLlmsTxt } = require('./lib/llms-txt')
       const { buildSitemap } = require('./lib/sitemap')
+      const { buildLlmsFullTxt } = require('./lib/llms-full-txt')
 
       const { srcDir, generate } = generator.nuxt.options
       const docs = readContent(path.join(srcDir, 'content'))
 
       await fs.promises.writeFile(path.join(generate.dir, 'llms.txt'), buildLlmsTxt(docs))
+      await fs.promises.writeFile(path.join(generate.dir, 'llms-full.txt'), buildLlmsFullTxt(docs))
       await fs.promises.writeFile(path.join(generate.dir, 'sitemap.xml'), buildSitemap(docs))
 
       // A child process, not a require: satori and resvg crash under the esm
@@ -269,7 +285,7 @@ export default {
         path.join(generate.dir, 'og'),
       ], { stdio: ['ignore', 'pipe', 'inherit'] }).toString().trim()
 
-      console.log('SEO: wrote llms.txt, sitemap.xml and ' + cards + ' share cards for ' + docs.length + ' documents')
+      console.log('SEO: wrote llms.txt, llms-full.txt, sitemap.xml and ' + cards + ' share cards for ' + docs.length + ' documents')
     },
   },
 

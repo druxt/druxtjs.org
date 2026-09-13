@@ -11,15 +11,17 @@ import https from 'https'
  * Minimal HTTP client. Node 16, the version Nuxt 2 projects run on, has no
  * global fetch.
  */
-export const request = (url, { method = 'GET', headers = {}, body = null } = {}) =>
+export const request = (url, { method = 'GET', headers = {}, body = null, timeout = 30000 } = {}) =>
   new Promise((resolve, reject) => {
     const lib = url.startsWith('https:') ? https : http
-    const req = lib.request(url, { method, headers }, (res) => {
+    const req = lib.request(url, { method, headers, timeout }, (res) => {
       let data = ''
       res.on('data', (chunk) => { data += chunk })
       res.on('end', () => resolve({ status: res.statusCode, body: data }))
     })
     req.on('error', reject)
+    // Node only emits the event; the request has to be destroyed by hand.
+    req.on('timeout', () => req.destroy(new Error(`[decoupled-settings] no answer from ${url} within ${timeout}ms`)))
     if (body) req.write(body)
     req.end()
   })

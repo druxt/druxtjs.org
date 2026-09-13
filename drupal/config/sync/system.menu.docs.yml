@@ -4,5 +4,5 @@ status: true
 dependencies: {  }
 id: docs
 label: Documentation
-description: "The documentation's sections and pages, in the order a reader moves through them."
+description: 'The documentation sections and pages, in the order a reader moves through them.'
 locked: false

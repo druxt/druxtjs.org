@@ -9,5 +9,10 @@ export default {
   props: {
     source: { type: String, required: true },
   },
+  // A diagram that mounts after the page's own pass, such as one inside a live
+  // example, asks for another; the plugin listens for this.
+  mounted() {
+    window.dispatchEvent(new Event('docs:content'))
+  },
 }
 </script>

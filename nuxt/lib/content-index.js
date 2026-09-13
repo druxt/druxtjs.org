@@ -157,6 +157,10 @@ const readContent = (contentDir) => {
         description: data.description || excerpt(content),
         weight: typeof data.weight === 'number' ? data.weight : 0,
         section: route.split('/').filter(Boolean)[0] || null,
+        // Frontmatter is already stripped here, so the body is carried rather
+        // than re-read. llms-full.txt needs it; llms.txt and sitemap.xml ignore
+        // it.
+        content,
       }
     })]
     .sort((a, b) => a.route.localeCompare(b.route))

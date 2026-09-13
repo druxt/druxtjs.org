@@ -72,6 +72,11 @@ const buildLlmsTxt = (docs, options) => {
     '> ' + SITE_DESCRIPTION,
     '',
     ...PREAMBLE,
+    '',
+    // The whole guide as one document, for an assistant that would rather make
+    // one request than follow every link below. Untagged deliberately: it is a
+    // sibling file, not a page visit, so a UTM click would never arrive.
+    'The complete documentation as a single file: ' + origin + '/llms-full.txt',
   ]
 
   ;['tutorials', 'how-to', 'explanation', 'modules', 'playground'].forEach((section) => {

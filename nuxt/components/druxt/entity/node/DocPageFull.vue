@@ -26,10 +26,14 @@ const layoutOf = (paragraph) => ((paragraph.attributes || {}).behavior_settings 
  * A node fetched on its own, as the live examples do, gets them fetched here.
  */
 export default {
-  // DruxtEntity's other props (fields, schema, value) are not HTML attributes.
-  inheritAttrs: false,
+  // Every DruxtEntity prop is declared, so none leaks as an attribute. Not
+  // `inheritAttrs: false`: that would also drop the data-fetch-key Nuxt
+  // stamps on the root, and the browser would run fetch() again.
   props: {
     entity: { type: Object, default: undefined },
+    fields: { type: [Object, Boolean], default: undefined },
+    schema: { type: Object, default: undefined },
+    value: { type: Object, default: undefined },
   },
   async fetch() {
     const missing = this.refs.filter((ref) => !this.stored(ref))

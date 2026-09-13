@@ -158,11 +158,13 @@
 </template>
 
 <script>
+import { PAGES } from '~/lib/site'
 import { isReportableTerm, searchEvent, searchSelectEvent } from '~/lib/analytics'
 import { documentContext } from '~/utils/content'
 import { trapTab } from '~/utils/focus'
 
 const GROUPS = [
+  { type: 'playground', label: 'Playground' },
   { type: 'tutorials', label: 'Tutorials' },
   { type: 'how-to', label: 'How-to guides' },
   { type: 'modules', label: 'Modules' },
@@ -171,7 +173,14 @@ const GROUPS = [
   { type: 'explanation', label: 'Concepts' },
 ]
 
-const EMPTY = () => ({ tutorials: [], 'how-to': [], modules: [], components: [], api: [], explanation: [] })
+const EMPTY = () => ({ playground: [], tutorials: [], 'how-to': [], modules: [], components: [], api: [], explanation: [] })
+
+/** The site's own pages, outside the content corpus: matched on title, description and keywords. */
+const matchPages = (query) => {
+  const q = query.trim().toLowerCase()
+  return PAGES.filter((page) => [page.title, page.description, ...(page.keywords || [])].join(' ').toLowerCase().includes(q))
+    .map((page) => ({ title: page.title, description: page.description, path: page.route }))
+}
 
 export default {
   props: {
@@ -268,8 +277,9 @@ export default {
     async search() {
       const query = this.query
       const results = EMPTY()
+      results.playground = matchPages(query)
 
-      await Promise.all(GROUPS.map(async ({ type }) => {
+      await Promise.all(GROUPS.filter(({ type }) => type !== 'playground').map(async ({ type }) => {
         try {
           results[type] = await this.$content(type, { deep: true })
             .only(['title', 'description', 'path'])

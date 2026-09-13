@@ -25,9 +25,10 @@ if [ "$pages" = "0" ]; then
 fi
 
 keys="$app/drupal/web/sites/default/files/private/oauth"
-if [ ! -f "$keys/private.key" ]; then
+if [ ! -s "$keys/private.key" ] || [ ! -s "$keys/public.key" ]; then
   echo "Generating the Simple OAuth keys."
   mkdir -p "$keys"
+  rm -f "$keys/private.key" "$keys/public.key"
   drush php:eval "\\Drupal::service('simple_oauth.key.generator')->generateKeys('$keys');"
   chmod 600 "$keys/private.key" "$keys/public.key"
 fi

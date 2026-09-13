@@ -6,7 +6,7 @@
     <AppProse v-else :key="document.path" :title="document.title">
       <DruxtEntity :type="document.type" :uuid="document.uuid" mode="full" />
     </AppProse>
-    <AppDocFooter :edit-path="editPath" :prev="prev" :next="next" />
+    <AppDocFooter :prev="prev" :next="next" />
   </article>
 </template>
 
@@ -26,13 +26,15 @@ const GENERATED = ['/how-to/contributing']
  */
 export default {
   name: 'AppSectionDocument',
-  async asyncData({ $config, $content, error, params, store, route }) {
+  async asyncData({ $config, $content, error, params, redirect, store, route }) {
     const section = sectionOf(route.path)
     const path = route.path.replace(/\/$/, '') || '/'
 
     if ($config.docsSource !== 'markdown' && !GENERATED.includes(path)) {
       const document = await fetchDrupalPage(store, path)
       if (!document) return error({ statusCode: 404, message: 'Document not found' })
+      // Drupal matches aliases in any case; one spelling is the page.
+      if (document.redirect) return redirect(301, document.redirect, route.query)
       // Siblings in the docs menu's order, the section landing first.
       const top = store.state.menu.find((item) => (item.props || {}).to === `/${section}`)
       // Drupal's menu also lists the landing among its own children; keep it once.
@@ -73,7 +75,6 @@ export default {
     })
   },
   computed: {
-    editPath: ({ drupal, section, document }) => (drupal ? null : section + document.path.replace(`/${section}`, '') + '.md'),
     position: ({ siblings, current }) => siblings.findIndex((o) => o.to === current),
     prev: ({ siblings, position }) => (position > 0 ? siblings[position - 1] : null),
     next: ({ siblings, position }) => (position > -1 && position < siblings.length - 1 ? siblings[position + 1] : null),

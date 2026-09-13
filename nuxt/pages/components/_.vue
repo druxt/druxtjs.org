@@ -5,7 +5,7 @@
 
     <NuxtContent class="prose" :document="document" />
 
-    <AppDocFooter :edit-path="editPath" :prev="prev" :next="next" />
+    <AppDocFooter :prev="prev" :next="next" />
   </article>
 </template>
 
@@ -46,8 +46,6 @@ export default {
   },
 
   computed: {
-    editPath: ({ document }) => 'components' + document.path.replace('/components', '') + '.md',
-
     position: ({ index, document }) => index.findIndex((o) => o.path === document.path),
 
     prev: ({ index, position }) => (position > 0 ? link(index[position - 1]) : null),

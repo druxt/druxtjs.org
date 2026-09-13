@@ -94,13 +94,15 @@ export function dates(commits) {
  * A page's contents at one commit, or null when that commit removed it.
  */
 export function contentAt(root, commit) {
-  const spec = `${commit.sha}:${commit.path}`
-  try {
-    execFileSync('git', ['-C', root, 'cat-file', '-e', spec], { stdio: 'ignore' })
-  } catch {
-    return null
-  }
-  return execFileSync('git', ['-C', root, 'cat-file', 'blob', spec], {
+  const listed = execFileSync(
+    'git',
+    ['-C', root, 'ls-tree', '--name-only', commit.sha, '--', commit.path],
+    {
+      encoding: 'utf8',
+    }
+  )
+  if (!listed.trim()) return null
+  return execFileSync('git', ['-C', root, 'cat-file', 'blob', `${commit.sha}:${commit.path}`], {
     encoding: 'utf8',
     maxBuffer: 64 * 1024 * 1024,
   })

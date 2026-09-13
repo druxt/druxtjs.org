@@ -30,7 +30,15 @@
 //             directory and never the checkout.
 //   --check   round-trip every page and report, writing nothing.
 
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  realpathSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import path from 'node:path'
 import { createRequire } from 'node:module'
 import { Defects, buildBlocks, normalise, serialise } from './lib/blocks.mjs'
@@ -92,6 +100,18 @@ function buildToc(doc) {
 // ---------------------------------------------------------------------------
 
 /**
+ * The file an image's src names under the static directory, or null when
+ * the src reaches outside it.
+ */
+function staticFile(root, src) {
+  const dir = path.resolve(root, STATIC_DIR)
+  const file = path.resolve(dir, `.${src}`)
+  if (!file.startsWith(`${dir}${path.sep}`) || !existsSync(file)) return null
+  // A symlink is followed on the copy, so what it points at has to be inside too.
+  return realpathSync(file).startsWith(`${realpathSync(dir)}${path.sep}`) ? file : null
+}
+
+/**
  * Builds the IR for every authored page.
  *
  * @param {string} root - Root of the documentation checkout.
@@ -129,7 +149,7 @@ export function build(root) {
     }
 
     for (const image of extractImages(doc.body)) {
-      if (!image.src.startsWith('/') || !existsSync(path.join(root, STATIC_DIR, image.src))) {
+      if (!image.src.startsWith('/') || !staticFile(root, image.src)) {
         defects.add(file, 1, `image is not a file under ${STATIC_DIR}: ${image.src}`)
       }
     }
@@ -303,7 +323,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   for (const src of images) {
     const target = path.join(out, 'static', src)
     mkdirSync(path.dirname(target), { recursive: true })
-    copyFileSync(path.join(source, STATIC_DIR, src), target)
+    const from = staticFile(source, src)
+    if (!from) throw new Error(`image reaches outside ${STATIC_DIR}: ${src}`)
+    copyFileSync(from, target)
   }
   process.stdout.write(
     `${documents.length} documents and ${images.size} images written to ${out}\n`

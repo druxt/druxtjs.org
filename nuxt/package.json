@@ -1,7 +1,7 @@
 {
   "name": "druxtjs-org",
   "description": "The Fully Decoupled Drupal Framework",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "private": true,
   "scripts": {
     "cypress:open": "npx cypress open --project test",
@@ -22,11 +22,13 @@
     "daisyui": "1.25.4",
     "drupal-jsonapi-params": "2.3.2",
     "druxt": "0.24.0",
+    "druxt-blocks": "0.17.3",
     "druxt-breadcrumb": "0.17.2",
     "druxt-entity": "0.28.1",
     "druxt-layout-paragraphs": "0.4.1",
     "druxt-menu": "0.21.0",
     "druxt-router": "0.31.0",
+    "druxt-schema": "0.11.3",
     "druxt-site": "0.14.3",
     "druxt-views": "0.22.2",
     "github-slugger": "1.5.0",
@@ -46,7 +48,8 @@
     "tailwindcss": "^2.2.19"
   },
   "resolutions": {
-    "vue-template-compiler": "2.7.16"
+    "vue-template-compiler": "2.7.16",
+    "ws": "7.5.11"
   },
   "packageManager": "yarn@3.8.7",
   "engines": {

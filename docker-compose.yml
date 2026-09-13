@@ -4,7 +4,7 @@
 
 x-environment: &default-environment
   LAGOON_ENVIRONMENT_TYPE: local
-  LAGOON_ROUTES: http://localhost:3000,http://localhost:8080
+  LAGOON_ROUTES: http://localhost:3000,http://localhost:8080,http://localhost:3030
   DRUXT_FRONTEND_URL: http://localhost:3000
 
 volumes:
@@ -82,5 +82,16 @@ services:
       lagoon.type: node
     ports:
       - '3000:3000'
+    environment:
+      <<: *default-environment
+
+  storybook:
+    build:
+      context: .
+      dockerfile: lagoon/storybook.dockerfile
+    labels:
+      lagoon.type: node
+    ports:
+      - '3030:3000'
     environment:
       <<: *default-environment

@@ -40,8 +40,24 @@ describe('SOURCES', () => {
           { attributes: { title: 'Borscht', path: { alias: '/recipes/borscht' } } },
           { attributes: { title: 'No alias', path: {} } },
         ])
-      if (url.includes('/configurable_language/'))
-        return { ok: false, status: 404, json: async () => ({}) }
+      if (url.includes('/node/article')) return jsonapi([])
+      if (url.includes('/node/page'))
+        return jsonapi([{ attributes: { title: 'About', path: { alias: '/about' } } }])
+      // The index names the resources a backend has; only Umami has languages.
+      if (url === '/jsonapi')
+        return { ok: true, json: async () => ({ links: { 'node--doc_page': {} } }) }
+      if (url === '/umami/jsonapi')
+        return {
+          ok: true,
+          json: async () => ({ links: { 'configurable_language--configurable_language': {} } }),
+        }
+      if (url.includes('/configurable_language/')) {
+        return jsonapi([
+          { attributes: { drupal_internal__id: 'en', label: 'English', locked: false } },
+          { attributes: { drupal_internal__id: 'es', label: 'Spanish', locked: false } },
+          { attributes: { drupal_internal__id: 'und', label: 'Not specified', locked: true } },
+        ])
+      }
       if (url.includes('/menu/menu'))
         return jsonapi([{ attributes: { drupal_internal__id: 'main', label: 'Main navigation' } }])
       throw new Error('unexpected ' + url)
@@ -60,14 +76,25 @@ describe('SOURCES', () => {
     assert.equal(list[1].label, 'Recipes (recipes)')
   })
 
-  test('paths come from the backend content bundle and skip nodes without an alias', async () => {
+  test('paths list every content type of the backend, grouped, and skip nodes without an alias', async () => {
     const list = await m.SOURCES.paths('/umami/jsonapi', {}, m.BACKENDS.umami)
-    assert.deepEqual(list, [{ value: '/recipes/borscht', label: 'Borscht (/recipes/borscht)' }])
+    assert.deepEqual(list, [
+      { value: '/recipes/borscht', label: 'Borscht (/recipes/borscht)', group: 'recipe' },
+      { value: '/about', label: 'About (/about)', group: 'page' },
+    ])
     assert.match(calls[0], /^\/umami\/jsonapi\/node\/recipe\?/)
   })
 
-  test('languages offers nothing on a backend that exposes none', async () => {
+  test('languages offers nothing on a backend whose index has none, without asking for it', async () => {
     assert.deepEqual(await m.SOURCES.languages('/jsonapi'), [])
+    assert.deepEqual(calls, ['/jsonapi'])
+  })
+
+  test('languages lists the unlocked ones on a backend that has them', async () => {
+    assert.deepEqual(
+      (await m.SOURCES.languages('/umami/jsonapi')).map((o) => o.value),
+      ['en', 'es']
+    )
   })
 
   test('menus are labelled the way the Storybook stories name them', async () => {
@@ -77,13 +104,22 @@ describe('SOURCES', () => {
   })
 })
 
+describe('the playground page', () => {
+  test('site search knows it by every component it renders', async () => {
+    const { PAGES } = (await import('../nuxt/lib/site.js')).default
+    const page = PAGES.find((p) => p.route === '/playground')
+    for (const name of m.COMPONENT_NAMES)
+      assert.ok(page.keywords.includes(name), `${name} is not a keyword`)
+  })
+})
+
 describe('BACKENDS', () => {
   test('each backend names where its options come from and where its runtime sends requests', () => {
     assert.equal(m.BACKENDS.site.api, '/jsonapi')
     assert.equal(m.BACKENDS.site.proxyRoot, '')
     assert.equal(m.BACKENDS.umami.api, '/umami/jsonapi')
     assert.equal(m.BACKENDS.umami.proxyRoot, '/umami')
-    assert.equal(m.BACKENDS.umami.baseUrl, 'https://demo-api.druxtjs.org')
+    assert.equal(m.BACKENDS.umami.baseUrl, 'https://api.umami.demo.druxtjs.org')
   })
 })
 
@@ -170,7 +206,7 @@ describe('demo defaults', () => {
       ),
       '1'
     )
-    assert.equal(step(m.COMPONENTS.DruxtBlockRegion, 'name').prefer, 'header')
+    assert.equal(step(m.COMPONENTS.DruxtBlockRegion, 'name').prefer, 'content')
     assert.equal(step(m.COMPONENTS.DruxtEntity, 'bundle').prefer({ backend: 'umami' }), 'recipe')
     assert.equal(
       m.pickOption(
@@ -182,17 +218,25 @@ describe('demo defaults', () => {
       ),
       'y'
     )
+    // The router shows a path resolving, so it prefers a short page over a long read.
     const path = m.COMPONENTS.DruxtRouter.props.find((p) => p.name === 'path')
     assert.equal(
       m.pickOption(
         [
-          { value: '/a', label: 'A (/tutorials/authentication)' },
-          { value: '/g', label: 'G (/tutorials/getting-started)' },
+          {
+            value: '/tutorials/getting-started',
+            label: 'Getting started (/tutorials/getting-started)',
+          },
+          {
+            value: '/explanation/drupal-for-nuxt-developers',
+            label: 'Drupal for Nuxt developers (/explanation/drupal-for-nuxt-developers)',
+          },
         ],
         path.prefer({ backend: 'site' })
       ),
-      '/g'
+      '/explanation/drupal-for-nuxt-developers'
     )
+    assert.equal(path.prefer({ backend: 'umami' }), '/about-umami')
   })
 })
 
@@ -214,5 +258,95 @@ describe('pages', () => {
     assert.equal(m.knowsComponent('DruxtMenuItem'), true)
     assert.equal(m.knowsComponent('DruxtFieldImage'), true)
     assert.equal(m.knowsComponent('DruxtEntityMixin'), false)
+  })
+})
+
+describe("a reader's own Drupal", () => {
+  test('parseOrigin keeps an origin, adds https, and refuses what a https page cannot fetch', () => {
+    assert.deepEqual(m.parseOrigin('https://example.com/some/path'), {
+      origin: 'https://example.com',
+    })
+    assert.deepEqual(m.parseOrigin('example.com'), { origin: 'https://example.com' })
+    assert.deepEqual(m.parseOrigin('http://example.com', 'http:'), { origin: 'http://example.com' })
+    assert.match(m.parseOrigin('http://example.com').error, /https/)
+    assert.match(m.parseOrigin('not a url at all ://').error, /not a URL/)
+  })
+
+  test('customBackend talks to the origin directly, with no proxy', () => {
+    const b = m.customBackend('https://drupal.example')
+    assert.equal(b.api, 'https://drupal.example/jsonapi')
+    assert.equal(b.proxyRoot, 'https://drupal.example')
+    assert.equal(b.baseUrl, 'https://drupal.example')
+    assert.equal(b.label, 'drupal.example')
+  })
+
+  // A Drupal with JSON:API, blocks, menus and views, but neither Decoupled
+  // Router nor JSON:API Views, and menu items answering.
+  const drupal = (url) => {
+    const ok = (body) => ({ ok: true, status: 200, json: async () => body })
+    if (url === 'https://drupal.example/jsonapi')
+      return ok({
+        links: { 'node--article': {}, 'block--block': {}, 'menu--menu': {}, 'view--view': {} },
+      })
+    if (url.startsWith('https://drupal.example/router/translate-path')) return { status: 404 }
+    if (url.startsWith('https://drupal.example/jsonapi/menu/menu'))
+      return ok({ data: [{ attributes: { drupal_internal__id: 'footer' } }] })
+    if (url === 'https://drupal.example/jsonapi/menu_items/footer') return ok({ data: [] })
+    if (url.startsWith('https://drupal.example/jsonapi/view/view'))
+      return ok({
+        data: [{ attributes: { drupal_internal__id: 'content', display: { page_1: {} } } }],
+      })
+    if (url === 'https://drupal.example/jsonapi/views/content/page_1') return { status: 404 }
+    throw new Error('unexpected ' + url)
+  }
+
+  test('probeBackend asks for what the index cannot say, and names what each missing module costs', async () => {
+    const calls = []
+    globalThis.fetch = async (url) => {
+      calls.push(url)
+      return drupal(url)
+    }
+    try {
+      const { backend } = await m.probeBackend('https://drupal.example')
+      assert.deepEqual(backend.nodeBundles, ['article'])
+      assert.equal(backend.reasons.DruxtBlock, undefined)
+      assert.equal(backend.reasons.DruxtMenu, undefined)
+      assert.match(backend.reasons.DruxtRouter, /Decoupled Router/)
+      assert.match(backend.reasons.DruxtSite, /Decoupled Router/)
+      assert.match(backend.reasons.DruxtView, /JSON:API Views/)
+      assert.ok(calls.includes('https://drupal.example/jsonapi/menu_items/footer'))
+      assert.ok(calls.includes('https://drupal.example/jsonapi/views/content/page_1'))
+    } finally {
+      delete globalThis.fetch
+    }
+  })
+
+  test('probeBackend tells a refusing Drupal from a missing module', async () => {
+    globalThis.fetch = async (url) =>
+      url === 'https://drupal.example/jsonapi/menu_items/footer' ? { status: 403 } : drupal(url)
+    try {
+      const { backend } = await m.probeBackend('https://drupal.example')
+      assert.match(backend.reasons.DruxtMenu, /answers 403 for JSON:API Menu Items/)
+      assert.match(backend.reasons.DruxtView, /needs JSON:API Views/)
+    } finally {
+      delete globalThis.fetch
+    }
+  })
+
+  test('probeBackend tells CORS from a missing JSON:API', async () => {
+    globalThis.fetch = async () => {
+      throw new TypeError('Failed to fetch')
+    }
+    try {
+      await assert.rejects(m.probeBackend('https://drupal.example'), /allow this origin/)
+    } finally {
+      delete globalThis.fetch
+    }
+    globalThis.fetch = async () => ({ ok: false, status: 404, json: async () => ({}) })
+    try {
+      await assert.rejects(m.probeBackend('https://drupal.example'), /No JSON:API answered/)
+    } finally {
+      delete globalThis.fetch
+    }
   })
 })

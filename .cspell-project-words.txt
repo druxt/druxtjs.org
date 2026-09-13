@@ -1,5 +1,5 @@
-# Words this project uses that the standard dictionaries do not carry.
 # Add a term here rather than switching the check off for a file.
+# Words this project uses that the standard dictionaries do not carry.
 aarch
 automerge
 bmewburn
@@ -11,6 +11,7 @@ Codespaces
 commitlint
 corepack
 cweagans
+databaseless
 davidanson
 dbaeumer
 DDEV
@@ -26,6 +27,7 @@ druxt
 druxtjs
 esbenp
 fatalled
+Fqix
 freetype
 frontmatter
 getsockname

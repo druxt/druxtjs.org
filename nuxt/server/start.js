@@ -58,13 +58,15 @@ const main = async () => {
     const { readContent } = require('../lib/content-index')
     const { buildSitemap } = require('../lib/sitemap')
     const { buildLlmsTxt } = require('../lib/llms-txt')
+    const { buildLlmsFullTxt } = require('../lib/llms-full-txt')
     const docs = readContent(path.join(rootDir, 'content'))
     const siteOrigin = env.SITE_ORIGIN || 'https://druxtjs.org'
     fs.writeFileSync(path.join(rootDir, 'static', 'sitemap.xml'), buildSitemap(docs, { origin: siteOrigin }))
     fs.writeFileSync(path.join(rootDir, 'static', 'llms.txt'), buildLlmsTxt(docs, { origin: siteOrigin }))
-    log(`wrote sitemap.xml and llms.txt for ${docs.length} documents`)
+    fs.writeFileSync(path.join(rootDir, 'static', 'llms-full.txt'), buildLlmsFullTxt(docs, { origin: siteOrigin }))
+    log(`wrote sitemap.xml, llms.txt and llms-full.txt for ${docs.length} documents`)
   } catch (error) {
-    log(`sitemap.xml and llms.txt not written: ${error.message}`)
+    log(`sitemap.xml, llms.txt and llms-full.txt not written: ${error.message}`)
   }
 
   // The share cards, as `nuxt generate` writes them. A child process, because

@@ -276,9 +276,30 @@ function stop_webserver(string $port): void {
     }
   }
 
-  $targets = array_filter(array_unique($candidates), function (int $pid): bool {
+  // `start` runs `php -S host:port -t . .ht.router.php` with the working
+  // directory set to this checkout's web/, so the command line is identical
+  // across checkouts. The working directory is the one thing that says whose
+  // server a PID is: only signal servers whose cwd is this checkout's
+  // docroot, or a server another checkout started on the same port takes
+  // the TERM and the KILL for this one's restart.
+  $web_root = (string) realpath(__DIR__ . '/../web');
+  $targets = array_filter(array_unique($candidates), function (int $pid) use ($web_root): bool {
     $command = trim((string) @shell_exec(sprintf('ps -p %d -o command= 2>/dev/null', $pid)));
-    return $command !== '' && str_contains($command, 'php') && str_contains($command, '-S');
+    if ($command === '' || !str_contains($command, 'php') || !str_contains($command, '-S')) {
+      return FALSE;
+    }
+    // Linux answers from /proc; macOS needs lsof for the same fact.
+    $cwd = trim((string) @shell_exec(sprintf('readlink /proc/%d/cwd 2>/dev/null', $pid)));
+    if ($cwd === '') {
+      $lsof = (string) @shell_exec(sprintf('lsof -a -p %d -d cwd -Fn 2>/dev/null', $pid));
+      foreach (explode("\n", $lsof) as $line) {
+        if (str_starts_with($line, 'n/')) {
+          $cwd = substr($line, 1);
+          break;
+        }
+      }
+    }
+    return $cwd !== '' && (string) realpath($cwd) === $web_root;
   });
   if ($targets === []) {
     return;

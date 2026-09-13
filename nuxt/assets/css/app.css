@@ -18,6 +18,8 @@
    floor and it must beat any component library rule that lands after it. */
 a:focus-visible,
 button:focus-visible,
+select:focus-visible,
+input:focus-visible,
 [tabindex]:focus-visible,
 .btn:focus-visible,
 .menu :where(li) > *:focus-visible {

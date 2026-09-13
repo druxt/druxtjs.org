@@ -82,7 +82,11 @@ fetch() {
 
 # --- Vale --------------------------------------------------------------------
 
-if [ -x "$bin_dir/vale" ] && "$bin_dir/vale" --version 2>/dev/null | grep -q "$vale_version"; then
+# `vale --version` prints `vale version X.Y.Z`; an unanchored grep would
+# accept 3.17.10 when 3.17.1 is pinned, so the version is parsed out and
+# compared exactly.
+if [ -x "$bin_dir/vale" ] \
+  && [ "$("$bin_dir/vale" --version 2>/dev/null | awk 'NR == 1 { print $NF }')" = "$vale_version" ]; then
   echo "vale ${vale_version} already installed in ${bin_dir}"
 else
   archive="$work/vale.tar.gz"

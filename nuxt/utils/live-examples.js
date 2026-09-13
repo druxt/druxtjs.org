@@ -13,13 +13,14 @@
  * `proxyRoot`.
  */
 export const BACKENDS = {
-  site: { label: 'Druxtjs.org', api: '/jsonapi', baseUrl: null, proxyRoot: '', nodeBundle: 'doc_page' },
+  // Its Storybook is the environment's own, read from the runtime config.
+  site: { label: 'Druxtjs.org', api: '/jsonapi', baseUrl: null, proxyRoot: '', nodeBundles: ['doc_page'], storybookLabel: 'Druxtjs.org' },
   umami: {
     label: 'Umami demo',
     api: '/umami/jsonapi',
-    baseUrl: 'https://demo-api.druxtjs.org',
+    baseUrl: 'https://api.umami.demo.druxtjs.org',
     proxyRoot: '/umami',
-    nodeBundle: 'recipe',
+    nodeBundles: ['recipe', 'article', 'page'],
     storybook: 'https://storybook.umami.demo.druxtjs.org/',
     storybookLabel: 'Umami',
   },
@@ -29,6 +30,83 @@ const get = async (api, path) => {
   const response = await fetch(`${api}${path}`, { headers: { Accept: 'application/vnd.api+json' } })
   if (!response.ok) throw new Error(`${response.status} from ${path}`)
   return response.json()
+}
+
+/**
+ * A reader's own Drupal as a backend. The browser talks to it directly, so
+ * it must allow this origin (CORS); nothing here is proxied.
+ *
+ * @param {string} origin - The Drupal's origin, `https://example.com`.
+ * @returns {object} A backend like those in BACKENDS.
+ */
+export const customBackend = (origin) => ({
+  label: new URL(origin).host,
+  api: `${origin}/jsonapi`,
+  baseUrl: origin,
+  proxyRoot: origin,
+  custom: true,
+})
+
+/**
+ * The origin a reader typed, as one this card can use, or the reason it cannot.
+ *
+ * @param {string} input - What was typed.
+ * @param {string} [pageProtocol] - This page's protocol: an https page cannot fetch http.
+ * @returns {{ origin?: string, error?: string }} The origin, or the problem.
+ */
+export const parseOrigin = (input, pageProtocol = 'https:') => {
+  let url
+  try {
+    url = new URL(/^https?:\/\//.test(input.trim()) ? input.trim() : `https://${input.trim()}`)
+  } catch (e) {
+    return { error: 'That is not a URL.' }
+  }
+  if (pageProtocol === 'https:' && url.protocol !== 'https:') return { error: 'It must be https: this page is, and a browser will not mix the two.' }
+  return { origin: url.origin }
+}
+
+/**
+ * What a Drupal offers, by asking it. Each check names the component it
+ * unlocks; a failed one becomes that component's reason in the backend list.
+ *
+ * @param {string} origin - The Drupal's origin.
+ * @returns {Promise<{ backend: object, links: object }>} The backend, its per-component reasons filled in.
+ */
+export const probeBackend = async (origin) => {
+  const backend = customBackend(origin)
+  let index
+  try {
+    index = await get(backend.api, '')
+  } catch (e) {
+    throw new Error(e instanceof TypeError
+      ? `The browser could not reach ${backend.api}. If it is up, that Drupal has to allow this origin: enable CORS in its services.yml.`
+      : `No JSON:API answered at ${backend.api} (${e.message}).`)
+  }
+  const links = index.links || {}
+  const reasons = {}
+  // A module is there when its endpoint answers 2xx. A 404 means it is missing; anything else is that Drupal refusing.
+  const answers = async (url, what) => {
+    const status = await fetch(url, { headers: { Accept: 'application/vnd.api+json' } }).then((r) => r.status, () => 0)
+    if (status >= 200 && status < 300) return null
+    return status === 404 || status === 0 ? `needs ${what} on that Drupal` : `that Drupal answers ${status} for ${what}`
+  }
+  // The first of a collection, for a request that needs a real name.
+  const first = async (path) => (((await get(backend.api, path).catch(() => ({}))).data || [])[0] || {}).attributes || {}
+  // The router: one path resolved, whatever it answers with.
+  const router = await answers(`${origin}/router/translate-path?path=/`, 'Decoupled Router')
+  if (router) reasons.DruxtRouter = reasons.DruxtBreadcrumb = reasons.DruxtSite = router
+  // Menu items and views add nothing to the index; ask for one of each.
+  const menu = links['menu--menu'] ? (await first('/menu/menu?page%5Blimit%5D=1&fields%5Bmenu--menu%5D=drupal_internal__id')).drupal_internal__id : null
+  const menuReason = menu ? await answers(`${backend.api}/menu_items/${menu}`, 'JSON:API Menu Items') : 'needs JSON:API Menu Items on that Drupal'
+  if (menuReason) reasons.DruxtMenu = menuReason
+  const view = links['view--view'] ? await first('/view/view?page%5Blimit%5D=1&fields%5Bview--view%5D=drupal_internal__id,display') : {}
+  const display = Object.keys(view.display || {})[0]
+  const viewReason = display ? await answers(`${backend.api}/views/${view.drupal_internal__id}/${display}`, 'JSON:API Views') : 'needs JSON:API Views on that Drupal'
+  if (viewReason) reasons.DruxtView = viewReason
+  if (!links['block--block']) reasons.DruxtBlock = reasons.DruxtBlockRegion = 'exposes no blocks over JSON:API'
+  // The content types the router examples list: every node type it has.
+  const nodeBundles = Object.keys(links).map((k) => k.match(/^node--(.+)$/)).filter(Boolean).map((m) => m[1])
+  return { backend: { ...backend, nodeBundles: nodeBundles.length ? nodeBundles : undefined, reasons }, links }
 }
 
 const label = (o) => {
@@ -114,23 +192,22 @@ export const SOURCES = {
   },
 
   // The backend's languages, for the langcode prop. A monolingual site without
-  // the language module exposes none, and offers none.
+  // the language module has no such resource, which its index says, so it is
+  // not asked for one it would answer with a 404.
   languages: async (api) => {
-    try {
-      const { data } = await get(api, '/configurable_language/configurable_language?fields%5Bconfigurable_language--configurable_language%5D=drupal_internal__id,label,locked')
-      return data.filter((o) => !o.attributes.locked).map((o) => ({ value: o.attributes.drupal_internal__id, label: `${o.attributes.label} (${o.attributes.drupal_internal__id})` }))
-    } catch (e) {
-      return []
-    }
+    const { links = {} } = await get(api, '')
+    if (!links['configurable_language--configurable_language']) return []
+    const { data } = await get(api, '/configurable_language/configurable_language?fields%5Bconfigurable_language--configurable_language%5D=drupal_internal__id,label,locked')
+    return data.filter((o) => !o.attributes.locked).map((o) => ({ value: o.attributes.drupal_internal__id, label: `${o.attributes.label} (${o.attributes.drupal_internal__id})` }))
   },
 
-  // Paths the router can resolve: this backend's content, by title.
+  // Paths the router can resolve: this backend's content, by title, a group per content type.
   paths: async (api, deps, backend) => {
-    const bundle = (backend || {}).nodeBundle || 'page'
-    const { data } = await get(api, `/node/${bundle}?page%5Blimit%5D=50&sort=title&fields%5Bnode--${bundle}%5D=title,path`)
-    return data
+    const bundles = (backend || {}).nodeBundles || ['page']
+    const lists = await Promise.all(bundles.map((bundle) => get(api, `/node/${bundle}?page%5Blimit%5D=50&sort=title&fields%5Bnode--${bundle}%5D=title,path`).catch(() => ({ data: [] }))))
+    return lists.flatMap(({ data }, i) => data
       .filter((o) => (o.attributes.path || {}).alias)
-      .map((o) => ({ value: o.attributes.path.alias, label: `${o.attributes.title} (${o.attributes.path.alias})` }))
+      .map((o) => ({ value: o.attributes.path.alias, label: `${o.attributes.title} (${o.attributes.path.alias})`, ...(bundles.length > 1 ? { group: bundles[i] } : {}) })))
   },
 
   displays: async (api, { viewId }) => {
@@ -185,7 +262,8 @@ export const COMPONENTS = {
       steps: [
         { name: 'theme', source: 'themes', required: true, prefer: siteTheme },
         // The header on both: a banner region's blocks show only on their own pages.
-        { name: 'name', source: 'regions', needs: ['theme'], prefer: 'header' },
+        // The content region: the header would show the very block the block example does.
+        { name: 'name', source: 'regions', needs: ['theme'], prefer: 'content' },
       ],
     },
     props: [],
@@ -271,7 +349,8 @@ export const COMPONENTS = {
     story: 'druxt-router-druxtrouter--default',
     args: [],
     props: [
-      { name: 'path', type: 'string', control: 'select', source: 'paths', required: true, prefer: perBackend(/getting-started/, /deep-mediterranean-quiche/), description: 'The path to resolve; the current route when unset.' },
+      // A short page: the card shows the router resolving a path, not a long read.
+      { name: 'path', type: 'string', control: 'select', source: 'paths', required: true, prefer: perBackend('/explanation/drupal-for-nuxt-developers', '/about-umami'), description: 'The path to resolve; the current route when unset.' },
     ],
   },
 

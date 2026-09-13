@@ -28,6 +28,9 @@ export const apiSourceUrl = (dir, slug) => {
     return `${REPO}/blob/${BRANCH}/packages/${pkg}/CHANGELOG.md`
   }
 
+  // The components directory's own index page has no file of its own; the
+  // other buckets keep an index.js.
+  if (slug === 'index' && tail[0] === 'components') return `${REPO}/tree/${BRANCH}/packages/${pkg}/src/${tail.join('/')}`
   const extension = tail[0] === 'components' ? '.vue' : '.js'
   const file = [...tail, slug].join('/') + extension
   return `${REPO}/blob/${BRANCH}/packages/${pkg}/src/${file}`

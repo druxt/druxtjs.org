@@ -201,7 +201,15 @@ const docTypeExpression = () => {
  * llms.txt all the same, in the shape readContent() gives a document.
  */
 const PAGES = [
-  { route: '/playground', title: 'Live component playground', description: PLAYGROUND_DESCRIPTION, weight: 0, section: 'playground' },
+  {
+    route: '/playground',
+    title: 'Live component playground',
+    description: PLAYGROUND_DESCRIPTION,
+    weight: 0,
+    section: 'playground',
+    // What site search matches besides the title: the components it renders.
+    keywords: ['DruxtBlock', 'DruxtBlockRegion', 'DruxtBreadcrumb', 'DruxtEntity', 'DruxtEntityForm', 'DruxtMenu', 'DruxtRouter', 'DruxtSite', 'DruxtView'],
+  },
 ]
 
 module.exports = {

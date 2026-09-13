@@ -19,6 +19,10 @@ describe('numberRange', () => {
     assert.equal(range[0], -14)
     assert.equal(range[range.length - 1], 10)
   })
+  test('refuses a span too broad to pick from', () => {
+    assert.equal(w.numberRange({ settings: {} }, 1000000), null)
+    assert.equal(w.numberRange({ settings: { config: { min: 0, max: 1000000 } } }, 0), null)
+  })
 })
 
 describe('allowedOptions', () => {
@@ -44,6 +48,24 @@ describe('references', () => {
   test('lists the resource types a reference can point at', () => {
     assert.deepEqual(w.referenceTypes(schema), ['taxonomy_term--tags', 'taxonomy_term--section'])
     assert.deepEqual(w.referenceTypes({}), [])
+  })
+  test('reads null or absent target_bundles as unrestricted, an empty map as none', () => {
+    const withType = (handlerSettings) => ({
+      settings: {
+        storage: { target_type: 'taxonomy_term' },
+        config: { handler_settings: handlerSettings },
+      },
+    })
+    assert.equal(w.unrestrictedReference(withType({ target_bundles: null })), true)
+    assert.equal(w.unrestrictedReference(withType({})), true)
+    assert.equal(w.unrestrictedReference(schema), false)
+    assert.equal(w.unrestrictedReference(withType({ target_bundles: {} })), false)
+    assert.equal(
+      w.unrestrictedReference({
+        settings: { config: { handler_settings: { target_bundles: null } } },
+      }),
+      false
+    )
   })
   test('reads the referenced id from relationship data, an item, or a bare id', () => {
     assert.equal(w.referenceId({ data: { type: 'user--user', id: 'u1' } }), 'u1')

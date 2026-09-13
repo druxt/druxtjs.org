@@ -121,9 +121,13 @@ lint:commit:
   extends: .node-lint
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  variables:
+    # The range is origin/<target>..HEAD; a shallow target makes the fork
+    # point look like a root and pulls shared ancestors into the range.
+    GIT_DEPTH: 0
   script:
     - section_start "commitlint" "Validating commit messages"
-    - git fetch --depth 50 origin "+refs/heads/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}:refs/remotes/origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
+    - git fetch origin "+refs/heads/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}:refs/remotes/origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
     - npm run lint:commit -- --from "origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" --to HEAD --verbose
     - section_end "commitlint"
 
@@ -245,10 +249,14 @@ secret-detection:
       printf 'a = "%s"\nb = "%s"\nc = "%s"\n' "$pat" "$stripe" "$slack" > "$canary/canary.txt"
       ./gitleaks detect --no-git --source "$canary" --no-banner --redact \
         --report-format json --report-path "$canary/report.json" || true
+      # Each planted value must be named exactly once: an aggregate count
+      # alone would pass a report that found one canary twice and one not
+      # at all.
       found=$(grep -c '"RuleID"' "$canary/report.json" || true)
+      distinct=$(grep -o '"RuleID": *"[^"]*"' "$canary/report.json" | sort -u | wc -l)
       rm -rf "$canary"
-      if [ "$found" != "3" ]; then
-        echo "The canary planted 3 credentials and gitleaks reported $found."
+      if [ "$found" != "3" ] || [ "$distinct" != "3" ]; then
+        echo "The canary planted 3 credentials and gitleaks reported $found findings for $distinct rules."
         echo "The scan above proves nothing while this is true."
         exit 1
       fi
@@ -326,7 +334,10 @@ test:validate-guardrails:
     - apk add --no-cache git unzip sqlite-dev libpng-dev libjpeg-turbo-dev libwebp-dev freetype-dev $PHPIZE_DEPS
     - docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype
     - docker-php-ext-install pdo_sqlite gd
-    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - curl -fsSLo composer-setup.php https://getcomposer.org/installer
+    - curl -fsSLo composer-setup.sig https://composer.github.io/installer.sig
+    - php -r 'if (hash_file("sha384", "composer-setup.php") !== trim(file_get_contents("composer-setup.sig"))) { fwrite(STDERR, "The Composer installer does not match its signature.\n"); exit(1); }'
+    - php composer-setup.php --install-dir=/usr/local/bin --filename=composer && rm composer-setup.php composer-setup.sig
     - section_end "toolchain"
 
 test:phpunit:

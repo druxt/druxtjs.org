@@ -30,13 +30,13 @@ three ways.
 
 ### Dev container
 
-[![Open in DevPod!](https://devpod.sh/assets/open-in-devpod.svg)](https://devpod.sh/open#https://github.com/druxt/cms.druxtjs.org)
+[![Open in DevPod!](https://devpod.sh/assets/open-in-devpod.svg)](https://devpod.sh/open#https://github.com/druxt/druxtjs.org)
 
-| Tool                        | How                                                                          |
-| --------------------------- | ---------------------------------------------------------------------------- |
-| VS Code                     | Clone the repository, open it, then choose **Reopen in Container**           |
-| GitHub Codespaces           | On the repository page, open **Code** and choose **Codespaces**              |
-| [DevPod](https://devpod.sh) | Click the badge, or run `devpod up https://github.com/druxt/cms.druxtjs.org` |
+| Tool                        | How                                                                      |
+| --------------------------- | ------------------------------------------------------------------------ |
+| VS Code                     | Clone the repository, open it, then choose **Reopen in Container**       |
+| GitHub Codespaces           | On the repository page, open **Code** and choose **Codespaces**          |
+| [DevPod](https://devpod.sh) | Click the badge, or run `devpod up https://github.com/druxt/druxtjs.org` |
 
 The container has Node 16.20.1, PHP 8.4, Composer and mise. Creating it runs
 `npm install` and `npm run setup`, so Drupal is running when it opens. Then run
@@ -93,17 +93,21 @@ documentation on GitHub.
 **Preview**, on the edit form, shows unsaved changes.
 [docs/backend.md](docs/backend.md#previewing-a-page) explains its tabs.
 
+An edit made here is local to this machine's database: it previews and tests
+the site, and is not how page text is published. See
+[Where changes go](#where-changes-go) for what belongs where.
+
 The Modules, API reference and Components pages come from the druxt.js
 packages. `npm run docs:generate` builds them locally, in the pinned druxt.js
 checkout. It installs and builds druxt.js first, so the first run is slow.
 
 ### Where changes go
 
-| Change                                               | Where it goes                                                                                                      |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| The content model, the editor or the site's settings | Export them with `vendor/bin/drush config:export` in `drupal/`, and commit `drupal/config/sync/` in a pull request |
-| The frontend                                         | A pull request with the change in `nuxt/`                                                                          |
-| The text of a page                                   | A pull request to [druxt/druxt.js](https://github.com/druxt/druxt.js), where the documentation is still written    |
+| Change                                               | Where it goes                                                                                                          |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| The content model, the editor or the site's settings | Export them with `vendor/bin/drush config:export` in `drupal/`, and commit `drupal/config/sync/` in a pull request     |
+| The frontend                                         | A pull request with the change in `nuxt/`                                                                              |
+| The text of a page                                   | Drupal, where editors change it. The database is the source of truth, and page text is not taken as a pull request yet |
 
 The site's content is stored in its database, and `npm run setup` seeds that
 database from a pinned commit of druxt.js. Edits in your local Drupal stay
@@ -121,6 +125,7 @@ local.
 | Layout                     | druxt-layout-paragraphs renders the page's layout sections.                                                                                                                                                                                                                                                                        |
 | Header, sidebar and footer | druxt-blocks renders the blocks placed in the `druxtjs` theme's regions in Drupal. The theme and the site's name and logo come from the `druxtjs_org` consumer's decoupled settings, read at build by `nuxt/modules/decoupled-settings`.                                                                                           |
 | UI                         | `nuxt/components/dui/` holds presentational components with no Drupal dependency: code blocks, diagrams, rich text and columns. They will move to the shared Druxt UI library.                                                                                                                                                     |
+| Playground                 | `nuxt/components/global/DruxtExample.vue` renders any Druxt component under a runtime of its own for the chosen backend (`nuxt/utils/druxt-runtime.js`), with what it knows about each component in `nuxt/utils/live-examples.js`. The same card sits on the module and component reference pages.                                 |
 
 To change how something looks, find the wrapper name Druxt looked for (the Vue devtools show it), and add a component at the matching path under `nuxt/components/druxt/`. [Component resolution](https://druxtjs.org/explanation/component-resolution) explains the naming.
 
@@ -137,19 +142,20 @@ covers what a deployment does.
 | ------------------------ | ----------------------------------------------------- |
 | `npm run setup`          | Install and import the backend, then start it         |
 | `npm run dev`            | Nuxt dev server against the backend                   |
+| `npm run storybook`      | Storybook on port 3030, against the backend           |
 | `npm run start` / `stop` | Start or stop Drupal                                  |
 | `npm run info`           | Where Drupal is, and the versions it runs             |
 | `npm run login`          | One-time login link for Drupal                        |
 | `npm run docs:generate`  | Build the Modules, API reference and Components pages |
 | `npm run lint`           | Every linter except prose                             |
 | `npm run lint:prose`     | Vale, after `npm run lint:prose:install` once         |
-| `npm test`               | Node tests for the importer's scripts                 |
+| `npm test`               | Node tests for the scripts and the frontend's modules |
 
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for commit messages, checks and what
 never goes in a file. Open issues and pull requests on
-[druxt/cms.druxtjs.org](https://github.com/druxt/cms.druxtjs.org).
+[druxt/druxtjs.org](https://github.com/druxt/druxtjs.org).
 [docs/backend.md](docs/backend.md) covers the importer and page history.
 
 ## License

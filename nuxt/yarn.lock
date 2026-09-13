@@ -10861,7 +10861,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"druxt-blocks@npm:^0.17.1, druxt-blocks@npm:^0.17.3":
+"druxt-blocks@npm:0.17.3, druxt-blocks@npm:^0.17.1, druxt-blocks@npm:^0.17.3":
   version: 0.17.3
   resolution: "druxt-blocks@npm:0.17.3"
   dependencies:
@@ -10995,7 +10995,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"druxt-schema@npm:^0.11.2, druxt-schema@npm:^0.11.3":
+"druxt-schema@npm:0.11.3, druxt-schema@npm:^0.11.2, druxt-schema@npm:^0.11.3":
   version: 0.11.3
   resolution: "druxt-schema@npm:0.11.3"
   dependencies:
@@ -11177,11 +11177,13 @@ __metadata:
     daisyui: 1.25.4
     drupal-jsonapi-params: 2.3.2
     druxt: 0.24.0
+    druxt-blocks: 0.17.3
     druxt-breadcrumb: 0.17.2
     druxt-entity: 0.28.1
     druxt-layout-paragraphs: 0.4.1
     druxt-menu: 0.21.0
     druxt-router: 0.31.0
+    druxt-schema: 0.11.3
     druxt-site: 0.14.3
     druxt-views: 0.22.2
     github-slugger: 1.5.0
@@ -23377,9 +23379,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^7.3.1, ws@npm:^7.4.3":
-  version: 7.5.9
-  resolution: "ws@npm:7.5.9"
+"ws@npm:7.5.11":
+  version: 7.5.11
+  resolution: "ws@npm:7.5.11"
   peerDependencies:
     bufferutil: ^4.0.1
     utf-8-validate: ^5.0.2
@@ -23388,7 +23390,7 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: c3c100a181b731f40b7f2fddf004aa023f79d64f489706a28bc23ff88e87f6a64b3c6651fbec3a84a53960b75159574d7a7385709847a62ddb7ad6af76f49138
+  checksum: 3f32457a6019e6875cc0c2a037d4b4789da22a55b7be278e78845ec7614d28eaab9b36994cfdf9a18a48fe02f11c496168354b96b6ce202f65fe414cdf96f08c
   languageName: node
   linkType: hard
 

@@ -15,8 +15,6 @@
     </section>
 
     <AppApiIndex v-if="pkg" :pkg="pkg" class="mt-12" />
-
-    <AppDocFooter :edit-path="editPath" />
   </div>
 </template>
 
@@ -77,8 +75,6 @@ export default {
   },
 
   computed: {
-    editPath: ({ slug }) => 'modules/' + slug + '.md',
-
     /** Whether the layout header above already names this page. */
     inModuleHeader: ({ $route }) => isPackageRoot($route.path),
 

@@ -15,10 +15,13 @@
       </a>
     </AppPageHeader>
 
-    <!-- A component's page opens with the component itself, live. -->
-    <DruxtExample v-if="example" :component="example" />
-
     <AppProse :document="document" />
+
+    <!-- A component's page ends with the component itself, live. -->
+    <section v-if="example" class="mt-12">
+      <h2 id="try-it" class="text-xl font-semibold">Try it</h2>
+      <DruxtExample :component="example" />
+    </section>
   </article>
 </template>
 
@@ -46,7 +49,9 @@ export default {
     }
 
     store.commit('addRecent', { text: document.title, to: route.path })
-    store.commit('setToc', document.toc || [])
+    // The document's own headings, then the live card this page adds.
+    const isComponent = /\/components$/.test(document.dir || '') && knowsComponent(document.slug)
+    store.commit('setToc', [...(document.toc || []), ...(isComponent ? [{ id: 'try-it', depth: 2, text: 'Try it' }] : [])])
 
     return { document }
   },

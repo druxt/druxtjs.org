@@ -79,6 +79,10 @@ for (const page of all) {
 }
 
 const checked = all.filter((page) => !page.path.startsWith('/modules')).length
+if (!checked) {
+  console.log('FAIL no pages were checked')
+  process.exit(1)
+}
 console.log(`${checked - failures.length}/${checked} pages render`)
 for (const failure of failures) console.log(`FAIL ${failure}`)
 process.exit(failures.length ? 1 : 0)

@@ -18,7 +18,7 @@
       <!-- The version links to its release notes, the generated page from the package's changelog. -->
       <NuxtLink
         v-if="version"
-        class="badge badge-sm badge-outline hidden sm:inline-flex hover:border-primary hover:text-primary-focus"
+        class="badge badge-sm badge-outline min-h-[24px] hidden sm:inline-flex hover:border-primary hover:text-primary-focus"
         to="/api/packages/druxt/CHANGELOG"
         :title="'Druxt ' + version + ' release notes'"
       >{{ version }}</NuxtLink>

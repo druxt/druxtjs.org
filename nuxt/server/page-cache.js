@@ -7,6 +7,7 @@
  * renders behind it. A page that is not stored yet renders live, and is
  * stored once it has answered 200.
  */
+const { redirectFor } = require('./redirects')
 const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')
@@ -32,6 +33,16 @@ const ENCODINGS = [
   },
   { suffix: '.gz', encoding: 'gzip', compress: (html) => zlib.gzipSync(html, { level: 9 }) },
 ]
+
+/** Whether an Accept-Encoding header allows an encoding: named, with a quality above zero. */
+const accepts = (accept, encoding) =>
+  String(accept || '')
+    .split(',')
+    .some((part) => {
+      const [name, ...params] = part.split(';').map((s) => s.trim())
+      const q = params.find((param) => param.startsWith('q='))
+      return name === encoding && (!q || Number(q.slice(2)) > 0)
+    })
 
 /**
  * Whether a request asks for a page rather than an asset or an API.
@@ -78,7 +89,7 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
   const read = async (pathname, accept = '') => {
     const file = fileFor(pathname)
     if (!file) return null
-    const choices = [...ENCODINGS.filter((e) => accept.includes(e.encoding)), { suffix: '', encoding: null }]
+    const choices = [...ENCODINGS.filter((e) => accepts(accept, e.encoding)), { suffix: '', encoding: null }]
     for (const { suffix, encoding } of choices) {
       try {
         const [body, stats] = await Promise.all([fs.promises.readFile(file + suffix), fs.promises.stat(file + suffix)])
@@ -182,6 +193,12 @@ const createHandler =
       return res.end('Bad Request')
     }
     const { pathname, search } = url
+    // An old URL, or a package subdomain: sent on before anything is served.
+    const elsewhere = redirectFor(req.headers.host, pathname, search)
+    if (elsewhere) {
+      res.writeHead(301, { Location: elsewhere })
+      return res.end()
+    }
     if (!isPage(req.method, pathname)) return live(req, res)
 
     // Canonical page URLs carry no trailing slash.
@@ -189,7 +206,9 @@ const createHandler =
       res.writeHead(301, { Location: `/${pathname.replace(/^\/+|\/+$/g, '')}${search}` })
       return res.end()
     }
-    if (!cache || search) return live(req, res)
+    // Only `live=1` renders past the store: any other query string, a campaign
+    // tag say, is the same page and gets the stored copy.
+    if (!cache || /(^\?|&)live=1(&|$)/.test(search)) return live(req, res)
 
     const page = await cache.read(pathname, String(req.headers['accept-encoding'] || ''))
     if (!page) {

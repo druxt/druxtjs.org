@@ -67,7 +67,7 @@ function main() {
   const tome = loadTome(dirs.content)
   checkIndex(tome)
   const pages = checkPages(baseline, tome, tracked)
-  checkSections(baseline, tome, pages)
+  checkSections(baseline, ir, tome, pages)
   checkFrontmatter(pages)
   checkBlocks(baseline, ir, tome, pages)
   checkImages(baseline, ir, tome, pages)
@@ -179,7 +179,8 @@ function checkPages(baseline, tome, tracked) {
   return pages
 }
 
-function checkSections(baseline, tome, pages) {
+function checkSections(baseline, ir, tome, pages) {
+  const sectionBySource = new Map(ir.map((doc) => [doc.source, doc.section]))
   const terms = tome.byType.taxonomy_term.filter(
     (term) => target(term.vid) === 'documentation_section'
   )
@@ -195,7 +196,13 @@ function checkSections(baseline, tome, pages) {
   for (const page of pages) {
     const slug = slugByUuid.get(targetUuid(page.node.field_section))
     if (!slug) details.push(`${page.source}: no section term`)
-    else counts[slug] = (counts[slug] ?? 0) + 1
+    else {
+      counts[slug] = (counts[slug] ?? 0) + 1
+      if (sectionBySource.get(page.source) !== slug)
+        details.push(
+          `${page.source}: in ${slug}, the source says ${sectionBySource.get(page.source)}`
+        )
+    }
   }
   for (const [slug, expected] of Object.entries(baseline.bySection)) {
     if ((counts[slug] ?? 0) !== expected)
@@ -236,8 +243,11 @@ function checkFrontmatter(pages) {
           `${page.source}: ${key} ${JSON.stringify(stored[key])} != ${JSON.stringify(fm[key])}`
         )
     }
-    if ('weight' in fm && Number(stored.weight) !== Number(fm.weight)) {
-      details.push(`${page.source}: weight ${stored.weight} != ${fm.weight}`)
+    const weight = 'weight' in fm ? Number(fm.weight) : null
+    const storedWeight =
+      stored.weight === undefined || stored.weight === null ? null : Number(stored.weight)
+    if (storedWeight !== weight) {
+      details.push(`${page.source}: weight ${storedWeight} != ${weight}`)
     }
   }
   const withWeight = pages.filter(
@@ -388,6 +398,16 @@ function checkImages(baseline, ir, tome, pages) {
         )
       if (path.basename(relative) !== path.basename(want.src))
         details.push(`${page.source} image ${i + 1}: ${relative} for ${want.src}`)
+      const exported = path.join(dirs.files, relative)
+      const canonical = path.join(dirs.ir, 'static', want.src)
+      if (
+        existsSync(exported) &&
+        existsSync(canonical) &&
+        !readFileSync(exported).equals(readFileSync(canonical))
+      )
+        details.push(
+          `${page.source} image ${i + 1}: ${relative} differs from the source image ${want.src}`
+        )
     })
   }
   const expectedParagraphs = baseline.blockKinds.image ?? 0

@@ -13,12 +13,21 @@
         <p class="mt-3 text-sm text-base-content/70 max-w-xs">
           The fully decoupled Drupal framework, for Nuxt.
         </p>
-        <p v-if="version" class="mt-3">
+        <p v-if="version || $config.storybookUrl" class="mt-3">
           <NuxtLink
-            class="badge badge-sm badge-outline hover:border-primary hover:text-primary-focus"
+            v-if="version"
+            class="badge badge-sm badge-outline min-h-[24px] hover:border-primary hover:text-primary-focus"
             to="/api/packages/druxt/CHANGELOG"
             :title="'Druxt ' + version + ' release notes'"
           >{{ version }}</NuxtLink>
+          <a
+            v-if="$config.storybookUrl"
+            class="badge badge-sm badge-outline min-h-[24px] hover:border-primary hover:text-primary-focus"
+            :class="{ 'ml-2': version }"
+            :href="$config.storybookUrl"
+            target="_blank"
+            rel="noopener"
+          >Storybook</a>
         </p>
       </div>
 

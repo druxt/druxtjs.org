@@ -7,12 +7,12 @@ configuration.
 
 ## Repositories
 
-| Change                                                                                            | Where it goes                                                                                                                                         |
-| ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The text of a documentation page                                                                  | [druxt/druxt.js](https://github.com/druxt/druxt.js), where the pages are written. This site seeds its content from a pinned commit of that repository |
-| A Druxt Nuxt module                                                                               | [druxt/druxt.js](https://github.com/druxt/druxt.js)                                                                                                   |
-| The Druxt Drupal module                                                                           | [drupal.org/project/druxt](https://www.drupal.org/project/druxt)                                                                                      |
-| The frontend, the content model, the importer, the editing experience or the site's configuration | This repository. Open an issue or a pull request on [druxt/cms.druxtjs.org](https://github.com/druxt/cms.druxtjs.org)                                 |
+| Change                                                                                            | Where it goes                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The text of a documentation page                                                                  | Drupal, where editors change it. The database is the source of truth, and page text is not taken as a pull request yet, so report a mistake as an issue here |
+| A Druxt Nuxt module                                                                               | [druxt/druxt.js](https://github.com/druxt/druxt.js)                                                                                                          |
+| The Druxt Drupal module                                                                           | [drupal.org/project/druxt](https://www.drupal.org/project/druxt)                                                                                             |
+| The frontend, the content model, the importer, the editing experience or the site's configuration | This repository. Open an issue or a pull request on [druxt/druxtjs.org](https://github.com/druxt/druxtjs.org)                                                |
 
 ## Getting set up
 
@@ -60,6 +60,16 @@ A change made through the admin UI stays in the database until you export it.
 Run `vendor/bin/drush config:export` in `drupal/`, and commit
 `drupal/config/sync/` with the change that needed it.
 
+## Releases
+
+The site is versioned by [Semantic Versioning](https://semver.org/), and
+`CHANGELOG.md` records every version. Releases before 1.0.0 count up toward
+the launch of Druxt 1.0.0, which the site will celebrate as its own 1.0.0.
+
+A release dates the changelog's Unreleased section, bumps the `version` in
+both `package.json` files, and tags the commit `v` followed by the number, for
+example `v0.9.0`.
+
 ## What not to put in a file
 
 This repository is public. Nothing that resolves only on a private network may
@@ -68,5 +78,5 @@ description. `npm run lint:private` checks this and runs in the pipeline. To
 cite something internal, describe it without the URL. A public equivalent,
 such as a drupal.org issue, can be linked instead.
 
-No commit, pull request description or file may credit an AI tool as an author
-or co-author. `npm run lint:attribution` checks this.
+No commit, pull request or merge request description, or file may credit an
+AI tool as an author or co-author. `npm run lint:attribution` checks this.

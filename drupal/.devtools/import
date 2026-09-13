@@ -225,13 +225,13 @@ if (!preg_match('/(-?\d+)\s*$/', $unaccounted, $matches)) {
 }
 $unaccounted = (int) $matches[1];
 if ($unaccounted > 0 && !$force) {
-  FAIL('The site holds %d documentation page(s) this run did not create. Seeding over them would overwrite whoever wrote them. Roll the migrations back, or pass --force to overwrite deliberately.', $unaccounted);
+  FAIL('The site holds %d documentation page(s) this run did not create. The import does not touch them, but the site would never again match the corpus exactly. Roll the migrations back, or pass --force to continue with them in place.', $unaccounted);
 }
 if ($unaccounted > 0) {
-  NOTE('Overwriting %d documentation page(s) this run did not create, because --force was given.', $unaccounted);
+  NOTE('The site holds %d documentation page(s) this run did not create. Continuing because --force was given; the import leaves them untouched.', $unaccounted);
 }
 else {
-  PASS('Nothing to overwrite.');
+  PASS('Nothing unaccounted for.');
 }
 
 TASK('Pointing the migrations at %s.', $ir_dir);
@@ -296,8 +296,11 @@ if (!preg_match('/(\d+)\s*$/', trim($counted), $matches)) {
   FAIL('Could not read a page count from drush. It answered: %s', trim($counted));
 }
 $imported = (int) $matches[1];
-if ($imported !== count($documents)) {
-  FAIL('The source produced %d documents and the site holds %d documentation pages. The import did not write what it read.', count($documents), $imported);
+// Pages that predate the run and were forced past are still on the site,
+// and the import does not touch them, so they belong in the expected total.
+$expected = count($documents) + $unaccounted;
+if ($imported !== $expected) {
+  FAIL('The source produced %d documents and the site holds %d documentation pages (%d of them predating this run). The import did not write what it read.', count($documents), $imported, $unaccounted);
 }
 PASS('%d documentation pages.', $imported);
 
