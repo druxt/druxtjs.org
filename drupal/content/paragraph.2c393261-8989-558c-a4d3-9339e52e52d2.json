@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "2c393261-8989-558c-a4d3-9339e52e52d2"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Deprecated in:** `druxt-entity:0.5.0`\n**Removed in:** `druxt-entity:2.0.0`\n\n`options` was an early mechanism for configuring field slots, replaced by the\n[component suggestion system](\/explanation\/component-resolution) in `0.5.0`.\nNothing in the module reads it any more, so passing it has no effect. Name a\nwrapper component instead of configuring options.\n\n## Internal mixins",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Deprecated in:<\/strong> <code>druxt-entity:0.5.0<\/code>\n<strong>Removed in:<\/strong> <code>druxt-entity:2.0.0<\/code><\/p>\n<p><code>options<\/code> was an early mechanism for configuring field slots, replaced by the\n<a href=\"\/explanation\/component-resolution\">component suggestion system<\/a> in <code>0.5.0<\/code>.\nNothing in the module reads it any more, so passing it has no effect. Name a\nwrapper component instead of configuring options.<\/p>\n<h2>Internal mixins<\/h2>\n"
+        }
+    ]
+}

@@ -1,0 +1,48 @@
+# Composer-managed. Rebuilt by .devtools/assemble.
+/drupal/vendor/
+/drupal/web/core/
+/drupal/web/modules/contrib/
+/drupal/web/profiles/contrib/
+/drupal/web/themes/contrib/
+/drupal/web/libraries/
+/drupal/drush/Commands/contrib/
+
+# Scaffolded by drupal/core-composer-scaffold.
+/drupal/web/*.php
+/drupal/web/*.txt
+/drupal/web/robots.txt
+/drupal/web/.htaccess
+/drupal/web/.ht.router.php
+/drupal/web/sites/default/default.services.yml
+/drupal/web/sites/default/default.settings.php
+
+# Site-local, written by .devtools/provision. Never committed.
+/drupal/web/sites/default/settings.php
+/drupal/web/sites/default/settings.local.php
+/drupal/web/sites/default/services.yml
+/drupal/web/sites/default/files/
+/drupal/keys/
+
+# Node tooling.
+node_modules/
+
+# Editors and platforms.
+.DS_Store
+*.log
+
+# PHPUnit.
+/drupal/.phpunit.cache/
+
+# Written by .devtools. Never committed.
+/.env
+/.docs-source/
+/.docs-ir/
+
+# Vale and its styles, installed by .gitlab/scripts/install-vale.sh.
+/.vale/
+
+# The npm cache the pipeline keeps between jobs.
+/.npm/
+
+# Test reports written by npm run test:coverage.
+/reports/

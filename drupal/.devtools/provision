@@ -1,0 +1,155 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * @file
+ * Provision the site against a throwaway SQLite database.
+ *
+ * The install path depends on what the checkout actually carries, because
+ * this project is built in stages and each stage has to be provisionable:
+ *
+ *   config only        drush site:install --existing-config
+ *   neither            drush site:install minimal
+ *
+ * Reading the checkout rather than assuming the finished shape is what
+ * keeps `provision` working on the commit that adds the content model and
+ * on every commit before it.
+ *
+ * Content is never installed here. It lives in the site's database rather
+ * than in the repository, so a provisioned site starts empty and
+ * `.devtools/import` seeds it. That is also what lets the import job assert
+ * something: from an empty site, an importer that writes nothing leaves a
+ * page count of zero instead of hiding behind content the install loaded.
+ *
+ * The SQLite override lives in `web/sites/default/settings.local.php`
+ * (gitignored), not `settings.php`. Only `default.settings.php` is
+ * committed, so this rewrites `settings.php` from it on every run and
+ * enables its already-present but commented-out `settings.local.php`
+ * include. The installer leaves `settings.php` alone as long as the
+ * included file also carries a hash salt: without one it appends its own
+ * database block after the include, and that block would win over every
+ * later `DB_FILE`.
+ */
+
+declare(strict_types=1);
+
+namespace DocsDevTools;
+
+require_once __DIR__ . '/helpers.php';
+
+// -----------------------------------------------------------------------------
+// Variables.
+// -----------------------------------------------------------------------------
+
+$db_file = resolve_env_value('DB_FILE', '/tmp/cms-druxtjs-org-drupal.sqlite')[0];
+$site_name = resolve_env_value('SITE_NAME', 'DruxtJS documentation')[0];
+
+// -----------------------------------------------------------------------------
+
+echo '===============================' . PHP_EOL;
+echo '         🚀 PROVISION          ' . PHP_EOL;
+echo '===============================' . PHP_EOL;
+echo PHP_EOL;
+
+TASK('Preparing web/sites/default/settings.php.');
+$settings_php = 'web/sites/default/settings.php';
+// The installer makes both read-only once it has run.
+chmod('web/sites/default', 0755);
+if (file_exists($settings_php)) {
+  chmod($settings_php, 0644);
+}
+$settings_contents = (string) file_get_contents('web/sites/default/default.settings.php');
+$commented_include = "#\n# if (file_exists(\$app_root . '/' . \$site_path . '/settings.local.php')) {\n#   include \$app_root . '/' . \$site_path . '/settings.local.php';\n# }\n";
+$active_include = "\nif (file_exists(\$app_root . '/' . \$site_path . '/settings.local.php')) {\n  include \$app_root . '/' . \$site_path . '/settings.local.php';\n}\n";
+if (!str_contains($settings_contents, $commented_include)) {
+  FAIL('Could not find the expected settings.local.php include block in default.settings.php. The file may have changed shape - update this script\'s anchor rather than skipping the patch.');
+}
+file_put_contents($settings_php, str_replace($commented_include, $active_include, $settings_contents));
+PASS('settings.php includes settings.local.php.');
+
+TASK('Configuring the SQLite database at %s.', $db_file);
+if (file_exists($db_file)) {
+  unlink($db_file);
+}
+// var_export() so a path containing quotes stays valid PHP.
+$db_file_php = var_export($db_file, TRUE);
+// A throwaway site needs no secret salt, only a present one.
+$hash_salt_php = var_export(hash('sha256', $db_file), TRUE);
+file_put_contents('web/sites/default/settings.local.php', sprintf(
+  "<?php\n\n/**\n * @file\n * Provision-only override, written fresh each run by .devtools/provision.\n * Gitignored - never committed.\n */\n\n\$databases['default']['default'] = [\n  'driver' => 'sqlite',\n  'database' => %s,\n];\n\n\$settings['hash_salt'] = %s;\n\$settings['config_sync_directory'] = '../config/sync';\n\n// A local tunnel reaches the built-in server over loopback; trusting it\n// keeps generated links on the tunnel's https scheme and host.\n\$settings['reverse_proxy'] = TRUE;\n\$settings['reverse_proxy_addresses'] = ['127.0.0.1', '::1'];\n\n// The admin names the environment, so a local site is never taken for the\n// live one.\n\$config['environment_indicator.indicator'] = ['name' => 'Local', 'fg_color' => '#ffffff', 'bg_color' => '#108775'];\n\n// Anonymous visitors to the root or a page go to that path on the frontend.\n\$settings['druxt_docs_frontend_url'] = 'https://druxtjs.org';\n\n// Drupal 12's default, set here so forms are tested without the browser's\n// own validation before the upgrade makes it so.\n\$settings['enable_html5_validation'] = FALSE;\n\n// The hosts a local site answers to: loopback, and a quick tunnel.\n\$settings['trusted_host_patterns'] = ['^127\\.0\\.0\\.1\$', '^localhost\$', '\\.trycloudflare\\.com\$'];\n",
+  $db_file_php,
+  $hash_salt_php
+));
+PASS('SQLite database configured.');
+
+// -----------------------------------------------------------------------------
+// Install.
+// -----------------------------------------------------------------------------
+
+$has_config = file_exists('config/sync/core.extension.yml');
+
+// The committed config is authored against whatever database the editorial
+// environment uses, and Drupal refuses to uninstall the module providing the
+// active database driver. Enabling sqlite in this checkout only keeps the
+// import from failing without changing what is committed.
+$extension_yml = 'config/sync/core.extension.yml';
+$extension_patched = FALSE;
+if ($has_config) {
+  $extension = (string) file_get_contents($extension_yml);
+  if (!preg_match('/^  sqlite: /m', $extension)) {
+    TASK('Enabling the sqlite module in this checkout only (never committed).');
+    $patched = preg_replace('/^(module:\n)/m', "$1  sqlite: 0\n", $extension, 1);
+    if ($patched === NULL || $patched === $extension) {
+      FAIL('Could not add sqlite to %s. Update this anchor rather than skipping the patch.', $extension_yml);
+    }
+    file_put_contents($extension_yml, $patched);
+    $extension_patched = TRUE;
+    PASS('sqlite enabled for this checkout.');
+  }
+}
+
+// Whatever happens next, the checkout must come back to how it was found.
+// Registered before the install so a failed install still reverts it.
+register_shutdown_function(static function () use ($extension_patched, $extension_yml): void {
+  if (!$extension_patched) {
+    return;
+  }
+  $current = (string) @file_get_contents($extension_yml);
+  file_put_contents($extension_yml, preg_replace('/^  sqlite: \d+\n/m', '', $current, 1));
+});
+
+if ($has_config) {
+  TASK('Running drush site:install --existing-config.');
+  drush('site:install --existing-config');
+  PASS('Site installed from committed config.');
+}
+else {
+  TASK('Running drush site:install minimal.');
+  drush('site:install minimal --site-name=%s', $site_name);
+  PASS('Site installed. No committed config yet, so this is a bare install.');
+}
+
+TASK('Rebuilding caches.');
+drush('cache:rebuild');
+PASS('Caches rebuilt.');
+
+// OAuth keys live outside the web root and are never committed, so each
+// site makes its own; a hosted environment keeps its keys between deploys.
+if ($has_config && str_contains((string) file_get_contents('config/sync/core.extension.yml'), "\n  simple_oauth: ")) {
+  TASK('Generating OAuth keys in ../keys if there are none.');
+  drush('php:eval %s', ['$dir = DRUPAL_ROOT . "/../keys"; if (!is_file("$dir/private.key")) { @mkdir($dir, 0700, TRUE); \Drupal::service("simple_oauth.key.generator")->generateKeys($dir); }']);
+  PASS('OAuth keys in place.');
+}
+
+echo PHP_EOL;
+echo '===============================' . PHP_EOL;
+echo '   🚀 PROVISION COMPLETE  ✅  ' . PHP_EOL;
+echo '===============================' . PHP_EOL;
+echo PHP_EOL;
+echo 'Database: ' . $db_file . PHP_EOL;
+echo 'Config:   ' . ($has_config ? 'imported' : 'none committed yet') . PHP_EOL;
+echo 'Content:  ' . 'none, run .devtools/import to seed it' . PHP_EOL;
+echo PHP_EOL;
+echo '> Next steps:' . PHP_EOL;
+echo '  .devtools/start    # Start the webserver' . PHP_EOL;
+echo PHP_EOL;

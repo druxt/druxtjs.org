@@ -1,0 +1,11 @@
+uuid: 84716db2-1c87-4a5e-b1b8-c89051873c62
+langcode: en
+status: true
+dependencies: {  }
+name: 'Documentation page'
+type: doc_page
+description: 'A page of the druxtjs.org documentation.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

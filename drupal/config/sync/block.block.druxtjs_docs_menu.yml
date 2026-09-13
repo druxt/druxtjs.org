@@ -1,0 +1,25 @@
+uuid: b4e9dfa5-67e4-4cf5-9a5f-f6f57a75d855
+langcode: en
+status: true
+dependencies:
+  config:
+    - system.menu.docs
+  module:
+    - system
+  theme:
+    - druxtjs
+id: druxtjs_docs_menu
+theme: druxtjs
+region: sidebar
+weight: 0
+provider: null
+plugin: 'system_menu_block:docs'
+settings:
+  id: 'system_menu_block:docs'
+  label: Documentation
+  label_display: '0'
+  provider: system
+  level: 1
+  depth: 0
+  expand_all_items: true
+visibility: {  }

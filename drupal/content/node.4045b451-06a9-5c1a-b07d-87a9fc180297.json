@@ -1,0 +1,119 @@
+{
+    "uuid": [
+        {
+            "value": "4045b451-06a9-5c1a-b07d-87a9fc180297"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Decoupled routing"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "40d64310-02f1-5c33-b3ce-551d4c2480f8"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0b67484c-017d-5af1-911e-765fa245cfc4"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "1ca504d6-eded-519e-bc7a-1ae174705524"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Only Drupal knows which entity serves a path, so Druxt asks it, then turns that answer into a resource request and follows any redirect."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "4f80265c-02fd-5652-8970-c0bf9eaf5e5b"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/explanation\/routing.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"path-translation\",\"depth\":2,\"text\":\"Path translation\"},{\"id\":\"beyond-entities-path-translators\",\"depth\":2,\"text\":\"Beyond entities: path translators\"},{\"id\":\"where-routing-happens\",\"depth\":2,\"text\":\"Where routing happens\"},{\"id\":\"multilingual-paths\",\"depth\":2,\"text\":\"Multilingual paths\"},{\"id\":\"why-translation-instead-of-frontend-route-definitions\",\"depth\":2,\"text\":\"Why translation instead of frontend route definitions?\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -5
+        }
+    ]
+}

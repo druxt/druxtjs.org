@@ -1,0 +1,23 @@
+uuid: 197e66d2-42a0-4f9b-81f4-0da1a528502b
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - druxtjs
+id: druxtjs_branding
+theme: druxtjs
+region: header
+weight: 0
+provider: null
+plugin: system_branding_block
+settings:
+  id: system_branding_block
+  label: 'Site branding'
+  label_display: '0'
+  provider: system
+  use_site_logo: true
+  use_site_name: true
+  use_site_slogan: false
+visibility: {  }

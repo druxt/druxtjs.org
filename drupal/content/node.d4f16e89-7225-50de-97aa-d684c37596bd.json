@@ -1,0 +1,135 @@
+{
+    "uuid": [
+        {
+            "value": "d4f16e89-7225-50de-97aa-d684c37596bd"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Component resolution"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "83ec355a-a085-516e-9c04-97aaee381779"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "56e461eb-6733-58bc-811f-a9e37ee9ace4"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "5aec97f5-169d-554f-91e7-8ba96dfdc773"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "df87f061-739b-539d-9873-e3270df44374"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "e7d73733-7c72-5991-8a2d-0ad5e22ce9a1"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "e5995b1b-c97d-5683-88d3-e020d0c6da5d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "1d2ef756-d2d0-58b5-b0ba-740b2bf03aa0"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Druxt finds a wrapper component by ranking candidate names from the render context, then hands it the props, slots and attributes it needs."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "4f80265c-02fd-5652-8970-c0bf9eaf5e5b"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/explanation\/component-resolution.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"the-suggestion-chain\",\"depth\":2,\"text\":\"The suggestion chain\"},{\"id\":\"where-candidates-come-from\",\"depth\":2,\"text\":\"Where candidates come from\"},{\"id\":\"how-wrappers-receive-data\",\"depth\":2,\"text\":\"How wrappers receive data\"},{\"id\":\"re-wrapping-at-the-point-of-use\",\"depth\":2,\"text\":\"Re-wrapping at the point of use\"},{\"id\":\"why-this-design\",\"depth\":2,\"text\":\"Why this design\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -3
+        }
+    ]
+}

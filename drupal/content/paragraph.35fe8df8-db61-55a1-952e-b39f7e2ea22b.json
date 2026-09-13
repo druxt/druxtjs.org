@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "35fe8df8-db61-55a1-952e-b39f7e2ea22b"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Druxt follows [semantic versioning](https:\/\/semver.org). This page states\nwhat that promise covers: which stack 1.x supports, what a 1.x release\nmay and may not change, and how APIs leave the framework.\n\n## The supported stack\n\nThe full compatibility table, with the known pins and workarounds, lives\nwith the [`druxt` module reference](\/modules\/druxt). The short version:\n\n| Layer       | Supported                       |\n| ----------- | ------------------------------- |\n| Nuxt        | 2.15 or later, Nuxt 2 line only |\n| Vue         | 2.7                             |\n| Node        | 16, the tested version          |\n| Drupal core | 10.1 through 11                 |\n\nNuxt 2, Vue 2 and Node 16 are all past their upstream end of life. That\nis the honest shape of the 1.x line, and stating it plainly is the point\nof this page: 1.x exists to give sites built on this stack a stable,\nmaintained base, not to chase new majors. Adopting a newer Nuxt is\n2.0.0 territory, and the stack above does not change for the life of\n1.x.\n\n## What 1.0.0 means\n\n- **No breaking changes inside 1.x.** Code written against 1.0.0 keeps\n  working on every 1.x release.\n- **Deprecation before removal.** An API scheduled for removal keeps\n  working through the whole 1.x line, warns in the console when used,\n  and is removed in 2.0.0.\n- **Fixes, within reason.** The 1.x line receives bug and security\n  fixes for the stack above while 2.0.0 is developed, and within reason\n  after 2.0.0 is released. 2.0.0 is the priority, and 1.x maintenance\n  does not come ahead of it.\n\n## How deprecation works\n\nA deprecated API logs a console warning at runtime naming its\nreplacement and linking a ledger entry, like this one:",
+            "format": "docs_markdown",
+            "processed": "<p>Druxt follows <a href=\"https:\/\/semver.org\">semantic versioning<\/a>. This page states\nwhat that promise covers: which stack 1.x supports, what a 1.x release\nmay and may not change, and how APIs leave the framework.<\/p>\n<h2>The supported stack<\/h2>\n<p>The full compatibility table, with the known pins and workarounds, lives\nwith the <a href=\"\/modules\/druxt\"><code>druxt<\/code> module reference<\/a>. The short version:<\/p>\n<table>\n<thead>\n<tr>\n<th>Layer<\/th>\n<th>Supported<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td>Nuxt<\/td>\n<td>2.15 or later, Nuxt 2 line only<\/td>\n<\/tr>\n<tr>\n<td>Vue<\/td>\n<td>2.7<\/td>\n<\/tr>\n<tr>\n<td>Node<\/td>\n<td>16, the tested version<\/td>\n<\/tr>\n<tr>\n<td>Drupal core<\/td>\n<td>10.1 through 11<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<p>Nuxt 2, Vue 2 and Node 16 are all past their upstream end of life. That\nis the honest shape of the 1.x line, and stating it plainly is the point\nof this page: 1.x exists to give sites built on this stack a stable,\nmaintained base, not to chase new majors. Adopting a newer Nuxt is\n2.0.0 territory, and the stack above does not change for the life of\n1.x.<\/p>\n<h2>What 1.0.0 means<\/h2>\n<ul>\n<li><strong>No breaking changes inside 1.x.<\/strong> Code written against 1.0.0 keeps\nworking on every 1.x release.<\/li>\n<li><strong>Deprecation before removal.<\/strong> An API scheduled for removal keeps\nworking through the whole 1.x line, warns in the console when used,\nand is removed in 2.0.0.<\/li>\n<li><strong>Fixes, within reason.<\/strong> The 1.x line receives bug and security\nfixes for the stack above while 2.0.0 is developed, and within reason\nafter 2.0.0 is released. 2.0.0 is the priority, and 1.x maintenance\ndoes not come ahead of it.<\/li>\n<\/ul>\n<h2>How deprecation works<\/h2>\n<p>A deprecated API logs a console warning at runtime naming its\nreplacement and linking a ledger entry, like this one:<\/p>\n"
+        }
+    ]
+}

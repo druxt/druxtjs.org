@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "7658e93f-e7fb-5a1c-a771-2cb9603ed20d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "_Get the first 5 recipes._",
+            "format": "docs_markdown",
+            "processed": "<p><em>Get the first 5 recipes.<\/em><\/p>\n"
+        }
+    ]
+}

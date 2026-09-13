@@ -1,0 +1,56 @@
+{
+    "uuid": [
+        {
+            "value": "753db40d-f43d-5ecb-b19d-9e3322aa62ee"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_callout",
+            "target_type": "paragraphs_type",
+            "target_uuid": "1e924889-e030-4b91-811a-c906d05f0f0e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_callout": [
+        {
+            "value": "> **Before you start:** this guide assumes a working Druxt site running\n> in development mode (`nuxt dev`); the integration does not load in\n> production builds. See [Getting started](\/tutorials\/getting-started).",
+            "format": "docs_markdown",
+            "processed": "<blockquote>\n<p><strong>Before you start:<\/strong> this guide assumes a working Druxt site running\nin development mode (<code>nuxt dev<\/code>); the integration does not load in\nproduction builds. See <a href=\"\/tutorials\/getting-started\">Getting started<\/a>.<\/p>\n<\/blockquote>\n"
+        }
+    ],
+    "field_callout_type": [
+        {
+            "value": "prerequisite"
+        }
+    ]
+}

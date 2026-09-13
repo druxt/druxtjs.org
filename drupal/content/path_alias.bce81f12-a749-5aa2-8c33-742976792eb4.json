@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "bce81f12-a749-5aa2-8c33-742976792eb4"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/ea097a29-9381-514c-9a39-06722345364c"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/devtools"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

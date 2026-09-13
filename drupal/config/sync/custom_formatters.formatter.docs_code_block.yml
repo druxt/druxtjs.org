@@ -1,0 +1,14 @@
+uuid: 0af0c4da-93ea-4b9d-ac58-8884f6c4ec53
+langcode: en
+status: true
+dependencies: {  }
+id: docs_code_block
+label: 'Code block'
+type: twig
+description: 'Code in a pre element with its language, for block previews.'
+field_types:
+  - string_long
+data: |-
+  {% set language = entity.hasField('field_language') ? entity.field_language.value : (entity.hasField('field_syntax') ? entity.field_syntax.value : '') %}
+  {% set language = language ?: 'text' %}
+  {% for item in items %}<div class="docs-code"><pre class="language-{{ language|clean_class }}" data-language="{{ language }}"><code class="language-{{ language|clean_class }}">{{ item.value }}</code></pre></div>{% endfor %}

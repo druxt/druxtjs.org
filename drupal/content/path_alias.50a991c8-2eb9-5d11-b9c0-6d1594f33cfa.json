@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "50a991c8-2eb9-5d11-b9c0-6d1594f33cfa"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/8b53b136-61fa-50f6-8941-39be9eab4e2a"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/explanation\/drupal-for-nuxt-developers"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

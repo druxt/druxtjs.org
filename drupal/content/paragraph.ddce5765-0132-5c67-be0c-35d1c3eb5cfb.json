@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "ddce5765-0132-5c67-be0c-35d1c3eb5cfb"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Druxt proxies API and file requests with the\n[@nuxtjs\/proxy](https:\/\/github.com\/nuxt-community\/proxy-module) module:\nthe browser talks only to the frontend origin, and the Nuxt server\nforwards to Drupal. Cross-origin requests stop existing, so CORS stops\nmattering.\n\nThe proxy runs as server middleware inside `nuxt dev` and `nuxt start`.\n**A generated static site has no server, so the proxy does not exist\nthere.** If you deploy with `nuxt generate` and the browser must\nreach Drupal, [configure CORS in Drupal](\/how-to\/configure-cors)\ninstead, and see the target-tied setting in\n[Deploy a static site](\/how-to\/deploy-static).\n\n## API proxy\n\nRoutes browser JSON:API traffic through the frontend:",
+            "format": "docs_markdown",
+            "processed": "<p>Druxt proxies API and file requests with the\n<a href=\"https:\/\/github.com\/nuxt-community\/proxy-module\">@nuxtjs\/proxy<\/a> module:\nthe browser talks only to the frontend origin, and the Nuxt server\nforwards to Drupal. Cross-origin requests stop existing, so CORS stops\nmattering.<\/p>\n<p>The proxy runs as server middleware inside <code>nuxt dev<\/code> and <code>nuxt start<\/code>.\n<strong>A generated static site has no server, so the proxy does not exist\nthere.<\/strong> If you deploy with <code>nuxt generate<\/code> and the browser must\nreach Drupal, <a href=\"\/how-to\/configure-cors\">configure CORS in Drupal<\/a>\ninstead, and see the target-tied setting in\n<a href=\"\/how-to\/deploy-static\">Deploy a static site<\/a>.<\/p>\n<h2>API proxy<\/h2>\n<p>Routes browser JSON:API traffic through the frontend:<\/p>\n"
+        }
+    ]
+}

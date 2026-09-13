@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "5ae342cf-24c3-5793-a6a9-fdb20f599f2a"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "backend-jsonapi-settings.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/backend-jsonapi-settings.png",
+            "url": "\/sites\/default\/files\/documentation\/backend-jsonapi-settings.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 6716
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

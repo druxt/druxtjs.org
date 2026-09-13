@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "4020bfb2-817a-556d-b6fb-8b917a8a8bf7"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Druxt is a framework for **fully decoupled Drupal and Nuxt.js** sites. In a\ntraditional (coupled) Drupal site, Drupal both manages and renders content.\nIn a Druxt site, the two jobs are split:\n\n- **Drupal** models content, configuration and business logic, and exposes\n  it as JSON:API.\n- **Nuxt** handles the URL, the request lifecycle and the rendering.\n- **Druxt** is the contract between them: clients, stores, schemas and\n  components that turn JSON:API data into a rendered page.\n\nHow much Drupal drives is your choice.\n[DruxtSite](\/modules\/site) renders a whole site from Drupal's block\nlayout and menus with no frontend layout decisions at all; individual\ncomponents (`DruxtEntity`, `DruxtView`, `DruxtMenu`) drop Drupal-driven\npieces into pages and layouts you design yourself; and every component\ncan be overridden through the [theme layer](\/how-to\/theming). The\nmachinery below is the same at any point on that spectrum.\n\nUnderstanding the split explains most of Druxt's design decisions:\n\n- Why the frontend asks Drupal to translate paths.\n- Why display modes drive field rendering.\n- Why every component can be themed.\n\n## The request lifecycle\n\nWhen a browser requests a page from a Druxt site, the work happens in this\norder:\n\n1. **Nuxt receives the request** and matches it against its own Vue Router\n   routes. In a typical site, a wildcard route hands the path to the\n   [router](\/explanation\/routing) module.\n2. **Path translation**: Druxt asks Drupal (via the `decoupled_router`\n   module) what entity serves this path. The answer identifies the entity\n   type, bundle (Drupal's word for a content type, like `article`), UUID\n   and view mode.\n3. **Data fetching**: the [DruxtStore](\/explanation\/druxt-store) checks its\n   cache, and asks Drupal's JSON:API for anything missing. [Display-mode\n   schemas](\/explanation\/schemas) can narrow the query so only rendered\n   fields travel the wire.\n4. **Rendering**: entity, field and block components render the data. Each\n   delegates its markup to a [theme component chosen by the suggestion\n   system](\/explanation\/component-resolution).\n5. **Response**: Nuxt returns fully server-rendered HTML, then hydrates it\n   in the browser: Vue takes over the already-rendered markup and makes it\n   interactive without re-fetching the page.\n\nThe same five steps, as a picture:",
+            "format": "docs_markdown",
+            "processed": "<p>Druxt is a framework for <strong>fully decoupled Drupal and Nuxt.js<\/strong> sites. In a\ntraditional (coupled) Drupal site, Drupal both manages and renders content.\nIn a Druxt site, the two jobs are split:<\/p>\n<ul>\n<li><strong>Drupal<\/strong> models content, configuration and business logic, and exposes\nit as JSON:API.<\/li>\n<li><strong>Nuxt<\/strong> handles the URL, the request lifecycle and the rendering.<\/li>\n<li><strong>Druxt<\/strong> is the contract between them: clients, stores, schemas and\ncomponents that turn JSON:API data into a rendered page.<\/li>\n<\/ul>\n<p>How much Drupal drives is your choice.\n<a href=\"\/modules\/site\">DruxtSite<\/a> renders a whole site from Drupal's block\nlayout and menus with no frontend layout decisions at all; individual\ncomponents (<code>DruxtEntity<\/code>, <code>DruxtView<\/code>, <code>DruxtMenu<\/code>) drop Drupal-driven\npieces into pages and layouts you design yourself; and every component\ncan be overridden through the <a href=\"\/how-to\/theming\">theme layer<\/a>. The\nmachinery below is the same at any point on that spectrum.<\/p>\n<p>Understanding the split explains most of Druxt's design decisions:<\/p>\n<ul>\n<li>Why the frontend asks Drupal to translate paths.<\/li>\n<li>Why display modes drive field rendering.<\/li>\n<li>Why every component can be themed.<\/li>\n<\/ul>\n<h2>The request lifecycle<\/h2>\n<p>When a browser requests a page from a Druxt site, the work happens in this\norder:<\/p>\n<ol>\n<li><strong>Nuxt receives the request<\/strong> and matches it against its own Vue Router\nroutes. In a typical site, a wildcard route hands the path to the\n<a href=\"\/explanation\/routing\">router<\/a> module.<\/li>\n<li><strong>Path translation<\/strong>: Druxt asks Drupal (via the <code>decoupled_router<\/code>\nmodule) what entity serves this path. The answer identifies the entity\ntype, bundle (Drupal's word for a content type, like <code>article<\/code>), UUID\nand view mode.<\/li>\n<li><strong>Data fetching<\/strong>: the <a href=\"\/explanation\/druxt-store\">DruxtStore<\/a> checks its\ncache, and asks Drupal's JSON:API for anything missing. <a href=\"\/explanation\/schemas\">Display-mode\nschemas<\/a> can narrow the query so only rendered\nfields travel the wire.<\/li>\n<li><strong>Rendering<\/strong>: entity, field and block components render the data. Each\ndelegates its markup to a <a href=\"\/explanation\/component-resolution\">theme component chosen by the suggestion\nsystem<\/a>.<\/li>\n<li><strong>Response<\/strong>: Nuxt returns fully server-rendered HTML, then hydrates it\nin the browser: Vue takes over the already-rendered markup and makes it\ninteractive without re-fetching the page.<\/li>\n<\/ol>\n<p>The same five steps, as a picture:<\/p>\n"
+        }
+    ]
+}

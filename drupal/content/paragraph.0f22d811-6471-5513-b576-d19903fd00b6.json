@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "0f22d811-6471-5513-b576-d19903fd00b6"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "The permission grants read-only (GET) access to the configuration\nresources the frontend needs to build itself: entity view and form\ndisplays and modes, field and field storage configuration, JSON:API\nresource configuration, blocks, languages, menus, menu links and views.\nWithout it,\nevery one of those requests returns 403, and the errors name the\nunderlying resource rather than the permission, which makes the cause hard\nto spot. See\n[the 403 entry in Troubleshooting](\/how-to\/troubleshooting#every-jsonapi-request-403s-even-for-content-that-should-be-public).\n\nIt grants nothing else: content entities keep their normal Drupal access\nrules. Granting it to Anonymous exposes structure (display and field\nconfiguration), not content that Drupal would otherwise protect. If that\ntrade-off is not acceptable, connect as an authenticated consumer instead\nand see the topology notes on\n[cookies and sessions](\/explanation\/request-topology#cookies-and-sessions).\n\n## Check the JSON:API settings\n\nCore's JSON:API defaults to read-only mode. Reads are all Druxt needs to\nrender a site, but form submissions through\n[DruxtEntityForm](\/modules\/entity) are JSON:API writes and will fail\nwith 405 responses until writes are enabled, at\n`\/admin\/config\/services\/jsonapi` or with drush:",
+            "format": "docs_markdown",
+            "processed": "<p>The permission grants read-only (GET) access to the configuration\nresources the frontend needs to build itself: entity view and form\ndisplays and modes, field and field storage configuration, JSON:API\nresource configuration, blocks, languages, menus, menu links and views.\nWithout it,\nevery one of those requests returns 403, and the errors name the\nunderlying resource rather than the permission, which makes the cause hard\nto spot. See\n<a href=\"\/how-to\/troubleshooting#every-jsonapi-request-403s-even-for-content-that-should-be-public\">the 403 entry in Troubleshooting<\/a>.<\/p>\n<p>It grants nothing else: content entities keep their normal Drupal access\nrules. Granting it to Anonymous exposes structure (display and field\nconfiguration), not content that Drupal would otherwise protect. If that\ntrade-off is not acceptable, connect as an authenticated consumer instead\nand see the topology notes on\n<a href=\"\/explanation\/request-topology#cookies-and-sessions\">cookies and sessions<\/a>.<\/p>\n<h2>Check the JSON:API settings<\/h2>\n<p>Core's JSON:API defaults to read-only mode. Reads are all Druxt needs to\nrender a site, but form submissions through\n<a href=\"\/modules\/entity\">DruxtEntityForm<\/a> are JSON:API writes and will fail\nwith 405 responses until writes are enabled, at\n<code>\/admin\/config\/services\/jsonapi<\/code> or with drush:<\/p>\n"
+        }
+    ]
+}

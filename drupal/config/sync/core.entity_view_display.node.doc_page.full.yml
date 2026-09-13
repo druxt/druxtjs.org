@@ -1,0 +1,42 @@
+uuid: 58842c0d-d57e-494a-85b0-47e72736f8ba
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.doc_page.field_content
+    - field.field.node.doc_page.field_description
+    - field.field.node.doc_page.field_is_landing
+    - field.field.node.doc_page.field_section
+    - field.field.node.doc_page.field_source_path
+    - field.field.node.doc_page.field_weight
+    - node.type.doc_page
+  module:
+    - layout_paragraphs
+id: node.doc_page.full
+targetEntityType: node
+bundle: doc_page
+mode: full
+content:
+  field_content:
+    type: layout_paragraphs
+    label: hidden
+    settings:
+      view_mode: preview
+      link: ''
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_description:
+    type: basic_string
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  field_is_landing: true
+  field_section: true
+  field_source_path: true
+  field_weight: true
+  links: true

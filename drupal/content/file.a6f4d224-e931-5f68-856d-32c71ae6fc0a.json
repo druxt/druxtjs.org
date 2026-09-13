@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "a6f4d224-e931-5f68-856d-32c71ae6fc0a"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "storybook-entity-story.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/storybook-entity-story.png",
+            "url": "\/sites\/default\/files\/documentation\/storybook-entity-story.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 29583
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

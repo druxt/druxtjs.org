@@ -1,0 +1,111 @@
+{
+    "uuid": [
+        {
+            "value": "8b53b136-61fa-50f6-8941-39be9eab4e2a"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Drupal for Nuxt developers"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "8422e156-4659-5117-a18f-e0146292bf9b"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "The Drupal vocabulary, tools and commands the rest of these docs assume, explained for developers coming from the JavaScript side."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "4f80265c-02fd-5652-8970-c0bf9eaf5e5b"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/explanation\/drupal-for-nuxt-developers.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"what-drupal-does-in-a-druxt-project\",\"depth\":2,\"text\":\"What Drupal does in a Druxt project\"},{\"id\":\"the-vocabulary\",\"depth\":2,\"text\":\"The vocabulary\"},{\"id\":\"composer\",\"depth\":2,\"text\":\"Composer\"},{\"id\":\"drush-drupals-cli\",\"depth\":2,\"text\":\"drush, Drupal's CLI\"},{\"id\":\"where-configuration-lives\",\"depth\":2,\"text\":\"Where configuration lives\"},{\"id\":\"what-you-can-skip\",\"depth\":2,\"text\":\"What you can skip\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -8
+        }
+    ]
+}

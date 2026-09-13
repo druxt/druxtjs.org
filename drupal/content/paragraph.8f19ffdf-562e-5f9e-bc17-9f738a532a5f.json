@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "8f19ffdf-562e-5f9e-bc17-9f738a532a5f"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "A component with a default template skips the wrapper system. To have\nboth, set the `wrapper` property:",
+            "format": "docs_markdown",
+            "processed": "<p>A component with a default template skips the wrapper system. To have\nboth, set the <code>wrapper<\/code> property:<\/p>\n"
+        }
+    ]
+}

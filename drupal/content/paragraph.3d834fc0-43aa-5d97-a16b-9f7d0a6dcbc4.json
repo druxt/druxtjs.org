@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "3d834fc0-43aa-5d97-a16b-9f7d0a6dcbc4"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## Drupal: create the consumer\n\nA Consumer is Drupal's entity for one registered OAuth client, provided\nby the `consumers` module that arrives as a Simple OAuth dependency.\nCreate one at `\/admin\/config\/services\/consumer\/add` (an administrator\naccount is needed for all of these forms):\n\n| Field        | Value                                                       |\n| ------------ | ----------------------------------------------------------- |\n| Client ID    | A stable id your frontend will use; generate a UUID         |\n| Secret       | Empty. A browser app cannot keep a secret; PKCE replaces it |\n| Confidential | Off                                                         |\n| PKCE         | On                                                          |\n| Scopes       | The scope you created, set as the consumer's default        |\n| Redirect URI | `https:\/\/your-frontend\/callback`, one per environment       |",
+            "format": "docs_markdown",
+            "processed": "<h2>Drupal: create the consumer<\/h2>\n<p>A Consumer is Drupal's entity for one registered OAuth client, provided\nby the <code>consumers<\/code> module that arrives as a Simple OAuth dependency.\nCreate one at <code>\/admin\/config\/services\/consumer\/add<\/code> (an administrator\naccount is needed for all of these forms):<\/p>\n<table>\n<thead>\n<tr>\n<th>Field<\/th>\n<th>Value<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td>Client ID<\/td>\n<td>A stable id your frontend will use; generate a UUID<\/td>\n<\/tr>\n<tr>\n<td>Secret<\/td>\n<td>Empty. A browser app cannot keep a secret; PKCE replaces it<\/td>\n<\/tr>\n<tr>\n<td>Confidential<\/td>\n<td>Off<\/td>\n<\/tr>\n<tr>\n<td>PKCE<\/td>\n<td>On<\/td>\n<\/tr>\n<tr>\n<td>Scopes<\/td>\n<td>The scope you created, set as the consumer's default<\/td>\n<\/tr>\n<tr>\n<td>Redirect URI<\/td>\n<td><code>https:\/\/your-frontend\/callback<\/code>, one per environment<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n"
+        }
+    ]
+}

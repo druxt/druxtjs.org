@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "795f951c-a276-573b-b3ed-f089c62fa2e5"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "devtools-theme.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/devtools-theme.png",
+            "url": "\/sites\/default\/files\/documentation\/devtools-theme.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 41480
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

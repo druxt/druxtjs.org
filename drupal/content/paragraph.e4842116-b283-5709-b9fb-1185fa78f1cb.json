@@ -1,0 +1,56 @@
+{
+    "uuid": [
+        {
+            "value": "e4842116-b283-5709-b9fb-1185fa78f1cb"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_callout",
+            "target_type": "paragraphs_type",
+            "target_uuid": "1e924889-e030-4b91-811a-c906d05f0f0e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_callout": [
+        {
+            "value": "> **Before you start:** this guide assumes a working Druxt site (see\n> [Getting started](\/tutorials\/getting-started)). If you have never written\n> a wrapper, [Theme your front page](\/tutorials\/theme-your-front-page)\n> walks through two of them end to end. It also helps to have read\n> [Component resolution](\/explanation\/component-resolution) for why the\n> suggestion chain works the way it does.",
+            "format": "docs_markdown",
+            "processed": "<blockquote>\n<p><strong>Before you start:<\/strong> this guide assumes a working Druxt site (see\n<a href=\"\/tutorials\/getting-started\">Getting started<\/a>). If you have never written\na wrapper, <a href=\"\/tutorials\/theme-your-front-page\">Theme your front page<\/a>\nwalks through two of them end to end. It also helps to have read\n<a href=\"\/explanation\/component-resolution\">Component resolution<\/a> for why the\nsuggestion chain works the way it does.<\/p>\n<\/blockquote>\n"
+        }
+    ],
+    "field_callout_type": [
+        {
+            "value": "prerequisite"
+        }
+    ]
+}

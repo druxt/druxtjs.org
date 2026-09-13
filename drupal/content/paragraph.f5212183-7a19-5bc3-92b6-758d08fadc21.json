@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "f5212183-7a19-5bc3-92b6-758d08fadc21"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "After routing resolves _which_ entity to render, the next question is\n_which fields, in what order, with what settings_. Druxt's answer is\nunusual: it doesn't invent a frontend field configuration, it reads\nDrupal's **display modes**. A display mode is Drupal's saved, per-view\nconfiguration of which fields appear, in what order, with which formatter\nand settings, managed by site builders in the admin UI.\n\nThe `druxt-schema` package turns view modes and form modes into\n**schemas**: plain objects describing the fields to render and the\ncomponents to render them with.\n\n## An example schema\n\nA schema for an article's `teaser` view mode looks conceptually like:",
+            "format": "docs_markdown",
+            "processed": "<p>After routing resolves <em>which<\/em> entity to render, the next question is\n<em>which fields, in what order, with what settings<\/em>. Druxt's answer is\nunusual: it doesn't invent a frontend field configuration, it reads\nDrupal's <strong>display modes<\/strong>. A display mode is Drupal's saved, per-view\nconfiguration of which fields appear, in what order, with which formatter\nand settings, managed by site builders in the admin UI.<\/p>\n<p>The <code>druxt-schema<\/code> package turns view modes and form modes into\n<strong>schemas<\/strong>: plain objects describing the fields to render and the\ncomponents to render them with.<\/p>\n<h2>An example schema<\/h2>\n<p>A schema for an article's <code>teaser<\/code> view mode looks conceptually like:<\/p>\n"
+        }
+    ]
+}

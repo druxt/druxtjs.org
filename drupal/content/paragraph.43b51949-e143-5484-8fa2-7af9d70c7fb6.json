@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "43b51949-e143-5484-8fa2-7af9d70c7fb6"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "If you completed [Getting started](\/tutorials\/getting-started), you already\nhave a working authentication setup: you just haven't used it yet. This\ntutorial logs a real user in through it, so you can see the whole flow work\nbefore building on it.\n\n## Prerequisites\n\n- The [Getting started](\/tutorials\/getting-started) tutorial, completed and\n  still running (`npm run dev` in your project root).\n\n## Step 1: See what's already there\n\nOpen `nuxt\/nuxt.config.js` in your project and look at `modules`:",
+            "format": "docs_markdown",
+            "processed": "<p>If you completed <a href=\"\/tutorials\/getting-started\">Getting started<\/a>, you already\nhave a working authentication setup: you just haven't used it yet. This\ntutorial logs a real user in through it, so you can see the whole flow work\nbefore building on it.<\/p>\n<h2>Prerequisites<\/h2>\n<ul>\n<li>The <a href=\"\/tutorials\/getting-started\">Getting started<\/a> tutorial, completed and\nstill running (<code>npm run dev<\/code> in your project root).<\/li>\n<\/ul>\n<h2>Step 1: See what's already there<\/h2>\n<p>Open <code>nuxt\/nuxt.config.js<\/code> in your project and look at <code>modules<\/code>:<\/p>\n"
+        }
+    ]
+}

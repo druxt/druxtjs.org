@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "02e5182d-1325-5e32-b07a-68d75e390670"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "(The same Node 17+ `NODE_OPTIONS` prefix applies here.)\n\nExpect the homepage, the language variants and the listing pages\n(articles, recipes) this time, with the Umami menu rendered. Individual\narticles and recipes are not crawled: the listings render their links\nclient-side, where the crawler cannot follow them. Deploy the output:",
+            "format": "docs_markdown",
+            "processed": "<p>(The same Node 17+ <code>NODE_OPTIONS<\/code> prefix applies here.)<\/p>\n<p>Expect the homepage, the language variants and the listing pages\n(articles, recipes) this time, with the Umami menu rendered. Individual\narticles and recipes are not crawled: the listings render their links\nclient-side, where the crawler cannot follow them. Deploy the output:<\/p>\n"
+        }
+    ]
+}

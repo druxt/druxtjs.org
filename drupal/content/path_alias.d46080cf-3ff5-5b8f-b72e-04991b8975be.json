@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "d46080cf-3ff5-5b8f-b72e-04991b8975be"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/a6b7b8ea-0101-5559-a4fb-d64d6b7cf18e"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/deploy-static"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

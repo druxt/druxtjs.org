@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "97795a83-bc5a-5740-a8d7-3ee923df61c9"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "The keys to get right:\n\n- `allowedOrigins` is your frontend origin, scheme included, no trailing\n  slash. List each environment that needs access (production, previews,\n  `http:\/\/localhost:3000`, the Nuxt dev server's default, for local\n  development), or use `['*']` while\n  developing. Never deploy `'*'` together with credentials support.\n- `allowedMethods` needs more than GET only if the site writes through\n  JSON:API (forms). `OPTIONS` must stay: browsers send it as the\n  preflight.\n- `supportsCredentials` stays `false` for anonymous reads. Set it `true`\n  only for credentialed flows, in which case `allowedOrigins` must list\n  explicit origins, never `'*'`, and `allowedHeaders` must name the\n  headers your requests use, such as\n  `['Authorization', 'Content-Type', 'Accept']`: the wildcard does not\n  cover non-safelisted headers on credentialed requests, and\n  `Authorization` always needs an explicit entry.\n\n## Verify\n\nAsk Drupal for a resource with an `Origin` header, and check the\nresponse:",
+            "format": "docs_markdown",
+            "processed": "<p>The keys to get right:<\/p>\n<ul>\n<li><code>allowedOrigins<\/code> is your frontend origin, scheme included, no trailing\nslash. List each environment that needs access (production, previews,\n<code>http:\/\/localhost:3000<\/code>, the Nuxt dev server's default, for local\ndevelopment), or use <code>['*']<\/code> while\ndeveloping. Never deploy <code>'*'<\/code> together with credentials support.<\/li>\n<li><code>allowedMethods<\/code> needs more than GET only if the site writes through\nJSON:API (forms). <code>OPTIONS<\/code> must stay: browsers send it as the\npreflight.<\/li>\n<li><code>supportsCredentials<\/code> stays <code>false<\/code> for anonymous reads. Set it <code>true<\/code>\nonly for credentialed flows, in which case <code>allowedOrigins<\/code> must list\nexplicit origins, never <code>'*'<\/code>, and <code>allowedHeaders<\/code> must name the\nheaders your requests use, such as\n<code>['Authorization', 'Content-Type', 'Accept']<\/code>: the wildcard does not\ncover non-safelisted headers on credentialed requests, and\n<code>Authorization<\/code> always needs an explicit entry.<\/li>\n<\/ul>\n<h2>Verify<\/h2>\n<p>Ask Drupal for a resource with an <code>Origin<\/code> header, and check the\nresponse:<\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "acad4274-e3d5-520d-9aae-f2d8836a4312"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/211b80f5-031e-57b3-8e0b-35895232faac"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/proxy"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

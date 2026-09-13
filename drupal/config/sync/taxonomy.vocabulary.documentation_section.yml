@@ -1,0 +1,9 @@
+uuid: 11c3f418-9d8a-430e-bb1e-a4d94741de9a
+langcode: en
+status: true
+dependencies: {  }
+name: 'Documentation section'
+vid: documentation_section
+description: 'The Diataxis quadrant a documentation page belongs to.'
+weight: 0
+new_revision: false

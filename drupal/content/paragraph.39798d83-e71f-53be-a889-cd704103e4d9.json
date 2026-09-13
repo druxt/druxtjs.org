@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "39798d83-e71f-53be-a889-cd704103e4d9"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "In this tutorial you will set up a complete Druxt site (a Drupal 11 backend\nand a Nuxt 2 frontend, connected by Druxt) running on your machine, and\npublish your first piece of content through it.\n\nYou'll use:\n\n- **The quickstart**: the maintained starter repository that wires Drupal,\n  Nuxt and Druxt together for you.\n- **The one-command setup**: provisions a local throwaway Drupal (SQLite)\n  with Druxt and OAuth pre-configured.\n\nNo prior Druxt knowledge is assumed. If one half of the stack is new to\nyou, [Drupal for Nuxt developers](\/explanation\/drupal-for-nuxt-developers)\nand [Nuxt for Drupal developers](\/explanation\/nuxt-for-drupal-developers)\nfill in the other side's vocabulary. This tutorial works without them.\n\n## Prerequisites\n\n- [Node](https:\/\/nodejs.org): 16 is the tested version, and the quickstart\n  scripts handle newer Node automatically. `node -v` tells you what you have;\n  [nvm](https:\/\/github.com\/nvm-sh\/nvm) \/ [mise](https:\/\/mise.jdx.dev) users get\n  the pinned version from `nvm use` \/ `mise install`.\n- One of:\n  - PHP 8.3 or newer with the `pdo_sqlite` extension and [Composer](https:\/\/getcomposer.org),\n    or\n  - [DDEV](https:\/\/ddev.readthedocs.io) (Docker). The steps below assume\n    the local PHP path; with DDEV, replace Step 2's setup with\n    `ddev start`, `ddev drupal-install` and `ddev druxt-add-consumer`,\n    then rejoin at Step 3.\n- A [GitHub](https:\/\/github.com) account, if you create the project from\n  the template button (the `giget` path below needs none).\n\n> If you'd rather watch the pieces being assembled by hand, the\n> [quickstart repository](https:\/\/github.com\/druxt\/quickstart) README documents\n> every step this tutorial automates.\n\n## Step 1: Create your project\n\nUse the **Use this template** button on\n[github.com\/druxt\/quickstart](https:\/\/github.com\/druxt\/quickstart) to create\nyour own repository from the starter, then clone it locally.\n\nIf you prefer the terminal, `giget` does the same in one line:",
+            "format": "docs_markdown",
+            "processed": "<p>In this tutorial you will set up a complete Druxt site (a Drupal 11 backend\nand a Nuxt 2 frontend, connected by Druxt) running on your machine, and\npublish your first piece of content through it.<\/p>\n<p>You'll use:<\/p>\n<ul>\n<li><strong>The quickstart<\/strong>: the maintained starter repository that wires Drupal,\nNuxt and Druxt together for you.<\/li>\n<li><strong>The one-command setup<\/strong>: provisions a local throwaway Drupal (SQLite)\nwith Druxt and OAuth pre-configured.<\/li>\n<\/ul>\n<p>No prior Druxt knowledge is assumed. If one half of the stack is new to\nyou, <a href=\"\/explanation\/drupal-for-nuxt-developers\">Drupal for Nuxt developers<\/a>\nand <a href=\"\/explanation\/nuxt-for-drupal-developers\">Nuxt for Drupal developers<\/a>\nfill in the other side's vocabulary. This tutorial works without them.<\/p>\n<h2>Prerequisites<\/h2>\n<ul>\n<li><a href=\"https:\/\/nodejs.org\">Node<\/a>: 16 is the tested version, and the quickstart\nscripts handle newer Node automatically. <code>node -v<\/code> tells you what you have;\n<a href=\"https:\/\/github.com\/nvm-sh\/nvm\">nvm<\/a> \/ <a href=\"https:\/\/mise.jdx.dev\">mise<\/a> users get\nthe pinned version from <code>nvm use<\/code> \/ <code>mise install<\/code>.<\/li>\n<li>One of:\n<ul>\n<li>PHP 8.3 or newer with the <code>pdo_sqlite<\/code> extension and <a href=\"https:\/\/getcomposer.org\">Composer<\/a>,\nor<\/li>\n<li><a href=\"https:\/\/ddev.readthedocs.io\">DDEV<\/a> (Docker). The steps below assume\nthe local PHP path; with DDEV, replace Step 2's setup with\n<code>ddev start<\/code>, <code>ddev drupal-install<\/code> and <code>ddev druxt-add-consumer<\/code>,\nthen rejoin at Step 3.<\/li>\n<\/ul>\n<\/li>\n<li>A <a href=\"https:\/\/github.com\">GitHub<\/a> account, if you create the project from\nthe template button (the <code>giget<\/code> path below needs none).<\/li>\n<\/ul>\n<blockquote>\n<p>If you'd rather watch the pieces being assembled by hand, the\n<a href=\"https:\/\/github.com\/druxt\/quickstart\">quickstart repository<\/a> README documents\nevery step this tutorial automates.<\/p>\n<\/blockquote>\n<h2>Step 1: Create your project<\/h2>\n<p>Use the <strong>Use this template<\/strong> button on\n<a href=\"https:\/\/github.com\/druxt\/quickstart\">github.com\/druxt\/quickstart<\/a> to create\nyour own repository from the starter, then clone it locally.<\/p>\n<p>If you prefer the terminal, <code>giget<\/code> does the same in one line:<\/p>\n"
+        }
+    ]
+}

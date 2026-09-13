@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "4456bf25-87b6-5e97-8faf-7a35d60abb9a"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Add caching for anonymous traffic once things work. One caution from\nproduction: anything that sets cookies on every response (some auth\nsetups do) makes responses uncacheable; keep anonymous responses\ncookie-free so a CDN or cache in front can do its job.\n\n## The hybrid: static files with a server fallback\n\nProduction Druxt sites often combine the models: nginx serves the\n`nuxt generate` output directly with long cache headers, and passes\nanything not generated (authenticated pages, server routes) to the node\nservice:",
+            "format": "docs_markdown",
+            "processed": "<p>Add caching for anonymous traffic once things work. One caution from\nproduction: anything that sets cookies on every response (some auth\nsetups do) makes responses uncacheable; keep anonymous responses\ncookie-free so a CDN or cache in front can do its job.<\/p>\n<h2>The hybrid: static files with a server fallback<\/h2>\n<p>Production Druxt sites often combine the models: nginx serves the\n<code>nuxt generate<\/code> output directly with long cache headers, and passes\nanything not generated (authenticated pages, server routes) to the node\nservice:<\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "25621b35-3534-5a97-b015-801c5833113f"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "backend-permissions.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/backend-permissions.png",
+            "url": "\/sites\/default\/files\/documentation\/backend-permissions.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 4531
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

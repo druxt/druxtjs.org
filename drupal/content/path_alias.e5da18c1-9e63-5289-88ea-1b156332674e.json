@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "e5da18c1-9e63-5289-88ea-1b156332674e"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/639d65b0-6903-53e7-8b5c-4c1d3b4a1953"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/tutorials\/getting-started"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

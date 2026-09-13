@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "c38f9856-b307-57be-ab14-12d07ea1a81e"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Outcome:** two services are now running:\n\n| URL                                                      | What it is       |\n| -------------------------------------------------------- | ---------------- |\n| http:\/\/127.0.0.1:8888, or the port setup printed         | Drupal (backend) |\n| http:\/\/localhost:3000, or the port `npm run dev` printed | Nuxt (frontend)  |\n\nOpen http:\/\/localhost:3000 (or the next free port, printed in the\nterminal). The page you see is rendered by Nuxt, and it looks like\nthis:",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Outcome:<\/strong> two services are now running:<\/p>\n<table>\n<thead>\n<tr>\n<th>URL<\/th>\n<th>What it is<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td><a href=\"http:\/\/127.0.0.1:8888\">http:\/\/127.0.0.1:8888<\/a>, or the port setup printed<\/td>\n<td>Drupal (backend)<\/td>\n<\/tr>\n<tr>\n<td><a href=\"http:\/\/localhost:3000\">http:\/\/localhost:3000<\/a>, or the port <code>npm run dev<\/code> printed<\/td>\n<td>Nuxt (frontend)<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<p>Open <a href=\"http:\/\/localhost:3000\">http:\/\/localhost:3000<\/a> (or the next free port, printed in the\nterminal). The page you see is rendered by Nuxt, and it looks like\nthis:<\/p>\n"
+        }
+    ]
+}

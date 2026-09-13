@@ -1,0 +1,139 @@
+{
+    "uuid": [
+        {
+            "value": "4dcc02b2-c9ab-5104-b48f-fc788b98ccc6"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Upgrade a Druxt site"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "de17e786-c6d7-5669-8fba-f7daaca43a85"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "9423009a-edc0-57d0-b751-b96de20d0037"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "5c6c8544-9d9e-5b8a-b0bb-acc657d614d5"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "755de088-8c02-5d3a-8466-070ae3d20fdd"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "80a3697f-064e-514e-8aca-3e5783416e49"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "9dbb0bc9-61f8-5c2b-b2e1-d260e7ff6234"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "2f43b41c-deaa-574c-b274-b9d06fd4f04a"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "c394a2bb-7dec-5a85-8195-c243e06352f6"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Move a 0.x site to Druxt 1.0.0, then use deprecation warnings as the working to-do list for 2.0.0."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "540fd949-ce24-5411-b703-1d1e76de2802"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/how-to\/upgrade.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"0x-to-100\",\"depth\":2,\"text\":\"0.x to 1.0.0\"},{\"id\":\"read-the-warnings\",\"depth\":2,\"text\":\"Read the warnings\"},{\"id\":\"the-200-to-do-list\",\"depth\":2,\"text\":\"The 2.0.0 to-do list\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": 8
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "7de5ddf0-f54b-5374-9804-e6f281f9449f"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Version:** `>= 0.6.0`\n\nPrior to `0.6.0`, DruxtStore used a `hash` argument to separate the filtered resource results:",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Version:<\/strong> <code>&gt;= 0.6.0<\/code><\/p>\n<p>Prior to <code>0.6.0<\/code>, DruxtStore used a <code>hash<\/code> argument to separate the filtered resource results:<\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "67aabe80-1670-5af1-9929-2edb6ebd09ba"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/acee9add-49c7-5820-8174-d5cf91c561c4"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/tutorials"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "b34d1123-5fa1-5c7f-ac43-b97076ea5d3f"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/0f5d39a0-1033-572e-8ba5-fe67de5d1938"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/explanation\/deployment-models"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

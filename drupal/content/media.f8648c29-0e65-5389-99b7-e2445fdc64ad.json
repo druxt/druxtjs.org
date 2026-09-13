@@ -1,0 +1,82 @@
+{
+    "uuid": [
+        {
+            "value": "f8648c29-0e65-5389-99b7-e2445fdc64ad"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "bundle": [
+        {
+            "target_id": "image",
+            "target_type": "media_type",
+            "target_uuid": "d63708bd-0a02-4969-b4b3-0f37b585bdd4"
+        }
+    ],
+    "revision_created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_user": [],
+    "revision_log_message": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "name": [
+        {
+            "value": "backend-jsonapi-settings.png"
+        }
+    ],
+    "thumbnail": [
+        {
+            "alt": "Drupal's JSON:API settings form with the accept-all-operations option selected",
+            "title": null,
+            "width": 984,
+            "height": 260,
+            "target_type": "file",
+            "target_uuid": "5ae342cf-24c3-5793-a6a9-fdb20f599f2a"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_media_image": [
+        {
+            "alt": "Drupal's JSON:API settings form with the accept-all-operations option selected",
+            "title": null,
+            "width": 984,
+            "height": 260,
+            "target_type": "file",
+            "target_uuid": "5ae342cf-24c3-5793-a6a9-fdb20f599f2a"
+        }
+    ]
+}

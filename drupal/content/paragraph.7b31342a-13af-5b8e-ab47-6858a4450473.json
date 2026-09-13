@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "7b31342a-13af-5b8e-ab47-6858a4450473"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Enable Pages for the repository (Settings \u2192 Pages \u2192 deploy from the\n`gh-pages` branch), and the site serves at the URL above. For rebuild\nautomation, a GitHub Actions workflow that runs the generate and the\n`gh-pages` push on each push to your default branch replaces the manual\ncommand.\n\n## After the first deploy\n\n- Add your new frontend origin to the backend's\n  [CORS `allowedOrigins`](\/how-to\/configure-cors); the\n  [proxy](\/how-to\/proxy) is not available on a static host.\n- Content changes need a rebuild. Trigger one from Drupal with a build\n  hook (most static hosts issue a URL that starts a build when POSTed),\n  or on a schedule.\n- Redirects managed in Drupal's redirect module resolve through the\n  router at request time only on served pages; a static host needs them\n  exported to its own redirect configuration.\n\n## Where to go next\n\n- [Deploy your site](\/tutorials\/deploy-your-site): the same journey as a\n  tutorial, starting from the quickstart.\n- [The deployment models overview](\/explanation\/deployment-models): what\n  static does and does not give you.\n- [Deploy with a Nuxt server](\/how-to\/deploy-server): when the static\n  limits above rule this model out.\n- [Environment variables](\/how-to\/environment-variables): every variable\n  these builds read, on one page.",
+            "format": "docs_markdown",
+            "processed": "<p>Enable Pages for the repository (Settings \u2192 Pages \u2192 deploy from the\n<code>gh-pages<\/code> branch), and the site serves at the URL above. For rebuild\nautomation, a GitHub Actions workflow that runs the generate and the\n<code>gh-pages<\/code> push on each push to your default branch replaces the manual\ncommand.<\/p>\n<h2>After the first deploy<\/h2>\n<ul>\n<li>Add your new frontend origin to the backend's\n<a href=\"\/how-to\/configure-cors\">CORS <code>allowedOrigins<\/code><\/a>; the\n<a href=\"\/how-to\/proxy\">proxy<\/a> is not available on a static host.<\/li>\n<li>Content changes need a rebuild. Trigger one from Drupal with a build\nhook (most static hosts issue a URL that starts a build when POSTed),\nor on a schedule.<\/li>\n<li>Redirects managed in Drupal's redirect module resolve through the\nrouter at request time only on served pages; a static host needs them\nexported to its own redirect configuration.<\/li>\n<\/ul>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/tutorials\/deploy-your-site\">Deploy your site<\/a>: the same journey as a\ntutorial, starting from the quickstart.<\/li>\n<li><a href=\"\/explanation\/deployment-models\">The deployment models overview<\/a>: what\nstatic does and does not give you.<\/li>\n<li><a href=\"\/how-to\/deploy-server\">Deploy with a Nuxt server<\/a>: when the static\nlimits above rule this model out.<\/li>\n<li><a href=\"\/how-to\/environment-variables\">Environment variables<\/a>: every variable\nthese builds read, on one page.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

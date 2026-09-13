@@ -1,0 +1,65 @@
+{
+  "name": "druxtjs.org",
+  "image": "mcr.microsoft.com/devcontainers/base:trixie",
+  "features": {
+    // The Node Nuxt 2 builds with, as .nvmrc.
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "16.20.1"
+    },
+    "ghcr.io/devcontainers/features/php:1": {
+      "version": "8.4",
+      "installComposer": true
+    },
+    // mise from its own v-tags. The mise feature asks for the "latest"
+    // jdx/mise release, which now resolves to a vfox-* release with no asset.
+    "ghcr.io/devcontainers-extra/features/gh-release:1": {
+      "repo": "jdx/mise",
+      "binaryNames": "mise",
+      // mise ships the same build in four archive formats. This picks one.
+      "assetRegex": ".tar.gz$",
+      "releaseTagRegex": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "containerEnv": {
+    // Pin the backend port so the forward below always matches.
+    // .devtools/start otherwise takes the first free port from 8888 up.
+    "WEBSERVER_PORT": "8888",
+    // Node and PHP come from the features. .mise.toml's pins are for host
+    // users. Without this, mise tries to build PHP from source in here.
+    "MISE_DISABLE_TOOLS": "node,php"
+  },
+  "forwardPorts": [8888, 3000],
+  "portsAttributes": {
+    "8888": {
+      "label": "Drupal backend (drupal/.devtools)",
+      "onAutoForward": "silent"
+    },
+    "3000": {
+      "label": "Nuxt frontend",
+      "onAutoForward": "notify"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        // Where the gh-release feature puts the binary. A bare "mise"
+        // re-prompts for approval on every reload.
+        "mise.binPath": "/usr/local/bin/mise"
+      },
+      "extensions": [
+        "hverlin.mise-vscode",
+        "davidanson.vscode-markdownlint",
+        "streetsidesoftware.code-spell-checker",
+        "EditorConfig.EditorConfig",
+        "redhat.vscode-yaml",
+        "bmewburn.vscode-intelephense-client",
+        "xdebug.php-debug",
+        "Vue.volar",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "remoteUser": "vscode"
+}

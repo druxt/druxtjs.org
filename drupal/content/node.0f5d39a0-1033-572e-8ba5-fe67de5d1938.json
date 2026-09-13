@@ -1,0 +1,127 @@
+{
+    "uuid": [
+        {
+            "value": "0f5d39a0-1033-572e-8ba5-fe67de5d1938"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Deployment models"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "68404d5e-29e3-5581-ad7b-4c0dd60addf2"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "1be138d5-41b2-51a4-bf04-1a2ce95023c1"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "a7ebdc90-4631-5322-a9f3-fad87f0a95b1"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "c260b6a2-c001-53e9-ab27-a2da5841b5f1"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "941af350-72cf-589b-8250-18a8023744e4"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "How a Druxt site goes to production, from fully static files through a server-rendered node service, and how to choose between the models."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "4f80265c-02fd-5652-8970-c0bf9eaf5e5b"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/explanation\/deployment-models.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"the-models\",\"depth\":2,\"text\":\"The models\"},{\"id\":\"choosing-a-model\",\"depth\":2,\"text\":\"Choosing a model\"},{\"id\":\"serving-druxt-from-drupal\",\"depth\":2,\"text\":\"Serving Druxt from Drupal\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -1
+        }
+    ]
+}

@@ -1,0 +1,82 @@
+{
+    "uuid": [
+        {
+            "value": "0d211df1-497d-56bf-8dbb-df3175092fd2"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "bundle": [
+        {
+            "target_id": "image",
+            "target_type": "media_type",
+            "target_uuid": "d63708bd-0a02-4969-b4b3-0f37b585bdd4"
+        }
+    ],
+    "revision_created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_user": [],
+    "revision_log_message": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "name": [
+        {
+            "value": "devtools-inspector.png"
+        }
+    ],
+    "thumbnail": [
+        {
+            "alt": "The DruxtJS inspector's Connection details node, showing the configured baseUrl and endpoint and the computed JSON:API address",
+            "title": null,
+            "width": 1280,
+            "height": 235,
+            "target_type": "file",
+            "target_uuid": "05e2d88f-1af6-5f1e-8c2e-0d34ee62c48f"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_media_image": [
+        {
+            "alt": "The DruxtJS inspector's Connection details node, showing the configured baseUrl and endpoint and the computed JSON:API address",
+            "title": null,
+            "width": 1280,
+            "height": 235,
+            "target_type": "file",
+            "target_uuid": "05e2d88f-1af6-5f1e-8c2e-0d34ee62c48f"
+        }
+    ]
+}

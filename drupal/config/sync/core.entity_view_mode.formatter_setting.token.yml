@@ -1,0 +1,11 @@
+uuid: dd424239-bd53-490b-a27f-0c661c28faf1
+langcode: en
+status: true
+dependencies:
+  module:
+    - custom_formatters
+id: formatter_setting.token
+label: Token
+description: null
+targetEntityType: formatter_setting
+cache: true

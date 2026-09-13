@@ -1,0 +1,29 @@
+{
+    "_hash": "de4f7c66907b8b386b72079ec97aa968f9f2c896659c0e39b99eace23db5ff14",
+    "patches": {
+        "drupal/decoupled_settings": [
+            {
+                "package": "drupal/decoupled_settings",
+                "description": "Expose the theme's regions, and let a consumer select its theme",
+                "url": "https://github.com/Decipher/decoupled_settings/pull/15.diff",
+                "sha256": "8d0086ba8c96616acb34f5da681a8aac0a1f643be64db95354ecce1fca97213c",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/jsonapi_node_preview": [
+            {
+                "package": "drupal/jsonapi_node_preview",
+                "description": "Issue #3367724: resolve includes from the previewed entity",
+                "url": "https://git.drupalcode.org/project/jsonapi_node_preview/-/merge_requests/4.diff",
+                "sha256": "cb4051a1c809d67a58024e35805b9b5bd7dcc9c8d5e23ec9686f729dbc1fa665",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ]
+    }
+}

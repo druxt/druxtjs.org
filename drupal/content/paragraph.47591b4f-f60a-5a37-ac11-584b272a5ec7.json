@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "47591b4f-f60a-5a37-ac11-584b272a5ec7"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Tutorials are **learning-oriented**: they walk you through a project from\nbeginning to end, guaranteeing the outcome at every step. No prior Druxt\nknowledge is assumed beyond the prerequisites stated at the start of each\nlesson.\n\n## Lessons\n\n- [Getting started with Druxt](\/tutorials\/getting-started): set up a\n  Nuxt application powered by a Drupal backend.\n- [Theme your front page](\/tutorials\/theme-your-front-page): replace the\n  front page listing and its teasers with your own components.\n- [Add a login flow](\/tutorials\/authentication): turn the quickstart's\n  already-configured OAuth setup into a real, working login.\n- [Deploy your site](\/tutorials\/deploy-your-site): generate the\n  quickstart as static files and put a working Druxt site on a live URL.\n- [Building a custom Druxt module](\/tutorials\/first-custom-module): extend\n  `DruxtModule` to create your own Druxt-powered components.\n\nIf you already have a site running and want to accomplish a specific task,\nsee the [How-to guides](\/how-to). To understand _why_ Druxt works the way it\ndoes, see the [Concepts](\/explanation) section.",
+            "format": "docs_markdown",
+            "processed": "<p>Tutorials are <strong>learning-oriented<\/strong>: they walk you through a project from\nbeginning to end, guaranteeing the outcome at every step. No prior Druxt\nknowledge is assumed beyond the prerequisites stated at the start of each\nlesson.<\/p>\n<h2>Lessons<\/h2>\n<ul>\n<li><a href=\"\/tutorials\/getting-started\">Getting started with Druxt<\/a>: set up a\nNuxt application powered by a Drupal backend.<\/li>\n<li><a href=\"\/tutorials\/theme-your-front-page\">Theme your front page<\/a>: replace the\nfront page listing and its teasers with your own components.<\/li>\n<li><a href=\"\/tutorials\/authentication\">Add a login flow<\/a>: turn the quickstart's\nalready-configured OAuth setup into a real, working login.<\/li>\n<li><a href=\"\/tutorials\/deploy-your-site\">Deploy your site<\/a>: generate the\nquickstart as static files and put a working Druxt site on a live URL.<\/li>\n<li><a href=\"\/tutorials\/first-custom-module\">Building a custom Druxt module<\/a>: extend\n<code>DruxtModule<\/code> to create your own Druxt-powered components.<\/li>\n<\/ul>\n<p>If you already have a site running and want to accomplish a specific task,\nsee the <a href=\"\/how-to\">How-to guides<\/a>. To understand <em>why<\/em> Druxt works the way it\ndoes, see the <a href=\"\/explanation\">Concepts<\/a> section.<\/p>\n"
+        }
+    ]
+}

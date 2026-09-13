@@ -1,0 +1,56 @@
+{
+    "uuid": [
+        {
+            "value": "ed28df60-6e61-5dbe-b65d-61e005e7f5af"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_callout",
+            "target_type": "paragraphs_type",
+            "target_uuid": "1e924889-e030-4b91-811a-c906d05f0f0e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_callout": [
+        {
+            "value": "> **Before you start:** this guide assumes a working Druxt site (see\n> [Getting started](\/tutorials\/getting-started)) with at least two\n> languages enabled in Drupal and URL path prefixes configured\n> (**Configuration \u2192 Regional and language \u2192 Languages**).",
+            "format": "docs_markdown",
+            "processed": "<blockquote>\n<p><strong>Before you start:<\/strong> this guide assumes a working Druxt site (see\n<a href=\"\/tutorials\/getting-started\">Getting started<\/a>) with at least two\nlanguages enabled in Drupal and URL path prefixes configured\n(<strong>Configuration \u2192 Regional and language \u2192 Languages<\/strong>).<\/p>\n<\/blockquote>\n"
+        }
+    ],
+    "field_callout_type": [
+        {
+            "value": "prerequisite"
+        }
+    ]
+}

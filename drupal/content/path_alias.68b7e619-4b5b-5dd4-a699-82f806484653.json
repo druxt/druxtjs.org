@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "68b7e619-4b5b-5dd4-a699-82f806484653"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/d5868e25-f037-57db-92d6-3b0833435f3d"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/example-apps"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

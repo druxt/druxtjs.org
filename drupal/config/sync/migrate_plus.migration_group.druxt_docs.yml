@@ -1,0 +1,10 @@
+uuid: efc4aa7a-b90f-448d-8f19-66596198a8e8
+langcode: en
+status: true
+dependencies: {  }
+id: druxt_docs
+label: 'DruxtJS documentation'
+description: 'Seeds the documentation from the pinned source. Run in dependency order; roll back to undo a run.'
+source_type: null
+module: null
+shared_configuration: null

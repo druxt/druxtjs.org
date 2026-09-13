@@ -1,0 +1,54 @@
+{
+    "uuid": [
+        {
+            "value": "0cbd629f-b296-5668-a93d-865287275466"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_code",
+            "target_type": "paragraphs_type",
+            "target_uuid": "eafde3f2-1572-48f8-a6ae-4d1ce17d56ee"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_code": [
+        {
+            "value": "<DruxtEntity type=\"node--article\" :uuid=\"uuid\">\n  <template #default=\"{ entity }\">\n    <div>\n      <h1>{{ entity.attributes.title }}<\/h1>\n    <\/div>\n  <\/template>\n<\/DruxtEntity>"
+        }
+    ],
+    "field_language": [
+        {
+            "value": "vue"
+        }
+    ]
+}

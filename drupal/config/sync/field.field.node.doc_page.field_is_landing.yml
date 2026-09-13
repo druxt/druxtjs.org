@@ -1,0 +1,21 @@
+uuid: b822ca42-b3ce-43dc-b300-5039697896c9
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_is_landing
+    - node.type.doc_page
+id: node.doc_page.field_is_landing
+field_name: field_is_landing
+entity_type: node
+bundle: doc_page
+label: 'Section landing page'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "e6497c75-736f-5da2-9112-56676ba008fe"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Concepts are **understanding-oriented**: they explain how Druxt works and the\nreasoning behind its design, from the architecture and data flow to the\nmental model the modules share. They deliberately avoid step-by-step\ninstructions. For doing, see the [How-to guides](\/how-to).\n\n## Topics\n\n- [Architecture](\/explanation\/architecture): the fully decoupled Drupal and\n  Nuxt.js request lifecycle, end to end.\n- [Drupal for Nuxt developers](\/explanation\/drupal-for-nuxt-developers):\n  the backend vocabulary and tooling, in frontend terms.\n- [Nuxt for Drupal developers](\/explanation\/nuxt-for-drupal-developers):\n  the frontend concepts, mapped to the Drupal ideas they replace.\n- [The DruxtStore](\/explanation\/druxt-store): collections, resources, and\n  how modules share state.\n- [Decoupled routing](\/explanation\/routing): how Drupal routes map to\n  frontend paths.\n- [The schema system](\/explanation\/schemas): display modes as a component\n  data source.\n- [Component resolution](\/explanation\/component-resolution): wrapper\n  discovery and the theme layer.\n- [Request topology](\/explanation\/request-topology): which requests\n  happen where, and why CORS only ever bites in the browser.\n- [Deployment models](\/explanation\/deployment-models): three production\n  shapes and the decision framework between them.\n- [Support and versioning](\/explanation\/support-and-versioning): what a\n  release number promises, and how deprecation works.",
+            "format": "docs_markdown",
+            "processed": "<p>Concepts are <strong>understanding-oriented<\/strong>: they explain how Druxt works and the\nreasoning behind its design, from the architecture and data flow to the\nmental model the modules share. They deliberately avoid step-by-step\ninstructions. For doing, see the <a href=\"\/how-to\">How-to guides<\/a>.<\/p>\n<h2>Topics<\/h2>\n<ul>\n<li><a href=\"\/explanation\/architecture\">Architecture<\/a>: the fully decoupled Drupal and\nNuxt.js request lifecycle, end to end.<\/li>\n<li><a href=\"\/explanation\/drupal-for-nuxt-developers\">Drupal for Nuxt developers<\/a>:\nthe backend vocabulary and tooling, in frontend terms.<\/li>\n<li><a href=\"\/explanation\/nuxt-for-drupal-developers\">Nuxt for Drupal developers<\/a>:\nthe frontend concepts, mapped to the Drupal ideas they replace.<\/li>\n<li><a href=\"\/explanation\/druxt-store\">The DruxtStore<\/a>: collections, resources, and\nhow modules share state.<\/li>\n<li><a href=\"\/explanation\/routing\">Decoupled routing<\/a>: how Drupal routes map to\nfrontend paths.<\/li>\n<li><a href=\"\/explanation\/schemas\">The schema system<\/a>: display modes as a component\ndata source.<\/li>\n<li><a href=\"\/explanation\/component-resolution\">Component resolution<\/a>: wrapper\ndiscovery and the theme layer.<\/li>\n<li><a href=\"\/explanation\/request-topology\">Request topology<\/a>: which requests\nhappen where, and why CORS only ever bites in the browser.<\/li>\n<li><a href=\"\/explanation\/deployment-models\">Deployment models<\/a>: three production\nshapes and the decision framework between them.<\/li>\n<li><a href=\"\/explanation\/support-and-versioning\">Support and versioning<\/a>: what a\nrelease number promises, and how deprecation works.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

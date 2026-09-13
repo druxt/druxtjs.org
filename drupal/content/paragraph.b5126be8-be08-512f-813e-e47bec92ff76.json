@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "b5126be8-be08-512f-813e-e47bec92ff76"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "That maps `\/sites\/cms.example.com\/files` rather than\n`\/sites\/default\/files`.\n\n## Additional proxy routes\n\nThe Druxt entries merge with anything you add to Nuxt's own `proxy`\nconfig, so backend paths beyond the API can ride the same origin. A\nserver-side endpoint the frontend calls (a logout route, a sitemap)\nis one line:",
+            "format": "docs_markdown",
+            "processed": "<p>That maps <code>\/sites\/cms.example.com\/files<\/code> rather than\n<code>\/sites\/default\/files<\/code>.<\/p>\n<h2>Additional proxy routes<\/h2>\n<p>The Druxt entries merge with anything you add to Nuxt's own <code>proxy<\/code>\nconfig, so backend paths beyond the API can ride the same origin. A\nserver-side endpoint the frontend calls (a logout route, a sitemap)\nis one line:<\/p>\n"
+        }
+    ]
+}

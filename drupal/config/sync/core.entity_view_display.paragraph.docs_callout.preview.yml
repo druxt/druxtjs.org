@@ -1,0 +1,32 @@
+uuid: 28f89d4e-eff9-40f6-a5eb-c6612ef5a6b8
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.paragraph.preview
+    - field.field.paragraph.docs_callout.field_callout
+    - field.field.paragraph.docs_callout.field_callout_type
+    - paragraphs.paragraphs_type.docs_callout
+  module:
+    - options
+    - text
+id: paragraph.docs_callout.preview
+targetEntityType: paragraph
+bundle: docs_callout
+mode: preview
+content:
+  field_callout:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_callout_type:
+    type: list_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden: {  }

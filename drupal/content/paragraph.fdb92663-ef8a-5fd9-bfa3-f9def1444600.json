@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "fdb92663-ef8a-5fd9-bfa3-f9def1444600"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "- The path is the component name, and the component name is the wiring.\n- Slots are the module's output: results and pager for a view, one per\n  field for an entity.\n- Undeclared props are written into your markup as attributes. A mixin\n  declares them for you.\n- A wrapper's `druxt.query` decides what its component fetches.\n- The most specific matching name wins, so you can theme broadly and then\n  make exceptions.\n\nNothing here is specific to the front page. Every Druxt component on your\nsite (blocks, menus, breadcrumbs, fields, forms) is themed exactly this\nway.\n\n## Where to go next\n\n- Keep learning: [Add a login flow](\/tutorials\/authentication), the next\n  lesson.\n- [Theme Druxt components](\/how-to\/theming): the reference version of this,\n  including the default-template alternative to wrapper files and the\n  dev-mode box that scaffolds a wrapper for you.\n- [Component resolution](\/explanation\/component-resolution): the full\n  candidate list and how the ranking is built.\n- [Debug Druxt with the Vue Devtools](\/how-to\/devtools): read\n  `component.options` to see every name a component would accept.\n- [Explore the example apps](\/how-to\/example-apps): finished wrapper sets\n  for Tailwind, DaisyUI and BootstrapVue.\n- [Building a custom Druxt module](\/tutorials\/first-custom-module): the\n  same system from the other side, as the author of a themeable component.\n- [Deploy your site](\/tutorials\/deploy-your-site): put the themed site on a\n  live URL.",
+            "format": "docs_markdown",
+            "processed": "<ul>\n<li>The path is the component name, and the component name is the wiring.<\/li>\n<li>Slots are the module's output: results and pager for a view, one per\nfield for an entity.<\/li>\n<li>Undeclared props are written into your markup as attributes. A mixin\ndeclares them for you.<\/li>\n<li>A wrapper's <code>druxt.query<\/code> decides what its component fetches.<\/li>\n<li>The most specific matching name wins, so you can theme broadly and then\nmake exceptions.<\/li>\n<\/ul>\n<p>Nothing here is specific to the front page. Every Druxt component on your\nsite (blocks, menus, breadcrumbs, fields, forms) is themed exactly this\nway.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li>Keep learning: <a href=\"\/tutorials\/authentication\">Add a login flow<\/a>, the next\nlesson.<\/li>\n<li><a href=\"\/how-to\/theming\">Theme Druxt components<\/a>: the reference version of this,\nincluding the default-template alternative to wrapper files and the\ndev-mode box that scaffolds a wrapper for you.<\/li>\n<li><a href=\"\/explanation\/component-resolution\">Component resolution<\/a>: the full\ncandidate list and how the ranking is built.<\/li>\n<li><a href=\"\/how-to\/devtools\">Debug Druxt with the Vue Devtools<\/a>: read\n<code>component.options<\/code> to see every name a component would accept.<\/li>\n<li><a href=\"\/how-to\/example-apps\">Explore the example apps<\/a>: finished wrapper sets\nfor Tailwind, DaisyUI and BootstrapVue.<\/li>\n<li><a href=\"\/tutorials\/first-custom-module\">Building a custom Druxt module<\/a>: the\nsame system from the other side, as the author of a themeable component.<\/li>\n<li><a href=\"\/tutorials\/deploy-your-site\">Deploy your site<\/a>: put the themed site on a\nlive URL.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

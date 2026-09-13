@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "fcf43e6f-203c-5616-b790-2be0c5593ca3"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Set the host's Node version explicitly (an `.nvmrc` file, or the host's\n`NODE_VERSION` setting) so builds do not move when the host's default\nchanges.\n\n## Deploy with the Netlify UI\n\n1. Push the project to a git host and choose **Add new site \u2192 Import an\n   existing project** in Netlify.\n2. Build command: `npm run generate` (prefix with the `NODE_OPTIONS`\n   flag above if building on Node 17+). Publish directory: `dist`.\n3. Add the environment variables the build needs, at minimum `BASE_URL`\n   pointing at a Drupal the **build machine** can reach. See\n   [Environment variables](\/how-to\/environment-variables).\n4. Deploy. Netlify rebuilds on every push to the production branch.\n\n## Deploy with the CLI\n\nThe same, scriptable:",
+            "format": "docs_markdown",
+            "processed": "<p>Set the host's Node version explicitly (an <code>.nvmrc<\/code> file, or the host's\n<code>NODE_VERSION<\/code> setting) so builds do not move when the host's default\nchanges.<\/p>\n<h2>Deploy with the Netlify UI<\/h2>\n<ol>\n<li>Push the project to a git host and choose <strong>Add new site \u2192 Import an\nexisting project<\/strong> in Netlify.<\/li>\n<li>Build command: <code>npm run generate<\/code> (prefix with the <code>NODE_OPTIONS<\/code>\nflag above if building on Node 17+). Publish directory: <code>dist<\/code>.<\/li>\n<li>Add the environment variables the build needs, at minimum <code>BASE_URL<\/code>\npointing at a Drupal the <strong>build machine<\/strong> can reach. See\n<a href=\"\/how-to\/environment-variables\">Environment variables<\/a>.<\/li>\n<li>Deploy. Netlify rebuilds on every push to the production branch.<\/li>\n<\/ol>\n<h2>Deploy with the CLI<\/h2>\n<p>The same, scriptable:<\/p>\n"
+        }
+    ]
+}

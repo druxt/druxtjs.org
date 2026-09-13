@@ -1,0 +1,111 @@
+{
+    "uuid": [
+        {
+            "value": "da64417e-840d-5353-8b69-92b1433ac915"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Nuxt for Drupal developers"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "8603c3ea-5883-53fd-9adf-6925812dcb1b"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "The Nuxt and Vue concepts behind a Druxt frontend, mapped to the Drupal ideas they replace."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "4f80265c-02fd-5652-8970-c0bf9eaf5e5b"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/explanation\/nuxt-for-drupal-developers.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"what-nuxt-does-in-a-druxt-project\",\"depth\":2,\"text\":\"What Nuxt does in a Druxt project\"},{\"id\":\"the-mapping\",\"depth\":2,\"text\":\"The mapping\"},{\"id\":\"the-part-that-will-feel-familiar\",\"depth\":2,\"text\":\"The part that will feel familiar\"},{\"id\":\"the-vue-you-actually-need\",\"depth\":2,\"text\":\"The Vue you actually need\"},{\"id\":\"files-that-matter\",\"depth\":2,\"text\":\"Files that matter\"},{\"id\":\"what-you-can-skip\",\"depth\":2,\"text\":\"What you can skip\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -7
+        }
+    ]
+}

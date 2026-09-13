@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "9423009a-edc0-57d0-b751-b96de20d0037"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## 0.x to 1.0.0\n\n1.0.0 declares stability rather than changing behaviour: it is not a\nbreaking release, and a site current on the last 0.x releases upgrades\nby bumping versions. Install every `druxt*` package your\n`package.json` names at the new major explicitly; `npm update` respects\nthe existing 0.x ranges and would leave you where you started:",
+            "format": "docs_markdown",
+            "processed": "<h2>0.x to 1.0.0<\/h2>\n<p>1.0.0 declares stability rather than changing behaviour: it is not a\nbreaking release, and a site current on the last 0.x releases upgrades\nby bumping versions. Install every <code>druxt*<\/code> package your\n<code>package.json<\/code> names at the new major explicitly; <code>npm update<\/code> respects\nthe existing 0.x ranges and would leave you where you started:<\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "0eb36c30-b5c6-5a3c-bcee-c056bf666460"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "This is a two-pane planning board: filterable recipe library on the left, a\nseven-day grid on the right, with native HTML5 drag-and-drop (plus a\nclick-to-place equivalent calling the identical store action, for touch and\nassistive tech) and live-recomputed per-day\/per-week totals and a\ndeduplicated shopping list. The one deliberately **Nuxt-free** app in the\nsuite: plain Vue 2 + Vite + vue-router, proving that Druxt's Vuex store\nmodules, `DruxtClient`\/`DruxtRouter`, and Vue components work outside Nuxt\nentirely (Nuxt's `fetch()` lifecycle hook is the one thing with no\nplain-Vue equivalent, replicated by hand with a small compatible mixin).\nIf you've been assuming Druxt requires Nuxt, this app is the counterexample.\n\n## Content Ops Console (druxt-bootstrapvue): authenticated inline editing",
+            "format": "docs_markdown",
+            "processed": "<p>This is a two-pane planning board: filterable recipe library on the left, a\nseven-day grid on the right, with native HTML5 drag-and-drop (plus a\nclick-to-place equivalent calling the identical store action, for touch and\nassistive tech) and live-recomputed per-day\/per-week totals and a\ndeduplicated shopping list. The one deliberately <strong>Nuxt-free<\/strong> app in the\nsuite: plain Vue 2 + Vite + vue-router, proving that Druxt's Vuex store\nmodules, <code>DruxtClient<\/code>\/<code>DruxtRouter<\/code>, and Vue components work outside Nuxt\nentirely (Nuxt's <code>fetch()<\/code> lifecycle hook is the one thing with no\nplain-Vue equivalent, replicated by hand with a small compatible mixin).\nIf you've been assuming Druxt requires Nuxt, this app is the counterexample.<\/p>\n<h2>Content Ops Console (druxt-bootstrapvue): authenticated inline editing<\/h2>\n"
+        }
+    ]
+}

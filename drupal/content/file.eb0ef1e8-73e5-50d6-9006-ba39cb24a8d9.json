@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "eb0ef1e8-73e5-50d6-9006-ba39cb24a8d9"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "devtools-scaffold.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/devtools-scaffold.png",
+            "url": "\/sites\/default\/files\/documentation\/devtools-scaffold.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 6553
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

@@ -1,0 +1,59 @@
+{
+    "uuid": [
+        {
+            "value": "a7ebdc90-4631-5322-a9f3-fad87f0a95b1"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_diagram",
+            "target_type": "paragraphs_type",
+            "target_uuid": "3c91ca27-0983-444c-a6bf-236eea8124d3"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_diagram": [
+        {
+            "value": "%% Static plus live backend\nflowchart TB\n  V2[Visitors] --> H2[Static host]\n  V2 -.->|\"forms, auth, search\"| D2[(Drupal)]"
+        }
+    ],
+    "field_group": [
+        {
+            "value": "group-1"
+        }
+    ],
+    "field_syntax": [
+        {
+            "value": "mermaid"
+        }
+    ]
+}

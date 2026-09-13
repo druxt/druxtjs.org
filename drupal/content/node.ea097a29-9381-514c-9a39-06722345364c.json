@@ -1,0 +1,143 @@
+{
+    "uuid": [
+        {
+            "value": "ea097a29-9381-514c-9a39-06722345364c"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Debug Druxt with the Vue Devtools"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "753db40d-f43d-5ecb-b19d-9e3322aa62ee"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "58855054-3545-578e-848f-673cf9643977"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "71186e64-3902-5499-a883-3545606e750b"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "6ff88de3-461e-5082-95f4-3891c2d86fe1"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "cd966cad-bd38-558a-a623-2b30df7886ec"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "3cf7c641-57a5-5f07-9acd-51e4b19309f8"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "fba86fb6-e469-5555-aa90-ef4b065ea2b3"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "413be212-042a-5b98-9026-1a70d9c86872"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "f7150cec-31bd-534d-bbad-6f8fd933b610"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "The DruxtJS devtools inspector shows connection details and live theme suggestions, and scaffolds wrapper components in one click."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "540fd949-ce24-5411-b703-1d1e76de2802"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/how-to\/devtools.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"install\",\"depth\":2,\"text\":\"Install\"},{\"id\":\"the-druxtjs-inspector\",\"depth\":2,\"text\":\"The DruxtJS inspector\"},{\"id\":\"theme-suggestions-on-every-component\",\"depth\":2,\"text\":\"Theme suggestions on every component\"},{\"id\":\"scaffold-a-wrapper-from-the-browser\",\"depth\":2,\"text\":\"Scaffold a wrapper from the browser\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -1
+        }
+    ]
+}

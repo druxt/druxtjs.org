@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "9c70a768-f399-5d29-a629-6e0296807b13"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "examples-recipe-box.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/examples-recipe-box.png",
+            "url": "\/sites\/default\/files\/documentation\/examples-recipe-box.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 217951
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

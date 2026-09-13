@@ -1,0 +1,10 @@
+uuid: eafde3f2-1572-48f8-a6ae-4d1ce17d56ee
+langcode: en
+status: true
+dependencies: {  }
+id: docs_code
+label: Code
+icon_uuid: null
+icon_default: null
+description: 'A fenced code example, stored verbatim with its language.'
+behavior_plugins: {  }

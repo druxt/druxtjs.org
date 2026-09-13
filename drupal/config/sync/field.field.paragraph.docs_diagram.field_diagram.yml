@@ -1,0 +1,19 @@
+uuid: 6b94c7c4-0a03-46a9-98cb-ab43d6e6b31d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_diagram
+    - paragraphs.paragraphs_type.docs_diagram
+id: paragraph.docs_diagram.field_diagram
+field_name: field_diagram
+entity_type: paragraph
+bundle: docs_diagram
+label: 'Diagram source'
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

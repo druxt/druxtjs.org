@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "8264fb4d-9a5c-5a81-9f67-6a032a6529cf"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Outcome:** your browser opens a Drupal admin session, same as in Getting\nstarted. Leave that tab open (or just remember you're logged in) and go back\nto the frontend.\n\n## Step 3: Trigger the login\n\nWith the frontend running, open http:\/\/localhost:3000\/user\/login.\n\n**Outcome:** the page briefly shows \"Redirecting...\" then sends you to\nDrupal's OAuth authorization screen, asking you to approve access for the\n\"Druxt\" consumer. Approve it. You're redirected back to\nhttp:\/\/localhost:3000\/callback, then on to the frontend homepage, now\nauthenticated.\n\n## Step 4: Confirm you're actually logged in\n\nNothing on the page visibly changes yet. There's no login state shown in\nthe UI. Open your browser's DevTools, go to **Application \u2192 Local Storage**\n(Chrome) or **Storage \u2192 Local Storage** (Firefox) for `localhost:3000`, and\nlook for keys starting with `auth.`.\n\n**Outcome:** you'll see `auth.strategy` set to `drupal-authorization_code`\nand an `auth._token.drupal-authorization_code` entry holding your access\ntoken. That's Nuxt's auth module confirming you're logged in.\n\n## What you've got\n\nA real, working OAuth 2.0 Authorization Code (with PKCE) login flow, backed\nby Drupal's Simple OAuth module. No passwords touch the frontend at any\npoint.\n\n| Piece                                            | What it is                                                          |\n| ------------------------------------------------ | ------------------------------------------------------------------- |\n| Drupal Consumer (provisioned by `npm run setup`) | A public OAuth client with PKCE enabled, redirecting to `\/callback` |\n| `druxt-auth` module                              | Wires `@nuxtjs\/auth-next` up with Drupal-specific OAuth strategies  |\n| `pages\/user\/login.vue`                           | Starts the flow                                                     |\n| `\/callback` route                                | Added automatically by `druxt-auth`; completes the token exchange   |\n\nFrom any component, `this.$auth.loggedIn` and `this.$auth.user` are now\nusable: `user` is populated from Drupal's `\/oauth\/userinfo` endpoint. A\nnatural next step is adding a login\/logout link to your layout using those,\nrather than requiring people to know the `\/user\/login` URL by heart.\n\n## Known limitations\n\nCurrent as of `druxt-auth` 0.4.0:\n\n- **Sessions renew silently, with three caveats.** The scheme\n  refreshes an expired access token automatically on any request, and\n  server rendering restores cold loads from the cookie-held tokens. The\n  real limits: an expired access token alone never logs anyone out\n  (`autoLogout` defaults off), a custom `druxt.axios` instance bypasses\n  the automatic refresh (the\n  [how-to](\/how-to\/authentication#keep-the-session-alive) covers that\n  case), and auth-next assumes a 30-day refresh token while the\n  consumer default is 14, so a long-idle session can still end\n  mid-request.\n- **Logging out** isn't wired to any UI yet either: `this.$auth.logout()`\n  ends the session once you've added something to call it.\n\n## Where to go next\n\n- Keep learning: [Deploy your site](\/tutorials\/deploy-your-site), the\n  next lesson.\n- See this flow put to work in a real app: [Explore the example\n  apps](\/how-to\/example-apps): Content Ops Console uses this exact login to\n  authenticate its inline content editing.\n- Full authentication option reference (scopes, environment variables):\n  the [`druxt-auth` README](https:\/\/github.com\/druxt\/druxt-auth).\n- Understand the machine you just started: [Architecture](\/explanation\/architecture).",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Outcome:<\/strong> your browser opens a Drupal admin session, same as in Getting\nstarted. Leave that tab open (or just remember you're logged in) and go back\nto the frontend.<\/p>\n<h2>Step 3: Trigger the login<\/h2>\n<p>With the frontend running, open <a href=\"http:\/\/localhost:3000\/user\/login\">http:\/\/localhost:3000\/user\/login<\/a>.<\/p>\n<p><strong>Outcome:<\/strong> the page briefly shows \"Redirecting...\" then sends you to\nDrupal's OAuth authorization screen, asking you to approve access for the\n\"Druxt\" consumer. Approve it. You're redirected back to\n<a href=\"http:\/\/localhost:3000\/callback\">http:\/\/localhost:3000\/callback<\/a>, then on to the frontend homepage, now\nauthenticated.<\/p>\n<h2>Step 4: Confirm you're actually logged in<\/h2>\n<p>Nothing on the page visibly changes yet. There's no login state shown in\nthe UI. Open your browser's DevTools, go to <strong>Application \u2192 Local Storage<\/strong>\n(Chrome) or <strong>Storage \u2192 Local Storage<\/strong> (Firefox) for <code>localhost:3000<\/code>, and\nlook for keys starting with <code>auth.<\/code>.<\/p>\n<p><strong>Outcome:<\/strong> you'll see <code>auth.strategy<\/code> set to <code>drupal-authorization_code<\/code>\nand an <code>auth._token.drupal-authorization_code<\/code> entry holding your access\ntoken. That's Nuxt's auth module confirming you're logged in.<\/p>\n<h2>What you've got<\/h2>\n<p>A real, working OAuth 2.0 Authorization Code (with PKCE) login flow, backed\nby Drupal's Simple OAuth module. No passwords touch the frontend at any\npoint.<\/p>\n<table>\n<thead>\n<tr>\n<th>Piece<\/th>\n<th>What it is<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td>Drupal Consumer (provisioned by <code>npm run setup<\/code>)<\/td>\n<td>A public OAuth client with PKCE enabled, redirecting to <code>\/callback<\/code><\/td>\n<\/tr>\n<tr>\n<td><code>druxt-auth<\/code> module<\/td>\n<td>Wires <code>@nuxtjs\/auth-next<\/code> up with Drupal-specific OAuth strategies<\/td>\n<\/tr>\n<tr>\n<td><code>pages\/user\/login.vue<\/code><\/td>\n<td>Starts the flow<\/td>\n<\/tr>\n<tr>\n<td><code>\/callback<\/code> route<\/td>\n<td>Added automatically by <code>druxt-auth<\/code>; completes the token exchange<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<p>From any component, <code>this.$auth.loggedIn<\/code> and <code>this.$auth.user<\/code> are now\nusable: <code>user<\/code> is populated from Drupal's <code>\/oauth\/userinfo<\/code> endpoint. A\nnatural next step is adding a login\/logout link to your layout using those,\nrather than requiring people to know the <code>\/user\/login<\/code> URL by heart.<\/p>\n<h2>Known limitations<\/h2>\n<p>Current as of <code>druxt-auth<\/code> 0.4.0:<\/p>\n<ul>\n<li><strong>Sessions renew silently, with three caveats.<\/strong> The scheme\nrefreshes an expired access token automatically on any request, and\nserver rendering restores cold loads from the cookie-held tokens. The\nreal limits: an expired access token alone never logs anyone out\n(<code>autoLogout<\/code> defaults off), a custom <code>druxt.axios<\/code> instance bypasses\nthe automatic refresh (the\n<a href=\"\/how-to\/authentication#keep-the-session-alive\">how-to<\/a> covers that\ncase), and auth-next assumes a 30-day refresh token while the\nconsumer default is 14, so a long-idle session can still end\nmid-request.<\/li>\n<li><strong>Logging out<\/strong> isn't wired to any UI yet either: <code>this.$auth.logout()<\/code>\nends the session once you've added something to call it.<\/li>\n<\/ul>\n<h2>Where to go next<\/h2>\n<ul>\n<li>Keep learning: <a href=\"\/tutorials\/deploy-your-site\">Deploy your site<\/a>, the\nnext lesson.<\/li>\n<li>See this flow put to work in a real app: <a href=\"\/how-to\/example-apps\">Explore the example\napps<\/a>: Content Ops Console uses this exact login to\nauthenticate its inline content editing.<\/li>\n<li>Full authentication option reference (scopes, environment variables):\nthe <a href=\"https:\/\/github.com\/druxt\/druxt-auth\"><code>druxt-auth<\/code> README<\/a>.<\/li>\n<li>Understand the machine you just started: <a href=\"\/explanation\/architecture\">Architecture<\/a>.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

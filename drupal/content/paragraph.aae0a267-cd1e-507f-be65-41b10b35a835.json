@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "aae0a267-cd1e-507f-be65-41b10b35a835"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "What the `druxt()` options mean:\n\n- **`componentOptions`** feeds the component suggestion system with names to\n  look for: `[['Default']]` means Druxt will look for a theme component at\n  `components\/druxt\/custom-module\/Default.vue` before falling back to its own\n  defaults.\n- **`propsData`** maps data from the module to props passed to whatever theme\n  component is resolved.\n- **`slots`** defines the default slot's render function: the actual\n  content your module provides.\n\nThen create the theme component it will resolve to,\n`nuxt\/components\/druxt\/custom-module\/Default.vue`:",
+            "format": "docs_markdown",
+            "processed": "<p>What the <code>druxt()<\/code> options mean:<\/p>\n<ul>\n<li><strong><code>componentOptions<\/code><\/strong> feeds the component suggestion system with names to\nlook for: <code>[['Default']]<\/code> means Druxt will look for a theme component at\n<code>components\/druxt\/custom-module\/Default.vue<\/code> before falling back to its own\ndefaults.<\/li>\n<li><strong><code>propsData<\/code><\/strong> maps data from the module to props passed to whatever theme\ncomponent is resolved.<\/li>\n<li><strong><code>slots<\/code><\/strong> defines the default slot's render function: the actual\ncontent your module provides.<\/li>\n<\/ul>\n<p>Then create the theme component it will resolve to,\n<code>nuxt\/components\/druxt\/custom-module\/Default.vue<\/code>:<\/p>\n"
+        }
+    ]
+}

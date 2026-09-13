@@ -1,0 +1,187 @@
+{
+    "uuid": [
+        {
+            "value": "2aa98ab6-6e9e-56ff-84b4-767e4be6b339"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Authenticate users with OAuth"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "70c2bb46-ecc8-53ec-a8df-45229bc929de"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "44009651-6242-56e3-909e-f1dd0c14b617"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "391eac3b-0c84-5856-bcdd-e1d9d4211174"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0150dd59-6116-5f1a-a223-e4fd2c6e68d6"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "1c03a733-d6ca-5a49-b7e9-4ddab9b82c2c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "b114fe67-53fb-5681-a4e6-0635138fe444"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "f3587e7c-d0fa-5850-bebd-d0a5a3b05c03"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "3d834fc0-43aa-5d97-a16b-9f7d0a6dcbc4"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "173fbbb2-90d8-5c2c-8b51-e9103f0bf254"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "060e7507-cf1f-595a-9aac-6b8d23320c22"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "19c42778-b965-54ef-afc8-a82b685c8fde"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "9d259fac-b1eb-5ef8-97e7-b4be4348cde3"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "7a568ca7-876a-5b5c-9850-55c57f9d6370"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "7231613e-a745-539f-ac9f-544ce8584274"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "74f063fa-f04f-5611-8294-f066a61420eb"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "a598f836-ca5a-5734-af37-66d27d3fb9b8"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "467692d9-da5a-54bb-a0cf-0c4c6506cd9d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "9658d952-0efd-5eb3-a658-d3dccea69f6c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "6bfac1ec-8c91-5015-a0f6-70cb72146642"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "adf38b84-e444-57e0-a5f9-619e4fcd932c"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "The full OAuth setup from scratch: Simple OAuth keys, scopes and a consumer in Drupal, druxt-auth in Nuxt, and the traps on both sides."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "540fd949-ce24-5411-b703-1d1e76de2802"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/how-to\/authentication.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"drupal-install-and-generate-keys\",\"depth\":2,\"text\":\"Drupal: install and generate keys\"},{\"id\":\"drupal-create-a-scope\",\"depth\":2,\"text\":\"Drupal: create a scope\"},{\"id\":\"drupal-create-the-consumer\",\"depth\":2,\"text\":\"Drupal: create the consumer\"},{\"id\":\"nuxt-configure-druxt-auth\",\"depth\":2,\"text\":\"Nuxt: configure druxt-auth\"},{\"id\":\"the-login-page-trap\",\"depth\":2,\"text\":\"The login page trap\"},{\"id\":\"which-requests-send-the-token\",\"depth\":2,\"text\":\"Which requests send the token\"},{\"id\":\"writes-and-the-csrf-question\",\"depth\":2,\"text\":\"Writes, and the CSRF question\"},{\"id\":\"keep-the-session-alive\",\"depth\":2,\"text\":\"Keep the session alive\"},{\"id\":\"logging-out\",\"depth\":2,\"text\":\"Logging out\"},{\"id\":\"known-limitations\",\"depth\":2,\"text\":\"Known limitations\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": 0
+        }
+    ]
+}

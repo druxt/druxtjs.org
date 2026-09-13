@@ -1,0 +1,10 @@
+uuid: 1e924889-e030-4b91-811a-c906d05f0f0e
+langcode: en
+status: true
+dependencies: {  }
+id: docs_callout
+label: Callout
+icon_uuid: null
+icon_default: null
+description: 'A prerequisite notice or other set-aside advisory.'
+behavior_plugins: {  }

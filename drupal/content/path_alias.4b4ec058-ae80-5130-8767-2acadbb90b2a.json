@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "4b4ec058-ae80-5130-8767-2acadbb90b2a"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/e38f300f-cffa-5266-9f1c-93607382bde8"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/explanation\/support-and-versioning"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

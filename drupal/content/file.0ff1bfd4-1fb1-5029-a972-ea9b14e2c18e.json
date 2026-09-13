@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "0ff1bfd4-1fb1-5029-a972-ea9b14e2c18e"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "examples-content-ops-console.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/examples-content-ops-console.png",
+            "url": "\/sites\/default\/files\/documentation\/examples-content-ops-console.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 141913
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

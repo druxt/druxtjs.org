@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "9de6a601-3184-5514-8f0b-54758875633a"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Most traffic gets CDN-grade static delivery; the node service only works\nfor the routes that need it. Driving the build target with an\nenvironment variable (`NUXT_TARGET`) lets one codebase produce both\nbuilds.\n\n## On a container platform\n\nOn [Lagoon](https:\/\/lagoon.sh) (which hosts this site) the same shapes\nmap to services: a `node` service running `nuxt start`, or the hybrid as\nan `nginx` service whose image contains the generated files plus a\n`node` fallback service. The build runs in the image build, which means:\n\n- Environment variables the build needs must reach the **image build**\n  (declared as build arguments), not just the running container. This\n  is true of any Docker-based platform.\n- The backend must be reachable from the builder. Gate the build on the\n  backend answering (`curl` its `\/jsonapi` until 200), and retry the\n  build once or twice, because large generates can fail transiently.\n\n## Content freshness\n\nServer-rendered pages are live. Generated pages in the hybrid are not:\nrebuild on a schedule, or from a Drupal webhook, whichever matches how\noften editors publish. The rebuild options in [Deploy a static\nsite](\/how-to\/deploy-static#after-the-first-deploy) apply to the\nhybrid's static half unchanged.\n\n## Where to go next\n\n- [Environment variables](\/how-to\/environment-variables): the build-time\n  vs runtime distinction matters most in this model.\n- [Proxy the Drupal backend](\/how-to\/proxy): single-origin browser\n  traffic.\n- [Authenticate users with OAuth](\/how-to\/authentication): server\n  deployments unlock the full authenticated experience.",
+            "format": "docs_markdown",
+            "processed": "<p>Most traffic gets CDN-grade static delivery; the node service only works\nfor the routes that need it. Driving the build target with an\nenvironment variable (<code>NUXT_TARGET<\/code>) lets one codebase produce both\nbuilds.<\/p>\n<h2>On a container platform<\/h2>\n<p>On <a href=\"https:\/\/lagoon.sh\">Lagoon<\/a> (which hosts this site) the same shapes\nmap to services: a <code>node<\/code> service running <code>nuxt start<\/code>, or the hybrid as\nan <code>nginx<\/code> service whose image contains the generated files plus a\n<code>node<\/code> fallback service. The build runs in the image build, which means:<\/p>\n<ul>\n<li>Environment variables the build needs must reach the <strong>image build<\/strong>\n(declared as build arguments), not just the running container. This\nis true of any Docker-based platform.<\/li>\n<li>The backend must be reachable from the builder. Gate the build on the\nbackend answering (<code>curl<\/code> its <code>\/jsonapi<\/code> until 200), and retry the\nbuild once or twice, because large generates can fail transiently.<\/li>\n<\/ul>\n<h2>Content freshness<\/h2>\n<p>Server-rendered pages are live. Generated pages in the hybrid are not:\nrebuild on a schedule, or from a Drupal webhook, whichever matches how\noften editors publish. The rebuild options in <a href=\"\/how-to\/deploy-static#after-the-first-deploy\">Deploy a static\nsite<\/a> apply to the\nhybrid's static half unchanged.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/how-to\/environment-variables\">Environment variables<\/a>: the build-time\nvs runtime distinction matters most in this model.<\/li>\n<li><a href=\"\/how-to\/proxy\">Proxy the Drupal backend<\/a>: single-origin browser\ntraffic.<\/li>\n<li><a href=\"\/how-to\/authentication\">Authenticate users with OAuth<\/a>: server\ndeployments unlock the full authenticated experience.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

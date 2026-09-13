@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "dc15ecd0-7090-53da-b8b9-b0a23f3e6a36"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Each field entry has the formatter and its settings from Drupal, in\n`weight` order. Entity components turn each field's formatter `type` into a\n`DruxtField*` component (an `image` formatter becomes `DruxtFieldImage`),\nso the field order and configuration in the schema is what renders on the\npage.\n\n## Where schemas come from\n\n`DruxtSchema` reads Drupal's `entity_view_display` and\n`entity_form_display` config entities over JSON:API: the same entities\nthat power Drupal's own **Manage display** screens. A schema is assembled\nper combination of entity type, bundle, display mode, and (where relevant)\nform or view variant, then cached in its own Vuex store.\n\nA site builder rearranging fields in Drupal changes the decoupled frontend\ntoo, since both read the same source of truth.\n\n## Schemas are generated once, at startup\n\n`druxt-schema` builds every schema during Nuxt's `builder:prepared` hook\n(once, when `nuxt dev` or `nuxt build` starts) and writes each one to a\nstatic `schemas\/<id>.json` file. At runtime, `$druxtSchema.import(id)` reads\nthat file. There is no live JSON:API request for schemas after startup.\n\nIn practice, this means rearranging fields, changing a formatter, or adding\na new view mode in Drupal **will not appear on the frontend until you\nrestart `nuxt dev`** (or rebuild). This surprises people because content\nchanges update live but display-mode changes don't: they run through\nentirely different paths.\n\n## Schemas shape the queries, not just the rendering\n\nA less visible role: schemas **narrow the JSON:API query**. Rendering only\nneeds the fields the display includes, so the fetch can add a\n`fields[node--article]=...` filter derived from the schema. Less data\ncrosses the wire, and because the store distinguishes\n[partial from full resources](\/explanation\/druxt-store), those slim\nfetches cache as partial, not as complete resources.\n\nThe entity module enables this with:",
+            "format": "docs_markdown",
+            "processed": "<p>Each field entry has the formatter and its settings from Drupal, in\n<code>weight<\/code> order. Entity components turn each field's formatter <code>type<\/code> into a\n<code>DruxtField*<\/code> component (an <code>image<\/code> formatter becomes <code>DruxtFieldImage<\/code>),\nso the field order and configuration in the schema is what renders on the\npage.<\/p>\n<h2>Where schemas come from<\/h2>\n<p><code>DruxtSchema<\/code> reads Drupal's <code>entity_view_display<\/code> and\n<code>entity_form_display<\/code> config entities over JSON:API: the same entities\nthat power Drupal's own <strong>Manage display<\/strong> screens. A schema is assembled\nper combination of entity type, bundle, display mode, and (where relevant)\nform or view variant, then cached in its own Vuex store.<\/p>\n<p>A site builder rearranging fields in Drupal changes the decoupled frontend\ntoo, since both read the same source of truth.<\/p>\n<h2>Schemas are generated once, at startup<\/h2>\n<p><code>druxt-schema<\/code> builds every schema during Nuxt's <code>builder:prepared<\/code> hook\n(once, when <code>nuxt dev<\/code> or <code>nuxt build<\/code> starts) and writes each one to a\nstatic <code>schemas\/&lt;id&gt;.json<\/code> file. At runtime, <code>$druxtSchema.import(id)<\/code> reads\nthat file. There is no live JSON:API request for schemas after startup.<\/p>\n<p>In practice, this means rearranging fields, changing a formatter, or adding\na new view mode in Drupal <strong>will not appear on the frontend until you\nrestart <code>nuxt dev<\/code><\/strong> (or rebuild). This surprises people because content\nchanges update live but display-mode changes don't: they run through\nentirely different paths.<\/p>\n<h2>Schemas shape the queries, not just the rendering<\/h2>\n<p>A less visible role: schemas <strong>narrow the JSON:API query<\/strong>. Rendering only\nneeds the fields the display includes, so the fetch can add a\n<code>fields[node--article]=...<\/code> filter derived from the schema. Less data\ncrosses the wire, and because the store distinguishes\n<a href=\"\/explanation\/druxt-store\">partial from full resources<\/a>, those slim\nfetches cache as partial, not as complete resources.<\/p>\n<p>The entity module enables this with:<\/p>\n"
+        }
+    ]
+}

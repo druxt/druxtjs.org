@@ -1,0 +1,54 @@
+{
+    "uuid": [
+        {
+            "value": "8d8c7437-86a6-5186-9ad7-3acb21f5d3cf"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_code",
+            "target_type": "paragraphs_type",
+            "target_uuid": "eafde3f2-1572-48f8-a6ae-4d1ce17d56ee"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_code": [
+        {
+            "value": "export default {\n  druxt: {\n    proxy: { files: true },\n  },\n};"
+        }
+    ],
+    "field_language": [
+        {
+            "value": "js"
+        }
+    ]
+}

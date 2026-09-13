@@ -1,0 +1,10 @@
+uuid: cec68f24-05b4-440b-bbac-45f800cc35d0
+langcode: en
+status: true
+dependencies: {  }
+id: docs_rich_text
+label: 'Rich text'
+icon_uuid: null
+icon_default: null
+description: 'Authored prose, written in the rich-text editor.'
+behavior_plugins: {  }

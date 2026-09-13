@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "9d6e552b-0755-500e-b9b4-42cf66bc14b8"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## Deploy to GitHub Pages\n\nWhen the project already is a GitHub repository, Pages needs nothing\noutside GitHub. The gotchas to handle first are both specific to Pages:\n\n- A **project page** serves from `https:\/\/<user>.github.io\/<repo>\/`, a\n  subpath the build must know about. Set the router base and asset path\n  before generating:\n\n  ```js\n  export default {\n    router: { base: '\/<repo>\/' },\n    build: { publicPath: '\/<repo>\/_nuxt\/' },\n  };\n  ```\n\n  A **user page** (a repository named `<user>.github.io`) serves from\n  the domain root and skips this entirely.\n\n- Pages serves `404.html` for unknown routes, so the\n  `generate.fallback: '404.html'` setting from above is already right.\n\nThen publish the generated output to the `gh-pages` branch:",
+            "format": "docs_markdown",
+            "processed": "<h2>Deploy to GitHub Pages<\/h2>\n<p>When the project already is a GitHub repository, Pages needs nothing\noutside GitHub. The gotchas to handle first are both specific to Pages:<\/p>\n<ul>\n<li>\n<p>A <strong>project page<\/strong> serves from <code>https:\/\/&lt;user&gt;.github.io\/&lt;repo&gt;\/<\/code>, a\nsubpath the build must know about. Set the router base and asset path\nbefore generating:<\/p>\n<pre><code class=\"language-js\">export default {\n  router: { base: '\/&lt;repo&gt;\/' },\n  build: { publicPath: '\/&lt;repo&gt;\/_nuxt\/' },\n};\n<\/code><\/pre>\n<p>A <strong>user page<\/strong> (a repository named <code>&lt;user&gt;.github.io<\/code>) serves from\nthe domain root and skips this entirely.<\/p>\n<\/li>\n<li>\n<p>Pages serves <code>404.html<\/code> for unknown routes, so the\n<code>generate.fallback: '404.html'<\/code> setting from above is already right.<\/p>\n<\/li>\n<\/ul>\n<p>Then publish the generated output to the <code>gh-pages<\/code> branch:<\/p>\n"
+        }
+    ]
+}

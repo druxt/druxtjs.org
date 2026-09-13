@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "060e7507-cf1f-595a-9aac-6b8d23320c22"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Every frontend origin that logs in needs its redirect URI registered;\nthe origins people forget are previews and `http:\/\/localhost:3000`.\nProduction setups keep one consumer per environment.\n\n## Nuxt: configure druxt-auth\n\nOptions are flat, and the module goes in `modules`, not `buildModules`:\nit registers server middleware that `nuxt start` only loads from\n`modules`.",
+            "format": "docs_markdown",
+            "processed": "<p>Every frontend origin that logs in needs its redirect URI registered;\nthe origins people forget are previews and <code>http:\/\/localhost:3000<\/code>.\nProduction setups keep one consumer per environment.<\/p>\n<h2>Nuxt: configure druxt-auth<\/h2>\n<p>Options are flat, and the module goes in <code>modules<\/code>, not <code>buildModules<\/code>:\nit registers server middleware that <code>nuxt start<\/code> only loads from\n<code>modules<\/code>.<\/p>\n"
+        }
+    ]
+}

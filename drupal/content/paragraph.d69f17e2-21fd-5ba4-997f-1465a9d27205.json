@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "d69f17e2-21fd-5ba4-997f-1465a9d27205"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Outcome:** the command prints a one-time login link. Open it in your\nbrowser for a Drupal admin session, logged in as the site administrator.\n\nIn the admin toolbar, go to **Content \u2192 Add content \u2192 Article**, give it a\ntitle (such as `Hello Druxt`), and **Save**.\n\n**Outcome:** the article page opens in Drupal, and the content list at\n**Content** shows one published article.\n\n## Step 5: See it on the frontend\n\nLook at the URL of the article you just created in Drupal. It ends in\nsomething like `\/node\/1`.\n\nNow open the **same path on the Nuxt frontend**:\nhttp:\/\/localhost:3000\/node\/1\n\n**Outcome:** the article title and body render, but this page was not built\nby Drupal's theming system. Drupal served the content as JSON:API data and\nNuxt rendered it.\n\n## What you've got\n\nA local fully decoupled site, and a set of commands to run it:\n\n| Command         | What it does                                |\n| --------------- | ------------------------------------------- |\n| `npm run dev`   | Start both backend (if needed) and frontend |\n| `npm run login` | Open a one-time Drupal admin login          |\n| `npm run stop`  | Stop the local backend                      |\n| `npm run reset` | Re-provision a fresh throwaway backend      |\n| `npm run info`  | Show backend status and details             |\n\nThe moving parts, in one paragraph: `drupal\/` is a standard Drupal 11 site\nwith the [Drupal Druxt module](https:\/\/www.drupal.org\/project\/druxt) installed and\nthe _access druxt resources_ permission enabled. `nuxt\/` is a Nuxt 2 site\nusing the `druxt-site` module, which pulls layout, menus, blocks and content\nfrom the backend. `.env` tells the frontend where to find the backend, and\nis the only file you'd change to point the frontend at a different Drupal.\n\n## Where to go next\n\n- Keep learning: [Theme your front page](\/tutorials\/theme-your-front-page),\n  the next lesson.\n- Log a user in: [Add a login flow](\/tutorials\/authentication): the OAuth\n  setup this command already provisioned, put to use.\n- Put it online: [Deploy your site](\/tutorials\/deploy-your-site), the\n  deployment lesson.\n- Understand the machine you just started:\n  [Architecture](\/explanation\/architecture).\n- Reference for the theme layer:\n  [Theme Druxt components](\/how-to\/theming).\n- Browse what each package does: [Druxt modules](\/modules).\n- See finished Druxt sites running in production:\n  [demo.druxtjs.org](https:\/\/demo.druxtjs.org).\n- Something not working the way you expect? [Troubleshoot common\n  issues](\/how-to\/troubleshooting).",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Outcome:<\/strong> the command prints a one-time login link. Open it in your\nbrowser for a Drupal admin session, logged in as the site administrator.<\/p>\n<p>In the admin toolbar, go to <strong>Content \u2192 Add content \u2192 Article<\/strong>, give it a\ntitle (such as <code>Hello Druxt<\/code>), and <strong>Save<\/strong>.<\/p>\n<p><strong>Outcome:<\/strong> the article page opens in Drupal, and the content list at\n<strong>Content<\/strong> shows one published article.<\/p>\n<h2>Step 5: See it on the frontend<\/h2>\n<p>Look at the URL of the article you just created in Drupal. It ends in\nsomething like <code>\/node\/1<\/code>.<\/p>\n<p>Now open the <strong>same path on the Nuxt frontend<\/strong>:\n<a href=\"http:\/\/localhost:3000\/node\/1\">http:\/\/localhost:3000\/node\/1<\/a><\/p>\n<p><strong>Outcome:<\/strong> the article title and body render, but this page was not built\nby Drupal's theming system. Drupal served the content as JSON:API data and\nNuxt rendered it.<\/p>\n<h2>What you've got<\/h2>\n<p>A local fully decoupled site, and a set of commands to run it:<\/p>\n<table>\n<thead>\n<tr>\n<th>Command<\/th>\n<th>What it does<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td><code>npm run dev<\/code><\/td>\n<td>Start both backend (if needed) and frontend<\/td>\n<\/tr>\n<tr>\n<td><code>npm run login<\/code><\/td>\n<td>Open a one-time Drupal admin login<\/td>\n<\/tr>\n<tr>\n<td><code>npm run stop<\/code><\/td>\n<td>Stop the local backend<\/td>\n<\/tr>\n<tr>\n<td><code>npm run reset<\/code><\/td>\n<td>Re-provision a fresh throwaway backend<\/td>\n<\/tr>\n<tr>\n<td><code>npm run info<\/code><\/td>\n<td>Show backend status and details<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<p>The moving parts, in one paragraph: <code>drupal\/<\/code> is a standard Drupal 11 site\nwith the <a href=\"https:\/\/www.drupal.org\/project\/druxt\">Drupal Druxt module<\/a> installed and\nthe <em>access druxt resources<\/em> permission enabled. <code>nuxt\/<\/code> is a Nuxt 2 site\nusing the <code>druxt-site<\/code> module, which pulls layout, menus, blocks and content\nfrom the backend. <code>.env<\/code> tells the frontend where to find the backend, and\nis the only file you'd change to point the frontend at a different Drupal.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li>Keep learning: <a href=\"\/tutorials\/theme-your-front-page\">Theme your front page<\/a>,\nthe next lesson.<\/li>\n<li>Log a user in: <a href=\"\/tutorials\/authentication\">Add a login flow<\/a>: the OAuth\nsetup this command already provisioned, put to use.<\/li>\n<li>Put it online: <a href=\"\/tutorials\/deploy-your-site\">Deploy your site<\/a>, the\ndeployment lesson.<\/li>\n<li>Understand the machine you just started:\n<a href=\"\/explanation\/architecture\">Architecture<\/a>.<\/li>\n<li>Reference for the theme layer:\n<a href=\"\/how-to\/theming\">Theme Druxt components<\/a>.<\/li>\n<li>Browse what each package does: <a href=\"\/modules\">Druxt modules<\/a>.<\/li>\n<li>See finished Druxt sites running in production:\n<a href=\"https:\/\/demo.druxtjs.org\">demo.druxtjs.org<\/a>.<\/li>\n<li>Something not working the way you expect? <a href=\"\/how-to\/troubleshooting\">Troubleshoot common\nissues<\/a>.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

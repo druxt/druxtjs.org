@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "d7b92869-b39e-5ef4-8e93-6570cf61f57d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "(On Node 17 or later, prefix the command with\n`NODE_OPTIONS=--openssl-legacy-provider`; Node 16, the tested version,\nrejects that flag and does not need it. See\n[Troubleshooting](\/how-to\/troubleshooting) for why.)\n\nNuxt renders your pages, your article included, into `nuxt\/dist\/` as\nplain HTML, CSS and JavaScript. Serve it and click around:",
+            "format": "docs_markdown",
+            "processed": "<p>(On Node 17 or later, prefix the command with\n<code>NODE_OPTIONS=--openssl-legacy-provider<\/code>; Node 16, the tested version,\nrejects that flag and does not need it. See\n<a href=\"\/how-to\/troubleshooting\">Troubleshooting<\/a> for why.)<\/p>\n<p>Nuxt renders your pages, your article included, into <code>nuxt\/dist\/<\/code> as\nplain HTML, CSS and JavaScript. Serve it and click around:<\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "faf34934-db43-507c-92a3-c7162994aec0"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "It's mostly empty because the backend has no content yet; the dashed\nboxes are dev-mode placeholders for blocks nothing themes, which\n[theming](\/how-to\/theming) explains later. That's the next step. (If\nyou see \"Welcome to Nuxt\" or an error page instead, the frontend is not\ntalking to the backend: see\n[Troubleshooting](\/how-to\/troubleshooting).)\n\n## Step 4: Create your first content\n\nLog into Drupal without touching a password:",
+            "format": "docs_markdown",
+            "processed": "<p>It's mostly empty because the backend has no content yet; the dashed\nboxes are dev-mode placeholders for blocks nothing themes, which\n<a href=\"\/how-to\/theming\">theming<\/a> explains later. That's the next step. (If\nyou see \"Welcome to Nuxt\" or an error page instead, the frontend is not\ntalking to the backend: see\n<a href=\"\/how-to\/troubleshooting\">Troubleshooting<\/a>.)<\/p>\n<h2>Step 4: Create your first content<\/h2>\n<p>Log into Drupal without touching a password:<\/p>\n"
+        }
+    ]
+}

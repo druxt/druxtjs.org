@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "77ef41e8-4aa3-5141-9f5f-67399e39a401"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Druxt generates Storybook stories from your Drupal backend at startup:\nyour blocks, content types, menus and views become a browsable component\nworkshop with no story files to write. There is nothing to keep in sync,\nbecause the stories are read from the same JSON:API the site renders\nfrom.\n\n## Set up Storybook\n\n1. Install the [Nuxt Storybook module](https:\/\/storybook.nuxtjs.org) on\n   the 4.x line. Majors 5 and later require Nuxt 3, which this stack\n   does not use:\n\n   ```sh\n   npm install -D @nuxtjs\/storybook@4\n   ```\n\n   The module bundles `@storybook\/addon-essentials` at the matching\n   Storybook 6 version; do not add addons unversioned, since current\n   majors require Storybook 10.\n\n2. Run it (on Node 17 or later, prefix with\n   `NODE_OPTIONS=--openssl-legacy-provider`, as for any build in this\n   stack):\n\n   ```sh\n   npx nuxt storybook\n   ```\n\nStorybook opens on port 3003 with a story tree generated from the\nbackend.\n\n## What gets generated",
+            "format": "docs_markdown",
+            "processed": "<p>Druxt generates Storybook stories from your Drupal backend at startup:\nyour blocks, content types, menus and views become a browsable component\nworkshop with no story files to write. There is nothing to keep in sync,\nbecause the stories are read from the same JSON:API the site renders\nfrom.<\/p>\n<h2>Set up Storybook<\/h2>\n<ol>\n<li>\n<p>Install the <a href=\"https:\/\/storybook.nuxtjs.org\">Nuxt Storybook module<\/a> on\nthe 4.x line. Majors 5 and later require Nuxt 3, which this stack\ndoes not use:<\/p>\n<pre><code class=\"language-sh\">npm install -D @nuxtjs\/storybook@4\n<\/code><\/pre>\n<p>The module bundles <code>@storybook\/addon-essentials<\/code> at the matching\nStorybook 6 version; do not add addons unversioned, since current\nmajors require Storybook 10.<\/p>\n<\/li>\n<li>\n<p>Run it (on Node 17 or later, prefix with\n<code>NODE_OPTIONS=--openssl-legacy-provider<\/code>, as for any build in this\nstack):<\/p>\n<pre><code class=\"language-sh\">npx nuxt storybook\n<\/code><\/pre>\n<\/li>\n<\/ol>\n<p>Storybook opens on port 3003 with a story tree generated from the\nbackend.<\/p>\n<h2>What gets generated<\/h2>\n"
+        }
+    ]
+}

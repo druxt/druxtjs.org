@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "cac79678-90ae-5a8b-baba-22d503e49610"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "1.2.2 also ends Drupal 8 and 9 support, so pin `^1.2.2` only on core 10 or\nlater. See [#3618675](https:\/\/www.drupal.org\/i\/3618675).\n\n## Composer refuses to install drupal\/druxt\n\nA stability error (`minimum-stability`) means a dependency's current\nrelease is below your project's floor. Allow the pre-release for that\none package with a stability flag, as in\n`composer require drupal\/jsonapi_views:^1.1@beta`, rather than lowering\n`minimum-stability` project-wide. See [Prepare the Drupal\nbackend](\/how-to\/prepare-the-backend).\n\n## \"require() of ES Module axios\" crash on a fresh install\n\nNuxt 2's webpack 4 resolves newer axios releases through their ESM\nentry, which the server, built as CommonJS, cannot load. Pin axios to a\n0.x release (the [compatibility table](\/modules\/druxt) lists the known\npins), or transpile it in `nuxt.config.js`:",
+            "format": "docs_markdown",
+            "processed": "<p>1.2.2 also ends Drupal 8 and 9 support, so pin <code>^1.2.2<\/code> only on core 10 or\nlater. See <a href=\"https:\/\/www.drupal.org\/i\/3618675\">#3618675<\/a>.<\/p>\n<h2>Composer refuses to install drupal\/druxt<\/h2>\n<p>A stability error (<code>minimum-stability<\/code>) means a dependency's current\nrelease is below your project's floor. Allow the pre-release for that\none package with a stability flag, as in\n<code>composer require drupal\/jsonapi_views:^1.1@beta<\/code>, rather than lowering\n<code>minimum-stability<\/code> project-wide. See <a href=\"\/how-to\/prepare-the-backend\">Prepare the Drupal\nbackend<\/a>.<\/p>\n<h2>\"require() of ES Module axios\" crash on a fresh install<\/h2>\n<p>Nuxt 2's webpack 4 resolves newer axios releases through their ESM\nentry, which the server, built as CommonJS, cannot load. Pin axios to a\n0.x release (the <a href=\"\/modules\/druxt\">compatibility table<\/a> lists the known\npins), or transpile it in <code>nuxt.config.js<\/code>:<\/p>\n"
+        }
+    ]
+}

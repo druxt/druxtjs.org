@@ -1,0 +1,151 @@
+{
+    "uuid": [
+        {
+            "value": "ef19b85f-cdec-55d9-9569-d16dd3f347c6"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Prepare the Drupal backend"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "88c0ddab-487f-52ff-aaeb-b4f87b704e07"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "c2725969-6632-5460-8a9c-02dd768e26a5"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "f7bf7ab2-7080-5e6d-96c3-d731a0a496e6"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "6ba1b586-5455-5987-a071-4d260e6fbc5d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "4b6f786c-c1b2-5ea0-bb46-2885195ef70d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "85337abc-1b38-5aab-acef-ac49f894f11e"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0f22d811-6471-5513-b576-d19903fd00b6"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "2726748f-99c5-5f86-b44e-62a80c60a67f"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "1c2a4efb-a01e-5e12-b31c-102c9d141b6c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "18da8f50-6b53-5555-85ab-b0ff4b9a5790"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "6820bdb2-7ab5-58b1-b25e-01726f8a3334"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Make an existing Drupal site Druxt-ready: modules, JSON:API settings, permissions and the minimum content the frontend needs."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "540fd949-ce24-5411-b703-1d1e76de2802"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/how-to\/prepare-the-backend.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"install-the-drupal-druxt-module\",\"depth\":2,\"text\":\"Install the Drupal Druxt module\"},{\"id\":\"grant-the-permission\",\"depth\":2,\"text\":\"Grant the permission\"},{\"id\":\"check-the-jsonapi-settings\",\"depth\":2,\"text\":\"Check the JSON:API settings\"},{\"id\":\"have-some-content-and-displays\",\"depth\":2,\"text\":\"Have some content and displays\"},{\"id\":\"commonly-added-modules\",\"depth\":2,\"text\":\"Commonly added modules\"},{\"id\":\"cross-origin-access\",\"depth\":2,\"text\":\"Cross-origin access\"},{\"id\":\"checklist\",\"depth\":2,\"text\":\"Checklist\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -8
+        }
+    ]
+}

@@ -1,0 +1,56 @@
+{
+    "uuid": [
+        {
+            "value": "f98e5cd5-9521-5555-adb3-7f8912a576ac"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_callout",
+            "target_type": "paragraphs_type",
+            "target_uuid": "1e924889-e030-4b91-811a-c906d05f0f0e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_callout": [
+        {
+            "value": "> **Before you start:** these are apps you run yourself against a local\n> Drupal backend, not hosted demos. The backend they expect is the\n> monorepo's Umami-provisioned Drupal at `docs\/drupal` (see\n> `examples\/README.md` in the monorepo for the exact commands), not the\n> empty quickstart site from the tutorial.",
+            "format": "docs_markdown",
+            "processed": "<blockquote>\n<p><strong>Before you start:<\/strong> these are apps you run yourself against a local\nDrupal backend, not hosted demos. The backend they expect is the\nmonorepo's Umami-provisioned Drupal at <code>docs\/drupal<\/code> (see\n<code>examples\/README.md<\/code> in the monorepo for the exact commands), not the\nempty quickstart site from the tutorial.<\/p>\n<\/blockquote>\n"
+        }
+    ],
+    "field_callout_type": [
+        {
+            "value": "prerequisite"
+        }
+    ]
+}

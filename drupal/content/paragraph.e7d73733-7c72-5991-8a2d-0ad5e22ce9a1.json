@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "e7d73733-7c72-5991-8a2d-0ad5e22ce9a1"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Drop that file in your project and it takes over article teaser rendering\neverywhere, with nothing to register and no framework code to copy. The\ndirectory path is what\nNuxt auto-discovery turns into the candidate name\n(`druxt\/entity\/node\/article\/Teaser.vue` \u2192 `DruxtEntityNodeArticleTeaser`);\nthe `entity` prop and per-field scoped slots (`field_image`, and one per\nrendered field) are what the module feeds you.\n\n## Re-wrapping at the point of use\n\nSeparately from the suggestion system, any Druxt component accepts a\n`wrapper` prop that swaps the element wrapping its output:",
+            "format": "docs_markdown",
+            "processed": "<p>Drop that file in your project and it takes over article teaser rendering\neverywhere, with nothing to register and no framework code to copy. The\ndirectory path is what\nNuxt auto-discovery turns into the candidate name\n(<code>druxt\/entity\/node\/article\/Teaser.vue<\/code> \u2192 <code>DruxtEntityNodeArticleTeaser<\/code>);\nthe <code>entity<\/code> prop and per-field scoped slots (<code>field_image<\/code>, and one per\nrendered field) are what the module feeds you.<\/p>\n<h2>Re-wrapping at the point of use<\/h2>\n<p>Separately from the suggestion system, any Druxt component accepts a\n<code>wrapper<\/code> prop that swaps the element wrapping its output:<\/p>\n"
+        }
+    ]
+}

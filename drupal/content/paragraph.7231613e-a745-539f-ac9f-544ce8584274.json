@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "7231613e-a745-539f-ac9f-544ce8584274"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "The `\/callback` route is handled for you.\n\n## The login page trap\n\nA \"Log in\" menu link pointing at `\/user\/login` fails: Decoupled Router\n(the Drupal module that [resolves paths](\/explanation\/routing) for the\nfrontend) has no resolver for Drupal's user routes, so the request for\nthat path errors. Either create your own page at `pages\/user\/login.vue`\nthat calls `loginWith`, or point the menu link somewhere the frontend\nowns. There is no default login page to fall back on.\n\n## Which requests send the token\n\nOn login, `@nuxtjs\/auth-next` sets the `Authorization` header on the\napp's shared axios instance, and Druxt's client uses that same instance\nby default, so JSON:API requests for entities, menus and routes carry\nthe token automatically. Drupal then applies the user's real permissions\nto every response. The caveats:\n\n- The header is global to that instance. Requests your app makes to\n  third-party APIs through the same `$axios` include the user's token\n  too. Give those a separate axios instance.\n- Configuring `druxt.axios` in `nuxt.config.js` makes the DruxtClient\n  create its own instance, and the automatic header no longer reaches\n  it. Either keep the default wiring, or attach the token explicitly\n  with `$druxt.addHeaders({ Authorization: this.$auth.strategy.token.get() })`.\n\nThe userinfo endpoint is proxied through the frontend only when the\n[API proxy](\/how-to\/proxy) is enabled; without it the browser calls\nDrupal's `\/oauth\/userinfo` cross-origin, which needs\n[CORS](\/how-to\/configure-cors).\n\n## Writes, and the CSRF question\n\nForm submissions through `DruxtEntityForm` are JSON:API writes.\n[Enable writes](\/how-to\/prepare-the-backend#check-the-jsonapi-settings)\n(`read_only: 0`) first. With **Bearer token** authentication, no CSRF\ntoken is needed; Drupal's CSRF protection applies to **cookie**\nsessions. A 403 naming `X-CSRF-Token` means the request authenticated\nby cookie (typically a session shared with the Drupal domain) rather\nthan by the OAuth header: attach the Bearer token as above, or fetch a\nCSRF token from Drupal's `\/session\/token` and send it in the\n`X-CSRF-Token` header alongside cookie auth.\n\n## Keep the session alive\n\nSessions renew silently out of the box. Simple OAuth issues a refresh\ntoken to this flow when the scope enables the `refresh_token` grant,\nand an interceptor on the shared axios instance exchanges it for a\nfresh access token on any request that finds the current one expired.\nServer rendering joins in: the tokens are stored as cookies, so a cold\nreload refreshes during the server render and arrives with fresh\ncookies and a restored session.\n\nA custom `druxt.axios` instance bypasses the interceptor (the same\nwiring caveat as the Bearer-token section above), and a generated\nstatic site has no server render to restore a cold load. Both fall\noutside the automatic path. For those, add a mount-time check\nin the default layout: after hydration, when auth storage holds token\nstate but the session is not logged in, refresh, and when the refresh\nfails the tokens are spent, so log out:",
+            "format": "docs_markdown",
+            "processed": "<p>The <code>\/callback<\/code> route is handled for you.<\/p>\n<h2>The login page trap<\/h2>\n<p>A \"Log in\" menu link pointing at <code>\/user\/login<\/code> fails: Decoupled Router\n(the Drupal module that <a href=\"\/explanation\/routing\">resolves paths<\/a> for the\nfrontend) has no resolver for Drupal's user routes, so the request for\nthat path errors. Either create your own page at <code>pages\/user\/login.vue<\/code>\nthat calls <code>loginWith<\/code>, or point the menu link somewhere the frontend\nowns. There is no default login page to fall back on.<\/p>\n<h2>Which requests send the token<\/h2>\n<p>On login, <code>@nuxtjs\/auth-next<\/code> sets the <code>Authorization<\/code> header on the\napp's shared axios instance, and Druxt's client uses that same instance\nby default, so JSON:API requests for entities, menus and routes carry\nthe token automatically. Drupal then applies the user's real permissions\nto every response. The caveats:<\/p>\n<ul>\n<li>The header is global to that instance. Requests your app makes to\nthird-party APIs through the same <code>$axios<\/code> include the user's token\ntoo. Give those a separate axios instance.<\/li>\n<li>Configuring <code>druxt.axios<\/code> in <code>nuxt.config.js<\/code> makes the DruxtClient\ncreate its own instance, and the automatic header no longer reaches\nit. Either keep the default wiring, or attach the token explicitly\nwith <code>$druxt.addHeaders({ Authorization: this.$auth.strategy.token.get() })<\/code>.<\/li>\n<\/ul>\n<p>The userinfo endpoint is proxied through the frontend only when the\n<a href=\"\/how-to\/proxy\">API proxy<\/a> is enabled; without it the browser calls\nDrupal's <code>\/oauth\/userinfo<\/code> cross-origin, which needs\n<a href=\"\/how-to\/configure-cors\">CORS<\/a>.<\/p>\n<h2>Writes, and the CSRF question<\/h2>\n<p>Form submissions through <code>DruxtEntityForm<\/code> are JSON:API writes.\n<a href=\"\/how-to\/prepare-the-backend#check-the-jsonapi-settings\">Enable writes<\/a>\n(<code>read_only: 0<\/code>) first. With <strong>Bearer token<\/strong> authentication, no CSRF\ntoken is needed; Drupal's CSRF protection applies to <strong>cookie<\/strong>\nsessions. A 403 naming <code>X-CSRF-Token<\/code> means the request authenticated\nby cookie (typically a session shared with the Drupal domain) rather\nthan by the OAuth header: attach the Bearer token as above, or fetch a\nCSRF token from Drupal's <code>\/session\/token<\/code> and send it in the\n<code>X-CSRF-Token<\/code> header alongside cookie auth.<\/p>\n<h2>Keep the session alive<\/h2>\n<p>Sessions renew silently out of the box. Simple OAuth issues a refresh\ntoken to this flow when the scope enables the <code>refresh_token<\/code> grant,\nand an interceptor on the shared axios instance exchanges it for a\nfresh access token on any request that finds the current one expired.\nServer rendering joins in: the tokens are stored as cookies, so a cold\nreload refreshes during the server render and arrives with fresh\ncookies and a restored session.<\/p>\n<p>A custom <code>druxt.axios<\/code> instance bypasses the interceptor (the same\nwiring caveat as the Bearer-token section above), and a generated\nstatic site has no server render to restore a cold load. Both fall\noutside the automatic path. For those, add a mount-time check\nin the default layout: after hydration, when auth storage holds token\nstate but the session is not logged in, refresh, and when the refresh\nfails the tokens are spent, so log out:<\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "automerge": false,
+  "dependencyDashboard": true,
+  "labels": ["dependencies"],
+  "enabledManagers": ["composer", "npm"],
+  "packageRules": [
+    {
+      "description": "Frozen. druxt_docs computes the table of contents with a PHP port of github-slugger 1.5.0, and the import fails when the two disagree. Move both together, by hand.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["github-slugger"],
+      "enabled": false
+    },
+    {
+      "description": "The root lint tooling is held at the last versions that run on Node 16.20.1, the Node Nuxt 2 builds with. Move it with the Node upgrade, not before.",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["package.json"],
+      "matchPackageNames": [
+        "cspell",
+        "eslint",
+        "knip",
+        "markdownlint-cli2",
+        "@commitlint/cli",
+        "@commitlint/config-conventional"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Majors need a human. An automated major lands a breaking change on a branch nobody chose to upgrade.",
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "One pull request for everything else. Ungrouped updates produce a pull request per dependency, and the whole set gets ignored together.",
+      "matchPackageNames": ["*"],
+      "groupName": "all dependencies",
+      "groupSlug": "all"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+_core:
+  default_config_hash: GySkI4ln45c-z9n5pE0JfCZ_SqxVTILC0BBj-u1lkZY
+resources:
+  - block--block
+  - configurable_language--configurable_language
+  - entity_form_display--entity_form_display
+  - entity_form_mode--entity_form_mode
+  - entity_view_display--entity_view_display
+  - entity_view_mode--entity_view_mode
+  - field_config--field_config
+  - field_storage_config--field_storage_config
+  - jsonapi_resource_config--jsonapi_resource_config
+  - menu--menu
+  - menu_link_content--menu_link_content
+  - view--view
+  - editor--editor
+  - filter_format--filter_format

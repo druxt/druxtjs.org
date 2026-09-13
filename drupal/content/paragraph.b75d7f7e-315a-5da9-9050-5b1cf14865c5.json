@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "b75d7f7e-315a-5da9-9050-5b1cf14865c5"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Outcome:** image, title and body are all back.\n\nThis is worth remembering as a symptom, not just a feature: **an empty\nfield slot usually means a `fields` list that doesn't include it**. The\nsame block also takes `include` for relationship data, which the\n[example apps](\/how-to\/example-apps) use to pull media and taxonomy terms\ninto a card.\n\n## Step 6: Theme more than one thing at a time\n\nThe name you choose decides how wide the net is. Drop a level off either\nfile name and it covers more:\n\n| File | Component | Themes |\n| --- | --- | --- |\n| `druxt\/entity\/node\/article\/Teaser.vue` | `DruxtEntityNodeArticleTeaser` | article teasers |\n| `druxt\/entity\/node\/Teaser.vue` | `DruxtEntityNodeTeaser` | every node type's teaser |\n| `druxt\/entity\/Teaser.vue` | `DruxtEntityTeaser` | every entity's teaser |\n| `druxt\/view\/frontpage\/Page1.vue` | `DruxtViewFrontpagePage1` | this one display |\n| `druxt\/view\/Frontpage.vue` | `DruxtViewFrontpage` | every display of the view |\n\nTry it: rename `article\/Teaser.vue` up to `node\/Teaser.vue` and your\nteaser still renders, now for every content type. Rename it back and the\narticle-specific file wins again, because **the most specific name that\nexists is the one Druxt uses**. Use a general wrapper for your project\nstyle, then add a specific one as an exception. The exception takes over\nthe moment you save it.\n\n> A **new** wrapper file appears on the next page load. A **renamed** one\n> sometimes doesn't, because the dev server's component index is built from\n> what it saw at startup. If a rename seems to be ignored, restart\n> `npm run dev`.\n\n## What you've got\n\nYour two files, and the rule behind them:",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Outcome:<\/strong> image, title and body are all back.<\/p>\n<p>This is worth remembering as a symptom, not just a feature: <strong>an empty\nfield slot usually means a <code>fields<\/code> list that doesn't include it<\/strong>. The\nsame block also takes <code>include<\/code> for relationship data, which the\n<a href=\"\/how-to\/example-apps\">example apps<\/a> use to pull media and taxonomy terms\ninto a card.<\/p>\n<h2>Step 6: Theme more than one thing at a time<\/h2>\n<p>The name you choose decides how wide the net is. Drop a level off either\nfile name and it covers more:<\/p>\n<table>\n<thead>\n<tr>\n<th>File<\/th>\n<th>Component<\/th>\n<th>Themes<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td><code>druxt\/entity\/node\/article\/Teaser.vue<\/code><\/td>\n<td><code>DruxtEntityNodeArticleTeaser<\/code><\/td>\n<td>article teasers<\/td>\n<\/tr>\n<tr>\n<td><code>druxt\/entity\/node\/Teaser.vue<\/code><\/td>\n<td><code>DruxtEntityNodeTeaser<\/code><\/td>\n<td>every node type's teaser<\/td>\n<\/tr>\n<tr>\n<td><code>druxt\/entity\/Teaser.vue<\/code><\/td>\n<td><code>DruxtEntityTeaser<\/code><\/td>\n<td>every entity's teaser<\/td>\n<\/tr>\n<tr>\n<td><code>druxt\/view\/frontpage\/Page1.vue<\/code><\/td>\n<td><code>DruxtViewFrontpagePage1<\/code><\/td>\n<td>this one display<\/td>\n<\/tr>\n<tr>\n<td><code>druxt\/view\/Frontpage.vue<\/code><\/td>\n<td><code>DruxtViewFrontpage<\/code><\/td>\n<td>every display of the view<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<p>Try it: rename <code>article\/Teaser.vue<\/code> up to <code>node\/Teaser.vue<\/code> and your\nteaser still renders, now for every content type. Rename it back and the\narticle-specific file wins again, because <strong>the most specific name that\nexists is the one Druxt uses<\/strong>. Use a general wrapper for your project\nstyle, then add a specific one as an exception. The exception takes over\nthe moment you save it.<\/p>\n<blockquote>\n<p>A <strong>new<\/strong> wrapper file appears on the next page load. A <strong>renamed<\/strong> one\nsometimes doesn't, because the dev server's component index is built from\nwhat it saw at startup. If a rename seems to be ignored, restart\n<code>npm run dev<\/code>.<\/p>\n<\/blockquote>\n<h2>What you've got<\/h2>\n<p>Your two files, and the rule behind them:<\/p>\n"
+        }
+    ]
+}
