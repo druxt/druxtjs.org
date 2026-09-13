@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "9822d930-9e96-59dd-ac5d-a7f9e4569752"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Version:** `>= 0.18.0`\n\nThe `DruxtRouter` class historically mirrored a set of `DruxtClient`\nmethods as pass-through methods on its `router.druxt` instance. These are\ndeprecated in favour of using a `DruxtClient` (or the\n[`DruxtStore`](\/explanation\/druxt-store) in Nuxt) directly:\n\n| Deprecated                                            | Replacement                                                                      |\n| ----------------------------------------------------- | -------------------------------------------------------------------------------- |\n| `router.druxt.addHeaders(headers)`                    | Set headers via the `DruxtClient` axios options, or `client.axios` interceptors. |\n| `router.druxt.buildQueryUrl(url, query)`              | `client.buildQueryUrl(url, query)`                                               |\n| `router.druxt.checkPermissions(res)`                  | Handle JSON:API `meta.omitted` links client-side.                                |\n| `router.druxt.getIndex(resource)`                     | `client.getIndex(resource)`                                                      |\n| `router.druxt.getResource(type, id)`                  | `client.getResource(type, id)`                                                   |\n| `router.druxt.getResources(resource, query, options)` | `client.getResources(resource, query, options)`                                  |\n\nThe routing methods themselves (`getRoute`, `getResourceByRoute`,\n`getRedirect`) are not deprecated; only the generic client\npass-through methods are.\n\n## DruxtRouter store resource members",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Version:<\/strong> <code>&gt;= 0.18.0<\/code><\/p>\n<p>The <code>DruxtRouter<\/code> class historically mirrored a set of <code>DruxtClient<\/code>\nmethods as pass-through methods on its <code>router.druxt<\/code> instance. These are\ndeprecated in favour of using a <code>DruxtClient<\/code> (or the\n<a href=\"\/explanation\/druxt-store\"><code>DruxtStore<\/code><\/a> in Nuxt) directly:<\/p>\n<table>\n<thead>\n<tr>\n<th>Deprecated<\/th>\n<th>Replacement<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td><code>router.druxt.addHeaders(headers)<\/code><\/td>\n<td>Set headers via the <code>DruxtClient<\/code> axios options, or <code>client.axios<\/code> interceptors.<\/td>\n<\/tr>\n<tr>\n<td><code>router.druxt.buildQueryUrl(url, query)<\/code><\/td>\n<td><code>client.buildQueryUrl(url, query)<\/code><\/td>\n<\/tr>\n<tr>\n<td><code>router.druxt.checkPermissions(res)<\/code><\/td>\n<td>Handle JSON:API <code>meta.omitted<\/code> links client-side.<\/td>\n<\/tr>\n<tr>\n<td><code>router.druxt.getIndex(resource)<\/code><\/td>\n<td><code>client.getIndex(resource)<\/code><\/td>\n<\/tr>\n<tr>\n<td><code>router.druxt.getResource(type, id)<\/code><\/td>\n<td><code>client.getResource(type, id)<\/code><\/td>\n<\/tr>\n<tr>\n<td><code>router.druxt.getResources(resource, query, options)<\/code><\/td>\n<td><code>client.getResources(resource, query, options)<\/code><\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<p>The routing methods themselves (<code>getRoute<\/code>, <code>getResourceByRoute<\/code>,\n<code>getRedirect<\/code>) are not deprecated; only the generic client\npass-through methods are.<\/p>\n<h2>DruxtRouter store resource members<\/h2>\n"
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "ee5a1108-b991-50da-a419-e19b45b929d6"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "The proxy is server middleware that no static host can run. With this\nline, development keeps the proxy, and the static build has the browser\ntalk to Drupal directly (the demo backend used later answers any\norigin).\n\n## Step 2: Generate locally and prove the dependency\n\nCheck the backend is up (`npm run info`), then generate from the project\nroot:",
+            "format": "docs_markdown",
+            "processed": "<p>The proxy is server middleware that no static host can run. With this\nline, development keeps the proxy, and the static build has the browser\ntalk to Drupal directly (the demo backend used later answers any\norigin).<\/p>\n<h2>Step 2: Generate locally and prove the dependency<\/h2>\n<p>Check the backend is up (<code>npm run info<\/code>), then generate from the project\nroot:<\/p>\n"
+        }
+    ]
+}

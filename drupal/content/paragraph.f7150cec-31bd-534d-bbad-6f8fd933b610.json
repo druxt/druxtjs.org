@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "f7150cec-31bd-534d-bbad-6f8fd933b610"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Each unregistered name in the `$theme` list carries a save action.\nClicking it asks the dev server to create that wrapper file, at its\nsuggestion path with the component's props and slots stubbed in, and\nopen it in your editor. The scaffolding runs through a dev-mode server\nendpoint (`\/_druxt\/template\/add`) that exists only under `nuxt dev`.\n\nInspect the component whose markup you want to own and click the\nsuggestion that fits. The file appears, ready to edit, and the\n[theming guide](\/how-to\/theming) covers what to put in it.\n\n## Where to go next\n\n- [Theme Druxt components](\/how-to\/theming): what to do with the\n  wrapper you just scaffolded.\n- [Component resolution](\/explanation\/component-resolution): the rules\n  behind the `$theme` list.\n- [Browse components in Storybook](\/how-to\/storybook): the other\n  workshop view of the same suggestion system.",
+            "format": "docs_markdown",
+            "processed": "<p>Each unregistered name in the <code>$theme<\/code> list carries a save action.\nClicking it asks the dev server to create that wrapper file, at its\nsuggestion path with the component's props and slots stubbed in, and\nopen it in your editor. The scaffolding runs through a dev-mode server\nendpoint (<code>\/_druxt\/template\/add<\/code>) that exists only under <code>nuxt dev<\/code>.<\/p>\n<p>Inspect the component whose markup you want to own and click the\nsuggestion that fits. The file appears, ready to edit, and the\n<a href=\"\/how-to\/theming\">theming guide<\/a> covers what to put in it.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/how-to\/theming\">Theme Druxt components<\/a>: what to do with the\nwrapper you just scaffolded.<\/li>\n<li><a href=\"\/explanation\/component-resolution\">Component resolution<\/a>: the rules\nbehind the <code>$theme<\/code> list.<\/li>\n<li><a href=\"\/how-to\/storybook\">Browse components in Storybook<\/a>: the other\nworkshop view of the same suggestion system.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

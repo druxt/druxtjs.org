@@ -1,0 +1,21 @@
+node_modules/
+.npm/
+.vale/
+.docs-ir/
+.docs-source/
+package-lock.json
+
+# PHP, Drupal's exports and Composer's files. Drupal has its own coding
+# standards, and prettier has no business in config/sync or content/.
+drupal/
+
+# The frontend brings its own lint setup when it lands.
+nuxt/
+
+# Written by scripts/survey-content.mjs. Its layout is the script's, so a
+# regenerated baseline must not fail a format check.
+scripts/content-baseline.json
+
+# Pipeline definitions are owned by yamllint, not prettier. The two disagree on
+# comment spacing, and letting both format this file means each undoes the other.
+.gitlab-ci.yml

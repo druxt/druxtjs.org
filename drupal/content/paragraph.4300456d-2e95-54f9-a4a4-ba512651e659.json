@@ -1,0 +1,54 @@
+{
+    "uuid": [
+        {
+            "value": "4300456d-2e95-54f9-a4a4-ba512651e659"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_code",
+            "target_type": "paragraphs_type",
+            "target_uuid": "eafde3f2-1572-48f8-a6ae-4d1ce17d56ee"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_code": [
+        {
+            "value": "parameters:\n  cors.config:\n    enabled: true\n    allowedHeaders: ['*']\n    allowedMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS']\n    allowedOrigins: ['https:\/\/www.example.com']\n    exposedHeaders: false\n    maxAge: 1000\n    supportsCredentials: false"
+        }
+    ],
+    "field_language": [
+        {
+            "value": "yaml"
+        }
+    ]
+}

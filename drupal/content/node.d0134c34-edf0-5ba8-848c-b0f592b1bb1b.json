@@ -1,0 +1,151 @@
+{
+    "uuid": [
+        {
+            "value": "d0134c34-edf0-5ba8-848c-b0f592b1bb1b"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "DruxtMenu deprecations"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "c111de9f-5686-50e6-a7ff-274655f569c0"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "071e1a39-96e3-5399-baf2-af033ab9a775"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "56a42329-8e9f-5954-b7f5-8c7aadea9731"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0f096ea1-921d-5783-ab7e-61cbf23733b2"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "63925cbc-164f-57dd-b8b7-f37857c7aba0"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "3ab3fafa-ce91-5e03-95d8-5958f7fd0947"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "26704c0a-a654-5f90-95aa-b3f5a480dd0f"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "53527da0-ab62-5dd0-bb14-d3c758cd413d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "ed39dd16-bb20-59d2-8951-95e514482a12"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "3f9c57da-c651-5dc8-b0b2-b4791a32e00c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "008d47c5-4ee2-5a9f-996d-ad820b50f8a9"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "The retired DruxtMenu items computed property, and what replaces it."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "e3e5a067-aa03-52c7-9806-563396663220"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/modules\/menu\/deprecations.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"druxtmenu--items-computed\",\"depth\":2,\"text\":\"DruxtMenu \/ items computed\"},{\"id\":\"what-replaces-it\",\"depth\":3,\"text\":\"What replaces it\"},{\"id\":\"what-is-not-affected\",\"depth\":3,\"text\":\"What is not affected\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": 10
+        }
+    ]
+}

@@ -1,0 +1,56 @@
+{
+    "uuid": [
+        {
+            "value": "071e1a39-96e3-5399-baf2-af033ab9a775"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_callout",
+            "target_type": "paragraphs_type",
+            "target_uuid": "1e924889-e030-4b91-811a-c906d05f0f0e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_callout": [
+        {
+            "value": "> [druxt-menu] The `items` computed property is deprecated.",
+            "format": "docs_markdown",
+            "processed": "<blockquote>\n<p>[druxt-menu] The <code>items<\/code> computed property is deprecated.<\/p>\n<\/blockquote>\n"
+        }
+    ],
+    "field_callout_type": [
+        {
+            "value": "output"
+        }
+    ]
+}

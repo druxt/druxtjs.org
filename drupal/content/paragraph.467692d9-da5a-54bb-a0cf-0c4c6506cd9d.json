@@ -1,0 +1,54 @@
+{
+    "uuid": [
+        {
+            "value": "467692d9-da5a-54bb-a0cf-0c4c6506cd9d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_code",
+            "target_type": "paragraphs_type",
+            "target_uuid": "eafde3f2-1572-48f8-a6ae-4d1ce17d56ee"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_code": [
+        {
+            "value": "<!-- pages\/user\/logout.vue -->\n<template>\n  <p>\n    Logging out.\n    <NuxtLink to=\"#\" @click.native=\"logout()\">Click here<\/NuxtLink>\n    if you are not redirected.\n  <\/p>\n<\/template>\n\n<script>\nexport default {\n  mounted() {\n    this.logout();\n  },\n\n  methods: {\n    async logout() {\n      \/\/ Revoke the tokens server-side first. This endpoint comes from\n      \/\/ the #2945273 patch (or your own route that revokes the user's\n      \/\/ tokens); proxy it through the frontend so the call is\n      \/\/ same-origin. Skip this step and the tokens outlive the logout.\n      \/\/ A failed revocation must not leave the user locally logged in,\n      \/\/ so the local cleanup below runs regardless.\n      try {\n        await this.$axios.post('\/oauth\/logout');\n      } catch (e) {\n        \/\/ Do not log the error object itself: axios keeps the request\n        \/\/ config, Authorization header included, on rejections.\n        console.warn('Token revocation failed; tokens live until expiry.');\n      }\n\n      const strategy = this.$auth.strategy.name;\n      await this.$auth.logout();\n\n      \/\/ auth-next's reset() writes the literal string \"false\" into these\n      \/\/ keys rather than removing them (removal happens only on undefined\n      \/\/ or null), in cookies and localStorage both, so clear both stores.\n      [\n        `auth._token.${strategy}`,\n        `auth._token_expiration.${strategy}`,\n        `auth._refresh_token.${strategy}`,\n        `auth._refresh_token_expiration.${strategy}`,\n        `auth.${strategy}.pkce_state`,\n        'auth.strategy',\n      ].forEach((name) => {\n        document.cookie = `${name}=; Path=\/; Max-Age=0`;\n        localStorage.removeItem(name);\n      });\n\n      \/\/ A full page load, not router.push: this is what drops\n      \/\/ privileged content from the DruxtStore.\n      location.href = location.origin;\n    },\n  },\n};\n<\/script>"
+        }
+    ],
+    "field_language": [
+        {
+            "value": "vue"
+        }
+    ]
+}

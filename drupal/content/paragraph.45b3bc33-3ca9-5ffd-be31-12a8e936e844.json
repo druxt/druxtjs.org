@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "45b3bc33-3ca9-5ffd-be31-12a8e936e844"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## Getting all collections of a resource\n\nThe `getCollectionAll` method takes the same parameters as `getCollection`, and will return an array of all collections.\n\n_Get all recipes._",
+            "format": "docs_markdown",
+            "processed": "<h2>Getting all collections of a resource<\/h2>\n<p>The <code>getCollectionAll<\/code> method takes the same parameters as <code>getCollection<\/code>, and will return an array of all collections.<\/p>\n<p><em>Get all recipes.<\/em><\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "d7cec0cd-ad1d-5a9a-b450-625ec11eeba5"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Every Druxt component (entities, views, menus) is built on the same base\nclass: `DruxtModule`. In this tutorial you'll extend it yourself to build a\n`DruxtCustomModule` that:\n\n1. registers as a first-class Druxt module,\n2. renders through a **theme component** resolved by Druxt's suggestion\n   system, and\n3. fetches its own data from Drupal through the **DruxtStore**.\n\nYou'll know each step worked because each one has a visible outcome.\n\n## Prerequisites\n\n- You completed [Getting started with Druxt](\/tutorials\/getting-started)\n  and the quickstart is running locally (`npm run dev`).\n- At least one Article is published in the backend.\n- You're comfortable reading a Vue single-file component.\n\n## Step 1: Scaffold the module and its theme component\n\nCreate `nuxt\/components\/druxt\/CustomModule.vue`:",
+            "format": "docs_markdown",
+            "processed": "<p>Every Druxt component (entities, views, menus) is built on the same base\nclass: <code>DruxtModule<\/code>. In this tutorial you'll extend it yourself to build a\n<code>DruxtCustomModule<\/code> that:<\/p>\n<ol>\n<li>registers as a first-class Druxt module,<\/li>\n<li>renders through a <strong>theme component<\/strong> resolved by Druxt's suggestion\nsystem, and<\/li>\n<li>fetches its own data from Drupal through the <strong>DruxtStore<\/strong>.<\/li>\n<\/ol>\n<p>You'll know each step worked because each one has a visible outcome.<\/p>\n<h2>Prerequisites<\/h2>\n<ul>\n<li>You completed <a href=\"\/tutorials\/getting-started\">Getting started with Druxt<\/a>\nand the quickstart is running locally (<code>npm run dev<\/code>).<\/li>\n<li>At least one Article is published in the backend.<\/li>\n<li>You're comfortable reading a Vue single-file component.<\/li>\n<\/ul>\n<h2>Step 1: Scaffold the module and its theme component<\/h2>\n<p>Create <code>nuxt\/components\/druxt\/CustomModule.vue<\/code>:<\/p>\n"
+        }
+    ]
+}

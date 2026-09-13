@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "977df66f-8b73-5ef5-b454-0e2baa6015c9"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/920428b6-2f9e-5f9b-be7d-9ea8ec064135"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/tutorials\/authentication"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

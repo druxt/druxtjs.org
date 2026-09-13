@@ -1,0 +1,119 @@
+{
+    "uuid": [
+        {
+            "value": "87ae1335-aaa2-55fa-8470-e935f88b6ae4"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Architecture"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "4020bfb2-817a-556d-b6fb-8b917a8a8bf7"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "096c2a40-6b42-56b0-bd13-a89f6c38bae2"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "3c472a25-925a-515e-9152-eb496030ec80"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "How Drupal, JSON:API and Nuxt fit together in a fully decoupled Druxt site."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "4f80265c-02fd-5652-8970-c0bf9eaf5e5b"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/explanation\/architecture.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"the-request-lifecycle\",\"depth\":2,\"text\":\"The request lifecycle\"},{\"id\":\"what-lives-where\",\"depth\":2,\"text\":\"What lives where\"},{\"id\":\"why-this-shape\",\"depth\":2,\"text\":\"Why this shape\"},{\"id\":\"trade-offs\",\"depth\":2,\"text\":\"Trade-offs\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -9
+        }
+    ]
+}

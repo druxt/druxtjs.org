@@ -1,0 +1,82 @@
+{
+    "uuid": [
+        {
+            "value": "d8e0bb62-293e-51dc-b264-4387cc2c756e"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "bundle": [
+        {
+            "target_id": "image",
+            "target_type": "media_type",
+            "target_uuid": "d63708bd-0a02-4969-b4b3-0f37b585bdd4"
+        }
+    ],
+    "revision_created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_user": [],
+    "revision_log_message": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "name": [
+        {
+            "value": "examples-content-ops-console.png"
+        }
+    ],
+    "thumbnail": [
+        {
+            "alt": "Content Ops Console: a dark sidebar next to a dense editorial table with inline difficulty\/prep-time editing and a \"needs attention\" filter, showing real content from the backend",
+            "title": null,
+            "width": 1440,
+            "height": 900,
+            "target_type": "file",
+            "target_uuid": "0ff1bfd4-1fb1-5029-a972-ea9b14e2c18e"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_media_image": [
+        {
+            "alt": "Content Ops Console: a dark sidebar next to a dense editorial table with inline difficulty\/prep-time editing and a \"needs attention\" filter, showing real content from the backend",
+            "title": null,
+            "width": 1440,
+            "height": 900,
+            "target_type": "file",
+            "target_uuid": "0ff1bfd4-1fb1-5029-a972-ea9b14e2c18e"
+        }
+    ]
+}

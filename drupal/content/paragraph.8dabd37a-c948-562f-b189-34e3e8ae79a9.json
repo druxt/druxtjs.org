@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "8dabd37a-c948-562f-b189-34e3e8ae79a9"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Each installed Druxt module registers its own stories at startup:\n\n| Group                    | Generated from                                                                                           |\n| ------------------------ | -------------------------------------------------------------------------------------------------------- |\n| Blocks                   | Every block placement, grouped by the backend's themes, plus `DruxtBlock` and `DruxtBlockRegion`         |\n| Entity                   | `DruxtEntity` and `DruxtEntityForm`, with a group per entity type and bundle, one story per display mode |\n| Menu                     | One story per Drupal menu (main navigation, footer, and the rest)                                        |\n| Views                    | One component per view, with its displays                                                                |\n| Router, Breadcrumb, Site | The wildcard router, breadcrumb and site-scaffolding components                                          |\n\nThe tree mirrors your backend. Place a block or create a content type\nin Drupal, and after a Storybook restart its story is there.\n\n## Work a story",
+            "format": "docs_markdown",
+            "processed": "<p>Each installed Druxt module registers its own stories at startup:<\/p>\n<table>\n<thead>\n<tr>\n<th>Group<\/th>\n<th>Generated from<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td>Blocks<\/td>\n<td>Every block placement, grouped by the backend's themes, plus <code>DruxtBlock<\/code> and <code>DruxtBlockRegion<\/code><\/td>\n<\/tr>\n<tr>\n<td>Entity<\/td>\n<td><code>DruxtEntity<\/code> and <code>DruxtEntityForm<\/code>, with a group per entity type and bundle, one story per display mode<\/td>\n<\/tr>\n<tr>\n<td>Menu<\/td>\n<td>One story per Drupal menu (main navigation, footer, and the rest)<\/td>\n<\/tr>\n<tr>\n<td>Views<\/td>\n<td>One component per view, with its displays<\/td>\n<\/tr>\n<tr>\n<td>Router, Breadcrumb, Site<\/td>\n<td>The wildcard router, breadcrumb and site-scaffolding components<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<p>The tree mirrors your backend. Place a block or create a content type\nin Drupal, and after a Storybook restart its story is there.<\/p>\n<h2>Work a story<\/h2>\n"
+        }
+    ]
+}

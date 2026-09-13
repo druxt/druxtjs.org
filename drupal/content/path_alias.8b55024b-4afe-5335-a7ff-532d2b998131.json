@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "8b55024b-4afe-5335-a7ff-532d2b998131"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/9b50b8b5-4a8a-5b68-ad74-9cff55a48355"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/environment-variables"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

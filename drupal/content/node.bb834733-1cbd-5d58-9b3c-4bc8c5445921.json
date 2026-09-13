@@ -1,0 +1,131 @@
+{
+    "uuid": [
+        {
+            "value": "bb834733-1cbd-5d58-9b3c-4bc8c5445921"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Browse and develop components in Storybook"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "a7b3242c-bd5c-518b-976f-161d0ca6eb66"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "77ef41e8-4aa3-5141-9f5f-67399e39a401"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "312e9dce-3ed3-5096-bee0-6acd83861a7c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "8dabd37a-c948-562f-b189-34e3e8ae79a9"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "a60d8c81-a548-5015-8bd1-0a34120f8c1c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "f193771d-0759-59cb-b39a-a9b832c41e4d"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Storybook stories generated from live Drupal data, with a story tree that mirrors your backend and controls driven by real content."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "540fd949-ce24-5411-b703-1d1e76de2802"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/how-to\/storybook.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"set-up-storybook\",\"depth\":2,\"text\":\"Set up Storybook\"},{\"id\":\"what-gets-generated\",\"depth\":2,\"text\":\"What gets generated\"},{\"id\":\"work-a-story\",\"depth\":2,\"text\":\"Work a story\"},{\"id\":\"develop-a-theme-component-in-isolation\",\"depth\":2,\"text\":\"Develop a theme component in isolation\"},{\"id\":\"publish-it\",\"depth\":2,\"text\":\"Publish it\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -2
+        }
+    ]
+}

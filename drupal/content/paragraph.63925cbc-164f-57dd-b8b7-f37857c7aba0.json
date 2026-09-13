@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "63925cbc-164f-57dd-b8b7-f37857c7aba0"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "### What replaces it\n\nRead `model` instead of `items` when you access the component instance\ndirectly, through a template ref or in a component that extends `DruxtMenu`:",
+            "format": "docs_markdown",
+            "processed": "<h3>What replaces it<\/h3>\n<p>Read <code>model<\/code> instead of <code>items<\/code> when you access the component instance\ndirectly, through a template ref or in a component that extends <code>DruxtMenu<\/code>:<\/p>\n"
+        }
+    ]
+}

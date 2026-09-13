@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "1294e58a-6dbf-5d52-9e1d-37362003ffb1"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "backend-scopes.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/backend-scopes.png",
+            "url": "\/sites\/default\/files\/documentation\/backend-scopes.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 14235
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

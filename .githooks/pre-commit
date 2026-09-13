@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# The fast half of CI. PHPUnit, the guardrails and the import stay in the pipeline.
+set -e
+npm run --silent lint
+npm run --silent test

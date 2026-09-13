@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "81eed063-6db6-58e5-8811-b12a5de563aa"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Druxt components are themed two ways: a **wrapper component** placed at a\nconventional path, or the **default template** passed inline. Wrappers are\nthe Drupal-template-suggestions of Druxt; the default template is the\nquick inline override.\n\n## Theme with a wrapper component\n\nEverything follows from one rule: **the file path is the component\nname**. Nuxt auto-imports everything under `components\/`, turning the\npath into a PascalCase name, and Druxt renders the most specific name\nthat exists. The file starts working the moment it is saved.\n\n1. Render a Druxt component (a UUID is the `id` of any JSON:API\n   resource, e.g. from `\/jsonapi\/node\/article`; here it arrives as a\n   prop):\n\n   ```vue\n   <Druxt module=\"entity\" :props-data=\"{ type: 'node--article', uuid: '87e155a1-70c5-4a3c-a1a4-fee8a2ee3155' }\" \/>\n   ```\n\n2. Create a wrapper at the path that spells the suggestion you want to\n   own. To theme every article in the default display:\n\n   ```vue\n   <!-- components\/druxt\/entity\/node\/article\/Default.vue -->\n   <!-- Auto-imported as DruxtEntityNodeArticleDefault -->\n   <template>\n     <div>\n       <h1>{{ entity.attributes.title }}<\/h1>\n\n       <slot \/>\n     <\/div>\n   <\/template>\n\n   <script>\n   export default {\n     props: {\n       entity: { type: Object, required: true },\n     },\n   };\n   <\/script>\n   ```\n\n3. Reload. The entity now renders through your wrapper: your markup, the\n   module's data, arriving as props.\n\nEach module passes its own props (`entity` here; a block wrapper gets\n`block`, and so on), and anything you do not declare as a prop is still\navailable on `$attrs`. Declare what you use, as above, so the template\nreads plainly.",
+            "format": "docs_markdown",
+            "processed": "<p>Druxt components are themed two ways: a <strong>wrapper component<\/strong> placed at a\nconventional path, or the <strong>default template<\/strong> passed inline. Wrappers are\nthe Drupal-template-suggestions of Druxt; the default template is the\nquick inline override.<\/p>\n<h2>Theme with a wrapper component<\/h2>\n<p>Everything follows from one rule: <strong>the file path is the component\nname<\/strong>. Nuxt auto-imports everything under <code>components\/<\/code>, turning the\npath into a PascalCase name, and Druxt renders the most specific name\nthat exists. The file starts working the moment it is saved.<\/p>\n<ol>\n<li>\n<p>Render a Druxt component (a UUID is the <code>id<\/code> of any JSON:API\nresource, e.g. from <code>\/jsonapi\/node\/article<\/code>; here it arrives as a\nprop):<\/p>\n<pre><code class=\"language-vue\">&lt;Druxt module=\"entity\" :props-data=\"{ type: 'node--article', uuid: '87e155a1-70c5-4a3c-a1a4-fee8a2ee3155' }\" \/&gt;\n<\/code><\/pre>\n<\/li>\n<li>\n<p>Create a wrapper at the path that spells the suggestion you want to\nown. To theme every article in the default display:<\/p>\n<pre><code class=\"language-vue\">&lt;!-- components\/druxt\/entity\/node\/article\/Default.vue --&gt;\n&lt;!-- Auto-imported as DruxtEntityNodeArticleDefault --&gt;\n&lt;template&gt;\n  &lt;div&gt;\n    &lt;h1&gt;{{ entity.attributes.title }}&lt;\/h1&gt;\n\n    &lt;slot \/&gt;\n  &lt;\/div&gt;\n&lt;\/template&gt;\n\n&lt;script&gt;\nexport default {\n  props: {\n    entity: { type: Object, required: true },\n  },\n};\n&lt;\/script&gt;\n<\/code><\/pre>\n<\/li>\n<li>\n<p>Reload. The entity now renders through your wrapper: your markup, the\nmodule's data, arriving as props.<\/p>\n<\/li>\n<\/ol>\n<p>Each module passes its own props (<code>entity<\/code> here; a block wrapper gets\n<code>block<\/code>, and so on), and anything you do not declare as a prop is still\navailable on <code>$attrs<\/code>. Declare what you use, as above, so the template\nreads plainly.<\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "1d2ef756-d2d0-58b5-b0ba-740b2bf03aa0"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "This composes with the theme layer: the wrapper component is resolved by\nsuggestions, then wrapped again by whatever you passed.\n\n## Why this design\n\nThe common failure it avoids is the fork: a theming system that requires\nediting framework components (or copying them) makes upgrades painful and\ndrift inevitable. Suggestion-based discovery means the framework never\nneeds to know about your components: it only needs to _name_ what it would\nlike to see. The cost is indirection: the rendered component isn't visible\nat the use site, so the devtools integration and the `component.options`\nintrospection exist to show you which component was chosen.\n\n## Where to go next\n\n- [Theme your front page](\/tutorials\/theme-your-front-page): the rules\n  above, applied to a real page, start to finish.\n- [Theme Druxt components](\/how-to\/theming): the practical side.\n- [DruxtModule API reference](\/api\/packages\/druxt\/components\/DruxtModule):\n  the base class behind everything described here.",
+            "format": "docs_markdown",
+            "processed": "<p>This composes with the theme layer: the wrapper component is resolved by\nsuggestions, then wrapped again by whatever you passed.<\/p>\n<h2>Why this design<\/h2>\n<p>The common failure it avoids is the fork: a theming system that requires\nediting framework components (or copying them) makes upgrades painful and\ndrift inevitable. Suggestion-based discovery means the framework never\nneeds to know about your components: it only needs to <em>name<\/em> what it would\nlike to see. The cost is indirection: the rendered component isn't visible\nat the use site, so the devtools integration and the <code>component.options<\/code>\nintrospection exist to show you which component was chosen.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/tutorials\/theme-your-front-page\">Theme your front page<\/a>: the rules\nabove, applied to a real page, start to finish.<\/li>\n<li><a href=\"\/how-to\/theming\">Theme Druxt components<\/a>: the practical side.<\/li>\n<li><a href=\"\/api\/packages\/druxt\/components\/DruxtModule\">DruxtModule API reference<\/a>:\nthe base class behind everything described here.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

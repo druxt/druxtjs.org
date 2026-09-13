@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "40d64310-02f1-5c33-b3ce-551d4c2480f8"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "In a fully decoupled site the frontend handles the URL, but the content lives\nin Drupal, and only Drupal knows which entity serves `\/node\/1`, or\n`\/recipes\/super-easy-pasta`, or a redirect that moved last week. Druxt's\nrouter module bridges the two worlds with **path translation**.\n\n## Path translation\n\nWhen the router receives a path, it asks Drupal's\n[`decoupled_router`](https:\/\/www.drupal.org\/project\/decoupled_router)\nmodule (via its `\/router\/translate-path` endpoint) one question: _what\nserves this path?_ The answer is a normalized route object:",
+            "format": "docs_markdown",
+            "processed": "<p>In a fully decoupled site the frontend handles the URL, but the content lives\nin Drupal, and only Drupal knows which entity serves <code>\/node\/1<\/code>, or\n<code>\/recipes\/super-easy-pasta<\/code>, or a redirect that moved last week. Druxt's\nrouter module bridges the two worlds with <strong>path translation<\/strong>.<\/p>\n<h2>Path translation<\/h2>\n<p>When the router receives a path, it asks Drupal's\n<a href=\"https:\/\/www.drupal.org\/project\/decoupled_router\"><code>decoupled_router<\/code><\/a>\nmodule (via its <code>\/router\/translate-path<\/code> endpoint) one question: <em>what\nserves this path?<\/em> The answer is a normalized route object:<\/p>\n"
+        }
+    ]
+}

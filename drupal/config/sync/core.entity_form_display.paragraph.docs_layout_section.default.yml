@@ -1,0 +1,15 @@
+uuid: 1a713691-8c73-4af7-93ef-0a4cb90917a2
+langcode: en
+status: true
+dependencies:
+  config:
+    - paragraphs.paragraphs_type.docs_layout_section
+id: paragraph.docs_layout_section.default
+targetEntityType: paragraph
+bundle: docs_layout_section
+mode: default
+content: {  }
+hidden:
+  created: true
+  layout_paragraphs_fields: true
+  status: true

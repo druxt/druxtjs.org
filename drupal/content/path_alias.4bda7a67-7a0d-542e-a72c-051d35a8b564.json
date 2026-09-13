@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "4bda7a67-7a0d-542e-a72c-051d35a8b564"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/ef19b85f-cdec-55d9-9569-d16dd3f347c6"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/prepare-the-backend"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

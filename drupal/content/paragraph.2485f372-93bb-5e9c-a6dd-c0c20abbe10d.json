@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "2485f372-93bb-5e9c-a6dd-c0c20abbe10d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## Field components\n\nRendering a field means choosing a component for its formatter. The schema\nsystem maps Drupal field formatters to `DruxtField*` components: an image\nfield with an image formatter becomes `DruxtFieldImage`, a text field with\nthe default formatter becomes `DruxtFieldTextDefault`, and so on. As with\neverything Druxt, the chosen component is then themeable via the\n[suggestion system](\/explanation\/component-resolution): you override the\nrendering, not the mapping.\n\n## Why display modes?\n\nThe alternative designs all have a known failure mode: a parallel frontend\nfield configuration drifts from Drupal, or a bespoke \"fields in YAML\"\nformat reinvents what site builders already manage. Display modes come with\na UI, per-bundle and per-mode overrides, third-party settings from\ncontrib, and a decade of Drupal muscle memory. Druxt inherits all of it,\nat the cost of depending on display-mode config being present and correct\non the backend.\n\n## Where to go next\n\n- [Component resolution](\/explanation\/component-resolution): how the\n  schema's field components meet your theme components.\n- [DruxtSchema API reference](\/api\/packages\/schema).",
+            "format": "docs_markdown",
+            "processed": "<h2>Field components<\/h2>\n<p>Rendering a field means choosing a component for its formatter. The schema\nsystem maps Drupal field formatters to <code>DruxtField*<\/code> components: an image\nfield with an image formatter becomes <code>DruxtFieldImage<\/code>, a text field with\nthe default formatter becomes <code>DruxtFieldTextDefault<\/code>, and so on. As with\neverything Druxt, the chosen component is then themeable via the\n<a href=\"\/explanation\/component-resolution\">suggestion system<\/a>: you override the\nrendering, not the mapping.<\/p>\n<h2>Why display modes?<\/h2>\n<p>The alternative designs all have a known failure mode: a parallel frontend\nfield configuration drifts from Drupal, or a bespoke \"fields in YAML\"\nformat reinvents what site builders already manage. Display modes come with\na UI, per-bundle and per-mode overrides, third-party settings from\ncontrib, and a decade of Drupal muscle memory. Druxt inherits all of it,\nat the cost of depending on display-mode config being present and correct\non the backend.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/explanation\/component-resolution\">Component resolution<\/a>: how the\nschema's field components meet your theme components.<\/li>\n<li><a href=\"\/api\/packages\/schema\">DruxtSchema API reference<\/a>.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

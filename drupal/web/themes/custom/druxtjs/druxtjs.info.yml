@@ -1,0 +1,17 @@
+name: DruxtJS
+type: theme
+description: 'The regions and blocks of the druxtjs.org frontend, which Druxt renders. Drupal renders only its block region demo in this theme.'
+package: Custom
+core_version_requirement: ^11
+base theme: false
+libraries:
+  - druxtjs/global
+regions:
+  header: Header
+  sidebar: Sidebar
+  breadcrumb: Breadcrumb
+  content: Content
+  toc: 'On this page'
+  footer: Footer
+  page_top: 'Page top'
+  page_bottom: 'Page bottom'

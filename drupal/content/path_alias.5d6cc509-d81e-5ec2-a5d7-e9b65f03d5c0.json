@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "5d6cc509-d81e-5ec2-a5d7-e9b65f03d5c0"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/bb834733-1cbd-5d58-9b3c-4bc8c5445921"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/storybook"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

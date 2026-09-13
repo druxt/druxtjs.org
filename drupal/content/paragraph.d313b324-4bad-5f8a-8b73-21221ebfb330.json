@@ -1,0 +1,54 @@
+{
+    "uuid": [
+        {
+            "value": "d313b324-4bad-5f8a-8b73-21221ebfb330"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_code",
+            "target_type": "paragraphs_type",
+            "target_uuid": "eafde3f2-1572-48f8-a6ae-4d1ce17d56ee"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_code": [
+        {
+            "value": "nuxt\/components\/druxt\/\n\u251c\u2500\u2500 entity\/node\/article\/Teaser.vue   \u2192 DruxtEntityNodeArticleTeaser\n\u2514\u2500\u2500 view\/frontpage\/Page1.vue         \u2192 DruxtViewFrontpagePage1"
+        }
+    ],
+    "field_language": [
+        {
+            "value": "text"
+        }
+    ]
+}

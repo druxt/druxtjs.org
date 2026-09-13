@@ -1,0 +1,30 @@
+{
+  // MD013 (line length) is off: prose reflows, and a hard wrap shows up as a
+  // diff on every edit to the paragraph rather than the sentence.
+  // MD024 is scoped to siblings so the changelog can repeat "Added" per release.
+  // MD041 is off: the merge request templates open with a comment, not a heading.
+  "config": {
+    "default": true,
+    "MD013": false,
+    "MD024": { "siblings_only": true },
+    "MD033": false,
+    "MD041": false
+  },
+  "gitignore": true,
+  "ignores": [
+    "node_modules/**",
+    "**/node_modules/**",
+    ".npm/**",
+    ".vale/**",
+    ".docs-ir/**",
+    ".docs-source/**",
+    "drupal/vendor/**",
+    "drupal/web/core/**",
+    "drupal/web/libraries/**",
+    "drupal/web/modules/contrib/**",
+    "drupal/web/profiles/contrib/**",
+    "drupal/web/themes/contrib/**",
+    // The frontend brings its own lint setup when it lands.
+    "nuxt/**"
+  ]
+}

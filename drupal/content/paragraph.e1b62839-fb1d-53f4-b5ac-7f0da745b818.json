@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "e1b62839-fb1d-53f4-b5ac-7f0da745b818"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "One page for every environment variable, so other guides can link here\ninstead of repeating themselves. The quickstart writes its variables to\na `.env` file, which Node does not read on its own: the quickstart's\n`nuxt.config.js` loads it with the `dotenv` package\n(`require('dotenv').config()`) and then reads plain `process.env`\nvalues. Deployment platforms skip the file and inject their settings as\nreal environment variables. `.env` stays out of git; commit a\n`.env.example` with placeholders instead.\n\n## The variables\n\n| Variable          | Consumed by                        | Purpose                                                                                                                                                                                                       |\n| ----------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |\n| `BASE_URL`        | `nuxt.config.js` \u2192 `druxt.baseUrl` | The Drupal origin, scheme included and trimmed of any trailing slash. Must be reachable from wherever the consuming code runs. [Request topology](\/explanation\/request-topology#baseurl-rules) has the rules. |\n| `OAUTH_CLIENT_ID` | `druxt-auth`                       | The consumer id created in Drupal for the login flow.                                                                                                                                                         |\n| `NUXT_TARGET`     | `nuxt.config.js` \u2192 `target`        | `static` for generated builds, unset for the node server. One config file serves both modes.                                                                                                                  |\n| `PORT`, `HOST`    | The dev and node servers           | Where the frontend listens.                                                                                                                                                                                   |\n| `NODE_OPTIONS`    | Node itself                        | `--openssl-legacy-provider` for building on Node 17 or later ([why](\/how-to\/troubleshooting#error0308010cdigital-envelope-routines-on-node-17-or-later)).                                                     |\n\nA copyable template:",
+            "format": "docs_markdown",
+            "processed": "<p>One page for every environment variable, so other guides can link here\ninstead of repeating themselves. The quickstart writes its variables to\na <code>.env<\/code> file, which Node does not read on its own: the quickstart's\n<code>nuxt.config.js<\/code> loads it with the <code>dotenv<\/code> package\n(<code>require('dotenv').config()<\/code>) and then reads plain <code>process.env<\/code>\nvalues. Deployment platforms skip the file and inject their settings as\nreal environment variables. <code>.env<\/code> stays out of git; commit a\n<code>.env.example<\/code> with placeholders instead.<\/p>\n<h2>The variables<\/h2>\n<table>\n<thead>\n<tr>\n<th>Variable<\/th>\n<th>Consumed by<\/th>\n<th>Purpose<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td><code>BASE_URL<\/code><\/td>\n<td><code>nuxt.config.js<\/code> \u2192 <code>druxt.baseUrl<\/code><\/td>\n<td>The Drupal origin, scheme included and trimmed of any trailing slash. Must be reachable from wherever the consuming code runs. <a href=\"\/explanation\/request-topology#baseurl-rules\">Request topology<\/a> has the rules.<\/td>\n<\/tr>\n<tr>\n<td><code>OAUTH_CLIENT_ID<\/code><\/td>\n<td><code>druxt-auth<\/code><\/td>\n<td>The consumer id created in Drupal for the login flow.<\/td>\n<\/tr>\n<tr>\n<td><code>NUXT_TARGET<\/code><\/td>\n<td><code>nuxt.config.js<\/code> \u2192 <code>target<\/code><\/td>\n<td><code>static<\/code> for generated builds, unset for the node server. One config file serves both modes.<\/td>\n<\/tr>\n<tr>\n<td><code>PORT<\/code>, <code>HOST<\/code><\/td>\n<td>The dev and node servers<\/td>\n<td>Where the frontend listens.<\/td>\n<\/tr>\n<tr>\n<td><code>NODE_OPTIONS<\/code><\/td>\n<td>Node itself<\/td>\n<td><code>--openssl-legacy-provider<\/code> for building on Node 17 or later (<a href=\"\/how-to\/troubleshooting#error0308010cdigital-envelope-routines-on-node-17-or-later\">why<\/a>).<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<p>A copyable template:<\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,175 @@
+{
+    "uuid": [
+        {
+            "value": "ea63ca90-3269-58fd-841c-23f48ffde8e7"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Deploy your site"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "15f64282-61f2-52de-a5b7-de02da5435fb"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "a449e253-0aa8-5543-bab0-50a106da0442"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0aae3c32-611f-5387-aa2c-aa8bb44b8926"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "072b6984-9b94-53fe-9d9a-1655752220f2"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "ee5a1108-b991-50da-a419-e19b45b929d6"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0cc09ea4-8f46-5772-aca5-33101419c9f3"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "d7b92869-b39e-5ef4-8e93-6570cf61f57d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "e55b2f44-a027-599f-a6e3-1e882d97daa2"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "c616c1bc-74a1-57b1-9127-e4b2797d44fd"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "5b496c4c-9946-5356-987c-253d7e803ed9"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "587d05bc-31d0-5334-8377-20a65465712f"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0e297b6a-784b-564b-af5f-db2e9dc89def"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "02e5182d-1325-5e32-b07a-68d75e390670"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "76b9d333-f8d3-5530-a092-d41654b75353"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "b8cc50b0-8c14-58b0-8b7b-483a9832a69f"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "9b9320cf-3c63-5148-916c-27a47049af84"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0c58b1f4-cbf7-59a1-8fd8-9e3aedc7d73b"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Generate the quickstart as static files, prove why the backend still matters, and put a working Druxt site on a live URL."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "5f1bbf70-8b03-5759-8f2a-5ec8ec14f60e"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/tutorials\/deploy-your-site.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"prerequisites\",\"depth\":2,\"text\":\"Prerequisites\"},{\"id\":\"step-1-tell-nuxt-what-to-generate\",\"depth\":2,\"text\":\"Step 1: Tell Nuxt what to generate\"},{\"id\":\"step-2-generate-locally-and-prove-the-dependency\",\"depth\":2,\"text\":\"Step 2: Generate locally and prove the dependency\"},{\"id\":\"step-3-deploy-against-the-public-demo-backend\",\"depth\":2,\"text\":\"Step 3: Deploy against the public demo backend\"},{\"id\":\"step-4-publishing-your-own-content\",\"depth\":2,\"text\":\"Step 4: Publishing your own content\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -6
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "d32f211a-ae3b-5e87-9712-eb5fef266f23"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "(`giget@1` is the last major that runs on Node 16; `#develop` is the\ntemplate's default branch. The homepage one-liner adds `--install`, which\nruns the next step's setup for you; skip Step 2's setup command if you\nused it.)\n\n**Outcome:** you are inside your project root, and it contains a `drupal\/`\ndirectory (the backend) and a `nuxt\/` directory (the frontend).\n\n## Step 2: Set everything up\n\nFrom the project root:",
+            "format": "docs_markdown",
+            "processed": "<p>(<code>giget@1<\/code> is the last major that runs on Node 16; <code>#develop<\/code> is the\ntemplate's default branch. The homepage one-liner adds <code>--install<\/code>, which\nruns the next step's setup for you; skip Step 2's setup command if you\nused it.)<\/p>\n<p><strong>Outcome:<\/strong> you are inside your project root, and it contains a <code>drupal\/<\/code>\ndirectory (the backend) and a <code>nuxt\/<\/code> directory (the frontend).<\/p>\n<h2>Step 2: Set everything up<\/h2>\n<p>From the project root:<\/p>\n"
+        }
+    ]
+}

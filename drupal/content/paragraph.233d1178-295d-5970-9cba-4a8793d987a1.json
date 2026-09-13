@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "233d1178-295d-5970-9cba-4a8793d987a1"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Version:** `>= 0.16.0`\n\nThe default DruxtField components were deprecated in version `0.16.0` and will be removed in a future release.\n\nThey are no longer imported by default (`entity.components.fields`\ndefaults to `false`), so a current site carries\nno deprecated field components unless it opts back in:",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Version:<\/strong> <code>&gt;= 0.16.0<\/code><\/p>\n<p>The default DruxtField components were deprecated in version <code>0.16.0<\/code> and will be removed in a future release.<\/p>\n<p>They are no longer imported by default (<code>entity.components.fields<\/code>\ndefaults to <code>false<\/code>), so a current site carries\nno deprecated field components unless it opts back in:<\/p>\n"
+        }
+    ]
+}

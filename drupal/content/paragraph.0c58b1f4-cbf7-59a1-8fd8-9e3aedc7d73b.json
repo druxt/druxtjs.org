@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "0c58b1f4-cbf7-59a1-8fd8-9e3aedc7d73b"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Answer the prompts to create a new site. The printed URL is a working\nDruxt site on the internet: pages pre-rendered, menu live, navigation\nresolving routes against the demo backend from your visitors' browsers.\nIf something fails, [Troubleshoot common\nissues](\/how-to\/troubleshooting) covers the build and CORS failure\nmodes; if the demo backend itself is unreachable, the deploy still\nserves its generated pages, and navigation degrades until it returns.\n\nChange `theme` back to `olivero` (the quickstart's original value,\nDrupal's default frontend theme) when you return to local work.\n\n## Step 4: Publishing your own content\n\nTo put **your** content on that URL, your backend has to live somewhere\nbrowsers can reach. The realistic options:\n\n- **Host Drupal, keep the frontend static.** Any Drupal host works\n  ([prepare the backend](\/how-to\/prepare-the-backend),\n  [configure CORS](\/how-to\/configure-cors)); point `BASE_URL` at it,\n  generate, deploy, rebuild when content changes. This is the most\n  common production shape.\n- **Host both halves as servers.** A node service renders live content\n  next to hosted Drupal.\n- **A databaseless backend.** Drupal can exist only at build time, its\n  content exported to files with\n  [Tome](https:\/\/www.drupal.org\/project\/tome), and the\n  [quickstart-druxt-site-tome](https:\/\/github.com\/druxt\/quickstart-druxt-site-tome)\n  starter is this shape. Freeing the result from any backend also means\n  disabling the router middleware, covered under the fully static\n  model.\n\n[Deployment models](\/explanation\/deployment-models) compares the three\nand hands off to the deploy guides.\n\n## Where to go next\n\n- Keep learning: [Build a custom Druxt module](\/tutorials\/first-custom-module),\n  the final lesson.\n- [Deployment models](\/explanation\/deployment-models): choose the shape\n  for your real site.\n- [Deploy a static site](\/how-to\/deploy-static): the production version\n  of this lesson, with git-driven builds and rebuild hooks.\n- [Prepare the Drupal backend](\/how-to\/prepare-the-backend): make a real\n  Drupal site Druxt-ready.\n- Back to [the tutorials index](\/tutorials).",
+            "format": "docs_markdown",
+            "processed": "<p>Answer the prompts to create a new site. The printed URL is a working\nDruxt site on the internet: pages pre-rendered, menu live, navigation\nresolving routes against the demo backend from your visitors' browsers.\nIf something fails, <a href=\"\/how-to\/troubleshooting\">Troubleshoot common\nissues<\/a> covers the build and CORS failure\nmodes; if the demo backend itself is unreachable, the deploy still\nserves its generated pages, and navigation degrades until it returns.<\/p>\n<p>Change <code>theme<\/code> back to <code>olivero<\/code> (the quickstart's original value,\nDrupal's default frontend theme) when you return to local work.<\/p>\n<h2>Step 4: Publishing your own content<\/h2>\n<p>To put <strong>your<\/strong> content on that URL, your backend has to live somewhere\nbrowsers can reach. The realistic options:<\/p>\n<ul>\n<li><strong>Host Drupal, keep the frontend static.<\/strong> Any Drupal host works\n(<a href=\"\/how-to\/prepare-the-backend\">prepare the backend<\/a>,\n<a href=\"\/how-to\/configure-cors\">configure CORS<\/a>); point <code>BASE_URL<\/code> at it,\ngenerate, deploy, rebuild when content changes. This is the most\ncommon production shape.<\/li>\n<li><strong>Host both halves as servers.<\/strong> A node service renders live content\nnext to hosted Drupal.<\/li>\n<li><strong>A databaseless backend.<\/strong> Drupal can exist only at build time, its\ncontent exported to files with\n<a href=\"https:\/\/www.drupal.org\/project\/tome\">Tome<\/a>, and the\n<a href=\"https:\/\/github.com\/druxt\/quickstart-druxt-site-tome\">quickstart-druxt-site-tome<\/a>\nstarter is this shape. Freeing the result from any backend also means\ndisabling the router middleware, covered under the fully static\nmodel.<\/li>\n<\/ul>\n<p><a href=\"\/explanation\/deployment-models\">Deployment models<\/a> compares the three\nand hands off to the deploy guides.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li>Keep learning: <a href=\"\/tutorials\/first-custom-module\">Build a custom Druxt module<\/a>,\nthe final lesson.<\/li>\n<li><a href=\"\/explanation\/deployment-models\">Deployment models<\/a>: choose the shape\nfor your real site.<\/li>\n<li><a href=\"\/how-to\/deploy-static\">Deploy a static site<\/a>: the production version\nof this lesson, with git-driven builds and rebuild hooks.<\/li>\n<li><a href=\"\/how-to\/prepare-the-backend\">Prepare the Drupal backend<\/a>: make a real\nDrupal site Druxt-ready.<\/li>\n<li>Back to <a href=\"\/tutorials\">the tutorials index<\/a>.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

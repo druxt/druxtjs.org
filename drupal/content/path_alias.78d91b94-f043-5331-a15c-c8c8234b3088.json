@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "78d91b94-f043-5331-a15c-c8c8234b3088"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/e943bbe0-dd0d-5c52-a01c-c7f9f400d775"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/modules\/router\/deprecations"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

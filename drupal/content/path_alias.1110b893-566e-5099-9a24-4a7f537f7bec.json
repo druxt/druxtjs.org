@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "1110b893-566e-5099-9a24-4a7f537f7bec"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/4dcc02b2-c9ab-5104-b48f-fc788b98ccc6"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/upgrade"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

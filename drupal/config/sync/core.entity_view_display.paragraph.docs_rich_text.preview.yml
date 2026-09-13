@@ -1,0 +1,23 @@
+uuid: b35ef533-d0b7-4eaf-b553-266f79152e13
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.paragraph.preview
+    - field.field.paragraph.docs_rich_text.field_rich_text
+    - paragraphs.paragraphs_type.docs_rich_text
+  module:
+    - text
+id: paragraph.docs_rich_text.preview
+targetEntityType: paragraph
+bundle: docs_rich_text
+mode: preview
+content:
+  field_rich_text:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden: {  }

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "74700428-6354-547f-8ae3-f70d7859468d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Never commit real secrets; keep per-environment values in the\nplatform's settings, and put anything sensitive only there.\n\n## Build time vs runtime\n\n**Nuxt 2 bakes `process.env` values into the bundle at build time.** A\n`baseUrl` read from `BASE_URL` in `nuxt.config.js` is fixed at the moment\nyou run `nuxt build` or `nuxt generate`. Changing the variable on the\nserver later has no effect until the next build.\n\nThis is the most common deployment trap: one build promoted\nthrough staging and production keeps talking to the backend it was built\nagainst. The options:\n\n- **One build per environment**, each built with its own `BASE_URL`.\n  Simple, and the only option for generated static sites, since their\n  pages are rendered against one backend by definition.\n- **Runtime config** for server deployments: values under\n  `publicRuntimeConfig` and `privateRuntimeConfig` in `nuxt.config.js`\n  are read when the server starts, not when it was built, and code\n  reads them through `this.$config` (such as `this.$config.baseUrl`)\n  instead of `process.env`. Use\n  `publicRuntimeConfig` for values the browser may see and\n  `privateRuntimeConfig` for server-only secrets (service accounts,\n  API keys used in server middleware).\n\nThe build machine and the visitor's browser both use `baseUrl`, and\nthey may not be able to reach the same address. See\n[Request topology](\/explanation\/request-topology#baseurl-rules) for the\nlayouts that resolve this.\n\n## Where to go next\n\n- [Deploy a static site](\/how-to\/deploy-static): where these variables\n  get set on a host.\n- [Prepare the Drupal backend](\/how-to\/prepare-the-backend): the Drupal\n  side of `BASE_URL` and `OAUTH_CLIENT_ID`.",
+            "format": "docs_markdown",
+            "processed": "<p>Never commit real secrets; keep per-environment values in the\nplatform's settings, and put anything sensitive only there.<\/p>\n<h2>Build time vs runtime<\/h2>\n<p><strong>Nuxt 2 bakes <code>process.env<\/code> values into the bundle at build time.<\/strong> A\n<code>baseUrl<\/code> read from <code>BASE_URL<\/code> in <code>nuxt.config.js<\/code> is fixed at the moment\nyou run <code>nuxt build<\/code> or <code>nuxt generate<\/code>. Changing the variable on the\nserver later has no effect until the next build.<\/p>\n<p>This is the most common deployment trap: one build promoted\nthrough staging and production keeps talking to the backend it was built\nagainst. The options:<\/p>\n<ul>\n<li><strong>One build per environment<\/strong>, each built with its own <code>BASE_URL<\/code>.\nSimple, and the only option for generated static sites, since their\npages are rendered against one backend by definition.<\/li>\n<li><strong>Runtime config<\/strong> for server deployments: values under\n<code>publicRuntimeConfig<\/code> and <code>privateRuntimeConfig<\/code> in <code>nuxt.config.js<\/code>\nare read when the server starts, not when it was built, and code\nreads them through <code>this.$config<\/code> (such as <code>this.$config.baseUrl<\/code>)\ninstead of <code>process.env<\/code>. Use\n<code>publicRuntimeConfig<\/code> for values the browser may see and\n<code>privateRuntimeConfig<\/code> for server-only secrets (service accounts,\nAPI keys used in server middleware).<\/li>\n<\/ul>\n<p>The build machine and the visitor's browser both use <code>baseUrl<\/code>, and\nthey may not be able to reach the same address. See\n<a href=\"\/explanation\/request-topology#baseurl-rules\">Request topology<\/a> for the\nlayouts that resolve this.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/how-to\/deploy-static\">Deploy a static site<\/a>: where these variables\nget set on a host.<\/li>\n<li><a href=\"\/how-to\/prepare-the-backend\">Prepare the Drupal backend<\/a>: the Drupal\nside of <code>BASE_URL<\/code> and <code>OAUTH_CLIENT_ID<\/code>.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

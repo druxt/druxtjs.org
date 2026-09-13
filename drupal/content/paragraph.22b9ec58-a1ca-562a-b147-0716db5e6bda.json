@@ -1,0 +1,54 @@
+{
+    "uuid": [
+        {
+            "value": "22b9ec58-a1ca-562a-b147-0716db5e6bda"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_code",
+            "target_type": "paragraphs_type",
+            "target_uuid": "eafde3f2-1572-48f8-a6ae-4d1ce17d56ee"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_code": [
+        {
+            "value": "npm install --global netlify-cli@15   # newer majors need Node 18+\nnetlify init\nNODE_OPTIONS=--openssl-legacy-provider npm run generate\nnetlify deploy --prod --dir=dist"
+        }
+    ],
+    "field_language": [
+        {
+            "value": "sh"
+        }
+    ]
+}

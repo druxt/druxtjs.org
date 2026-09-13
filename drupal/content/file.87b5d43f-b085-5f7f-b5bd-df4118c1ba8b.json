@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "87b5d43f-b085-5f7f-b5bd-df4118c1ba8b"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "vuejs-devtools.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/vuejs-devtools.png",
+            "url": "\/sites\/default\/files\/documentation\/vuejs-devtools.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 61560
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

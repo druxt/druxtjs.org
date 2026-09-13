@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "3ccbea8e-738a-50c7-8d82-32ad9791c853"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/7888ad09-7264-5ad1-b72c-e78004eed4da"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/explanation\/request-topology"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

@@ -1,0 +1,55 @@
+{
+    "uuid": [
+        {
+            "value": "391eac3b-0c84-5856-bcdd-e1d9d4211174"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_diagram",
+            "target_type": "paragraphs_type",
+            "target_uuid": "3c91ca27-0983-444c-a6bf-236eea8124d3"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_diagram": [
+        {
+            "value": "%% The Authorization Code + PKCE login flow between browser, frontend and Drupal\nsequenceDiagram\n  participant B as Browser\n  participant F as Frontend (druxt-auth)\n  participant D as Drupal (Simple OAuth)\n  B->>F: Log in\n  F->>D: \/oauth\/authorize + code challenge\n  D->>B: Drupal login form\n  B->>D: credentials\n  D-->>F: redirect to \/callback with code\n  F->>D: \/oauth\/token + code verifier\n  D-->>F: access + refresh tokens\n  Note over B,F: Authorization header set on the shared axios instance"
+        }
+    ],
+    "field_group": [],
+    "field_syntax": [
+        {
+            "value": "mermaid"
+        }
+    ]
+}

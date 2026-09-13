@@ -1,0 +1,29 @@
+uuid: 287501a8-bb38-4aeb-850e-397dcd34fff4
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.paragraph.preview
+    - custom_formatters.formatter.docs_code_block
+    - field.field.paragraph.docs_diagram.field_diagram
+    - field.field.paragraph.docs_diagram.field_group
+    - field.field.paragraph.docs_diagram.field_syntax
+    - paragraphs.paragraphs_type.docs_diagram
+  module:
+    - custom_formatters
+id: paragraph.docs_diagram.preview
+targetEntityType: paragraph
+bundle: docs_diagram
+mode: preview
+content:
+  field_diagram:
+    type: 'custom_formatters:docs_code_block'
+    label: hidden
+    settings:
+      formatter_setting_uuid: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  field_group: true
+  field_syntax: true

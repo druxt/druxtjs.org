@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "d996b5d0-2a26-5af9-a471-ca8bcae298f3"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/7ade84b1-00c3-55a3-a62c-13a92652ce80"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/theming"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

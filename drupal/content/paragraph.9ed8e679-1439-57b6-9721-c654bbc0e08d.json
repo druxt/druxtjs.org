@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "9ed8e679-1439-57b6-9721-c654bbc0e08d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Deprecated in:** `druxt-entity:0.5.0`\n**Removed in:** `druxt-entity:2.0.0`\n\nThese internal mixins (both `@private`) predate `DruxtModule` absorbing the\nsame behaviour. They have no generated API page, so they are recorded here:\n\n| Deprecated                  | Replacement                                 |\n| --------------------------- | ------------------------------------------- |\n| `componentSuggestion` mixin | `DruxtModule`'s component suggestion system |\n| `context` mixin             | `DruxtModule`                               |\n\n## Where to go next\n\n- [`druxt-entity` module reference](\/modules\/entity): options and components.\n- [Upgrade Druxt](\/how-to\/upgrade): the procedure these removals feed into.",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Deprecated in:<\/strong> <code>druxt-entity:0.5.0<\/code>\n<strong>Removed in:<\/strong> <code>druxt-entity:2.0.0<\/code><\/p>\n<p>These internal mixins (both <code>@private<\/code>) predate <code>DruxtModule<\/code> absorbing the\nsame behaviour. They have no generated API page, so they are recorded here:<\/p>\n<table>\n<thead>\n<tr>\n<th>Deprecated<\/th>\n<th>Replacement<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td><code>componentSuggestion<\/code> mixin<\/td>\n<td><code>DruxtModule<\/code>'s component suggestion system<\/td>\n<\/tr>\n<tr>\n<td><code>context<\/code> mixin<\/td>\n<td><code>DruxtModule<\/code><\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/modules\/entity\"><code>druxt-entity<\/code> module reference<\/a>: options and components.<\/li>\n<li><a href=\"\/how-to\/upgrade\">Upgrade Druxt<\/a>: the procedure these removals feed into.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

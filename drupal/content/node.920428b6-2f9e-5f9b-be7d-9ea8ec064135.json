@@ -1,0 +1,135 @@
+{
+    "uuid": [
+        {
+            "value": "920428b6-2f9e-5f9b-be7d-9ea8ec064135"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Add a login flow"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "43b51949-e143-5484-8fa2-7af9d70c7fb6"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "6718d2d7-8fef-5560-ad70-68f51e6dc1c1"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "38c57da8-514c-50db-9780-5082e1186cb1"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "7a3a5fec-25fa-54ac-bca1-9a1f5530ee53"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "3e90d129-ccab-5a3c-a920-6b568e963fba"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "e7cbb42e-2455-5c2e-b576-f2de44e6e05c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "8264fb4d-9a5c-5a81-9f67-6a032a6529cf"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Turn the quickstart's already-configured OAuth setup into a real, working login."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "5f1bbf70-8b03-5759-8f2a-5ec8ec14f60e"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/tutorials\/authentication.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"prerequisites\",\"depth\":2,\"text\":\"Prerequisites\"},{\"id\":\"step-1-see-whats-already-there\",\"depth\":2,\"text\":\"Step 1: See what's already there\"},{\"id\":\"step-2-make-sure-you-have-an-active-drupal-session\",\"depth\":2,\"text\":\"Step 2: Make sure you have an active Drupal session\"},{\"id\":\"step-3-trigger-the-login\",\"depth\":2,\"text\":\"Step 3: Trigger the login\"},{\"id\":\"step-4-confirm-youre-actually-logged-in\",\"depth\":2,\"text\":\"Step 4: Confirm you're actually logged in\"},{\"id\":\"what-youve-got\",\"depth\":2,\"text\":\"What you've got\"},{\"id\":\"known-limitations\",\"depth\":2,\"text\":\"Known limitations\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -7
+        }
+    ]
+}

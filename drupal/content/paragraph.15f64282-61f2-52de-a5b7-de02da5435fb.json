@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "15f64282-61f2-52de-a5b7-de02da5435fb"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "The [first tutorial](\/tutorials\/getting-started) ended with a site running\non your machine. This lesson takes the next step: generating the site as static files\nand finishing with a working Druxt site on a public URL. It also proves\nwhy the backend still matters.\n\n## Prerequisites\n\n- The [Getting started](\/tutorials\/getting-started) tutorial, completed,\n  with its backend provisioned and running (`npm run info` shows its\n  status).\n- A [Netlify](https:\/\/www.netlify.com) account.\n- Permission to install npm packages globally, and about half an hour.\n  The generate runs are the slow part.\n\nOne constraint shapes the lesson. A Druxt site needs its backend even\nafter generating, because route lookups on navigation and live data are\nbrowser requests. Your throwaway backend runs on your machine, where\nthe internet cannot reach it, so the live deploy in step 3 points at\nthe public Druxt demo backend instead. Your own article stays local for\nnow, and step 4 covers what publishing your own content takes.\n\n## Step 1: Tell Nuxt what to generate\n\nThe quickstart's routes come from Drupal, so the static generator needs\na starting point to crawl from. Add this line to `nuxt\/nuxt.config.js`,\njust inside `export default {`:",
+            "format": "docs_markdown",
+            "processed": "<p>The <a href=\"\/tutorials\/getting-started\">first tutorial<\/a> ended with a site running\non your machine. This lesson takes the next step: generating the site as static files\nand finishing with a working Druxt site on a public URL. It also proves\nwhy the backend still matters.<\/p>\n<h2>Prerequisites<\/h2>\n<ul>\n<li>The <a href=\"\/tutorials\/getting-started\">Getting started<\/a> tutorial, completed,\nwith its backend provisioned and running (<code>npm run info<\/code> shows its\nstatus).<\/li>\n<li>A <a href=\"https:\/\/www.netlify.com\">Netlify<\/a> account.<\/li>\n<li>Permission to install npm packages globally, and about half an hour.\nThe generate runs are the slow part.<\/li>\n<\/ul>\n<p>One constraint shapes the lesson. A Druxt site needs its backend even\nafter generating, because route lookups on navigation and live data are\nbrowser requests. Your throwaway backend runs on your machine, where\nthe internet cannot reach it, so the live deploy in step 3 points at\nthe public Druxt demo backend instead. Your own article stays local for\nnow, and step 4 covers what publishing your own content takes.<\/p>\n<h2>Step 1: Tell Nuxt what to generate<\/h2>\n<p>The quickstart's routes come from Drupal, so the static generator needs\na starting point to crawl from. Add this line to <code>nuxt\/nuxt.config.js<\/code>,\njust inside <code>export default {<\/code>:<\/p>\n"
+        }
+    ]
+}

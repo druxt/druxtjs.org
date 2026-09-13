@@ -1,0 +1,8 @@
+# GitHub-flavoured markdown, the flavour Markdown Easy renders, which
+# CodeMirror Editor ships the mode for but does not declare.
+gfm:
+  label: 'GitHub-flavoured Markdown'
+  mime_types:
+    - text/x-gfm
+  dependencies:
+    - markdown

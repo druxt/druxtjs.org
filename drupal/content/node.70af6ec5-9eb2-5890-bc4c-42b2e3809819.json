@@ -1,0 +1,183 @@
+{
+    "uuid": [
+        {
+            "value": "70af6ec5-9eb2-5890-bc4c-42b2e3809819"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Theme your front page"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "73f0797c-9e48-5db4-9a34-3c583883029c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "ac5f9eaf-25e9-5cb4-bbc2-7a25fbe979a8"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "b4c75a3d-bab7-5765-8188-67d4f6b44d9f"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "d18f36e9-3d9c-5863-bbad-a741c3d28355"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "58996e3e-b6c0-5f2c-a499-e19be23fff1d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0f95812c-11f7-5534-9728-250ebbeead1e"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "4f0bab29-5c4e-5672-aeae-f803f6c55779"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "31aee6c7-f30c-5baa-8a32-553722c0f1f2"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "ee8bc084-39e9-59d2-a7b7-fd58a280624d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "67909cdf-f11e-5d6a-ba79-3364a3727f4c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "efb44447-e795-5885-8b97-fb1de01f9f85"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "361e4bd2-cdfd-574d-b81c-78c8c0d00a6a"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "080694e4-6800-5cb7-b4b1-8bd5664d5a0e"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "c7c93355-6227-5443-92e7-b92516d7837f"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "989fd6a2-671c-5e31-a5d6-eb9eb2888bbf"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "da0fef9f-58b4-5233-8601-e0c461217fe8"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "b75d7f7e-315a-5da9-9050-5b1cf14865c5"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "d313b324-4bad-5f8a-8b73-21221ebfb330"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "fdb92663-ef8a-5fd9-bfa3-f9def1444600"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Take over the front page view and its teasers with two wrapper components, and learn the naming rule the whole Druxt theme layer runs on."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "5f1bbf70-8b03-5759-8f2a-5ec8ec14f60e"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/tutorials\/theme-your-front-page.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"prerequisites\",\"depth\":2,\"text\":\"Prerequisites\"},{\"id\":\"step-1-find-out-what-is-rendering-the-page\",\"depth\":2,\"text\":\"Step 1: Find out what is rendering the page\"},{\"id\":\"step-2-write-the-listing-component\",\"depth\":2,\"text\":\"Step 2: Write the listing component\"},{\"id\":\"step-3-write-the-teaser-component\",\"depth\":2,\"text\":\"Step 3: Write the teaser component\"},{\"id\":\"step-4-declare-your-props\",\"depth\":2,\"text\":\"Step 4: Declare your props\"},{\"id\":\"step-5-narrow-the-teasers-jsonapi-request\",\"depth\":2,\"text\":\"Step 5: Narrow the teaser's JSON:API request\"},{\"id\":\"step-6-theme-more-than-one-thing-at-a-time\",\"depth\":2,\"text\":\"Step 6: Theme more than one thing at a time\"},{\"id\":\"what-youve-got\",\"depth\":2,\"text\":\"What you've got\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -8
+        }
+    ]
+}

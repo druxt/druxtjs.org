@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "a598f836-ca5a-5734-af37-66d27d3fb9b8"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Skip the callback route (the code exchange is mid-flight there), and\nguard against loops if your logout redirects somewhere that mounts this\nlayout again; a flag in `sessionStorage` set on failure and cleared on\nthe login page does it.\n\n## Logging out\n\n`this.$auth.logout()` ends the frontend session, and nothing more. Two\nthings survive it: data fetched while logged in stays in the\n[DruxtStore](\/explanation\/druxt-store) until the page reloads, and the\nissued tokens keep working. Measured after a logout with no revocation,\nthe old access token still answers API requests and the old refresh\ntoken still mints new access tokens for its whole lifetime, because\nSimple OAuth has no logout or revocation endpoint of its own\n([#2945273](https:\/\/www.drupal.org\/project\/simple_oauth\/issues\/2945273)\nadds one as a patch).\n\nThe pattern production Druxt sites use is a dedicated logout page that\nrevokes, logs out and cleans up, then forces a full page load, which\nalso empties the store:",
+            "format": "docs_markdown",
+            "processed": "<p>Skip the callback route (the code exchange is mid-flight there), and\nguard against loops if your logout redirects somewhere that mounts this\nlayout again; a flag in <code>sessionStorage<\/code> set on failure and cleared on\nthe login page does it.<\/p>\n<h2>Logging out<\/h2>\n<p><code>this.$auth.logout()<\/code> ends the frontend session, and nothing more. Two\nthings survive it: data fetched while logged in stays in the\n<a href=\"\/explanation\/druxt-store\">DruxtStore<\/a> until the page reloads, and the\nissued tokens keep working. Measured after a logout with no revocation,\nthe old access token still answers API requests and the old refresh\ntoken still mints new access tokens for its whole lifetime, because\nSimple OAuth has no logout or revocation endpoint of its own\n(<a href=\"https:\/\/www.drupal.org\/project\/simple_oauth\/issues\/2945273\">#2945273<\/a>\nadds one as a patch).<\/p>\n<p>The pattern production Druxt sites use is a dedicated logout page that\nrevokes, logs out and cleans up, then forces a full page load, which\nalso empties the store:<\/p>\n"
+        }
+    ]
+}

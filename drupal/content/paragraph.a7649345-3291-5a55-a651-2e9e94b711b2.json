@@ -1,0 +1,56 @@
+{
+    "uuid": [
+        {
+            "value": "a7649345-3291-5a55-a651-2e9e94b711b2"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_callout",
+            "target_type": "paragraphs_type",
+            "target_uuid": "1e924889-e030-4b91-811a-c906d05f0f0e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_callout": [
+        {
+            "value": "> **Before you start:** this guide assumes a Drupal backend with Druxt\n> enabled (see [Getting started](\/tutorials\/getting-started)) and a reason\n> to bypass the component layer: custom fetching, scripting, or non-Nuxt\n> usage.",
+            "format": "docs_markdown",
+            "processed": "<blockquote>\n<p><strong>Before you start:<\/strong> this guide assumes a Drupal backend with Druxt\nenabled (see <a href=\"\/tutorials\/getting-started\">Getting started<\/a>) and a reason\nto bypass the component layer: custom fetching, scripting, or non-Nuxt\nusage.<\/p>\n<\/blockquote>\n"
+        }
+    ],
+    "field_callout_type": [
+        {
+            "value": "prerequisite"
+        }
+    ]
+}

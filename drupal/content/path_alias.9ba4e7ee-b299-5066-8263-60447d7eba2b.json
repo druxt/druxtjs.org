@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "9ba4e7ee-b299-5066-8263-60447d7eba2b"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/c1ee1c77-b07e-588b-bcb7-4c2b4e53d351"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/deploy-server"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

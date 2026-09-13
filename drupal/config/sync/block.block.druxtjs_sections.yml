@@ -1,0 +1,25 @@
+uuid: a4ed44ba-7efb-44da-a4e0-798d83c93b97
+langcode: en
+status: true
+dependencies:
+  config:
+    - system.menu.docs
+  module:
+    - system
+  theme:
+    - druxtjs
+id: druxtjs_sections
+theme: druxtjs
+region: header
+weight: 1
+provider: null
+plugin: 'system_menu_block:docs'
+settings:
+  id: 'system_menu_block:docs'
+  label: Sections
+  label_display: '0'
+  provider: system
+  level: 1
+  depth: 1
+  expand_all_items: false
+visibility: {  }

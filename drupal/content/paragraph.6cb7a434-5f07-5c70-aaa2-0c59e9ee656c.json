@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "6cb7a434-5f07-5c70-aaa2-0c59e9ee656c"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Druxt is built on two frameworks, Drupal and Nuxt, both with their own modules which can be used alongside Druxt modules.\n\nDruxt modules provide Nuxt modules, plugins, components and more to\nbridge the gap and make decoupled development easier.\n\nNew here? Start with [druxt-site](\/modules\/site), which pulls the rest\nin and renders a whole site from the backend, then reach for the\nindividual modules when you need finer control.",
+            "format": "docs_markdown",
+            "processed": "<p>Druxt is built on two frameworks, Drupal and Nuxt, both with their own modules which can be used alongside Druxt modules.<\/p>\n<p>Druxt modules provide Nuxt modules, plugins, components and more to\nbridge the gap and make decoupled development easier.<\/p>\n<p>New here? Start with <a href=\"\/modules\/site\">druxt-site<\/a>, which pulls the rest\nin and renders a whole site from the backend, then reach for the\nindividual modules when you need finer control.<\/p>\n"
+        }
+    ]
+}

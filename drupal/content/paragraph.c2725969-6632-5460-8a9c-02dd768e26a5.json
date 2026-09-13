@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "c2725969-6632-5460-8a9c-02dd768e26a5"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "The [quickstart](\/tutorials\/getting-started) provisions a ready-made\nbackend. This guide is for the other case: making a Drupal site you\nalready have Druxt-ready. (Starting from nothing? Create a site with\n[Drupal's own instructions](https:\/\/www.drupal.org\/docs\/getting-started)\nfirst, then return here.)\n\nCommands run in the Drupal project root. `composer` manages Drupal\ndependencies; [drush](https:\/\/www.drush.org) is Drupal's CLI, installed\ninto the project with `composer require drush\/drush`. If the backend\nruns in a container, prefix commands with your tool's exec command.\nEvery step also has an admin-UI path, noted as it appears. If Drupal and\nits tooling are new to you,\n[Drupal for Nuxt developers](\/explanation\/drupal-for-nuxt-developers)\nexplains the concepts these steps lean on.\n\n## Install the Drupal Druxt module",
+            "format": "docs_markdown",
+            "processed": "<p>The <a href=\"\/tutorials\/getting-started\">quickstart<\/a> provisions a ready-made\nbackend. This guide is for the other case: making a Drupal site you\nalready have Druxt-ready. (Starting from nothing? Create a site with\n<a href=\"https:\/\/www.drupal.org\/docs\/getting-started\">Drupal's own instructions<\/a>\nfirst, then return here.)<\/p>\n<p>Commands run in the Drupal project root. <code>composer<\/code> manages Drupal\ndependencies; <a href=\"https:\/\/www.drush.org\">drush<\/a> is Drupal's CLI, installed\ninto the project with <code>composer require drush\/drush<\/code>. If the backend\nruns in a container, prefix commands with your tool's exec command.\nEvery step also has an admin-UI path, noted as it appears. If Drupal and\nits tooling are new to you,\n<a href=\"\/explanation\/drupal-for-nuxt-developers\">Drupal for Nuxt developers<\/a>\nexplains the concepts these steps lean on.<\/p>\n<h2>Install the Drupal Druxt module<\/h2>\n"
+        }
+    ]
+}

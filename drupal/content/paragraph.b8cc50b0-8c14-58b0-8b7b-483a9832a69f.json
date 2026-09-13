@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "b8cc50b0-8c14-58b0-8b7b-483a9832a69f"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "(Newer Netlify CLI majors need Node 18 and later; 15 is the last line\nthat runs on the Node 16 this stack pins.)",
+            "format": "docs_markdown",
+            "processed": "<p>(Newer Netlify CLI majors need Node 18 and later; 15 is the last line\nthat runs on the Node 16 this stack pins.)<\/p>\n"
+        }
+    ]
+}

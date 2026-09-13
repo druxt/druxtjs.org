@@ -1,0 +1,71 @@
+{
+    "uuid": [
+        {
+            "value": "5f1bbf70-8b03-5759-8f2a-5ec8ec14f60e"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "vid": [
+        {
+            "target_id": "documentation_section",
+            "target_type": "taxonomy_vocabulary",
+            "target_uuid": "11c3f418-9d8a-430e-bb1e-a4d94741de9a"
+        }
+    ],
+    "revision_created": [
+        {
+            "value": "2026-09-04T15:29:19+00:00"
+        }
+    ],
+    "revision_user": [],
+    "revision_log_message": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "name": [
+        {
+            "value": "Tutorials"
+        }
+    ],
+    "description": [
+        {
+            "value": "tutorials",
+            "format": "plain_text",
+            "processed": "<p>tutorials<\/p>\n"
+        }
+    ],
+    "weight": [
+        {
+            "value": -10
+        }
+    ],
+    "parent": [
+        {
+            "target_id": null
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-04T15:29:19+00:00"
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ]
+}

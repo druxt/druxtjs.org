@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "941af350-72cf-589b-8250-18a8023744e4"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "<\/div>\n\n**Fully static** generates every page at build time and deploys plain\nfiles, with no backend left running. This is a deliberate build mode, not the\ndefault: an ordinary build still asks Drupal to resolve routes when a\nvisitor navigates, so going backendless means disabling the router\nmiddleware (`druxt.router.middleware: false` in `nuxt.config.js`) and\ncutting out every runtime request. A databaseless backend completes the\nshape: Drupal exists only during the build, its content exported to\nfiles with [Tome](https:\/\/www.drupal.org\/project\/tome)'s Tome Sync, as\nin the\n[quickstart-druxt-site-tome](https:\/\/github.com\/druxt\/quickstart-druxt-site-tome)\nstarter. The starter does not yet preconfigure the no-runtime-requests\nhalf, so treat that part as an advanced configuration.\n\n**Static + live backend** is the recommended default. Pages are generated\nand served from a static host, while the browser talks to the\nstill-running Drupal for the live parts: authenticated content, form\nsubmissions, search. With no frontend server to proxy through, this\nmodel needs [CORS configured in Drupal](\/how-to\/configure-cors).\n\n**Server-rendered** runs the built app as a node service: a long-lived\nprocess you supervise, listening on a port behind your web server. Every\nrequest renders live data, the [API proxy](\/how-to\/proxy) can shield the\nbackend origin, and server middleware can hold secrets (mail delivery,\nsearch backends). You host and operate that node process alongside PHP.\n\nProduction sites also combine models into a hybrid: static files with a\nserver fallback. One build serves generated pages from a web server with\nlong cache headers, and a node service behind it catches routes that\nwere not generated, such as authenticated pages. Nuxt's `target` option\n(the build target) can be driven by an environment variable so one\n`nuxt.config.js` serves all modes; [Deploy a server-rendered\nsite](\/how-to\/deploy-server) shows the working shape.\n\n## Choosing a model\n\n- Content site, editors publish on a schedule: **static + live backend**,\n  with scheduled rebuilds.\n- Brochure site, content rarely changes: **fully static**, backend off or\n  databaseless.\n- Logged-in experiences, per-user pages, secrets in server code:\n  **server-rendered**, or the hybrid above.\n\n## Serving Druxt from Drupal\n\nA question that comes up regularly: can Druxt run progressively\ndecoupled, served by Drupal itself?\n\nWhat works today is the **same-origin layout**: generate the site and let\nthe web server in front of Drupal serve the files, routing `\/jsonapi` and\n`\/router` to Drupal. One origin, no CORS, and Drupal cookies work\neverywhere. The frontend is still a whole application owning the page.\n\nWhat Druxt does not do today is true progressive decoupling: rendering\nindividual Druxt components inside Drupal-rendered (Twig) pages. The\ncomponents need the running Nuxt application around them (its store and\nplugin system), which a Twig page does not have. The tracked feature\nrequest is a custom-elements build: web components a Drupal theme could\nattach as a library and place straight into markup. The\n[DruxtClient](\/how-to\/use-the-druxt-client) already runs outside Nuxt,\nso the data half of that is ready.\n\n## Where to go next\n\n- [Deploy a static site](\/how-to\/deploy-static): the generate-and-host\n  procedure.\n- [Deploy a server-rendered site](\/how-to\/deploy-server): the node\n  service and the hybrid.\n- [Environment variables](\/how-to\/environment-variables): what each\n  build needs to know.\n- [The deploy-your-site tutorial](\/tutorials\/deploy-your-site): this\n  page's decision, walked end to end from the quickstart.",
+            "format": "docs_markdown",
+            "processed": "\n<p><strong>Fully static<\/strong> generates every page at build time and deploys plain\nfiles, with no backend left running. This is a deliberate build mode, not the\ndefault: an ordinary build still asks Drupal to resolve routes when a\nvisitor navigates, so going backendless means disabling the router\nmiddleware (<code>druxt.router.middleware: false<\/code> in <code>nuxt.config.js<\/code>) and\ncutting out every runtime request. A databaseless backend completes the\nshape: Drupal exists only during the build, its content exported to\nfiles with <a href=\"https:\/\/www.drupal.org\/project\/tome\">Tome<\/a>'s Tome Sync, as\nin the\n<a href=\"https:\/\/github.com\/druxt\/quickstart-druxt-site-tome\">quickstart-druxt-site-tome<\/a>\nstarter. The starter does not yet preconfigure the no-runtime-requests\nhalf, so treat that part as an advanced configuration.<\/p>\n<p><strong>Static + live backend<\/strong> is the recommended default. Pages are generated\nand served from a static host, while the browser talks to the\nstill-running Drupal for the live parts: authenticated content, form\nsubmissions, search. With no frontend server to proxy through, this\nmodel needs <a href=\"\/how-to\/configure-cors\">CORS configured in Drupal<\/a>.<\/p>\n<p><strong>Server-rendered<\/strong> runs the built app as a node service: a long-lived\nprocess you supervise, listening on a port behind your web server. Every\nrequest renders live data, the <a href=\"\/how-to\/proxy\">API proxy<\/a> can shield the\nbackend origin, and server middleware can hold secrets (mail delivery,\nsearch backends). You host and operate that node process alongside PHP.<\/p>\n<p>Production sites also combine models into a hybrid: static files with a\nserver fallback. One build serves generated pages from a web server with\nlong cache headers, and a node service behind it catches routes that\nwere not generated, such as authenticated pages. Nuxt's <code>target<\/code> option\n(the build target) can be driven by an environment variable so one\n<code>nuxt.config.js<\/code> serves all modes; <a href=\"\/how-to\/deploy-server\">Deploy a server-rendered\nsite<\/a> shows the working shape.<\/p>\n<h2>Choosing a model<\/h2>\n<ul>\n<li>Content site, editors publish on a schedule: <strong>static + live backend<\/strong>,\nwith scheduled rebuilds.<\/li>\n<li>Brochure site, content rarely changes: <strong>fully static<\/strong>, backend off or\ndatabaseless.<\/li>\n<li>Logged-in experiences, per-user pages, secrets in server code:\n<strong>server-rendered<\/strong>, or the hybrid above.<\/li>\n<\/ul>\n<h2>Serving Druxt from Drupal<\/h2>\n<p>A question that comes up regularly: can Druxt run progressively\ndecoupled, served by Drupal itself?<\/p>\n<p>What works today is the <strong>same-origin layout<\/strong>: generate the site and let\nthe web server in front of Drupal serve the files, routing <code>\/jsonapi<\/code> and\n<code>\/router<\/code> to Drupal. One origin, no CORS, and Drupal cookies work\neverywhere. The frontend is still a whole application owning the page.<\/p>\n<p>What Druxt does not do today is true progressive decoupling: rendering\nindividual Druxt components inside Drupal-rendered (Twig) pages. The\ncomponents need the running Nuxt application around them (its store and\nplugin system), which a Twig page does not have. The tracked feature\nrequest is a custom-elements build: web components a Drupal theme could\nattach as a library and place straight into markup. The\n<a href=\"\/how-to\/use-the-druxt-client\">DruxtClient<\/a> already runs outside Nuxt,\nso the data half of that is ready.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/how-to\/deploy-static\">Deploy a static site<\/a>: the generate-and-host\nprocedure.<\/li>\n<li><a href=\"\/how-to\/deploy-server\">Deploy a server-rendered site<\/a>: the node\nservice and the hybrid.<\/li>\n<li><a href=\"\/how-to\/environment-variables\">Environment variables<\/a>: what each\nbuild needs to know.<\/li>\n<li><a href=\"\/tutorials\/deploy-your-site\">The deploy-your-site tutorial<\/a>: this\npage's decision, walked end to end from the quickstart.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

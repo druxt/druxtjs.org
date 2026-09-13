@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "ee8bc084-39e9-59d2-a7b7-fd58a280624d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "**Outcome:** each article is now your `<article class=\"teaser\">`, with the\nimage above the title and the trimmed body below it. The titles are back,\nread straight off the entity rather than waiting for a field slot.\n\n`components\/druxt\/entity\/node\/article\/Teaser.vue` is\n`DruxtEntityNodeArticleTeaser`: entity type `node`, bundle `article`, view\nmode `teaser`. The **slot names are the field names** from Drupal's teaser\ndisplay for that bundle, so `field_image` and `body` are there because the\narticle teaser display shows them. Change the display in Drupal and the\nslots change with it.\n\n> The image works because Druxt proxies Drupal's files directory through\n> your frontend by default. On a static build there is no proxy at runtime,\n> so read [Proxy the Drupal backend through Nuxt](\/how-to\/proxy) before you\n> deploy.\n\n## Step 4: Declare your props\n\nLook at your teaser in the browser's element inspector:",
+            "format": "docs_markdown",
+            "processed": "<p><strong>Outcome:<\/strong> each article is now your <code>&lt;article class=\"teaser\"&gt;<\/code>, with the\nimage above the title and the trimmed body below it. The titles are back,\nread straight off the entity rather than waiting for a field slot.<\/p>\n<p><code>components\/druxt\/entity\/node\/article\/Teaser.vue<\/code> is\n<code>DruxtEntityNodeArticleTeaser<\/code>: entity type <code>node<\/code>, bundle <code>article<\/code>, view\nmode <code>teaser<\/code>. The <strong>slot names are the field names<\/strong> from Drupal's teaser\ndisplay for that bundle, so <code>field_image<\/code> and <code>body<\/code> are there because the\narticle teaser display shows them. Change the display in Drupal and the\nslots change with it.<\/p>\n<blockquote>\n<p>The image works because Druxt proxies Drupal's files directory through\nyour frontend by default. On a static build there is no proxy at runtime,\nso read <a href=\"\/how-to\/proxy\">Proxy the Drupal backend through Nuxt<\/a> before you\ndeploy.<\/p>\n<\/blockquote>\n<h2>Step 4: Declare your props<\/h2>\n<p>Look at your teaser in the browser's element inspector:<\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "3c472a25-925a-515e-9152-eb496030ec80"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## What lives where\n\n| Layer              | Package(s)                                                      | Responsibility                                                       |\n| ------------------ | --------------------------------------------------------------- | -------------------------------------------------------------------- |\n| Core client        | `druxt`                                                         | `DruxtClient`: JSON:API communication, authentication, caching hints |\n| Core store         | `druxt`                                                         | `DruxtStore`: resource\/collection cache shared by all modules        |\n| Base component     | `druxt`                                                         | `DruxtModule`: the `druxt()` options contract every module builds on |\n| Routing            | `druxt-router`                                                  | Path translation, redirects, metadata                                |\n| Schemas            | `druxt-schema`                                                  | Display modes as query-filtering and render configuration            |\n| Content            | `druxt-entity`                                                  | Entity and field components                                          |\n| Site furniture     | `druxt-blocks`, `druxt-menu`, `druxt-views`, `druxt-breadcrumb` | Blocks, menus, views, breadcrumbs                                    |\n| Everything at once | `druxt-site`                                                    | Opinionated bundle: a working site layout out of the box             |\n\nOn the Drupal side, the [`druxt`](https:\/\/www.drupal.org\/project\/druxt)\nmodule is the only piece to install (it adds the permissions and path\ntranslators). It depends on `decoupled_router`, `jsonapi_menu_items` and\n`jsonapi_views`, so composer and Drupal bring those in with it. See\n[Prepare the Drupal backend](\/how-to\/prepare-the-backend).\n\n## Why this shape\n\n- **JSON:API as the contract** (not custom REST endpoints) keeps the\n  frontend compatible with Drupal core's supported web services, including\n  its filtering, inclusion and pagination semantics.\n- **A shared store** (rather than per-component fetching) means two\n  components asking for the same article hit Drupal once, and includes\n  (an article's image, the image's file) are stored once no matter which\n  query brought them in.\n- **Display modes as configuration source** means site builders (not\n  frontend developers) decide which fields appear where, using a UI they\n  already know.\n- **Wrapper components everywhere** keep the frontend from becoming a fork:\n  any component's rendering can be replaced per-site without patching the\n  framework.\n\n## Trade-offs\n\nThe architecture is **opinionated about Drupal**: it assumes JSON:API,\ndisplay modes and decoupled routing are available and authoritative. It is\nnot a general-purpose headless-CMS toolkit: the tight coupling is what\nmakes the out-of-the-box experience possible.\n\nThe current major line targets Nuxt 2 \/ Vue 2.7; the rendering layer is\ndesigned to be rebuilt (Nuxt 4 \/ Vue 3) without changing the Drupal-side\ncontract.\n\n## Where to go next\n\n- [The DruxtStore](\/explanation\/druxt-store): the data layer in depth.\n- [Decoupled routing](\/explanation\/routing): path translation details.\n- [Component resolution](\/explanation\/component-resolution): the theming\n  model.",
+            "format": "docs_markdown",
+            "processed": "<h2>What lives where<\/h2>\n<table>\n<thead>\n<tr>\n<th>Layer<\/th>\n<th>Package(s)<\/th>\n<th>Responsibility<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td>Core client<\/td>\n<td><code>druxt<\/code><\/td>\n<td><code>DruxtClient<\/code>: JSON:API communication, authentication, caching hints<\/td>\n<\/tr>\n<tr>\n<td>Core store<\/td>\n<td><code>druxt<\/code><\/td>\n<td><code>DruxtStore<\/code>: resource\/collection cache shared by all modules<\/td>\n<\/tr>\n<tr>\n<td>Base component<\/td>\n<td><code>druxt<\/code><\/td>\n<td><code>DruxtModule<\/code>: the <code>druxt()<\/code> options contract every module builds on<\/td>\n<\/tr>\n<tr>\n<td>Routing<\/td>\n<td><code>druxt-router<\/code><\/td>\n<td>Path translation, redirects, metadata<\/td>\n<\/tr>\n<tr>\n<td>Schemas<\/td>\n<td><code>druxt-schema<\/code><\/td>\n<td>Display modes as query-filtering and render configuration<\/td>\n<\/tr>\n<tr>\n<td>Content<\/td>\n<td><code>druxt-entity<\/code><\/td>\n<td>Entity and field components<\/td>\n<\/tr>\n<tr>\n<td>Site furniture<\/td>\n<td><code>druxt-blocks<\/code>, <code>druxt-menu<\/code>, <code>druxt-views<\/code>, <code>druxt-breadcrumb<\/code><\/td>\n<td>Blocks, menus, views, breadcrumbs<\/td>\n<\/tr>\n<tr>\n<td>Everything at once<\/td>\n<td><code>druxt-site<\/code><\/td>\n<td>Opinionated bundle: a working site layout out of the box<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<p>On the Drupal side, the <a href=\"https:\/\/www.drupal.org\/project\/druxt\"><code>druxt<\/code><\/a>\nmodule is the only piece to install (it adds the permissions and path\ntranslators). It depends on <code>decoupled_router<\/code>, <code>jsonapi_menu_items<\/code> and\n<code>jsonapi_views<\/code>, so composer and Drupal bring those in with it. See\n<a href=\"\/how-to\/prepare-the-backend\">Prepare the Drupal backend<\/a>.<\/p>\n<h2>Why this shape<\/h2>\n<ul>\n<li><strong>JSON:API as the contract<\/strong> (not custom REST endpoints) keeps the\nfrontend compatible with Drupal core's supported web services, including\nits filtering, inclusion and pagination semantics.<\/li>\n<li><strong>A shared store<\/strong> (rather than per-component fetching) means two\ncomponents asking for the same article hit Drupal once, and includes\n(an article's image, the image's file) are stored once no matter which\nquery brought them in.<\/li>\n<li><strong>Display modes as configuration source<\/strong> means site builders (not\nfrontend developers) decide which fields appear where, using a UI they\nalready know.<\/li>\n<li><strong>Wrapper components everywhere<\/strong> keep the frontend from becoming a fork:\nany component's rendering can be replaced per-site without patching the\nframework.<\/li>\n<\/ul>\n<h2>Trade-offs<\/h2>\n<p>The architecture is <strong>opinionated about Drupal<\/strong>: it assumes JSON:API,\ndisplay modes and decoupled routing are available and authoritative. It is\nnot a general-purpose headless-CMS toolkit: the tight coupling is what\nmakes the out-of-the-box experience possible.<\/p>\n<p>The current major line targets Nuxt 2 \/ Vue 2.7; the rendering layer is\ndesigned to be rebuilt (Nuxt 4 \/ Vue 3) without changing the Drupal-side\ncontract.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/explanation\/druxt-store\">The DruxtStore<\/a>: the data layer in depth.<\/li>\n<li><a href=\"\/explanation\/routing\">Decoupled routing<\/a>: path translation details.<\/li>\n<li><a href=\"\/explanation\/component-resolution\">Component resolution<\/a>: the theming\nmodel.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

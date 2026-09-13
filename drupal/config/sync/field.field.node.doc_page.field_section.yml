@@ -1,0 +1,24 @@
+uuid: dd360998-10b0-4347-8acb-de73c4b69b1f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_section
+    - node.type.doc_page
+    - taxonomy.vocabulary.documentation_section
+id: node.doc_page.field_section
+field_name: field_section
+entity_type: node
+bundle: doc_page
+label: Section
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      documentation_section: documentation_section
+field_type: entity_reference

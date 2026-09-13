@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "a98617fc-c707-54e3-b468-08b48f77fc9a"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "For matching options and rewrites, see the\n[Nuxt Proxy module](https:\/\/github.com\/nuxt-community\/proxy-module).\n\n## Where to go next\n\n- [Request topology](\/explanation\/request-topology): why only browser\n  requests ever needed this.\n- [Configure CORS in Drupal](\/how-to\/configure-cors): the alternative,\n  and the only option for static deployments.\n- [Authenticate users with OAuth](\/how-to\/authentication): the logout\n  route above in context.",
+            "format": "docs_markdown",
+            "processed": "<p>For matching options and rewrites, see the\n<a href=\"https:\/\/github.com\/nuxt-community\/proxy-module\">Nuxt Proxy module<\/a>.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/explanation\/request-topology\">Request topology<\/a>: why only browser\nrequests ever needed this.<\/li>\n<li><a href=\"\/how-to\/configure-cors\">Configure CORS in Drupal<\/a>: the alternative,\nand the only option for static deployments.<\/li>\n<li><a href=\"\/how-to\/authentication\">Authenticate users with OAuth<\/a>: the logout\nroute above in context.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

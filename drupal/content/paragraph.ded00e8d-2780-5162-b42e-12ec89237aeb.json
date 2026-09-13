@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "ded00e8d-2780-5162-b42e-12ec89237aeb"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "A Druxt site is two applications: a Drupal backend and a Nuxt frontend.\nRequests flow between them at three different times, from three different\nplaces. Most \"it works locally but not deployed\" problems come from not\nknowing which of the three is failing.\n\n## The request contexts\n\n| Context          | Who calls Drupal                                         | When                                    | Subject to CORS?                               |\n| ---------------- | -------------------------------------------------------- | --------------------------------------- | ---------------------------------------------- |\n| Build            | The Node process running `nuxt build` or `nuxt generate` | Once, at build time                     | No                                             |\n| Server rendering | The Node server rendering a page                         | On each uncached page request           | No                                             |\n| Browser          | The visitor's browser, after hydration                   | On client-side navigation and live data | Yes, when calling Drupal directly cross-origin |\n\nThe same table, as a picture:",
+            "format": "docs_markdown",
+            "processed": "<p>A Druxt site is two applications: a Drupal backend and a Nuxt frontend.\nRequests flow between them at three different times, from three different\nplaces. Most \"it works locally but not deployed\" problems come from not\nknowing which of the three is failing.<\/p>\n<h2>The request contexts<\/h2>\n<table>\n<thead>\n<tr>\n<th>Context<\/th>\n<th>Who calls Drupal<\/th>\n<th>When<\/th>\n<th>Subject to CORS?<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td>Build<\/td>\n<td>The Node process running <code>nuxt build<\/code> or <code>nuxt generate<\/code><\/td>\n<td>Once, at build time<\/td>\n<td>No<\/td>\n<\/tr>\n<tr>\n<td>Server rendering<\/td>\n<td>The Node server rendering a page<\/td>\n<td>On each uncached page request<\/td>\n<td>No<\/td>\n<\/tr>\n<tr>\n<td>Browser<\/td>\n<td>The visitor's browser, after hydration<\/td>\n<td>On client-side navigation and live data<\/td>\n<td>Yes, when calling Drupal directly cross-origin<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<p>The same table, as a picture:<\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,151 @@
+{
+    "uuid": [
+        {
+            "value": "d5868e25-f037-57db-92d6-3b0833435f3d"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Explore the example apps"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "4a73ad39-1c73-54f4-804c-a40ed400a93d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "f98e5cd5-9521-5555-adb3-7f8912a576ac"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "ade0b5fa-be0c-59c2-81f3-461cd6d7e798"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "a576ddfc-074c-5e78-887f-fc5fc879597c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "437b6732-7cf3-5e5e-b2f8-a6c027b840b0"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "ea7059ad-09a2-52fb-a74e-ed179e39692e"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "d4485848-698c-53fd-933d-d3ddd7bc061f"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "936dfcd4-0f0a-53db-8dba-5b5d5dd9542d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "0eb36c30-b5c6-5a3c-bcee-c056bf666460"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "4bc9b9e8-ee17-50da-950a-a7e484a75e6c"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "e9a2427b-5301-5b0d-aff5-7cc750b09d27"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Reference apps sharing one Umami backend, from an unstyled pattern index through daisyUI and Tailwind themes to a BootstrapVue editorial console."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "540fd949-ce24-5411-b703-1d1e76de2802"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/how-to\/example-apps.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"reference-app-druxt-site-the-technical-baseline\",\"depth\":2,\"text\":\"Reference app (druxt-site): the technical baseline\"},{\"id\":\"recipe-box-druxt-daisyui-swipe-to-save-discovery\",\"depth\":2,\"text\":\"Recipe Box (druxt-daisyui): swipe-to-save discovery\"},{\"id\":\"meal-planner-druxt-tailwind-drag-and-drop-no-nuxt-at-all\",\"depth\":2,\"text\":\"Meal Planner (druxt-tailwind): drag-and-drop, no Nuxt at all\"},{\"id\":\"content-ops-console-druxt-bootstrapvue-authenticated-inline-editing\",\"depth\":2,\"text\":\"Content Ops Console (druxt-bootstrapvue): authenticated inline editing\"},{\"id\":\"run-them-yourself\",\"depth\":2,\"text\":\"Run them yourself\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": 1
+        }
+    ]
+}

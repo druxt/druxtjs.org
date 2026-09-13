@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "437b6732-7cf3-5e5e-b2f8-a6c027b840b0"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "The plain, unstyled baseline the other three apps are compared against: a\nwireframe system (one type scale, 8px spacing rhythm, no palette, no\ncomponent library) deliberately undressed so nothing distracts from the\nunderlying Druxt output. Its `\/examples\/*` pages are the actual point:\neleven focused demonstrations covering `DruxtDebug`, entity queries,\nan entity explorer, an entity form, frontend menu editing, router modes, the\nschema mixin, wrapper theming, views, a custom `DruxtCardGrid` module, and\nreactive client-side filtering. If you want to see one specific Druxt concept in\nisolation without a themed app around it, start here.\n\n## Recipe Box (druxt-daisyui): swipe-to-save discovery",
+            "format": "docs_markdown",
+            "processed": "<p>The plain, unstyled baseline the other three apps are compared against: a\nwireframe system (one type scale, 8px spacing rhythm, no palette, no\ncomponent library) deliberately undressed so nothing distracts from the\nunderlying Druxt output. Its <code>\/examples\/*<\/code> pages are the actual point:\neleven focused demonstrations covering <code>DruxtDebug<\/code>, entity queries,\nan entity explorer, an entity form, frontend menu editing, router modes, the\nschema mixin, wrapper theming, views, a custom <code>DruxtCardGrid<\/code> module, and\nreactive client-side filtering. If you want to see one specific Druxt concept in\nisolation without a themed app around it, start here.<\/p>\n<h2>Recipe Box (druxt-daisyui): swipe-to-save discovery<\/h2>\n"
+        }
+    ]
+}

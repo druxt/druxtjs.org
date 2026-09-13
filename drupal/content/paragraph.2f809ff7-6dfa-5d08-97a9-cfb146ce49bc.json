@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "2f809ff7-6dfa-5d08-97a9-cfb146ce49bc"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "As of `0.6.0`, the store combines all results into a composite record without the need of the hash:",
+            "format": "docs_markdown",
+            "processed": "<p>As of <code>0.6.0<\/code>, the store combines all results into a composite record without the need of the hash:<\/p>\n"
+        }
+    ]
+}

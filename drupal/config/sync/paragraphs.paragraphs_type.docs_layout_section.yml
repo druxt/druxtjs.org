@@ -1,0 +1,18 @@
+uuid: 401bf5ff-9c35-4263-a4f1-24a038c3ecb8
+langcode: en
+status: true
+dependencies:
+  module:
+    - layout_paragraphs
+id: docs_layout_section
+label: Section
+icon_uuid: null
+icon_default: null
+description: 'A layout section. Blocks sit in its regions.'
+behavior_plugins:
+  layout_paragraphs:
+    enabled: true
+    available_layouts:
+      layout_onecol: 'One column'
+      layout_twocol: 'Two column'
+      layout_threecol_33_34_33: 'Three column'

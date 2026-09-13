@@ -1,0 +1,18 @@
+uuid: 6c344048-58f0-49b6-a99c-021b4388beb7
+langcode: en
+status: true
+dependencies:
+  theme:
+    - druxtjs
+id: druxtjs_page_title
+theme: druxtjs
+region: content
+weight: -7
+provider: null
+plugin: page_title_block
+settings:
+  id: page_title_block
+  label: 'Page title'
+  label_display: '0'
+  provider: core
+visibility: {  }

@@ -1,0 +1,39 @@
+uuid: 0ed03923-2c3d-4577-b184-ad5d1f942880
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.docs_diagram.field_diagram
+    - field.field.paragraph.docs_diagram.field_group
+    - field.field.paragraph.docs_diagram.field_syntax
+    - paragraphs.paragraphs_type.docs_diagram
+id: paragraph.docs_diagram.default
+targetEntityType: paragraph
+bundle: docs_diagram
+mode: default
+content:
+  field_diagram:
+    type: string_textarea
+    weight: 1
+    region: content
+    settings:
+      rows: 12
+      placeholder: ''
+    third_party_settings: {  }
+  field_group:
+    type: string_textfield
+    weight: 2
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_syntax:
+    type: options_select
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

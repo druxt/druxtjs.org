@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "d4485848-698c-53fd-933d-d3ddd7bc061f"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "This is a mobile-first discovery deck showing one recipe at a time. Swipe,\nuse the Save\/Skip buttons, or press \u2190\/\u2192 to build a saved collection that\npersists in `localStorage` across reloads. All three input methods work\nequally well. Built on the `druxt-site` all-in-one module, styled with DaisyUI on\nTailwind. The interesting part for anyone evaluating Druxt: the swipe\nmechanics, animation, and persistence are all plain Vuex + CSS transitions.\nNothing about the interaction pattern itself is Druxt-specific, only the\ndata behind each card is.\n\n## Meal Planner (druxt-tailwind): drag-and-drop, no Nuxt at all",
+            "format": "docs_markdown",
+            "processed": "<p>This is a mobile-first discovery deck showing one recipe at a time. Swipe,\nuse the Save\/Skip buttons, or press \u2190\/\u2192 to build a saved collection that\npersists in <code>localStorage<\/code> across reloads. All three input methods work\nequally well. Built on the <code>druxt-site<\/code> all-in-one module, styled with DaisyUI on\nTailwind. The interesting part for anyone evaluating Druxt: the swipe\nmechanics, animation, and persistence are all plain Vuex + CSS transitions.\nNothing about the interaction pattern itself is Druxt-specific, only the\ndata behind each card is.<\/p>\n<h2>Meal Planner (druxt-tailwind): drag-and-drop, no Nuxt at all<\/h2>\n"
+        }
+    ]
+}

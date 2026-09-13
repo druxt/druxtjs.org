@@ -1,0 +1,60 @@
+uuid: 63364f1c-530a-459d-9700-abef97581ac5
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_content
+    - node.type.doc_page
+    - paragraphs.paragraphs_type.docs_callout
+    - paragraphs.paragraphs_type.docs_code
+    - paragraphs.paragraphs_type.docs_diagram
+    - paragraphs.paragraphs_type.docs_image
+    - paragraphs.paragraphs_type.docs_layout_section
+    - paragraphs.paragraphs_type.docs_rich_text
+    - paragraphs.paragraphs_type.docs_text
+  module:
+    - entity_reference_revisions
+id: node.doc_page.field_content
+field_name: field_content
+entity_type: node
+bundle: doc_page
+label: Content
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      docs_text: docs_text
+      docs_code: docs_code
+      docs_diagram: docs_diagram
+      docs_callout: docs_callout
+      docs_image: docs_image
+      docs_rich_text: docs_rich_text
+      docs_layout_section: docs_layout_section
+    target_bundles_drag_drop:
+      docs_callout:
+        weight: 4
+        enabled: true
+      docs_code:
+        weight: 2
+        enabled: true
+      docs_diagram:
+        weight: 5
+        enabled: true
+      docs_image:
+        weight: 3
+        enabled: true
+      docs_layout_section:
+        weight: 8
+        enabled: true
+      docs_rich_text:
+        weight: 6
+        enabled: true
+      docs_text:
+        weight: 1
+        enabled: true
+field_type: entity_reference_revisions

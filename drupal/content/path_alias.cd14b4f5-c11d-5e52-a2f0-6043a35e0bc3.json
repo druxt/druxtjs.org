@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "cd14b4f5-c11d-5e52-a2f0-6043a35e0bc3"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/202dd7c7-50f9-54d8-ab31-dce3deeaa4b9"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/how-to\/configure-cors"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

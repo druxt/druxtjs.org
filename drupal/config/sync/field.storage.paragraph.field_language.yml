@@ -1,0 +1,45 @@
+uuid: 1d392a34-2473-4406-bc9a-018c03f3d9bb
+langcode: en
+status: true
+dependencies:
+  module:
+    - options
+    - paragraphs
+id: paragraph.field_language
+field_name: field_language
+entity_type: paragraph
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: js
+      label: JavaScript
+    -
+      value: sh
+      label: Shell
+    -
+      value: vue
+      label: Vue
+    -
+      value: html
+      label: HTML
+    -
+      value: json
+      label: JSON
+    -
+      value: yaml
+      label: YAML
+    -
+      value: nginx
+      label: nginx
+    -
+      value: text
+      label: 'Plain text'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

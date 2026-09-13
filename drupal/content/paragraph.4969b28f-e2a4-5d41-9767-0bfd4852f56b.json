@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "4969b28f-e2a4-5d41-9767-0bfd4852f56b"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "And edit `nuxt\/pages\/custom.vue` back to the bare module:",
+            "format": "docs_markdown",
+            "processed": "<p>And edit <code>nuxt\/pages\/custom.vue<\/code> back to the bare module:<\/p>\n"
+        }
+    ]
+}

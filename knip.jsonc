@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/knip@2/schema.json",
+  // The root is tooling: the IR builder, the lints and their tests. nuxt/ and
+  // drupal/ are applications with their own manifests.
+  "entry": ["scripts/*.mjs", "tests/*.mjs"],
+  "project": ["scripts/**/*.mjs", "tests/**/*.mjs"],
+  "ignore": ["nuxt/**", "drupal/**", ".docs-source/**", ".docs-ir/**"],
+  // node --test's built-in reporters, which knip reads as packages in the
+  // test:coverage script.
+  "ignoreDependencies": ["junit", "spec"]
+}

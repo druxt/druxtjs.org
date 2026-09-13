@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "adf38b84-e444-57e0-a5f9-619e4fcd932c"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## Known limitations\n\nThe limitations documented in the\n[authentication tutorial](\/tutorials\/authentication#known-limitations)\napply to this setup identically: no logout control is included by\ndefault (the [Logging out](#logging-out) section above is the fix), and\nthe session caveats listed there, the `autoLogout` default, custom\naxios instances, and refresh-token lifetimes, apply unchanged.\n\n## Where to go next\n\n- [Deploy with a Nuxt server](\/how-to\/deploy-server): authenticated\n  sites need a runtime, because static hosting cannot keep the session.\n- [Request topology](\/explanation\/request-topology#cookies-and-sessions):\n  how hosting layout affects cookies and credentialed CORS.\n- [druxt-auth README](https:\/\/github.com\/druxt\/druxt-auth): every module\n  option.",
+            "format": "docs_markdown",
+            "processed": "<h2>Known limitations<\/h2>\n<p>The limitations documented in the\n<a href=\"\/tutorials\/authentication#known-limitations\">authentication tutorial<\/a>\napply to this setup identically: no logout control is included by\ndefault (the <a href=\"#logging-out\">Logging out<\/a> section above is the fix), and\nthe session caveats listed there, the <code>autoLogout<\/code> default, custom\naxios instances, and refresh-token lifetimes, apply unchanged.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/how-to\/deploy-server\">Deploy with a Nuxt server<\/a>: authenticated\nsites need a runtime, because static hosting cannot keep the session.<\/li>\n<li><a href=\"\/explanation\/request-topology#cookies-and-sessions\">Request topology<\/a>:\nhow hosting layout affects cookies and credentialed CORS.<\/li>\n<li><a href=\"https:\/\/github.com\/druxt\/druxt-auth\">druxt-auth README<\/a>: every module\noption.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

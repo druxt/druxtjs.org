@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "05e2d88f-1af6-5f1e-8c2e-0d34ee62c48f"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "devtools-inspector.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/devtools-inspector.png",
+            "url": "\/sites\/default\/files\/documentation\/devtools-inspector.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 9045
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

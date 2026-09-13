@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "daf6c22e-5596-515d-ae11-42c081934a67"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "This also works in CI and static-host build settings by prefixing the\nbuild command; [Deploy a static\nsite](\/how-to\/deploy-static#node-version) covers pinning the host's\nNode version so this stays predictable.\n\n## Builds fail on Windows\n\nNuxt 2 tooling and several Druxt build steps have known problems on\nnative Windows (path separators, OpenSSL differences). Use\n[WSL2](https:\/\/learn.microsoft.com\/windows\/wsl\/) and run everything\ninside the Linux environment. That is the setup the maintainers test.\n\n## Where to go next\n\n- [Theme Druxt components](\/how-to\/theming): wrapper components in full.\n- [The schema system](\/explanation\/schemas): how schemas are built and cached.\n- [Request topology](\/explanation\/request-topology): which request is\n  actually failing, and why.\n- [Prepare the Drupal backend](\/how-to\/prepare-the-backend) and\n  [Configure CORS in Drupal](\/how-to\/configure-cors): the backend-side\n  fixes.\n- [`druxt` module reference](\/modules\/druxt): installation and permissions.",
+            "format": "docs_markdown",
+            "processed": "<p>This also works in CI and static-host build settings by prefixing the\nbuild command; <a href=\"\/how-to\/deploy-static#node-version\">Deploy a static\nsite<\/a> covers pinning the host's\nNode version so this stays predictable.<\/p>\n<h2>Builds fail on Windows<\/h2>\n<p>Nuxt 2 tooling and several Druxt build steps have known problems on\nnative Windows (path separators, OpenSSL differences). Use\n<a href=\"https:\/\/learn.microsoft.com\/windows\/wsl\/\">WSL2<\/a> and run everything\ninside the Linux environment. That is the setup the maintainers test.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/how-to\/theming\">Theme Druxt components<\/a>: wrapper components in full.<\/li>\n<li><a href=\"\/explanation\/schemas\">The schema system<\/a>: how schemas are built and cached.<\/li>\n<li><a href=\"\/explanation\/request-topology\">Request topology<\/a>: which request is\nactually failing, and why.<\/li>\n<li><a href=\"\/how-to\/prepare-the-backend\">Prepare the Drupal backend<\/a> and\n<a href=\"\/how-to\/configure-cors\">Configure CORS in Drupal<\/a>: the backend-side\nfixes.<\/li>\n<li><a href=\"\/modules\/druxt\"><code>druxt<\/code> module reference<\/a>: installation and permissions.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

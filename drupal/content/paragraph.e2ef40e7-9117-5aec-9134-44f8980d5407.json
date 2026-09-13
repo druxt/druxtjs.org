@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "e2ef40e7-9117-5aec-9134-44f8980d5407"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "A working configuration answers with\n`access-control-allow-origin: https:\/\/www.example.com`. No\n`access-control-*` headers at all means the block is not loading: confirm\nthe file is `sites\/default\/services.yml`, the site was cache-rebuilt, and\nyour hosting platform does not strip the headers.\n\n## Per-environment configuration\n\nOrigins differ per environment, and `services.yml` is not part of config\nsync. A clean pattern used by production Druxt sites: keep a\n`services.yml` per environment (say\n`sites\/default\/envs\/<env>\/services.yml`) and include the right one from\n`settings.php`, so development can stay permissive while production lists\nexact origins.\n\n## When to prefer the proxy\n\n| Situation                               | Use                                                              |\n| --------------------------------------- | ---------------------------------------------------------------- |\n| Generated static site (`nuxt generate`) | CORS. The proxy would need a server.                             |\n| Nuxt server, one frontend origin        | Either. The [proxy](\/how-to\/proxy) leaves the backend untouched. |\n| Several frontends sharing one backend   | CORS, with each origin listed.                                   |\n| You cannot change the backend           | The proxy, and a server-rendered deployment.                     |\n\n## Where to go next\n\n- [Proxy the Drupal backend through Nuxt](\/how-to\/proxy): the\n  same-origin alternative when a server renders the frontend.\n- [Request topology](\/explanation\/request-topology): which requests\n  cross origins, and why only those need CORS.\n- [Troubleshoot common issues](\/how-to\/troubleshooting): the CORS\n  failures and their signatures.",
+            "format": "docs_markdown",
+            "processed": "<p>A working configuration answers with\n<code>access-control-allow-origin: https:\/\/www.example.com<\/code>. No\n<code>access-control-*<\/code> headers at all means the block is not loading: confirm\nthe file is <code>sites\/default\/services.yml<\/code>, the site was cache-rebuilt, and\nyour hosting platform does not strip the headers.<\/p>\n<h2>Per-environment configuration<\/h2>\n<p>Origins differ per environment, and <code>services.yml<\/code> is not part of config\nsync. A clean pattern used by production Druxt sites: keep a\n<code>services.yml<\/code> per environment (say\n<code>sites\/default\/envs\/&lt;env&gt;\/services.yml<\/code>) and include the right one from\n<code>settings.php<\/code>, so development can stay permissive while production lists\nexact origins.<\/p>\n<h2>When to prefer the proxy<\/h2>\n<table>\n<thead>\n<tr>\n<th>Situation<\/th>\n<th>Use<\/th>\n<\/tr>\n<\/thead>\n<tbody>\n<tr>\n<td>Generated static site (<code>nuxt generate<\/code>)<\/td>\n<td>CORS. The proxy would need a server.<\/td>\n<\/tr>\n<tr>\n<td>Nuxt server, one frontend origin<\/td>\n<td>Either. The <a href=\"\/how-to\/proxy\">proxy<\/a> leaves the backend untouched.<\/td>\n<\/tr>\n<tr>\n<td>Several frontends sharing one backend<\/td>\n<td>CORS, with each origin listed.<\/td>\n<\/tr>\n<tr>\n<td>You cannot change the backend<\/td>\n<td>The proxy, and a server-rendered deployment.<\/td>\n<\/tr>\n<\/tbody>\n<\/table>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/how-to\/proxy\">Proxy the Drupal backend through Nuxt<\/a>: the\nsame-origin alternative when a server renders the frontend.<\/li>\n<li><a href=\"\/explanation\/request-topology\">Request topology<\/a>: which requests\ncross origins, and why only those need CORS.<\/li>\n<li><a href=\"\/how-to\/troubleshooting\">Troubleshoot common issues<\/a>: the CORS\nfailures and their signatures.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

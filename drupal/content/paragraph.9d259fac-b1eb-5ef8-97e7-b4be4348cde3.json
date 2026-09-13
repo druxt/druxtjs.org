@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "9d259fac-b1eb-5ef8-97e7-b4be4348cde3"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "No `scope` option is needed. When the app sends none, Drupal applies\nthe consumer's default scopes, and the consumer table above made your\nscope that default. Pass `scope: ['<machine-name>']` only when one\nconsumer serves several scopes and this app must pick; the value must\nequal the scope's machine name in Drupal, or logins fail with the same\n\"Check the `scope` parameter\" error.\n\nThe module registers two strategies. `drupal-authorization_code` is the\nPKCE flow above and the one to use. `drupal-password` (server-side\npassword grant) does not work against the backend this page builds:\nSimple OAuth 6 removed the password grant (its remaining grants are\nauthorization code, client credentials and refresh token), so that\nstrategy only functions against a Simple OAuth 5.x backend. Trigger a\nlogin from any component:",
+            "format": "docs_markdown",
+            "processed": "<p>No <code>scope<\/code> option is needed. When the app sends none, Drupal applies\nthe consumer's default scopes, and the consumer table above made your\nscope that default. Pass <code>scope: ['&lt;machine-name&gt;']<\/code> only when one\nconsumer serves several scopes and this app must pick; the value must\nequal the scope's machine name in Drupal, or logins fail with the same\n\"Check the <code>scope<\/code> parameter\" error.<\/p>\n<p>The module registers two strategies. <code>drupal-authorization_code<\/code> is the\nPKCE flow above and the one to use. <code>drupal-password<\/code> (server-side\npassword grant) does not work against the backend this page builds:\nSimple OAuth 6 removed the password grant (its remaining grants are\nauthorization code, client credentials and refresh token), so that\nstrategy only functions against a Simple OAuth 5.x backend. Trigger a\nlogin from any component:<\/p>\n"
+        }
+    ]
+}

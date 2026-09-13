@@ -1,0 +1,24 @@
+uuid: cb732b96-4ff1-4ced-8b8c-6d18b041edf9
+langcode: en
+status: true
+dependencies:
+  config:
+    - filter.format.docs_markdown
+  module:
+    - codemirror_editor
+format: docs_markdown
+editor: codemirror_editor
+settings:
+  toolbar: true
+  buttons:
+    - undo
+    - redo
+    - enlarge
+    - shrink
+  lineWrapping: true
+  lineNumbers: false
+  foldGutter: false
+  autoCloseTags: true
+  styleActiveLine: false
+  mode: gfm
+image_upload: {  }

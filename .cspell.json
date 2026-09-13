@@ -1,0 +1,40 @@
+{
+  "version": "0.2",
+  "language": "en,en-GB",
+  "files": ["**/*.{js,mjs,json,jsonc,md,yml,yaml,sh}"],
+  "dictionaryDefinitions": [
+    {
+      "name": "project-words",
+      "path": "./.cspell-project-words.txt",
+      "addWords": true
+    }
+  ],
+  "dictionaries": ["project-words", "bash", "misc", "node", "php", "softwareTerms"],
+  "ignoreRegExpList": ["/\\\\[nrt]/g"],
+  "ignorePaths": [
+    ".git/",
+    "node_modules/",
+    "**/node_modules/",
+    ".npm/",
+    ".vale/",
+    ".docs-ir/",
+    ".docs-source/",
+    "package-lock.json",
+    "*.lock",
+    "*.svg",
+    "*.png",
+    "scripts/content-baseline.json",
+    "drupal/config/",
+    "drupal/content/",
+    "drupal/files/",
+    "drupal/patches.lock.json",
+    "drupal/vendor/",
+    "drupal/web/core/",
+    "drupal/web/libraries/",
+    "drupal/web/modules/contrib/",
+    "drupal/web/profiles/contrib/",
+    "drupal/web/themes/contrib/",
+    "nuxt/"
+  ],
+  "useGitignore": true
+}

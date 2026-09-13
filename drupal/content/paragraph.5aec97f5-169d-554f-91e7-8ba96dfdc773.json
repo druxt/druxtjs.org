@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "5aec97f5-169d-554f-91e7-8ba96dfdc773"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Bare `DruxtEntity` is never a candidate. The first candidate that exists\nas a component in your project wins; if none match, Druxt falls back to\nits own default rendering. Registered means discovered by Nuxt's\nauto-import from your `components\/` directory, so a saved file is\nimmediately a candidate. Candidate sets combine any context the module\nprovides (entity type, bundle, view mode, field name), and, when a\nlanguage is in play, a langcode-suffixed variant of every candidate\n(`DruxtEntityNodeArticleTeaserEs`) is tried first.\n\n## Where candidates come from\n\nEach module built on the `DruxtModule` base class provides a\n`druxt.componentOptions()` callback returning sets of name parts. The base\nclass turns the parts into PascalCase candidate names, adds language\nvariants, de-duplicates, and sorts **most-specific first**. The order in\nthe sorted list is the theme override order: more parts (a more precise\ncontext) beats fewer.\n\nThe chain is visible at development time: the resolved options live on the\ncomponent's `component.options` data, and the\n[Vue Devtools integration](\/how-to\/devtools) can print a ready-to-edit\nskeleton for the component it _would_ have used.\n\n## How wrappers receive data\n\nA resolved wrapper isn't a slot dump: it's a full component with an input\ncontract:\n\n- **`propsData`**: the module's `druxt.propsData()` callback maps its data\n  to props the wrapper declares (an entity wrapper receives `entity`, a\n  field wrapper receives the field data and schema settings).\n- **Slots**: the module's `druxt.slots()` render functions provide default\n  content, which the wrapper places and wraps as it sees fit.\n- **`$attrs`**: anything not declared as a prop is passed down, so wrappers\n  can pass classes and attributes to their root element.\n\nA minimal wrapper is tiny:",
+            "format": "docs_markdown",
+            "processed": "<p>Bare <code>DruxtEntity<\/code> is never a candidate. The first candidate that exists\nas a component in your project wins; if none match, Druxt falls back to\nits own default rendering. Registered means discovered by Nuxt's\nauto-import from your <code>components\/<\/code> directory, so a saved file is\nimmediately a candidate. Candidate sets combine any context the module\nprovides (entity type, bundle, view mode, field name), and, when a\nlanguage is in play, a langcode-suffixed variant of every candidate\n(<code>DruxtEntityNodeArticleTeaserEs<\/code>) is tried first.<\/p>\n<h2>Where candidates come from<\/h2>\n<p>Each module built on the <code>DruxtModule<\/code> base class provides a\n<code>druxt.componentOptions()<\/code> callback returning sets of name parts. The base\nclass turns the parts into PascalCase candidate names, adds language\nvariants, de-duplicates, and sorts <strong>most-specific first<\/strong>. The order in\nthe sorted list is the theme override order: more parts (a more precise\ncontext) beats fewer.<\/p>\n<p>The chain is visible at development time: the resolved options live on the\ncomponent's <code>component.options<\/code> data, and the\n<a href=\"\/how-to\/devtools\">Vue Devtools integration<\/a> can print a ready-to-edit\nskeleton for the component it <em>would<\/em> have used.<\/p>\n<h2>How wrappers receive data<\/h2>\n<p>A resolved wrapper isn't a slot dump: it's a full component with an input\ncontract:<\/p>\n<ul>\n<li><strong><code>propsData<\/code><\/strong>: the module's <code>druxt.propsData()<\/code> callback maps its data\nto props the wrapper declares (an entity wrapper receives <code>entity<\/code>, a\nfield wrapper receives the field data and schema settings).<\/li>\n<li><strong>Slots<\/strong>: the module's <code>druxt.slots()<\/code> render functions provide default\ncontent, which the wrapper places and wraps as it sees fit.<\/li>\n<li><strong><code>$attrs<\/code><\/strong>: anything not declared as a prop is passed down, so wrappers\ncan pass classes and attributes to their root element.<\/li>\n<\/ul>\n<p>A minimal wrapper is tiny:<\/p>\n"
+        }
+    ]
+}

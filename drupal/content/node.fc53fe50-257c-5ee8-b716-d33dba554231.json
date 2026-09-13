@@ -1,0 +1,159 @@
+{
+    "uuid": [
+        {
+            "value": "fc53fe50-257c-5ee8-b716-d33dba554231"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Building a custom Druxt module"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "d7cec0cd-ad1d-5a9a-b450-625ec11eeba5"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "9ebab892-a610-5547-a6ad-6e21bc12b83a"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "aae0a267-cd1e-507f-be65-41b10b35a835"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "1cd1c401-19ed-590c-b079-05c6d3692cd1"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "80229792-bf07-5eca-9738-6db091bcc6c9"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "fac8d518-6f0c-5f22-a284-307ff7849456"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "5b64d1de-6410-55c2-b922-ca51179228ad"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "4088601e-13a9-5103-a6be-726d21aa8010"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "3ec583a1-3af7-5517-b799-30e9b79dbd4d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "59b7b59c-ec4c-50ea-a50f-8d3d3e0381db"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "4969b28f-e2a4-5d41-9767-0bfd4852f56b"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "b13dede5-cf73-533e-865d-8421252cd75a"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "d3f2e74c-cc7f-58f5-865a-81614f8118a1"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Extend DruxtModule to build your own Druxt-powered, themeable component backed by Drupal data."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "5f1bbf70-8b03-5759-8f2a-5ec8ec14f60e"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/tutorials\/first-custom-module.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"prerequisites\",\"depth\":2,\"text\":\"Prerequisites\"},{\"id\":\"step-1-scaffold-the-module-and-its-theme-component\",\"depth\":2,\"text\":\"Step 1: Scaffold the module and its theme component\"},{\"id\":\"step-2-change-the-theme-without-touching-the-module\",\"depth\":2,\"text\":\"Step 2: Change the theme without touching the module\"},{\"id\":\"step-3-fetch-data-from-drupal\",\"depth\":2,\"text\":\"Step 3: Fetch data from Drupal\"},{\"id\":\"how-it-works\",\"depth\":2,\"text\":\"How it works\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": -5
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "0aae3c32-611f-5387-aa2c-aa8bb44b8926"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "`routes: ['\/']` seeds the crawler with the homepage; it discovers the\nrest by following links. `fallback: '404.html'` writes the not-found\npage where static hosts expect it (this replaces the default `200.html`\nsingle-page-app fallback).\n\nThen find the `proxy` setting inside the `druxt` block and tie it to\nthe build target:",
+            "format": "docs_markdown",
+            "processed": "<p><code>routes: ['\/']<\/code> seeds the crawler with the homepage; it discovers the\nrest by following links. <code>fallback: '404.html'<\/code> writes the not-found\npage where static hosts expect it (this replaces the default <code>200.html<\/code>\nsingle-page-app fallback).<\/p>\n<p>Then find the <code>proxy<\/code> setting inside the <code>druxt<\/code> block and tie it to\nthe build target:<\/p>\n"
+        }
+    ]
+}

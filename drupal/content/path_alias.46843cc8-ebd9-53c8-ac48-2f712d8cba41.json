@@ -1,0 +1,27 @@
+{
+    "uuid": [
+        {
+            "value": "46843cc8-ebd9-53c8-ac48-2f712d8cba41"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "path": [
+        {
+            "value": "\/node\/4045b451-06a9-5c1a-b07d-87a9fc180297"
+        }
+    ],
+    "alias": [
+        {
+            "value": "\/explanation\/routing"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ]
+}

@@ -1,0 +1,82 @@
+{
+    "uuid": [
+        {
+            "value": "42c5987e-7cb7-5c1e-b694-cc9daa4e61b1"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "bundle": [
+        {
+            "target_id": "image",
+            "target_type": "media_type",
+            "target_uuid": "d63708bd-0a02-4969-b4b3-0f37b585bdd4"
+        }
+    ],
+    "revision_created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_user": [],
+    "revision_log_message": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "name": [
+        {
+            "value": "storybook-entity-story.png"
+        }
+    ],
+    "thumbnail": [
+        {
+            "alt": "A recipe's full display story rendering live Umami content, its summary, category, tags and timing fields, with the uuid control set to a real recipe",
+            "title": null,
+            "width": 1440,
+            "height": 900,
+            "target_type": "file",
+            "target_uuid": "a6f4d224-e931-5f68-856d-32c71ae6fc0a"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_media_image": [
+        {
+            "alt": "A recipe's full display story rendering live Umami content, its summary, category, tags and timing fields, with the uuid control set to a real recipe",
+            "title": null,
+            "width": 1440,
+            "height": 900,
+            "target_type": "file",
+            "target_uuid": "a6f4d224-e931-5f68-856d-32c71ae6fc0a"
+        }
+    ]
+}

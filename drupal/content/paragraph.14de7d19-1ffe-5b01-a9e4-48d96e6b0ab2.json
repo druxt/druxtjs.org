@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "14de7d19-1ffe-5b01-a9e4-48d96e6b0ab2"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "How-to guides are **goal-oriented**: recipes for a task you already\nhave, not lessons. They assume you already have a working\nDruxt site; if you don't, start with the [Getting started\ntutorial](\/tutorials\/getting-started).\n\n## Guides\n\n- [Prepare the Drupal backend](\/how-to\/prepare-the-backend): modules, permissions and JSON:API settings for a Druxt-ready site.\n- [Configure CORS in Drupal](\/how-to\/configure-cors): let the browser talk to the backend directly.\n- [Proxy the Drupal backend through Nuxt](\/how-to\/proxy): prevent CORS issues.\n- [Theme Druxt components](\/how-to\/theming): customize output with wrappers and slots.\n- [Serve content in multiple languages](\/how-to\/multilingual): fetch and render translated content.\n- [Use the Druxt client directly](\/how-to\/use-the-druxt-client): fetch resources without components, in Nuxt or plain Node.\n- [Browse and develop components in Storybook](\/how-to\/storybook): zero-config stories with live data.\n- [Debug Druxt with the Vue Devtools](\/how-to\/devtools): inspect connections and suggestions.\n- [Authenticate users with OAuth](\/how-to\/authentication): the full Simple OAuth setup from scratch, both sides.\n- [Explore the example apps](\/how-to\/example-apps): four complete reference implementations.\n- [Environment variables](\/how-to\/environment-variables): every variable a build reads, and the build-time vs runtime trap.\n- [Deploy a static site](\/how-to\/deploy-static): the worked Netlify example, from local proof to rebuild hooks.\n- [Deploy a server-rendered site](\/how-to\/deploy-server): the node service behind nginx, and the hybrid with a server fallback.\n- [Troubleshoot common issues](\/how-to\/troubleshooting): quick answers to the errors and gotchas that come up most often.\n- [Upgrade a Druxt site](\/how-to\/upgrade): move to 1.0.0 and collect the 2.0.0 to-do list.\n- [Contributing](\/how-to\/contributing): set up a development environment and submit changes.\n\nFor step-by-step lessons, see [Tutorials](\/tutorials). For the reasoning\nbehind the system, see [Concepts](\/explanation).",
+            "format": "docs_markdown",
+            "processed": "<p>How-to guides are <strong>goal-oriented<\/strong>: recipes for a task you already\nhave, not lessons. They assume you already have a working\nDruxt site; if you don't, start with the <a href=\"\/tutorials\/getting-started\">Getting started\ntutorial<\/a>.<\/p>\n<h2>Guides<\/h2>\n<ul>\n<li><a href=\"\/how-to\/prepare-the-backend\">Prepare the Drupal backend<\/a>: modules, permissions and JSON:API settings for a Druxt-ready site.<\/li>\n<li><a href=\"\/how-to\/configure-cors\">Configure CORS in Drupal<\/a>: let the browser talk to the backend directly.<\/li>\n<li><a href=\"\/how-to\/proxy\">Proxy the Drupal backend through Nuxt<\/a>: prevent CORS issues.<\/li>\n<li><a href=\"\/how-to\/theming\">Theme Druxt components<\/a>: customize output with wrappers and slots.<\/li>\n<li><a href=\"\/how-to\/multilingual\">Serve content in multiple languages<\/a>: fetch and render translated content.<\/li>\n<li><a href=\"\/how-to\/use-the-druxt-client\">Use the Druxt client directly<\/a>: fetch resources without components, in Nuxt or plain Node.<\/li>\n<li><a href=\"\/how-to\/storybook\">Browse and develop components in Storybook<\/a>: zero-config stories with live data.<\/li>\n<li><a href=\"\/how-to\/devtools\">Debug Druxt with the Vue Devtools<\/a>: inspect connections and suggestions.<\/li>\n<li><a href=\"\/how-to\/authentication\">Authenticate users with OAuth<\/a>: the full Simple OAuth setup from scratch, both sides.<\/li>\n<li><a href=\"\/how-to\/example-apps\">Explore the example apps<\/a>: four complete reference implementations.<\/li>\n<li><a href=\"\/how-to\/environment-variables\">Environment variables<\/a>: every variable a build reads, and the build-time vs runtime trap.<\/li>\n<li><a href=\"\/how-to\/deploy-static\">Deploy a static site<\/a>: the worked Netlify example, from local proof to rebuild hooks.<\/li>\n<li><a href=\"\/how-to\/deploy-server\">Deploy a server-rendered site<\/a>: the node service behind nginx, and the hybrid with a server fallback.<\/li>\n<li><a href=\"\/how-to\/troubleshooting\">Troubleshoot common issues<\/a>: quick answers to the errors and gotchas that come up most often.<\/li>\n<li><a href=\"\/how-to\/upgrade\">Upgrade a Druxt site<\/a>: move to 1.0.0 and collect the 2.0.0 to-do list.<\/li>\n<li><a href=\"\/how-to\/contributing\">Contributing<\/a>: set up a development environment and submit changes.<\/li>\n<\/ul>\n<p>For step-by-step lessons, see <a href=\"\/tutorials\">Tutorials<\/a>. For the reasoning\nbehind the system, see <a href=\"\/explanation\">Concepts<\/a>.<\/p>\n"
+        }
+    ]
+}

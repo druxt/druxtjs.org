@@ -1,0 +1,74 @@
+uuid: dd5a44fd-d02d-4b4b-b857-001f19a4e826
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - druxt_docs
+id: docs_consumer
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags: null
+migration_group: druxt_docs
+label: 'The druxtjs.org frontend as an OAuth consumer'
+source:
+  plugin: embedded_data
+  data_rows:
+    -
+      id: druxtjs_org
+      label: druxtjs.org
+      description: 'The documentation site. A public client: authorization code with PKCE, approved automatically.'
+      redirect:
+        - 'https://druxtjs.org/callback'
+        - 'http://localhost:3000/callback'
+  ids:
+    id:
+      type: string
+  constants:
+    author: stuart-clark
+    theme: druxtjs
+process:
+  uuid:
+    plugin: docs_identity
+    kind: consumer
+    source: id
+  label: label
+  description: description
+  client_id: id
+  owner_id:
+    plugin: migration_lookup
+    migration: docs_user
+    source: constants/author
+    no_stub: true
+  confidential:
+    plugin: default_value
+    default_value: 0
+  pkce:
+    plugin: default_value
+    default_value: 1
+  automatic_authorization:
+    plugin: default_value
+    default_value: 1
+  grant_types:
+    plugin: default_value
+    default_value:
+      - authorization_code
+      - refresh_token
+  authorization_code_scopes:
+    plugin: default_value
+    default_value:
+      - authenticated
+      - editor
+      - contributor
+  redirect: redirect
+  decoupled_settings_theme: constants/theme
+destination:
+  plugin: 'entity:consumer'
+  validate: true
+idMap: {  }
+migration_dependencies:
+  required:
+    - docs_user
+  optional: {  }
+include: null

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "b4c75a3d-bab7-5765-8188-67d4f6b44d9f"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "Run both lines from your project root. The first reads the backend URL out\nof `.env`, because `curl` does not load that file itself. Read it rather\nthan typing a port: setup takes the next free one, so yours may not be\n8888.\n\n**Outcome:** the response names a view. Abridged, the parts that matter\nare:",
+            "format": "docs_markdown",
+            "processed": "<p>Run both lines from your project root. The first reads the backend URL out\nof <code>.env<\/code>, because <code>curl<\/code> does not load that file itself. Read it rather\nthan typing a port: setup takes the next free one, so yours may not be\n8888.<\/p>\n<p><strong>Outcome:<\/strong> the response names a view. Abridged, the parts that matter\nare:<\/p>\n"
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "86814fde-fd30-52ac-95ae-6aaa8afbc1d5"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "## Testing against fixtures\n\n`DruxtClient` accepts an axios instance via `options.axios`, the same\ninjection point Nuxt's plugin uses. Handing it an axios adapter that\nreplays recorded JSON:API responses lets a test suite run with no\nbackend at all.\n\n## A worked example\n\nThe monorepo's\n[`examples\/node-client`](https:\/\/github.com\/druxt\/druxt.js\/tree\/develop\/examples\/node-client)\ndirectory shows the client and `druxt-schema` in a standalone Node\nscript (listing a backend's resource types, printing schemas, sampling\ncontent), with a Jest suite running against recorded fixtures through\nthe axios injection point. It is an example of what you could build,\nnot part of the framework. The package is private to the repository and\nnot published to npm.\n\n## Where to go next\n\n- [The schema system](\/explanation\/schemas): what schemas are and where\n  they come from.\n- [DruxtClient API](\/api\/packages\/druxt\/client): every method.",
+            "format": "docs_markdown",
+            "processed": "<h2>Testing against fixtures<\/h2>\n<p><code>DruxtClient<\/code> accepts an axios instance via <code>options.axios<\/code>, the same\ninjection point Nuxt's plugin uses. Handing it an axios adapter that\nreplays recorded JSON:API responses lets a test suite run with no\nbackend at all.<\/p>\n<h2>A worked example<\/h2>\n<p>The monorepo's\n<a href=\"https:\/\/github.com\/druxt\/druxt.js\/tree\/develop\/examples\/node-client\"><code>examples\/node-client<\/code><\/a>\ndirectory shows the client and <code>druxt-schema<\/code> in a standalone Node\nscript (listing a backend's resource types, printing schemas, sampling\ncontent), with a Jest suite running against recorded fixtures through\nthe axios injection point. It is an example of what you could build,\nnot part of the framework. The package is private to the repository and\nnot published to npm.<\/p>\n<h2>Where to go next<\/h2>\n<ul>\n<li><a href=\"\/explanation\/schemas\">The schema system<\/a>: what schemas are and where\nthey come from.<\/li>\n<li><a href=\"\/api\/packages\/druxt\/client\">DruxtClient API<\/a>: every method.<\/li>\n<\/ul>\n"
+        }
+    ]
+}

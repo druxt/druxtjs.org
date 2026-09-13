@@ -1,0 +1,155 @@
+{
+    "uuid": [
+        {
+            "value": "a6b7b8ea-0101-5559-a4fb-d64d6b7cf18e"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "doc_page",
+            "target_type": "node_type",
+            "target_uuid": "84716db2-1c87-4a5e-b1b8-c89051873c62"
+        }
+    ],
+    "revision_timestamp": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "revision_uid": [
+        []
+    ],
+    "revision_log": [],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "title": [
+        {
+            "value": "Deploy a static site"
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "promote": [
+        {
+            "value": false
+        }
+    ],
+    "sticky": [
+        {
+            "value": false
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "path": [
+        []
+    ],
+    "field_content": [
+        {
+            "target_type": "paragraph",
+            "target_uuid": "76b14e9f-0543-5c40-8fa8-78982a21c9eb"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "74887179-ef7d-5d94-a7a7-1384af6bd149"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "251298cb-5cee-565f-ae76-2be726fd492d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "61cb43d1-dd18-5bd4-8730-3a5311cf3dcb"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "ac3c4cca-791f-59ad-afb1-dbf2ced269ac"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "8c1a4354-3ed2-5da5-bd6b-0c6afa9025ab"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "58a34bc5-8c6f-5192-b53f-dfaaddbacd0d"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "fcf43e6f-203c-5616-b790-2be0c5593ca3"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "22b9ec58-a1ca-562a-b147-0716db5e6bda"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "9d6e552b-0755-500e-b9b4-42cf66bc14b8"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "e2a5916d-f62d-530c-ae57-f7263ccd7aff"
+        },
+        {
+            "target_type": "paragraph",
+            "target_uuid": "7b31342a-13af-5b8e-ab47-6858a4450473"
+        }
+    ],
+    "field_description": [
+        {
+            "value": "Generate the site and host the files anywhere static. Netlify is the worked example."
+        }
+    ],
+    "field_is_landing": [
+        {
+            "value": false
+        }
+    ],
+    "field_section": [
+        {
+            "target_type": "taxonomy_term",
+            "target_uuid": "540fd949-ce24-5411-b703-1d1e76de2802"
+        }
+    ],
+    "field_source_path": [
+        {
+            "value": "docs\/nuxt\/content\/how-to\/deploy-static.md"
+        }
+    ],
+    "field_toc": [
+        {
+            "value": "[{\"id\":\"generate-the-site-locally-first\",\"depth\":2,\"text\":\"Generate the site locally first\"},{\"id\":\"node-version\",\"depth\":2,\"text\":\"Node version\"},{\"id\":\"deploy-with-the-netlify-ui\",\"depth\":2,\"text\":\"Deploy with the Netlify UI\"},{\"id\":\"deploy-with-the-cli\",\"depth\":2,\"text\":\"Deploy with the CLI\"},{\"id\":\"deploy-to-github-pages\",\"depth\":2,\"text\":\"Deploy to GitHub Pages\"},{\"id\":\"after-the-first-deploy\",\"depth\":2,\"text\":\"After the first deploy\"},{\"id\":\"where-to-go-next\",\"depth\":2,\"text\":\"Where to go next\"}]"
+        }
+    ],
+    "field_weight": [
+        {
+            "value": 3
+        }
+    ]
+}

@@ -1,0 +1,86 @@
+{#
+/**
+ * @file
+ * Core's node preview as three tabs: the frontend, Drupal and JSON:API.
+ *
+ * Available variables:
+ * - drupal: Drupal's render of the unsaved node.
+ * - frontend_url: The frontend's preview URL, or NULL when not configured.
+ * - jsonapi_url: The JSON:API preview document's URL, or NULL.
+ */
+#}
+{%
+  set tabs = {
+    frontend: 'Frontend'|t,
+    drupal: 'Drupal'|t,
+    jsonapi: 'JSON:API'|t,
+  }
+%}
+{% set active = frontend_url ? 'frontend' : 'drupal' %}
+<div class="druxt-preview" data-druxt-preview>
+  <div class="tabs-wrapper tabs-wrapper--secondary is-horizontal druxt-preview__tabs">
+    <ul class="tabs tabs--secondary" role="tablist" aria-label="{{ 'Preview'|t }}">
+      {% for id, label in tabs %}
+        <li class="tabs__tab{{ id == active ? ' is-active' }}" role="presentation">
+          <a href="#druxt-preview-{{ id }}" id="druxt-preview-{{ id }}-tab" class="tabs__link{{ id == active ? ' is-active' }}" role="tab" aria-controls="druxt-preview-{{ id }}" aria-selected="{{ id == active ? 'true' : 'false' }}" data-druxt-preview-tab="{{ id }}">{{ label }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <section id="druxt-preview-frontend" class="druxt-preview__panel" role="tabpanel" aria-labelledby="druxt-preview-frontend-tab"{{ active != 'frontend' ? ' hidden' }}>
+    {% if frontend_url %}
+      <div class="druxt-preview__toolbar">
+        <div class="druxt-preview__widths" role="group" aria-label="{{ 'Preview width'|t }}">
+          {% for width, label in {'390px': 'Phone'|t, '820px': 'Tablet'|t, '100%': 'Full'|t} %}
+            <button type="button" class="button button--small{{ width == '100%' ? ' button--primary' }}" aria-pressed="{{ width == '100%' ? 'true' : 'false' }}" data-druxt-preview-width="{{ width }}">{{ label }}</button>
+          {% endfor %}
+        </div>
+        <a href="{{ frontend_url }}" target="_blank" rel="noopener" class="druxt-preview__open">{{ 'Open in new tab'|t }}</a>
+      </div>
+      <div class="druxt-preview__viewport" data-druxt-preview-viewport>
+        <iframe src="{{ frontend_url }}" class="druxt-preview__frame" title="{{ 'Frontend preview'|t }}"></iframe>
+      </div>
+    {% else %}
+      <div class="messages messages--warning druxt-preview__message" data-druxt-preview-unconfigured>
+        <div class="messages__header">
+          <h2 class="messages__title">{{ "The frontend preview isn't configured"|t }}</h2>
+        </div>
+        <div class="messages__content">
+          {% trans %}
+            Set <code>$settings['druxt_docs_preview_url']</code> in settings.php to the frontend's preview URL. Its <code>{uuid}</code> and <code>{view_mode}</code> placeholders take this page's UUID and view mode.
+          {% endtrans %}
+        </div>
+      </div>
+    {% endif %}
+  </section>
+
+  <section id="druxt-preview-drupal" class="druxt-preview__panel" role="tabpanel" aria-labelledby="druxt-preview-drupal-tab"{{ active != 'drupal' ? ' hidden' }}>
+    <div class="druxt-preview__page">
+      {{ drupal }}
+    </div>
+  </section>
+
+  <section id="druxt-preview-jsonapi" class="druxt-preview__panel" role="tabpanel" aria-labelledby="druxt-preview-jsonapi-tab" hidden>
+    {% if jsonapi_url %}
+      <div class="messages messages--status druxt-preview__message">
+        <div class="messages__header">
+          <h2 class="messages__title">{{ 'Paragraphs rely on an upstream fix'|t }}</h2>
+        </div>
+        <div class="messages__content">
+          {% trans %}
+            Paragraphs come from the request's <code>include</code>. New and edited paragraphs appear there only with the jsonapi_node_preview include fix (<a href="https://www.drupal.org/i/3367724" target="_blank" rel="noopener">issue #3367724</a>), which this site applies as a patch until a release has it. Without it, included paragraphs show their saved content and new ones are missing.
+          {% endtrans %}
+        </div>
+      </div>
+      <p class="druxt-preview__request"><code>GET {{ jsonapi_url }}</code></p>
+      <pre class="druxt-preview__document" data-druxt-preview-jsonapi="{{ jsonapi_url }}"><code>{{ 'Loading the preview document…'|t }}</code></pre>
+    {% else %}
+      <div class="messages messages--warning druxt-preview__message">
+        <div class="messages__header">
+          <h2 class="messages__title">{{ 'JSON:API has no preview for this content type'|t }}</h2>
+        </div>
+      </div>
+    {% endif %}
+  </section>
+</div>

@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "d8e26751-0e05-5ec4-a088-4d54079f11ca"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "uid": [
+        []
+    ],
+    "filename": [
+        {
+            "value": "getting-started-fresh-site.png"
+        }
+    ],
+    "uri": [
+        {
+            "value": "public:\/\/documentation\/getting-started-fresh-site.png",
+            "url": "\/sites\/default\/files\/documentation\/getting-started-fresh-site.png"
+        }
+    ],
+    "filemime": [
+        {
+            "value": "image\/png"
+        }
+    ],
+    "filesize": [
+        {
+            "value": 19288
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "changed": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ]
+}

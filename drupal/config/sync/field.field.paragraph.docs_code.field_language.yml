@@ -1,0 +1,21 @@
+uuid: 04e28ac1-8edd-4ac1-860e-60e198726f33
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_language
+    - paragraphs.paragraphs_type.docs_code
+  module:
+    - options
+id: paragraph.docs_code.field_language
+field_name: field_language
+entity_type: paragraph
+bundle: docs_code
+label: Language
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

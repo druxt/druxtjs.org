@@ -1,0 +1,115 @@
+/**
+ * Builder for `/llms.txt`, the plain-text site index described at
+ * https://llmstxt.org: an H1, a blockquote summary, optional orienting prose,
+ * then H2 sections of `- [name](url): notes` links.
+ *
+ * Unlike sitemap.xml, each URL carries a description of what it covers.
+ *
+ * Pure and side-effect free, so it can be unit tested without a build.
+ */
+
+const { SITE_ORIGIN, SITE_NAME, SITE_DESCRIPTION, SECTIONS } = require('./site')
+
+/**
+ * UTM params identifying assistant-sourced clicks.
+ *
+ * The per-page `<link rel="canonical">` keeps the extra params out of search.
+ */
+const UTM = 'utm_source=llms-txt&utm_medium=ai&utm_campaign=syndication'
+
+/**
+ * Orienting prose: the section list alone does not say that Druxt spans two
+ * ecosystems.
+ */
+const PREAMBLE = [
+  'Druxt connects a Drupal backend to a Nuxt frontend. It spans two ecosystems: Drupal modules (PHP) that expose JSON:API resources, and Nuxt/Vue packages (JavaScript) that render them.',
+  '',
+  'The Guide is written by hand. The API reference is generated from the package source by druxt-docgen, so it tracks the released code rather than being maintained separately.',
+]
+
+/**
+ * Append the tracking params to a URL.
+ *
+ * @param {string} url - An absolute URL with no query string.
+ * @returns {string} The URL with tracking params.
+ */
+const withUtm = (url) => url + '?' + UTM
+
+/**
+ * One `- [name](url): notes` list item.
+ *
+ * @param {string} title - Link text.
+ * @param {string} url - Absolute URL.
+ * @param {string} notes - Trailing description, omitted when empty.
+ * @returns {string} The list item.
+ */
+const listItem = (title, url, notes) => (
+  '- [' + title + '](' + url + ')' + (notes ? ': ' + notes : '')
+)
+
+/**
+ * Render `/llms.txt`.
+ *
+ * The guide sections and module pages are listed in full. The API reference is
+ * 100+ generated pages, so only its per-package indexes go under `## Optional`.
+ *
+ * @param {Array<object>} docs - Documents from readContent().
+ * @param {object} [options] - Overrides, for tests.
+ * @param {string} [options.origin] - Absolute origin for URLs.
+ * @returns {string} The complete file contents, newline terminated.
+ */
+const buildLlmsTxt = (docs, options) => {
+  const origin = (options || {}).origin || SITE_ORIGIN
+  const url = (route) => withUtm(origin + route)
+
+  const inSection = (section) => docs
+    .filter((doc) => doc.section === section)
+    .sort((a, b) => (a.weight - b.weight) || a.route.localeCompare(b.route))
+
+  const lines = [
+    '# ' + SITE_NAME,
+    '',
+    '> ' + SITE_DESCRIPTION,
+    '',
+    ...PREAMBLE,
+    '',
+    // The whole guide as one document, for an assistant that would rather make
+    // one request than follow every link below. Untagged deliberately: it is a
+    // sibling file, not a page visit, so a UTM click would never arrive.
+    'The complete documentation as a single file: ' + origin + '/llms-full.txt',
+  ]
+
+  ;['tutorials', 'how-to', 'explanation', 'modules', 'playground'].forEach((section) => {
+    const entries = inSection(section)
+    if (!entries.length) return
+    lines.push('', '## ' + SECTIONS[section].label, '')
+    entries.forEach((doc) => lines.push(listItem(doc.title, url(doc.route), doc.description)))
+  })
+
+  // One entry per package. `content/api` is a docgen artifact, absent from a
+  // fresh checkout, so the section disappears rather than emitting dead URLs.
+  const packages = docs
+    .filter((doc) => /^\/api\/packages\/[^/]+$/.test(doc.route))
+    .sort((a, b) => a.route.localeCompare(b.route))
+
+  if (packages.length) {
+    lines.push('', '## Optional', '')
+    lines.push(listItem('API reference', url('/api'), SECTIONS.api.description))
+    packages.forEach((doc) => {
+      // Labelled from the route: docgen titles each package index after the
+      // first symbol it documents, not after the package.
+      const name = doc.route.split('/').pop()
+      const label = name.charAt(0).toUpperCase() + name.slice(1)
+      lines.push(listItem(
+        label + ' API',
+        url(doc.route),
+        'Generated component, mixin and store reference for the ' + name + ' package.',
+      ))
+    })
+  }
+
+  lines.push('')
+  return lines.join('\n')
+}
+
+module.exports = { buildLlmsTxt, UTM }

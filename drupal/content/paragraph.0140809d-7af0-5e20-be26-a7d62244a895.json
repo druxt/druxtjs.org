@@ -1,0 +1,51 @@
+{
+    "uuid": [
+        {
+            "value": "0140809d-7af0-5e20-be26-a7d62244a895"
+        }
+    ],
+    "langcode": [
+        {
+            "value": "en"
+        }
+    ],
+    "type": [
+        {
+            "target_id": "docs_text",
+            "target_type": "paragraphs_type",
+            "target_uuid": "b81e56d6-63f8-4e1e-9451-5210ddfd6c3e"
+        }
+    ],
+    "status": [
+        {
+            "value": true
+        }
+    ],
+    "created": [
+        {
+            "value": "2026-09-08T03:46:13+00:00"
+        }
+    ],
+    "behavior_settings": [
+        {
+            "value": []
+        }
+    ],
+    "default_langcode": [
+        {
+            "value": true
+        }
+    ],
+    "revision_translation_affected": [
+        {
+            "value": true
+        }
+    ],
+    "field_text": [
+        {
+            "value": "On a Drupal multi-site, pass the site directory name instead of `true`:",
+            "format": "docs_markdown",
+            "processed": "<p>On a Drupal multi-site, pass the site directory name instead of <code>true<\/code>:<\/p>\n"
+        }
+    ]
+}
