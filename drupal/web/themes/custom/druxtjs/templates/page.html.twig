@@ -1,0 +1,39 @@
+{#
+/**
+ * @file
+ * The druxtjs.org layout: a header, then the sidebar, the page and its table
+ * of contents, then a footer. These are the regions Druxt renders.
+ */
+#}
+<div class="druxtjs-page">
+  {% if page.header %}
+    <header class="druxtjs-header" role="banner">
+      {{ page.header }}
+    </header>
+  {% endif %}
+
+  <div class="druxtjs-docs">
+    {% if page.sidebar %}
+      <aside class="druxtjs-sidebar" aria-label="{{ 'Documentation'|t }}">
+        {{ page.sidebar }}
+      </aside>
+    {% endif %}
+
+    <main id="main-content" class="druxtjs-main" tabindex="-1">
+      {{ page.breadcrumb }}
+      {{ page.content }}
+    </main>
+
+    {% if page.toc %}
+      <aside class="druxtjs-toc" aria-label="{{ 'On this page'|t }}">
+        {{ page.toc }}
+      </aside>
+    {% endif %}
+  </div>
+
+  {% if page.footer %}
+    <footer class="druxtjs-footer" role="contentinfo">
+      {{ page.footer }}
+    </footer>
+  {% endif %}
+</div>

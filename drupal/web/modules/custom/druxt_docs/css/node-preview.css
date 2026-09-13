@@ -1,0 +1,93 @@
+/* The node preview's tabs, in default_admin's own tab, button and message
+   styles. Sizes come from its tokens and Drupal.displace's offsets. */
+.druxt-preview {
+  /* The viewport left by the displaced admin bars and the sticky preview bar. */
+  --druxt-preview-height: calc(
+    100dvh - var(--drupal-displace-offset-top, 0px) -
+      var(--drupal-displace-offset-bottom, 0px) -
+      var(--admin-theme-toolbar-secondary-height, 0px) - var(--admin-space-l, 1.5rem)
+  );
+}
+
+.druxt-preview__tabs {
+  margin-block-end: var(--admin-space-l);
+}
+
+/* A clicked tab stays focused; the outline is kept for keyboard focus. */
+.druxt-preview__tabs .tabs__link:focus:not(:focus-visible) {
+  outline: 0;
+}
+
+.druxt-preview__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--admin-space-s);
+  margin-block-end: var(--admin-space-s);
+}
+
+.druxt-preview__widths {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--admin-space-xs);
+}
+
+.druxt-preview__widths .button {
+  margin: 0;
+}
+
+.druxt-preview__viewport {
+  --druxt-preview-width: 100%;
+}
+
+.druxt-preview__frame {
+  display: block;
+  box-sizing: border-box;
+  width: min(100%, var(--druxt-preview-width));
+  height: var(--druxt-preview-height);
+  min-height: 20rem;
+  margin-inline: auto;
+  border: 1px solid var(--admin-color-border);
+  border-radius: var(--admin-radius-m);
+  background-color: var(--admin-color-bg-surface);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .druxt-preview__frame {
+    transition: width 0.2s ease;
+  }
+}
+
+.druxt-preview__message {
+  margin-block: 0 var(--admin-space-m);
+}
+
+.druxt-preview__page {
+  padding: var(--admin-space-l);
+  border: 1px solid var(--admin-color-border-soft);
+  border-radius: var(--admin-radius-m);
+  background-color: var(--admin-color-bg-surface);
+}
+
+.druxt-preview__request {
+  margin-block: 0 var(--admin-space-s);
+  color: var(--admin-color-text-soft);
+  font-size: var(--admin-font-size-s);
+  overflow-wrap: anywhere;
+}
+
+.druxt-preview__document {
+  overflow: auto;
+  box-sizing: border-box;
+  max-height: var(--druxt-preview-height);
+  margin: 0;
+  padding: var(--admin-space-m);
+  border: 1px solid var(--admin-color-border);
+  border-radius: var(--admin-radius-m);
+  background-color: var(--admin-color-bg-surface);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--admin-font-size-s);
+  line-height: 1.5;
+  tab-size: 2;
+}

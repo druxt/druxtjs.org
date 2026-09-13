@@ -1,0 +1,96 @@
+/* Block previews in the layout builder, after the frontend's typography.
+   Code blocks come from code.css, a copy of the frontend's own file. Tints
+   are mixed from the text colour, so they hold in the admin's light and dark
+   themes alike. */
+.prose {
+  --docs-accent: #41b883;
+  --docs-link-rule: #53b0eb;
+  --docs-tint: color-mix(in srgb, currentColor 7%, transparent);
+  --docs-rule: color-mix(in srgb, currentColor 18%, transparent);
+  line-height: 1.7;
+  overflow-wrap: break-word;
+}
+
+.prose a,
+.prose code {
+  overflow-wrap: anywhere;
+}
+
+.prose a {
+  color: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid var(--docs-link-rule);
+}
+
+.prose :is(h1, h2, h3, h4) {
+  margin: 1.25em 0 0.5em;
+  line-height: 1.3;
+}
+
+.prose :is(p, ul, ol, table, blockquote) {
+  margin: 0 0 1em;
+}
+
+.prose > :last-child,
+.prose .field > :last-child {
+  margin-bottom: 0;
+}
+
+.prose :is(pre, code, kbd) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.prose :not(pre) > code {
+  padding: 0.15em 0.4em;
+  border-radius: 0.3rem;
+  background-color: var(--docs-tint);
+  font-weight: 500;
+}
+
+.prose pre {
+  overflow-x: auto;
+  margin: 0;
+  white-space: pre;
+}
+
+.prose pre code {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+}
+
+/* The language, since a preview has no copy button to carry it. */
+.prose pre[data-language]::before {
+  content: attr(data-language);
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.prose table {
+  border-collapse: collapse;
+}
+
+.prose :is(th, td) {
+  padding: 0.4em 0.75em;
+  border-bottom: 1px solid var(--docs-rule);
+  text-align: left;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+/* Callouts render as the frontend's blockquotes: a green rule on a tint. */
+.prose.docs-callout {
+  padding: 0.75rem 1.25rem;
+  border-left: 4px solid var(--docs-accent);
+  border-radius: 0 0.5rem 0.5rem 0;
+  background-color: var(--docs-tint);
+}
