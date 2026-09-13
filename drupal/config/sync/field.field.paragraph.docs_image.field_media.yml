@@ -1,0 +1,23 @@
+uuid: a005e8af-fd05-45c9-b9b5-7760e65ee113
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_media
+    - paragraphs.paragraphs_type.docs_image
+id: paragraph.docs_image.field_media
+field_name: field_media
+entity_type: paragraph
+bundle: docs_image
+label: Media
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+field_type: entity_reference

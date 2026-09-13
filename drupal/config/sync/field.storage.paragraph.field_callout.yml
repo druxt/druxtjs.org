@@ -1,0 +1,19 @@
+uuid: a8dc96c8-4066-4025-a606-bc08a7120039
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs
+    - text
+id: paragraph.field_callout
+field_name: field_callout
+entity_type: paragraph
+type: text_long
+settings: {  }
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,18 @@
+uuid: 705f8965-0356-4c2b-aef0-72f2cbd6a5f0
+langcode: en
+status: true
+dependencies:
+  theme:
+    - druxtjs
+id: druxtjs_actions
+theme: druxtjs
+region: content
+weight: -8
+provider: null
+plugin: local_actions_block
+settings:
+  id: local_actions_block
+  label: Actions
+  label_display: '0'
+  provider: core
+visibility: {  }

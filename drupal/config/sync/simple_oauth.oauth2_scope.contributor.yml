@@ -1,0 +1,19 @@
+uuid: d15166bb-6cf8-4a7d-8358-304bd188da0b
+langcode: en
+status: true
+dependencies: {  }
+id: contributor
+name: contributor
+description: 'Write documentation for review, for someone who is a contributor.'
+grant_types:
+  authorization_code:
+    status: true
+    description: ''
+  refresh_token:
+    status: true
+    description: ''
+umbrella: false
+parent: null
+granularity_id: role
+granularity_configuration:
+  role: contributor

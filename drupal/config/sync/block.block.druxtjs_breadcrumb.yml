@@ -1,0 +1,20 @@
+uuid: 358ee04f-a850-43eb-817e-dab7d626decd
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - druxtjs
+id: druxtjs_breadcrumb
+theme: druxtjs
+region: breadcrumb
+weight: 0
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  label_display: '0'
+  provider: system
+visibility: {  }

@@ -1,0 +1,20 @@
+uuid: 285f79ff-fda8-47e2-aa0a-cb52e53cf35a
+langcode: en
+status: true
+dependencies:
+  theme:
+    - druxtjs
+id: druxtjs_tabs
+theme: druxtjs
+region: content
+weight: -9
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: Tabs
+  label_display: '0'
+  provider: core
+  primary: true
+  secondary: true
+visibility: {  }

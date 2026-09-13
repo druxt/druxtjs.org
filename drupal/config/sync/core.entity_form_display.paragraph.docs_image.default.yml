@@ -1,0 +1,24 @@
+uuid: ef055e92-a3bf-4885-bdd4-eebc398e4824
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.docs_image.field_media
+    - paragraphs.paragraphs_type.docs_image
+  module:
+    - media_library
+id: paragraph.docs_image.default
+targetEntityType: paragraph
+bundle: docs_image
+mode: default
+content:
+  field_media:
+    type: media_library_widget
+    weight: 0
+    region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

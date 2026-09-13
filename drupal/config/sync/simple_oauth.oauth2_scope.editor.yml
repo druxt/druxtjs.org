@@ -1,0 +1,19 @@
+uuid: d2480cb7-2962-4b61-bc08-a5830b97201c
+langcode: en
+status: true
+dependencies: {  }
+id: editor
+name: editor
+description: 'Edit and publish documentation, for someone who is an editor.'
+grant_types:
+  authorization_code:
+    status: true
+    description: ''
+  refresh_token:
+    status: true
+    description: ''
+umbrella: false
+parent: null
+granularity_id: role
+granularity_configuration:
+  role: editor

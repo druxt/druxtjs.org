@@ -1,0 +1,23 @@
+uuid: 92afb147-61e1-40c5-b650-ff352b2d8178
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.paragraph.preview
+    - field.field.paragraph.docs_image.field_media
+    - paragraphs.paragraphs_type.docs_image
+id: paragraph.docs_image.preview
+targetEntityType: paragraph
+bundle: docs_image
+mode: preview
+content:
+  field_media:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden: {  }

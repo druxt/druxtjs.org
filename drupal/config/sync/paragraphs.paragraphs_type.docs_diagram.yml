@@ -1,0 +1,10 @@
+uuid: 3c91ca27-0983-444c-a6bf-236eea8124d3
+langcode: en
+status: true
+dependencies: {  }
+id: docs_diagram
+label: Diagram
+icon_uuid: null
+icon_default: null
+description: 'A diagram, stored as its source.'
+behavior_plugins: {  }

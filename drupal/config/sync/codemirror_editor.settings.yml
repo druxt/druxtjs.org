@@ -1,0 +1,9 @@
+_core:
+  default_config_hash: OQEHakzIUDx3nWOx2W5M-867WqcYLA_4mWia4mgdaqA
+cdn: false
+minified: false
+theme: default
+language_modes:
+  - xml
+  - markdown
+  - gfm

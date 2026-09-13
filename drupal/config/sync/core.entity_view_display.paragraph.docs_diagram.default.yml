@@ -1,0 +1,32 @@
+uuid: 1924bc6e-3ef2-4fee-96bf-d0f9f620fc07
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.docs_diagram.field_diagram
+    - field.field.paragraph.docs_diagram.field_group
+    - field.field.paragraph.docs_diagram.field_syntax
+    - paragraphs.paragraphs_type.docs_diagram
+  module:
+    - options
+id: paragraph.docs_diagram.default
+targetEntityType: paragraph
+bundle: docs_diagram
+mode: default
+content:
+  field_diagram:
+    type: basic_string
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_syntax:
+    type: list_default
+    label: inline
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  field_group: true

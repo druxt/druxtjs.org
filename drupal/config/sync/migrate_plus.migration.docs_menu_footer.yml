@@ -1,0 +1,97 @@
+uuid: b5127f68-b422-4d85-99c8-bba12dfd4faa
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - druxt_docs
+id: docs_menu_footer
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags: null
+migration_group: druxt_docs
+label: 'Footer menu'
+source:
+  plugin: embedded_data
+  constants:
+    menu: footer
+  data_rows:
+    -
+      id: tutorials
+      title: Tutorials
+      weight: 0
+      page: docs/nuxt/content/tutorials/README.md
+      uri: null
+    -
+      id: how-to
+      title: 'How-to guides'
+      weight: 1
+      page: docs/nuxt/content/how-to/README.md
+      uri: null
+    -
+      id: modules
+      title: Modules
+      weight: 2
+      page: docs/nuxt/content/modules/README.md
+      uri: null
+    -
+      id: api
+      title: 'API reference'
+      weight: 3
+      page: null
+      uri: 'internal:/api'
+    -
+      id: github
+      title: GitHub
+      weight: 4
+      page: null
+      uri: 'https://github.com/druxt/druxt.js'
+    -
+      id: discord
+      title: Discord
+      weight: 5
+      page: null
+      uri: 'https://discord.druxtjs.org'
+    -
+      id: drupal
+      title: 'Druxt on Drupal.org'
+      weight: 6
+      page: null
+      uri: 'https://www.drupal.org/project/druxt'
+  ids:
+    id:
+      type: string
+process:
+  _menu_key:
+    plugin: concat
+    source:
+      - constants/menu
+      - id
+    delimiter: ':'
+  uuid:
+    plugin: docs_identity
+    kind: menu_link
+    source: '@_menu_key'
+  title: title
+  weight: weight
+  menu_name: constants/menu
+  enabled:
+    plugin: default_value
+    default_value: 1
+  langcode:
+    plugin: default_value
+    default_value: en
+  link/uri:
+    plugin: docs_menu_uri
+    migration: docs_page
+    source:
+      - page
+      - uri
+destination:
+  plugin: 'entity:menu_link_content'
+idMap: {  }
+migration_dependencies:
+  required:
+    - docs_page
+include: null

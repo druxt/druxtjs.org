@@ -1,0 +1,19 @@
+uuid: d483ad9b-a13f-4151-a572-d82e520100fa
+langcode: en
+status: true
+dependencies: {  }
+id: authenticated
+name: authenticated
+description: 'Sign in to the documentation, with no editing rights of its own.'
+grant_types:
+  authorization_code:
+    status: true
+    description: ''
+  refresh_token:
+    status: true
+    description: ''
+umbrella: false
+parent: null
+granularity_id: role
+granularity_configuration:
+  role: authenticated

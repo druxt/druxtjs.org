@@ -1,0 +1,32 @@
+uuid: 99d09e12-ad58-49ac-a2cc-cbd4629f715d
+langcode: en
+status: true
+dependencies:
+  module:
+    - markdown_easy
+name: 'Documentation markdown'
+format: docs_markdown
+weight: 0
+filters:
+  filter_html:
+    id: filter_html
+    provider: filter
+    status: true
+    weight: 5
+    settings:
+      allowed_html: '<a href title> <blockquote> <br> <code class> <del> <em> <h1> <h2> <h3> <h4> <h5> <h6> <hr> <img alt src title> <input checked disabled type> <li> <ol> <p> <pre> <strong> <table> <tbody> <td class> <th class> <thead> <tr> <ul>'
+      filter_html_help: false
+      filter_html_nofollow: false
+  filter_html_image_secure:
+    id: filter_html_image_secure
+    provider: filter
+    status: true
+    weight: 10
+    settings: {  }
+  markdown_easy:
+    id: markdown_easy
+    provider: markdown_easy
+    status: true
+    weight: 0
+    settings:
+      flavor: github

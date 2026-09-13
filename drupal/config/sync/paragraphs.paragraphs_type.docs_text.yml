@@ -1,0 +1,10 @@
+uuid: b81e56d6-63f8-4e1e-9451-5210ddfd6c3e
+langcode: en
+status: true
+dependencies: {  }
+id: docs_text
+label: Text
+icon_uuid: null
+icon_default: null
+description: 'Authored prose, stored as markdown.'
+behavior_plugins: {  }

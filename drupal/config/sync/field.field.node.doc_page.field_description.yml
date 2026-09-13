@@ -1,0 +1,19 @@
+uuid: 952ec0a4-bd90-4a46-8855-25faf4d52fe8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.doc_page
+id: node.doc_page.field_description
+field_name: field_description
+entity_type: node
+bundle: doc_page
+label: Description
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

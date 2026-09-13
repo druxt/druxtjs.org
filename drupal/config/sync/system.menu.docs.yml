@@ -1,0 +1,8 @@
+uuid: 48c94dfc-27b1-477a-94c7-6b51dc4ae17b
+langcode: en
+status: true
+dependencies: {  }
+id: docs
+label: Documentation
+description: "The documentation's sections and pages, in the order a reader moves through them."
+locked: false

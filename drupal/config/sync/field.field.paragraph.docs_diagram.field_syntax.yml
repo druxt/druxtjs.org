@@ -1,0 +1,21 @@
+uuid: 7dc039d4-f49f-40c7-a6e5-7eb02ebdefb7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_syntax
+    - paragraphs.paragraphs_type.docs_diagram
+  module:
+    - options
+id: paragraph.docs_diagram.field_syntax
+field_name: field_syntax
+entity_type: paragraph
+bundle: docs_diagram
+label: Syntax
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

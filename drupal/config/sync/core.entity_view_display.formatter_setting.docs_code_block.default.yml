@@ -1,0 +1,13 @@
+uuid: b479278b-0ebe-4106-bf38-cc8a329b868d
+langcode: en
+status: true
+dependencies:
+  config:
+    - custom_formatters.formatter.docs_code_block
+id: formatter_setting.docs_code_block.default
+targetEntityType: formatter_setting
+bundle: docs_code_block
+mode: default
+content: {  }
+hidden:
+  label: true

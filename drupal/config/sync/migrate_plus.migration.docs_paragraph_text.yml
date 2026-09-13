@@ -1,0 +1,47 @@
+uuid: 8f77fdb0-9643-494a-84b9-b5e0d8fa3bb5
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - druxt_docs
+id: docs_paragraph_text
+class: null
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags: null
+migration_group: druxt_docs
+label: 'Documentation prose blocks'
+source:
+  plugin: docs_block
+  types:
+    - text
+process:
+  uuid:
+    plugin: docs_identity
+    kind: paragraph
+    source:
+      - page
+      - index
+  langcode:
+    plugin: default_value
+    default_value: en
+  behavior_settings:
+    plugin: docs_layout_behavior
+    role: block
+    source:
+      - page
+      - layout_section
+      - layout_region
+  field_text/value: markdown
+  field_text/format:
+    plugin: default_value
+    default_value: docs_markdown
+destination:
+  plugin: 'entity_reference_revisions:paragraph'
+  default_bundle: docs_text
+idMap: {  }
+migration_dependencies:
+  required: {  }
+  optional: {  }
+include: null
