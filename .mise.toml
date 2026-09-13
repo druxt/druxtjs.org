@@ -1,0 +1,76 @@
+# Pinned toolchain, so `mise install` gives every contributor the same PHP and
+# Node. The tasks run the npm scripts, which are what CI and the README use.
+
+[tools]
+# What the dev container runs. CI tests on 8.3, the floor drupal/composer.json
+# resolves the lock against.
+php = "8.4"
+# The Node Nuxt 2 builds with, as .nvmrc. The root lint tooling is pinned to
+# versions that still run on it.
+node = "16.20.1"
+
+[tasks.install]
+description = "Install the root tooling and the IR builder's dependency"
+run = "npm ci"
+
+[tasks.setup]
+description = "Assemble and provision Drupal, import the documentation, start the backend"
+run = "npm run setup"
+
+[tasks.dev]
+description = "Run the Nuxt dev server against the local backend"
+run = "npm run dev"
+
+[tasks.start]
+description = "Start the local Drupal backend"
+run = "npm run start"
+
+[tasks.stop]
+description = "Stop the local Drupal backend"
+run = "npm run stop"
+
+[tasks.info]
+description = "Show where the backend is and what it runs"
+run = "npm run info"
+
+[tasks.login]
+description = "Print a one-time login link for the local Drupal"
+run = "npm run login"
+
+[tasks."docs:generate"]
+description = "Generate the Modules, API and Components pages from druxt.js"
+run = "npm run docs:generate"
+
+[tasks.lint]
+description = "Run every linter except prose"
+run = "npm run lint"
+
+[tasks."lint:prose"]
+description = "Install Vale if needed, then lint every tracked markdown file"
+run = "npm run lint:prose:install && npm run lint:prose"
+
+[tasks."lint:yaml"]
+description = "Lint the pipeline and the GitHub configuration"
+run = "yamllint .gitlab-ci.yml .yamllint .github/"
+
+[tasks.test]
+description = "Run the node tests"
+run = "npm test"
+
+[tasks."test:guardrails"]
+description = "Run the guardrail tests for .devtools and the scripts"
+run = "bash tests/start-guardrails.sh && bash tests/import-guardrails.sh && bash tests/validate-guardrails.sh"
+
+[tasks."test:phpunit"]
+description = "Run PHPUnit for druxt_docs"
+dir = "{{config_root}}/drupal"
+run = ".devtools/assemble && vendor/bin/phpunit"
+
+[tasks.ci]
+description = "The lint and node test jobs of the pipeline"
+depends = ["lint", "test"]
+
+# Once per clone. `npm install` does this for you, unless install scripts are off.
+[tasks."hooks:install"]
+description = "Point git at the committed .githooks/ directory"
+run = "git config core.hooksPath .githooks"

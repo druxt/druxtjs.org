@@ -1,15 +1,20 @@
 /**
  * Fail if a tracked file points at a host only the author can reach.
  *
- * This repository is meant to become public, and a private URL in it is
- * not a buried comment: composer-patches prints every patch description
- * during `composer install`, which is how a self-hosted merge request link
- * once ended up in front of everyone who followed a Druxt starterkit.
+ * This repository is public, and a private URL in it is not a buried
+ * comment: composer-patches prints every patch description during
+ * `composer install`, which is how a self-hosted merge request link once
+ * ended up in front of everyone who followed a Druxt starterkit.
  *
  * The rule is the shape of the host, not a list of known hostnames -
- * anything resolvable only inside a LAN. localhost, loopback, and the
+ * anything resolvable only inside a LAN. localhost, loopback and the
  * DDEV and Lando development domains are how this project runs locally,
  * so they are the exceptions.
+ *
+ * Known gap: this matches host shape, so it catches `scheme://host/...`
+ * and scp-style git remotes. It cannot catch an internal project or
+ * repository name written as prose, which has no shape to match. A
+ * green run here is not a statement about that class.
  */
 
 import { execFileSync } from 'node:child_process'
@@ -18,12 +23,6 @@ import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-
-/** Report and exit non-zero. */
-function exitWithError(message) {
-  console.error(message)
-  process.exit(1)
-}
 
 /** Development hosts that are meant to be here. */
 const ALLOWED = [/^localhost$/i, /^127\./, /^::1$/, /\.ddev\.site$/i, /\.lndo\.site$/i]
@@ -45,15 +44,50 @@ const PRIVATE_HOST = [
  * remote usually carries it - `https://oauth2:TOKEN@host/path` - and
  * capturing `oauth2` instead of the host let the whole URL through.
  */
+// The bracket class takes dots as well as hex: an IPv4-mapped literal such as
+// [::ffff:10.0.0.8] is a bracketed host that carries an RFC1918 address.
 const URL_HOST =
-  /(?:[a-z][a-z0-9+.-]*:\/\/(?:[^/@\s]*@)?|\bgit@)(\[[0-9A-Fa-f:]+\]|[A-Za-z0-9._-]+)/g
+  /(?:[a-z][a-z0-9+.-]*:\/\/(?:[^/@\s]*@)?|\bgit@)(\[[0-9A-Fa-f:.]+\]|[A-Za-z0-9._-]+)/g
+
+/**
+ * The IPv4 address inside an IPv4-mapped IPv6 literal, else the host as given.
+ *
+ * A mapped address has four spellings, compressed or expanded, with the last
+ * 32 bits written as dotted decimal or as two hex groups. Matching the dotted
+ * spelling alone let `[0:0:0:0:0:ffff:0a00:0008]` name a private endpoint that
+ * every pattern below then read as a public one.
+ */
+export function mappedToIpv4(host) {
+  if (!/^[0-9a-f:.]+$/i.test(host) || !host.includes(':')) return host
+
+  // A trailing dotted quad occupies the last two groups. Rewriting it as hex
+  // first means the zero-fill below only ever counts groups.
+  const text = host.replace(/(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/, (_, a, b, c, d) =>
+    [((+a << 8) | +b).toString(16), ((+c << 8) | +d).toString(16)].join(':')
+  )
+
+  const [head, tail] = text.split('::')
+  const left = head ? head.split(':') : []
+  const right = tail === undefined ? [] : tail ? tail.split(':') : []
+  const groups =
+    tail === undefined ? left : left.concat(Array(8 - left.length - right.length).fill('0'), right)
+
+  if (groups.length !== 8 || groups.some((g) => !/^[0-9a-f]{1,4}$/i.test(g))) {
+    return host
+  }
+  const value = groups.map((g) => parseInt(g, 16))
+  if (!value.slice(0, 5).every((g) => g === 0) || value[5] !== 0xffff) {
+    return host
+  }
+  return [value[6] >> 8, value[6] & 0xff, value[7] >> 8, value[7] & 0xff].join('.')
+}
 
 /** Every private host referenced by `text`, with the line it sits on. */
 export function findPrivateRefs(text) {
   const found = []
   text.split('\n').forEach((line, index) => {
     for (const match of line.matchAll(URL_HOST)) {
-      const host = match[1].replace(/^\[|\]$/g, '').replace(/[.:]+$/, '')
+      const host = mappedToIpv4(match[1].replace(/^\[|\]$/g, '').replace(/[.:]+$/, ''))
       if (ALLOWED.some((pattern) => pattern.test(host))) {
         continue
       }
@@ -78,7 +112,7 @@ export function trackedFiles(root = ROOT) {
  * an opt-out marker anyone could paste would eventually be pasted over
  * a real leak.
  */
-const SELF = ['scripts/lint-private-refs.mjs', 'test/private-refs.test.mjs']
+const SELF = ['scripts/lint-private-refs.mjs', 'tests/private-refs.test.mjs']
 
 export function lintPrivateRefs(root = ROOT) {
   const problems = []
@@ -103,28 +137,28 @@ export function lintPrivateRefs(root = ROOT) {
   return problems
 }
 
-/**
- * What the command does, separated from the entry guard so a test can
- * measure it in-process. Run through a child process it works, but node
- * counts none of it as covered.
- */
 export function main(root = ROOT) {
   const problems = lintPrivateRefs(root)
   if (problems.length > 0) {
-    exitWithError(
+    console.error(
       [
+        '',
         'These tracked files reference a host that only resolves on a private network:',
         '',
         ...problems.map((problem) => `  ${problem}`),
         '',
-        'This repository is meant to become public. Replace the reference with',
-        'a public one, or describe the thing without a URL.',
+        'This repository is public. Replace the reference with a public one,',
+        'or describe the thing without a URL.',
+        '',
       ].join('\n')
     )
+    process.exit(1)
   }
   console.log('No private hosts referenced by tracked files.')
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  main()
+  // An explicit root keeps a test honest: it can run the real command
+  // against a throwaway repository rather than this one.
+  main(process.argv[2] ? path.resolve(process.argv[2]) : ROOT)
 }

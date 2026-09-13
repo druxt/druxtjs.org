@@ -1,15 +1,53 @@
 {
-  "name": "cms.druxtjs.org",
+  "name": "druxtjs.org",
   "private": true,
-  "description": "Drupal backend and content for the druxtjs.org documentation site",
+  "description": "The druxtjs.org documentation site, with a Drupal backend and a Nuxt frontend",
   "license": "MIT",
+  "packageManager": "npm@8.19.4",
+  "engines": {
+    "node": ">=16.20.1"
+  },
   "scripts": {
+    "setup": "npm run assemble && npm run provision && npm run import && sh scripts/link-content.sh && npm run start",
+    "assemble": "cd drupal && .devtools/assemble",
+    "provision": "cd drupal && .devtools/provision",
+    "import": "cd drupal && .devtools/import",
+    "start": "cd drupal && .devtools/start",
+    "stop": "cd drupal && .devtools/stop",
+    "info": "cd drupal && .devtools/info",
+    "login": "sh scripts/login.sh",
+    "dev": "sh scripts/dev.sh",
+    "docs:generate": "sh scripts/docs-generate.sh",
+    "hooks:install": "git config core.hooksPath .githooks",
+    "lint": "npm run lint:js && npm run lint:format && npm run lint:md && npm run lint:cspell && npm run lint:private && npm run lint:attribution && npm run lint:knip",
+    "lint:attribution": "bash .gitlab/scripts/check-attribution.sh",
+    "lint:audit": "npm audit --omit=dev --audit-level=high && npm run lint:audit:nuxt",
+    "lint:audit:nuxt": "sh scripts/audit-nuxt.sh",
+    "lint:commit": "commitlint",
+    "lint:cspell": "cspell lint --no-progress --no-must-find-files --gitignore --dot \"**/*.{js,mjs,cjs,json,jsonc,md,yml,yaml,sh}\"",
+    "lint:format": "prettier --check \"**/*.{js,mjs,cjs,json,jsonc,md,yml,yaml}\"",
+    "lint:format:fix": "prettier --write \"**/*.{js,mjs,cjs,json,jsonc,md,yml,yaml}\"",
+    "lint:js": "eslint --ext .js,.mjs,.cjs .",
+    "lint:knip": "knip --include dependencies,unlisted --no-config-hints",
+    "lint:md": "markdownlint-cli2 \"**/*.md\"",
     "lint:private": "node scripts/lint-private-refs.mjs",
+    "lint:prose": "PROSE_LINT_GLOB='!nuxt/**' bash .gitlab/scripts/lint-prose.sh --all",
+    "lint:prose:install": "bash .gitlab/scripts/install-vale.sh .vale/bin .vale/styles",
+    "prepare": "node scripts/prepare.mjs",
     "survey:content": "node scripts/survey-content.mjs --source .docs-source --json scripts/content-baseline.json",
-    "test:unit": "node --test \"tests/*.test.mjs\"",
+    "test": "node --test tests/*.test.mjs",
+    "test:coverage": "mkdir -p reports && node --test --experimental-test-coverage --test-coverage-include=\"scripts/**\" --test-coverage-lines=88 --test-coverage-branches=87 --test-coverage-functions=87 --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=reports/junit.xml tests/*.test.mjs",
     "validate:content": "node scripts/validate-content.mjs"
   },
   "devDependencies": {
-    "github-slugger": "1.5.0"
+    "@commitlint/cli": "17.8.1",
+    "@commitlint/config-conventional": "17.8.1",
+    "cspell": "7.3.9",
+    "eslint": "8.28.0",
+    "eslint-config-prettier": "8.10.0",
+    "github-slugger": "1.5.0",
+    "knip": "2.43.0",
+    "markdownlint-cli2": "0.10.0",
+    "prettier": "3.3.3"
   }
 }

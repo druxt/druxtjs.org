@@ -121,7 +121,11 @@ export function build(root) {
       if (link.kind !== 'internal') continue
       const [pathPart] = link.target.split('#')
       if (routes.has(pathPart) || isGeneratedPath(link.target)) continue
-      defects.add(file, 1, `internal link resolves to neither an authored page nor generated output: ${link.target}`)
+      defects.add(
+        file,
+        1,
+        `internal link resolves to neither an authored page nor generated output: ${link.target}`
+      )
     }
 
     for (const image of extractImages(doc.body)) {
@@ -145,9 +149,12 @@ export function build(root) {
       ...dates(commits.get(file)),
       links: extractLinks(doc.body).map((link) => ({
         ...link,
-        resolves: link.kind !== 'internal'
-          ? link.kind
-          : (routes.has(link.target.split('#')[0]) ? 'authored' : 'generated'),
+        resolves:
+          link.kind !== 'internal'
+            ? link.kind
+            : routes.has(link.target.split('#')[0])
+              ? 'authored'
+              : 'generated',
       })),
       images: extractImages(doc.body),
       blocks,
@@ -161,9 +168,11 @@ export function build(root) {
   // Earlier versions come after every current page, because whether an
   // image in one can point at today's media depends on every image the
   // current corpus migrates.
-  const images = new Map(documents.flatMap((doc) => doc.blocks
-    .filter((block) => block.type === 'image')
-    .map((block) => [block.src, block.alt])))
+  const images = new Map(
+    documents.flatMap((doc) =>
+      doc.blocks.filter((block) => block.type === 'image').map((block) => [block.src, block.alt])
+    )
+  )
 
   for (const doc of documents) {
     const earlier = versions(commits.get(doc.source), (commit) => contentAt(root, commit))
@@ -175,7 +184,11 @@ export function build(root) {
     for (const entry of built) {
       notes.push(...entry.notes)
       if (!entry.rebuilds) {
-        defects.add(`${entry.revision.path}@${entry.revision.sha.slice(0, 12)}`, 1, 'an earlier version its blocks do not rebuild, so its revision would not say what the page said')
+        defects.add(
+          `${entry.revision.path}@${entry.revision.sha.slice(0, 12)}`,
+          1,
+          'an earlier version its blocks do not rebuild, so its revision would not say what the page said'
+        )
       }
     }
     doc.revisions = built.map((entry) => entry.revision)
@@ -195,11 +208,15 @@ const flag = (name) => {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const source = flag('source')
   if (!source) {
-    process.stderr.write('--source <checkout> is required: the documentation repository to build from.\n')
+    process.stderr.write(
+      '--source <checkout> is required: the documentation repository to build from.\n'
+    )
     process.exit(2)
   }
   if (!existsSync(path.join(source, '.git'))) {
-    process.stderr.write(`${source} is not a git checkout. The corpus is listed with git, so it needs one.\n`)
+    process.stderr.write(
+      `${source} is not a git checkout. The corpus is listed with git, so it needs one.\n`
+    )
     process.exit(2)
   }
 
@@ -208,7 +225,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   // An empty corpus is a wrong checkout, not a documentation set with no
   // pages: the importer must not be handed nothing and read it as success.
   if (!documents.length) {
-    process.stderr.write(`No tracked files under ${CONTENT_DIR} in ${source}. Is this a checkout of the documentation repository?\n`)
+    process.stderr.write(
+      `No tracked files under ${CONTENT_DIR} in ${source}. Is this a checkout of the documentation repository?\n`
+    )
     process.exit(1)
   }
 
@@ -234,7 +253,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       const b = rebuilt.split('\n')
       for (let i = 0; i < Math.max(a.length, b.length); i += 1) {
         if (a[i] !== b[i]) {
-          process.stderr.write(`  line ${i + 1}\n    source: ${JSON.stringify(a[i])}\n    rebuilt: ${JSON.stringify(b[i])}\n`)
+          process.stderr.write(
+            `  line ${i + 1}\n    source: ${JSON.stringify(a[i])}\n    rebuilt: ${JSON.stringify(b[i])}\n`
+          )
           break
         }
       }
@@ -242,7 +263,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   }
 
   if (mismatched) {
-    process.stderr.write(`\n${mismatched} of ${documents.length} pages do not round-trip; nothing written.\n`)
+    process.stderr.write(
+      `\n${mismatched} of ${documents.length} pages do not round-trip; nothing written.\n`
+    )
     process.exit(1)
   }
 
@@ -264,7 +287,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   rmSync(out, { recursive: true, force: true })
   mkdirSync(out, { recursive: true })
   for (const doc of documents) {
-    const name = doc.source.replace(`${CONTENT_DIR}/`, '').replace(/\//g, '__').replace(/\.md$/, '.json')
+    const name = doc.source
+      .replace(`${CONTENT_DIR}/`, '')
+      .replace(/\//g, '__')
+      .replace(/\.md$/, '.json')
     // Dropped rather than written: it exists so validation can compare
     // without re-reading the source tree, and duplicating every page's body
     // into the IR on disk would double the artifact for no reader.
@@ -279,6 +305,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     mkdirSync(path.dirname(target), { recursive: true })
     copyFileSync(path.join(source, STATIC_DIR, src), target)
   }
-  process.stdout.write(`${documents.length} documents and ${images.size} images written to ${out}\n`)
-  process.stdout.write(`${earlier} earlier versions carried for the importer to save as revisions.\n`)
+  process.stdout.write(
+    `${documents.length} documents and ${images.size} images written to ${out}\n`
+  )
+  process.stdout.write(
+    `${earlier} earlier versions carried for the importer to save as revisions.\n`
+  )
 }

@@ -1,6 +1,12 @@
+---
 # Provisioning runs on the same entry points a developer runs locally
 # (drupal/.devtools/*), so there is no CI-only install path that can drift
 # away from the one people actually use.
+#
+# Secret scanning is gitleaks, not GitLab's Security/Secret-Detection template.
+# That template is an Ultimate-tier feature: on a non-Ultimate instance the
+# include produces no job at all, so the configuration reads as coverage while
+# scanning nothing.
 
 stages:
   - lint
@@ -8,17 +14,118 @@ stages:
   - provision
   - import
 
-default:
-  interruptible: true
-
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # One pipeline per push: a branch with an open merge request runs only the
+    # merge request pipeline, which is the one that carries its variables.
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
     - if: $CI_COMMIT_BRANCH
+
+default:
+  interruptible: true
+  # Collapsible log sections, in POSIX sh for the alpine images.
+  before_script:
+    - 'section_start() { printf "\033[0Ksection_start:%s:%s\r\033[0K%s\n" "$(date +%s)" "$1" "${2:-$1}"; }'
+    - 'section_end() { printf "\033[0Ksection_end:%s:%s\r\033[0K\n" "$(date +%s)" "$1"; }'
 
 variables:
   COMPOSER_MEMORY_LIMIT: "-1"
   DB_FILE: "$CI_PROJECT_DIR/drupal/ci.sqlite"
+
+#
+# --- Lint ---
+#
+
+# The root lint tooling, on the Node the frontend builds with. corepack reads
+# package.json's packageManager, so the npm that wrote the lockfile installs it.
+# Install scripts are skipped, so the git hook setup never runs in a job that
+# makes no commits.
+.node-lint:
+  stage: lint
+  image: node:16.20.1
+  cache:
+    key:
+      files:
+        - package-lock.json
+      prefix: node-16.20.1
+    paths:
+      - .npm/
+  before_script:
+    - !reference [default, before_script]
+    - corepack enable
+    - corepack prepare --activate
+    - section_start "npm" "Installing the lint tooling"
+    - npm ci --cache .npm --prefer-offline --ignore-scripts
+    - section_end "npm"
+
+lint:js:
+  extends: .node-lint
+  script:
+    - section_start "eslint" "Linting the Node tooling"
+    - npm run lint:js
+    - section_end "eslint"
+
+lint:format:
+  extends: .node-lint
+  script:
+    - section_start "prettier" "Checking formatting"
+    - npm run lint:format
+    - section_end "prettier"
+
+lint:md:
+  extends: .node-lint
+  script:
+    - section_start "markdownlint" "Linting Markdown"
+    - npm run lint:md
+    - section_end "markdownlint"
+
+lint:cspell:
+  extends: .node-lint
+  script:
+    - section_start "cspell" "Spell checking"
+    - npm run lint:cspell
+    - section_end "cspell"
+
+# Production dependencies only: a devDependency advisory is worth knowing about
+# and not worth blocking a merge request on. This is the root's gate.
+lint:audit:
+  extends: .node-lint
+  script:
+    - section_start "audit" "Auditing the root's production dependencies"
+    - npm audit --omit=dev --audit-level=high
+    - section_end "audit"
+
+# nuxt/'s production dependencies, report only. Nuxt 2's frozen dependency tree
+# cannot pass a production audit. Node 22, because the audit runs on Yarn 4, as
+# scripts/audit-nuxt.sh explains.
+lint:audit:nuxt:
+  stage: lint
+  image: node:22-alpine
+  allow_failure: true
+  script:
+    - section_start "audit-nuxt" "Auditing nuxt/'s production dependencies"
+    - npm run lint:audit:nuxt
+    - section_end "audit-nuxt"
+
+lint:knip:
+  extends: .node-lint
+  script:
+    - section_start "knip" "Checking for unused and undeclared dependencies"
+    - npm run lint:knip
+    - section_end "knip"
+
+# The merge request's own commits, not the whole history.
+lint:commit:
+  extends: .node-lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - section_start "commitlint" "Validating commit messages"
+    - git fetch --depth 50 origin "+refs/heads/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}:refs/remotes/origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
+    - npm run lint:commit -- --from "origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" --to HEAD --verbose
+    - section_end "commitlint"
 
 lint:private-refs:
   stage: lint
@@ -28,17 +135,150 @@ lint:private-refs:
   script:
     - node scripts/lint-private-refs.mjs
 
+# The work is the author's. No commit, merge request description or tracked
+# file may credit an AI tool. Full history, so the merge request's base is here.
+lint:attribution:
+  stage: lint
+  image: node:22-alpine
+  variables:
+    GIT_DEPTH: 0
+  before_script:
+    - !reference [default, before_script]
+    - apk add --no-cache bash git > /dev/null
+  script:
+    - section_start "attribution" "Checking for AI attribution"
+    - bash .gitlab/scripts/check-attribution.sh
+    - section_end "attribution"
+
+# Project voice over the markdown a change touches, its commit messages and the
+# merge request description. Debian rather than alpine: Vale links against glibc.
+# nuxt/ brings its own lint setup when it lands.
+lint:prose:
+  stage: lint
+  image: node:22
+  variables:
+    GIT_DEPTH: 0
+    PROSE_LINT_GLOB: "!nuxt/**"
+  cache:
+    key: vale-3.17.1
+    paths:
+      - .vale/
+  script:
+    - section_start "prose" "Linting prose with Vale"
+    - bash .gitlab/scripts/install-vale.sh .vale/bin .vale/styles
+    - bash .gitlab/scripts/lint-prose.sh
+    - section_end "prose"
+
+# The pipeline and the GitHub configuration. Drupal's own YAML follows Drupal's
+# style, which this configuration would fight.
+lint:yaml:
+  stage: lint
+  image: python:3.12-slim
+  script:
+    - section_start "yamllint" "Linting YAML"
+    - pip install --quiet --disable-pip-version-check yamllint==1.38.0
+    - yamllint .gitlab-ci.yml .yamllint .github/
+    - section_end "yamllint"
+
+# Links in the tracked markdown outside nuxt/. Report only, as .lychee.toml
+# explains. The binary is pinned and verified by checksum, as gitleaks is.
+lint:links:
+  stage: lint
+  image: alpine:3.21
+  allow_failure: true
+  variables:
+    LYCHEE_VERSION: '0.24.2'
+    LYCHEE_SHA256: '73657a111819a30c47c08352896796f23d64e4eb2b3ed39b6d32149241566fc5'
+  script:
+    - section_start "lychee" "Checking links"
+    - apk add --no-cache curl tar git > /dev/null
+    - curl -sSLo lychee.tar.gz "https://github.com/lycheeverse/lychee/releases/download/lychee-v${LYCHEE_VERSION}/lychee-x86_64-unknown-linux-musl.tar.gz"
+    - echo "${LYCHEE_SHA256}  lychee.tar.gz" | sha256sum -c -
+    - tar -xzf lychee.tar.gz
+    - ./lychee-x86_64-unknown-linux-musl/lychee --config .lychee.toml $(git ls-files '*.md' ':!nuxt/**')
+    - section_end "lychee"
+
 lint:php:
   stage: lint
   image: php:8.3-cli-alpine
   script:
     - find drupal/.devtools -type f -exec sh -c 'head -c2 "$1" | grep -q "#!" && php -l "$1"' _ {} \; -print
 
+secret-detection:
+  stage: lint
+  image: alpine:3.21
+  dependencies: []
+  variables:
+    GITLEAKS_VERSION: '8.30.1'
+    GITLEAKS_SHA256: '551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb'
+  script:
+    - section_start "gitleaks" "Scanning for committed secrets"
+    - apk add --no-cache curl tar git > /dev/null
+    - curl -sSLo gitleaks.tar.gz "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+    - echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
+    - tar -xzf gitleaks.tar.gz gitleaks
+    - ./gitleaks detect --source . --no-banner --redact --verbose
+    - section_end "gitleaks"
+    # A scan that finds nothing looks identical to a scan that cannot find
+    # anything. Plant three credentials outside the repository and assert all
+    # three are reported, so a bad download, a config change or a widened
+    # allowlist fails the job instead of passing it quietly.
+    #
+    # Each value is split across its own prefix so no fragment in this file
+    # triggers the rule it is meant to exercise: the repository scan above runs
+    # over this file too, and a canary that flags itself would need an ignore
+    # entry, which is the thing being guarded against.
+    #
+    # Fixed values, not generated ones. Detection is keyword-driven rather than
+    # entropy-driven, so a generated credential fires only sometimes and
+    # presents as flake. A value verified once keeps firing.
+    #
+    # Invented, not copied from any vendor's documentation: gitleaks allowlists
+    # documentation keys, and a canary built from one is inert in exactly the
+    # way this check exists to catch.
+    - section_start "canary" "Checking that the scanner still detects"
+    - |
+      canary="$(mktemp -d)"
+      pat="gh""p_8fK2mQ7xR4tV9nB3jH6yW1sZ5cD8gL0aE4uY"
+      stripe="sk""_live_51aBcD2eFgH3iJkL4mNoP5qR6sTuV7wXyZ8a"
+      slack="xo""xb-263594753641-2529420432-J1n4h6a9pQrStUvWxYz1AbCd"
+      printf 'a = "%s"\nb = "%s"\nc = "%s"\n' "$pat" "$stripe" "$slack" > "$canary/canary.txt"
+      ./gitleaks detect --no-git --source "$canary" --no-banner --redact \
+        --report-format json --report-path "$canary/report.json" || true
+      found=$(grep -c '"RuleID"' "$canary/report.json" || true)
+      rm -rf "$canary"
+      if [ "$found" != "3" ]; then
+        echo "The canary planted 3 credentials and gitleaks reported $found."
+        echo "The scan above proves nothing while this is true."
+        exit 1
+      fi
+      echo "Canary detected 3 of 3 planted credentials."
+    - section_end "canary"
+
+#
+# --- Test ---
+#
+
+# Node 22 for its built-in coverage floor and JUnit reporter, which Node 16 does
+# not have. git for the private-host lint tests, which run the real command
+# against a throwaway repository.
 test:unit:
   stage: test
   image: node:22-alpine
+  before_script:
+    - !reference [default, before_script]
+    - apk add --no-cache git > /dev/null
   script:
-    - npm run test:unit
+    - section_start "node-test" "Running the node tests with the coverage floor"
+    - npm run test:coverage
+    - section_end "node-test"
+  # Puts the line coverage in the merge request widget.
+  coverage: '/all files\s*\|\s*([\d.]+)/'
+  artifacts:
+    when: always
+    reports:
+      junit: reports/junit.xml
+    expire_in: 1 week
 
 # Needs only PHP, bash and python3: both guarded cases fail before Drupal is
 # touched, so this skips assemble and provision entirely.
@@ -81,17 +321,22 @@ test:validate-guardrails:
     paths:
       - drupal/vendor/
   before_script:
+    - !reference [default, before_script]
+    - section_start "toolchain" "Installing PHP extensions and Composer"
     - apk add --no-cache git unzip sqlite-dev libpng-dev libjpeg-turbo-dev libwebp-dev freetype-dev $PHPIZE_DEPS
     - docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype
     - docker-php-ext-install pdo_sqlite gd
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - section_end "toolchain"
 
 test:phpunit:
   extends: .drupal
   stage: test
   script:
     - cd drupal
+    - section_start "assemble" "Installing Composer dependencies"
     - .devtools/assemble
+    - section_end "assemble"
     - ./vendor/bin/phpunit
 
 provision:
@@ -99,8 +344,12 @@ provision:
   stage: provision
   script:
     - cd drupal
+    - section_start "assemble" "Installing Composer dependencies"
     - .devtools/assemble
+    - section_end "assemble"
+    - section_start "provision" "Installing the site"
     - .devtools/provision
+    - section_end "provision"
     - .devtools/info
   artifacts:
     when: on_failure
@@ -124,8 +373,12 @@ import:
     - npm ci --ignore-scripts
   script:
     - cd drupal
+    - section_start "assemble" "Installing Composer dependencies"
     - .devtools/assemble
+    - section_end "assemble"
+    - section_start "provision" "Installing the site"
     - .devtools/provision
+    - section_end "provision"
     - .devtools/import --check
   artifacts:
     when: on_failure

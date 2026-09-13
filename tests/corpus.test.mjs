@@ -56,7 +56,12 @@ describe('tokenize', () => {
     assert.equal(nested[0].lang, 'sh')
     assert.equal(nested[0].closed, true)
     assert.equal(blocks.filter((block) => block.kind === 'fence').length, 0)
-    assert.ok(blocks.map((block) => block.lines.join('\n')).join('\n').includes('npm run setup'))
+    assert.ok(
+      blocks
+        .map((block) => block.lines.join('\n'))
+        .join('\n')
+        .includes('npm run setup')
+    )
   })
 
   test('a fence at column zero is promoted', () => {
@@ -140,7 +145,10 @@ describe('isGeneratedPath', () => {
 describe('extractLinks', () => {
   test('classifies by shape', () => {
     const links = extractLinks('[a](/how-to/x) [b](https://example.com) [c](#anchor) [d](./rel)')
-    assert.deepEqual(links.map((l) => l.kind), ['internal', 'external', 'anchor', 'relative'])
+    assert.deepEqual(
+      links.map((l) => l.kind),
+      ['internal', 'external', 'anchor', 'relative']
+    )
   })
 
   // Counting image references as links is what inflated the figures this

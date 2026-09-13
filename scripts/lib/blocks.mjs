@@ -2,7 +2,13 @@
 // and back into markdown for the round-trip. Needs nothing from
 // node_modules, so its unit tests run without an install.
 
-import { CODE_LANGUAGES, DIAGRAM_SYNTAXES, calloutType, classify, extractImages } from './corpus.mjs'
+import {
+  CODE_LANGUAGES,
+  DIAGRAM_SYNTAXES,
+  calloutType,
+  classify,
+  extractImages,
+} from './corpus.mjs'
 
 /** A defect that stops the run, collected so one pass reports all of them. */
 export class Defects {
@@ -54,7 +60,7 @@ function toBlock(block, context) {
         context.defects.add(
           context.file,
           block.line,
-          `fence language "${block.lang}" is outside the model's set (${CODE_LANGUAGES.join(', ')})`,
+          `fence language "${block.lang}" is outside the model's set (${CODE_LANGUAGES.join(', ')})`
         )
         return null
       }
@@ -79,7 +85,11 @@ function toBlock(block, context) {
       // Only an earlier version passes `images`. There, an image today's
       // corpus does not migrate with this alt text has no media to point at.
       if (context.images && context.images.get(image.src) !== image.alt) {
-        context.defects.add(context.file, block.line, `image today's corpus does not migrate with this alt text, kept as markdown: ${image.src}`)
+        context.defects.add(
+          context.file,
+          block.line,
+          `image today's corpus does not migrate with this alt text, kept as markdown: ${image.src}`
+        )
         return null
       }
       return { type: 'image', src: image.src, alt: image.alt }
@@ -91,7 +101,7 @@ function toBlock(block, context) {
         context.defects.add(
           context.file,
           block.line,
-          `callout lead not recognised: ${block.lines[0].slice(0, 60)}`,
+          `callout lead not recognised: ${block.lines[0].slice(0, 60)}`
         )
         return null
       }
@@ -105,7 +115,11 @@ function toBlock(block, context) {
       const raw = block.lines.join('\n')
       if (/^<div\b/.test(raw.trim())) return { type: '__wrapper', open: true, raw }
       if (/^<\/div>/.test(raw.trim())) return { type: '__wrapper', open: false, raw }
-      context.defects.add(context.file, block.line, `raw HTML block: ${block.lines[0].slice(0, 60)}`)
+      context.defects.add(
+        context.file,
+        block.line,
+        `raw HTML block: ${block.lines[0].slice(0, 60)}`
+      )
       return null
     }
 
@@ -198,21 +212,20 @@ export function buildBlocks(doc, defects, options = {}) {
  * @returns {string} The reconstructed body.
  */
 export function serialise(blocks, presentation = []) {
-  const pieces = blocks
-    .map((block) => {
-      switch (block.type) {
-        case 'code':
-          return '```' + block.language + '\n' + block.code + '\n```'
-        case 'diagram':
-          return '```' + block.syntax + '\n' + block.source + '\n```'
-        case 'image':
-          return `![${block.alt}](${block.src})`
-        case 'callout':
-          return block.markdown
-        default:
-          return block.markdown
-      }
-    })
+  const pieces = blocks.map((block) => {
+    switch (block.type) {
+      case 'code':
+        return '```' + block.language + '\n' + block.code + '\n```'
+      case 'diagram':
+        return '```' + block.syntax + '\n' + block.source + '\n```'
+      case 'image':
+        return `![${block.alt}](${block.src})`
+      case 'callout':
+        return block.markdown
+      default:
+        return block.markdown
+    }
+  })
 
   // Reinserted from the end, so an earlier index is not shifted by a later
   // insertion.

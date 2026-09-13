@@ -46,9 +46,7 @@ const IMAGE = /!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g
  * rather than prose: monospaced, never translated, excluded from prose
  * linting.
  */
-const CALLOUT_TYPES = [
-  { type: 'prerequisite', test: (lead) => /^before you start$/i.test(lead) },
-]
+const CALLOUT_TYPES = [{ type: 'prerequisite', test: (lead) => /^before you start$/i.test(lead) }]
 
 /** A blockquote that quotes runtime output rather than prose. */
 const OUTPUT_QUOTE = /^>\s*(\[[a-z-]+\]|Missing Vue template)/
@@ -163,7 +161,14 @@ function tokenize(body) {
 
       flush()
       const { content, closed } = consumeFence(marker)
-      blocks.push({ kind: 'fence', marker, lang: lang || '', code: content.join('\n'), line: start, closed })
+      blocks.push({
+        kind: 'fence',
+        marker,
+        lang: lang || '',
+        code: content.join('\n'),
+        line: start,
+        closed,
+      })
       bufferStart = lineNo + 1
       continue
     }
@@ -246,8 +251,10 @@ function routeFor(file) {
  */
 function isGeneratedPath(target) {
   const [pathPart] = target.split('#')
-  return GENERATED_EXACT.has(pathPart) ||
+  return (
+    GENERATED_EXACT.has(pathPart) ||
     GENERATED_PREFIXES.some((prefix) => pathPart === prefix || pathPart.startsWith(`${prefix}/`))
+  )
 }
 
 /**

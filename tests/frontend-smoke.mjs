@@ -25,14 +25,19 @@ const fetch = (url, { headers = {} } = {}) =>
             status: res.statusCode,
             text: async () => body,
             json: async () => JSON.parse(body),
-          }),
+          })
         )
       })
       .on('error', reject)
   })
 
 const decode = (text) =>
-  text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#0?39;/g, "'")
+  text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;/g, "'")
 
 const pages = async () => {
   const found = []
@@ -42,7 +47,11 @@ const pages = async () => {
     if (!response.ok) throw new Error(`${url}: ${response.status}`)
     const body = await response.json()
     for (const { attributes } of body.data) {
-      found.push({ title: attributes.title, path: attributes.path.alias, toc: attributes.field_toc || [] })
+      found.push({
+        title: attributes.title,
+        path: attributes.path.alias,
+        toc: attributes.field_toc || [],
+      })
     }
     url = body.links?.next?.href
   }
@@ -60,8 +69,11 @@ for (const page of all) {
   if (response.status !== 200) problems.push(`status ${response.status}`)
   const h1 = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)
   const heading = h1 ? decode(h1[1].replace(/<[^>]+>/g, '').trim()) : null
-  if (heading !== page.title) problems.push(`h1 ${JSON.stringify(heading)}, expected ${JSON.stringify(page.title)}`)
-  const missing = page.toc.filter((entry) => !html.includes(`id="${entry.id}"`)).map((entry) => entry.id)
+  if (heading !== page.title)
+    problems.push(`h1 ${JSON.stringify(heading)}, expected ${JSON.stringify(page.title)}`)
+  const missing = page.toc
+    .filter((entry) => !html.includes(`id="${entry.id}"`))
+    .map((entry) => entry.id)
   if (missing.length) problems.push(`no heading for ${missing.join(', ')}`)
   if (problems.length) failures.push(`${page.path}: ${problems.join('; ')}`)
 }

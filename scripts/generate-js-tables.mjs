@@ -75,17 +75,21 @@ for (const cp of codePoints()) {
   // context toLowerCase() reads is the one final sigma needs, below.
   const lower = ch.toLowerCase()
   if (lower !== ch) lowercase.set(cp, lower)
-  if (`一${ch}`.toLowerCase().slice(1) !== lower) failures.push(`U+${hex(cp)}: lowercases differently in context`)
+  if (`一${ch}`.toLowerCase().slice(1) !== lower)
+    failures.push(`U+${hex(cp)}: lowercases differently in context`)
 
   // A capital sigma lowercases to final ς when a cased letter comes before
   // it and none after, skipping case-ignorable characters both ways. Each
   // character is placed on both sides of one to see which it is, and the
   // two answers have to agree.
-  const before = (`${ch}Σ`.toLowerCase().at(-1) === 'ς' ? 'cased' : null) ??
+  const before =
+    (`${ch}Σ`.toLowerCase().at(-1) === 'ς' ? 'cased' : null) ??
     (`A${ch}Σ`.toLowerCase().at(-1) === 'ς' ? 'ignorable' : 'neither')
-  const after = (`AΣ${ch}`.toLowerCase()[1] === 'σ' ? 'cased' : null) ??
+  const after =
+    (`AΣ${ch}`.toLowerCase()[1] === 'σ' ? 'cased' : null) ??
     (`AΣ${ch}A`.toLowerCase()[1] === 'σ' ? 'ignorable' : 'neither')
-  if (before !== after) failures.push(`U+${hex(cp)}: final sigma treats it as ${before} before and ${after} after`)
+  if (before !== after)
+    failures.push(`U+${hex(cp)}: final sigma treats it as ${before} before and ${after} after`)
   if (before === 'cased') sigmaCased.push(cp)
   if (before === 'ignorable') sigmaIgnorable.push(cp)
 
@@ -97,7 +101,9 @@ for (const cp of codePoints()) {
 }
 
 if (failures.length) {
-  process.stderr.write(`${failures.join('\n')}\n\n${failures.length} code points cannot be tabulated; nothing written.\n`)
+  process.stderr.write(
+    `${failures.join('\n')}\n\n${failures.length} code points cannot be tabulated; nothing written.\n`
+  )
   process.exit(1)
 }
 
@@ -117,7 +123,8 @@ function ranges(sorted) {
 }
 
 const escape = (cp) => `\\x{${hex(cp)}}`
-const runsToClass = (runs) => runs.map(([a, b]) => (a === b ? escape(a) : `${escape(a)}-${escape(b)}`)).join('')
+const runsToClass = (runs) =>
+  runs.map(([a, b]) => (a === b ? escape(a) : `${escape(a)}-${escape(b)}`)).join('')
 
 /** A PCRE class for a set of code points, negated when that is shorter. */
 function pcreClass(set) {
@@ -146,8 +153,11 @@ function phpString(value, indent) {
 const phpChar = (text) => `"${[...text].map((c) => `\\u{${hex(c.codePointAt(0))}}`).join('')}"`
 
 const lowercaseLines = []
-const entries = [...lowercase].map(([cp, lower]) => `${phpChar(String.fromCodePoint(cp))} => ${phpChar(lower)},`)
-for (let i = 0; i < entries.length; i += 3) lowercaseLines.push(`    ${entries.slice(i, i + 3).join(' ')}`)
+const entries = [...lowercase].map(
+  ([cp, lower]) => `${phpChar(String.fromCodePoint(cp))} => ${phpChar(lower)},`
+)
+for (let i = 0; i < entries.length; i += 3)
+  lowercaseLines.push(`    ${entries.slice(i, i + 3).join(' ')}`)
 
 const constant = (name, set) => `  public const ${name} = ${phpString(pcreClass(set), '    ')};`
 
@@ -218,5 +228,5 @@ process.stdout.write(
     `  WHITESPACE       ${whitespace.length} code points`,
     `  DOT              ${dot.length} code points`,
     '',
-  ].join('\n'),
+  ].join('\n')
 )

@@ -1,159 +1,155 @@
-# cms.druxtjs.org
+<!-- vale off -->
+<!-- The alt text describes what the banner shows: the druxtjs.org mark, name and description. The name-colon-description form trips ColonUsage. -->
+<a href="https://druxtjs.org">
+  <img src=".github/banner.svg" alt="druxtjs.org: Nuxt frontend and Drupal backend, built with Druxt">
+</a>
+<!-- vale on -->
 
-Drupal backend and content for the [druxtjs.org](https://druxtjs.org)
-documentation site.
+# druxtjs.org
 
-The documentation is authored as markdown in the
-[druxt.js](https://github.com/druxt/druxt.js) monorepo. This project holds the
-Drupal content model it is migrated into and the importer that does the
-migrating. The content itself lives in the site's database, the way it does
-on any other Drupal site. The frontend reads it back over JSON:API with
-Druxt, which makes druxtjs.org a site built with the framework it
-documents.
+Nuxt frontend and Drupal backend, built with Druxt.
 
-## Layout
+This repository is the source of [druxtjs.org](https://druxtjs.org), the
+documentation site for [Druxt](https://github.com/druxt/druxt.js). It is also a
+working example of a Druxt site: its pages are Drupal content, rendered by Nuxt.
 
-| Path | Purpose |
-| ---- | ------- |
-| `drupal/` | The Drupal codebase, configuration and importer |
-| `drupal/.devtools/` | Provisioning scripts: PHP and SQLite, no Docker |
-| `drupal/config/sync/` | Exported site configuration |
-| `drupal/content/` | A Tome export of the content from before the database became canonical, kept as a backup. Nothing writes to it |
-| `docs-source.json` | The documentation repository and commit the content is seeded from |
-| `scripts/` | The IR builder, the corpus survey and its baseline, content validation |
-| `tests/` | Unit tests for the corpus reader, guardrail tests for the scripts |
+The site is two applications in one repository. `nuxt/` is the frontend. It
+renders the documentation with Druxt, through DruxtEntity and its wrapper
+components. `drupal/` is the Drupal 11 backend that editors write in.
 
-## Getting started
+## Get involved
 
-Requires PHP 8.3 or later and Composer. No Docker, no database server.
+Run the whole site on your machine, frontend and backend together. Pick one of
+three ways.
 
-```sh
-cd drupal
-.devtools/assemble     # composer install
-.devtools/provision    # install Drupal against a throwaway SQLite database
-.devtools/start        # serve it
-```
+| Way                             | You need                                                  |
+| ------------------------------- | --------------------------------------------------------- |
+| [Dev container](#dev-container) | VS Code with Dev Containers, GitHub Codespaces, or DevPod |
+| [mise](#mise)                   | [mise](https://mise.jdx.dev), and three PHP extensions    |
+| [By hand](#by-hand)             | PHP 8.3 or later, Composer and Node 16.20.1               |
 
-`.devtools/info` reports what is configured, and `.devtools/stop` shuts the
-server down. Provisioning installs from the committed configuration, and
-falls back to a bare site when there is none, so that the scripts work on
-every commit. It gives you an empty site; run the importer to put the
-documentation in it.
+### Dev container
 
-### Export configuration after changing it
+[![Open in DevPod!](https://devpod.sh/assets/open-in-devpod.svg)](https://devpod.sh/open#https://github.com/druxt/cms.druxtjs.org)
 
-A change made through the admin UI or `drush` stays in the database until
-you export it:
+| Tool                        | How                                                                          |
+| --------------------------- | ---------------------------------------------------------------------------- |
+| VS Code                     | Clone the repository, open it, then choose **Reopen in Container**           |
+| GitHub Codespaces           | On the repository page, open **Code** and choose **Codespaces**              |
+| [DevPod](https://devpod.sh) | Click the badge, or run `devpod up https://github.com/druxt/cms.druxtjs.org` |
 
-```sh
-vendor/bin/drush config:export
-git status -- config/sync
-```
+The container has Node 16.20.1, PHP 8.4, Composer and mise. Creating it runs
+`npm install` and `npm run setup`, so Drupal is running when it opens. Then run
+`npm run dev`.
 
-Content is not exported. The database is the source of truth, and the
-importer seeds it from the pinned documentation.
+### mise
 
-## Previewing a page
-
-**Preview** on a page's edit form opens the preview in the admin theme,
-with three tabs. All three show the unsaved changes.
-
-| Tab | Shows |
-| --- | --- |
-| Frontend | The frontend's preview page in a frame, at phone, tablet or full width |
-| Drupal | The page's content in the admin theme, its paragraphs styled like the frontend's |
-| JSON:API | The `jsonapi_node_preview` document, with the page's paragraphs included |
-
-The Frontend tab needs the frontend's preview URL in `settings.php`.
-`{uuid}` and `{view_mode}` are filled in for each preview:
-
-```php
-$settings['druxt_docs_preview_url'] = '/druxt/node/preview?vm={view_mode}#/jsonapi/node/doc_page/{uuid}/preview';
-```
-
-Without it, the tab says the frontend preview isn't configured.
-
-## The documentation source
-
-`docs-source.json` pins the documentation repository and the exact commit
-the content is seeded from. Nothing here reads a branch: the content is a
-function of that commit, the importer and the content model, and CI proves
-the importer still produces it on every pipeline by building from the pin
-into a throwaway site.
-
-Everything that reads the documentation lives here. `scripts/build-ir.mjs`
-turns the pinned checkout into the intermediate representation the importer
-consumes, and `scripts/survey-content.mjs` measures the same checkout into
-`scripts/content-baseline.json`, the counts validation asserts against.
-
-To move the pin, edit the `ref` in `docs-source.json` to the new commit and
-rebuild against it:
+`.mise.toml` pins Node 16.20.1 and PHP 8.4. PHP needs the `gd`, `pdo_sqlite`
+and `sodium` extensions.
 
 ```sh
-npm ci                                   # the IR builder's one dependency
-cd drupal
-.devtools/assemble
-.devtools/provision                      # an empty site
-.devtools/import                         # fetch, build, import
-cd ..
-npm run survey:content                   # re-measure the baseline
+mise install
+npm install
+npm run setup
+npm run dev
 ```
 
-Commit the pin together with the baseline.
+### By hand
 
-`.devtools/import --check` is what CI runs. It refuses to build from
-anything but the pinned commit, and it fails unless the site ends up holding
-a page for every document the source produced, so a green pipeline means the
-importer still turns the pinned commit into the whole corpus.
+Install PHP 8.3 or later with the `gd`, `pdo_sqlite` and `sodium` extensions,
+Composer, and Node 16.20.1. Then run:
 
-That page count alone would not be enough. It is compared against the
-document count from the same build, so a builder that quietly produced fewer
-documents would agree with itself. Before importing anything, the run also
-checks the documents against the pinned checkout's tracked files and against
-the committed baseline, which are two sources the builder does not control.
-A page that leaves the corpus fails there, by name.
+```sh
+npm install
+npm run setup
+npm run dev
+```
 
-The importer seeds a site; it is not a synchronisation loop. Running it
-against a database an editor has worked in would overwrite them.
+### What you get
 
-## Page history
+| Command         | What it does                                                                                                      |
+| --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `npm install`   | Installs the root tooling and enables the git hooks                                                               |
+| `npm run setup` | Installs Drupal on a throwaway SQLite database and imports the documentation from druxt.js. Then it starts Drupal |
+| `npm run dev`   | Starts the Nuxt dev server against that Drupal. The first run installs the frontend's packages                    |
+| `npm run login` | Prints a one-time login link for Drupal                                                                           |
 
-Each page is imported with its history. The IR builder reads every commit
-that changed a page, follows the page through moves, and keeps each
-distinct version. A commit that leaves a page as it was, such as a move, is
-not a new version. The importer saves the versions as revisions, oldest
-first, and then the current version as the last revision:
+| Service | Address                                                                    |
+| ------- | -------------------------------------------------------------------------- |
+| Drupal  | <http://127.0.0.1:8888>, or the next free port. `npm run info` shows which |
+| Nuxt    | <http://localhost:3000>                                                    |
 
-| Revision | Value |
-| -------- | ----- |
-| Date | The commit's author date, as `revision_timestamp` and `changed` |
-| Log message | The commit subject and short sha |
-| Revision author | The account from the `docs_user` migration |
-| Content | Title, description and new paragraphs, parsed from that commit |
+`npm run setup` writes Drupal's address to `.env`, and `npm run dev` reads it
+from there. Setup needs network access, for Composer packages and the pinned
+documentation on GitHub.
 
-History is only written when a page is created. `--update` changes the
-current revision in place and never writes history again, so a re-run
-cannot duplicate it. To rebuild the history after moving the pin, roll the
-migrations back and import again. Rolling back deletes each page's earlier
-revisions and the paragraphs only they used.
+## Write documentation
 
-An earlier version cannot be edited, so it never fails the build:
+1. Run `npm run login`, and open the link it prints.
+2. In Drupal, go to **Content** and edit a page, or add one. The layout
+   paragraphs editor builds a page from sections of text, code and images.
+3. Save, then reload the page on <http://localhost:3000>.
 
-- A fence in a language the model does not accept stays in the prose
-  around it.
-- An image stays an image only when the current pages use the same file
-  with the same alt text. Any other image stays in the prose as markdown,
-  and no media is created for it.
-- Links are not checked.
+**Preview**, on the edit form, shows unsaved changes.
+[docs/backend.md](docs/backend.md#previewing-a-page) explains its tabs.
 
-The one check that does apply is the round-trip: an earlier version whose
-blocks do not rebuild it stops the build, because its revision would not
-say what the page said.
+The Modules, API reference and Components pages come from the druxt.js
+packages. `npm run docs:generate` builds them locally, in the pinned druxt.js
+checkout. It installs and builds druxt.js first, so the first run is slow.
 
-## Status
+### Where changes go
 
-Early. The content model and importer are being built; see the `druxtjs-docs-drupal-migration` change for the plan.
+| Change                                               | Where it goes                                                                                                      |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| The content model, the editor or the site's settings | Export them with `vendor/bin/drush config:export` in `drupal/`, and commit `drupal/config/sync/` in a pull request |
+| The frontend                                         | A pull request with the change in `nuxt/`                                                                          |
+| The text of a page                                   | A pull request to [druxt/druxt.js](https://github.com/druxt/druxt.js), where the documentation is still written    |
+
+The site's content is stored in its database, and `npm run setup` seeds that
+database from a pinned commit of druxt.js. Edits in your local Drupal stay
+local.
+
+## Druxt in the frontend
+
+`nuxt/` is a Nuxt 2 app built with Druxt, and it is written to be read as an example of a Druxt site.
+
+| What                       | How                                                                                                                                                                                                                                                                                                                                |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pages                      | Each section page resolves its path with the Druxt router, then renders the Drupal page with `<DruxtEntity mode="full">`.                                                                                                                                                                                                          |
+| Wrappers                   | `nuxt/components/druxt/` holds the wrapper components Druxt finds by name. The page is `entity/node/DocPageFull.vue`, with one component per paragraph type in `entity/paragraph/`. The rest are fields (`field/`), layout sections (`layout-paragraph/`), blocks (`block/`), block regions (`block-region/`) and menus (`menu/`). |
+| Display settings           | druxt-schema reads Drupal's view and form displays when the app builds, so the frontend follows the display settings editors change in Drupal.                                                                                                                                                                                     |
+| Layout                     | druxt-layout-paragraphs renders the page's layout sections.                                                                                                                                                                                                                                                                        |
+| Header, sidebar and footer | druxt-blocks renders the blocks placed in the `druxtjs` theme's regions in Drupal. The theme and the site's name and logo come from the `druxtjs_org` consumer's decoupled settings, read at build by `nuxt/modules/decoupled-settings`.                                                                                           |
+| UI                         | `nuxt/components/dui/` holds presentational components with no Drupal dependency: code blocks, diagrams, rich text and columns. They will move to the shared Druxt UI library.                                                                                                                                                     |
+
+To change how something looks, find the wrapper name Druxt looked for (the Vue devtools show it), and add a component at the matching path under `nuxt/components/druxt/`. [Component resolution](https://druxtjs.org/explanation/component-resolution) explains the naming.
+
+## Deployment
+
+Planned. The site will run on Lagoon as one environment. Nuxt will serve
+static pages, and render live any page that is newer than the static build.
+
+## Commands
+
+| Command                  | What it does                                          |
+| ------------------------ | ----------------------------------------------------- |
+| `npm run setup`          | Install and import the backend, then start it         |
+| `npm run dev`            | Nuxt dev server against the backend                   |
+| `npm run start` / `stop` | Start or stop Drupal                                  |
+| `npm run info`           | Where Drupal is, and the versions it runs             |
+| `npm run login`          | One-time login link for Drupal                        |
+| `npm run docs:generate`  | Build the Modules, API reference and Components pages |
+| `npm run lint`           | Every linter except prose                             |
+| `npm run lint:prose`     | Vale, after `npm run lint:prose:install` once         |
+| `npm test`               | Node tests for the importer's scripts                 |
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for commit messages, checks and what
+never goes in a file. Open issues and pull requests on
+[druxt/cms.druxtjs.org](https://github.com/druxt/cms.druxtjs.org).
+[docs/backend.md](docs/backend.md) covers the importer and page history.
 
 ## License
 
-[MIT](./LICENSE)
+[MIT](LICENSE)

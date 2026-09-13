@@ -1,0 +1,5 @@
+---
+# Semantic Pull Requests checks the title only. A squash merge makes the title
+# the commit subject, so conventional commits under a prose title still break
+# the target branch.
+titleOnly: true

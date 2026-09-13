@@ -27,15 +27,18 @@ export const LOG_FORMAT = '%x1e%H%x1f%at%x1f%s'
  *   where its contents are found after a move.
  */
 export function parseLog(output) {
-  return output.split('\x1e').filter((record) => record.trim()).map((record) => {
-    const [head, ...names] = record.split('\n')
-    const [sha, seconds, subject = ''] = head.split('\x1f')
-    const file = names.find((name) => name.trim())
-    if (!/^[0-9a-f]{40}$/.test(sha) || !/^\d+$/.test(seconds ?? '') || !file) {
-      throw new Error(`Unreadable git log entry: ${JSON.stringify(record.slice(0, 120))}`)
-    }
-    return { sha, date: isoDate(seconds), subject, path: file }
-  })
+  return output
+    .split('\x1e')
+    .filter((record) => record.trim())
+    .map((record) => {
+      const [head, ...names] = record.split('\n')
+      const [sha, seconds, subject = ''] = head.split('\x1f')
+      const file = names.find((name) => name.trim())
+      if (!/^[0-9a-f]{40}$/.test(sha) || !/^\d+$/.test(seconds ?? '') || !file) {
+        throw new Error(`Unreadable git log entry: ${JSON.stringify(record.slice(0, 120))}`)
+      }
+      return { sha, date: isoDate(seconds), subject, path: file }
+    })
 }
 
 /**
@@ -48,8 +51,19 @@ export function parseLog(output) {
 export function log(root, file) {
   const output = execFileSync(
     'git',
-    ['-C', root, 'log', '--follow', '-M30%', `--format=${LOG_FORMAT}`, '--name-only', 'HEAD', '--', file],
-    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
+    [
+      '-C',
+      root,
+      'log',
+      '--follow',
+      '-M30%',
+      `--format=${LOG_FORMAT}`,
+      '--name-only',
+      'HEAD',
+      '--',
+      file,
+    ],
+    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }
   )
   const commits = parseLog(output)
   if (!commits.length) throw new Error(`${file}: no history at HEAD`)
@@ -83,11 +97,13 @@ export function contentAt(root, commit) {
   const spec = `${commit.sha}:${commit.path}`
   try {
     execFileSync('git', ['-C', root, 'cat-file', '-e', spec], { stdio: 'ignore' })
-  }
-  catch {
+  } catch {
     return null
   }
-  return execFileSync('git', ['-C', root, 'cat-file', 'blob', spec], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
+  return execFileSync('git', ['-C', root, 'cat-file', 'blob', spec], {
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+  })
 }
 
 /**
@@ -117,8 +133,12 @@ export function versions(commits, read) {
  * be dated to the fetch rather than to when it was written, with no error.
  */
 export function assertFullHistory(root) {
-  const shallow = execFileSync('git', ['-C', root, 'rev-parse', '--is-shallow-repository'], { encoding: 'utf8' }).trim()
+  const shallow = execFileSync('git', ['-C', root, 'rev-parse', '--is-shallow-repository'], {
+    encoding: 'utf8',
+  }).trim()
   if (shallow === 'true') {
-    throw new Error(`${root} is a shallow clone. Page dates come from git history, so it needs the full history: fetch without --depth.`)
+    throw new Error(
+      `${root} is a shallow clone. Page dates come from git history, so it needs the full history: fetch without --depth.`
+    )
   }
 }

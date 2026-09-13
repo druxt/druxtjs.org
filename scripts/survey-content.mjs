@@ -130,7 +130,13 @@ function survey(root) {
 
   // Link classification needs the full page set, so it happens after the walk.
   const urls = new Set(pages.map((p) => p.url))
-  const links = { internalMigrated: [], internalGenerated: [], internalUnknown: [], external: [], anchor: [] }
+  const links = {
+    internalMigrated: [],
+    internalGenerated: [],
+    internalUnknown: [],
+    external: [],
+    anchor: [],
+  }
   // Paths served by docgen output rather than by authored markdown. These
   // are the gitignored targets in content/.gitignore, so a link to one is
   // valid but will never resolve to a migrated page.
@@ -152,7 +158,8 @@ function survey(root) {
     bySection[page.section] = (bySection[page.section] || 0) + 1
   }
 
-  const sortedTally = (map) => Object.fromEntries([...map].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])))
+  const sortedTally = (map) =>
+    Object.fromEntries([...map].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])))
 
   return {
     measuredAt: new Date().toISOString().slice(0, 10),
@@ -160,10 +167,15 @@ function survey(root) {
     totals: {
       pages: pages.length,
       sections: Object.keys(bySection).length,
-      internalLinkInstances: [...links.internalMigrated, ...links.internalGenerated, ...links.internalUnknown]
-        .reduce((n, l) => n + l.count, 0),
+      internalLinkInstances: [
+        ...links.internalMigrated,
+        ...links.internalGenerated,
+        ...links.internalUnknown,
+      ].reduce((n, l) => n + l.count, 0),
       distinctInternalTargets:
-        links.internalMigrated.length + links.internalGenerated.length + links.internalUnknown.length,
+        links.internalMigrated.length +
+        links.internalGenerated.length +
+        links.internalUnknown.length,
       distinctImages: images.size,
     },
     bySection,
@@ -173,7 +185,9 @@ function survey(root) {
     nestedFenceLanguages: sortedTally(nestedFenceLangs),
     calloutLeads: sortedTally(calloutLeads),
     htmlBlocks,
-    images: [...images].map(([src, e]) => ({ src, refs: e.refs, alt: [...e.alt] })).sort((a, b) => a.src.localeCompare(b.src)),
+    images: [...images]
+      .map(([src, e]) => ({ src, refs: e.refs, alt: [...e.alt] }))
+      .sort((a, b) => a.src.localeCompare(b.src)),
     links: {
       internalMigrated: links.internalMigrated.sort((a, b) => b.count - a.count),
       internalGenerated: links.internalGenerated.sort((a, b) => b.count - a.count),
@@ -193,11 +207,16 @@ function survey(root) {
 // ---------------------------------------------------------------------------
 
 function toMarkdown(s) {
-  const row = (o) => Object.entries(o).map(([k, v]) => `| \`${k}\` | ${v} |`).join('\n')
+  const row = (o) =>
+    Object.entries(o)
+      .map(([k, v]) => `| \`${k}\` | ${v} |`)
+      .join('\n')
   const lines = []
   lines.push(`# Documentation corpus survey`)
   lines.push('')
-  lines.push(`Measured ${s.measuredAt} at \`${s.ref.slice(0, 8)}\`, over git-tracked authored content only.`)
+  lines.push(
+    `Measured ${s.measuredAt} at \`${s.ref.slice(0, 8)}\`, over git-tracked authored content only.`
+  )
   lines.push('')
   lines.push('## Totals')
   lines.push('')
@@ -236,7 +255,9 @@ function toMarkdown(s) {
   lines.push('')
   lines.push('| Language | Fences |')
   lines.push('| -------- | ------ |')
-  lines.push(Object.keys(s.nestedFenceLanguages).length ? row(s.nestedFenceLanguages) : '| (none) | 0 |')
+  lines.push(
+    Object.keys(s.nestedFenceLanguages).length ? row(s.nestedFenceLanguages) : '| (none) | 0 |'
+  )
   lines.push('')
   lines.push('## Raw HTML blocks')
   lines.push('')
@@ -245,7 +266,9 @@ function toMarkdown(s) {
     lines.push('| File | Line | Opening |')
     lines.push('| ---- | ---- | ------- |')
     for (const h of s.htmlBlocks) {
-      lines.push(`| ${path.basename(h.file)} | ${h.line} | \`${h.opening.replace(/\|/g, '\\|')}\` |`)
+      lines.push(
+        `| ${path.basename(h.file)} | ${h.line} | \`${h.opening.replace(/\|/g, '\\|')}\` |`
+      )
     }
   }
   lines.push('')
@@ -259,9 +282,15 @@ function toMarkdown(s) {
   lines.push('')
   lines.push('| Class | Distinct targets | Instances |')
   lines.push('| ----- | ---------------- | --------- |')
-  lines.push(`| internal, resolves to an authored page | ${s.links.internalMigrated.length} | ${s.links.internalMigrated.reduce((n, l) => n + l.count, 0)} |`)
-  lines.push(`| internal, resolves to generated output | ${s.links.internalGenerated.length} | ${s.links.internalGenerated.reduce((n, l) => n + l.count, 0)} |`)
-  lines.push(`| internal, resolves to neither | ${s.links.internalUnknown.length} | ${s.links.internalUnknown.reduce((n, l) => n + l.count, 0)} |`)
+  lines.push(
+    `| internal, resolves to an authored page | ${s.links.internalMigrated.length} | ${s.links.internalMigrated.reduce((n, l) => n + l.count, 0)} |`
+  )
+  lines.push(
+    `| internal, resolves to generated output | ${s.links.internalGenerated.length} | ${s.links.internalGenerated.reduce((n, l) => n + l.count, 0)} |`
+  )
+  lines.push(
+    `| internal, resolves to neither | ${s.links.internalUnknown.length} | ${s.links.internalUnknown.reduce((n, l) => n + l.count, 0)} |`
+  )
   lines.push(`| external | ${s.links.distinctExternal} | ${s.links.externalCount} |`)
   lines.push(`| bare anchor | | ${s.links.anchorCount} |`)
   lines.push('')
@@ -271,7 +300,9 @@ function toMarkdown(s) {
     lines.push('| Target | Count | Sources |')
     lines.push('| ------ | ----- | ------- |')
     for (const l of s.links.internalUnknown) {
-      lines.push(`| \`${l.target}\` | ${l.count} | ${l.sources.map((f) => path.basename(f)).join(', ')} |`)
+      lines.push(
+        `| \`${l.target}\` | ${l.count} | ${l.sources.map((f) => path.basename(f)).join(', ')} |`
+      )
     }
     lines.push('')
   }
@@ -320,12 +351,16 @@ if (!source) {
   process.exit(2)
 }
 if (!existsSync(path.join(source, '.git'))) {
-  process.stderr.write(`${source} is not a git checkout. The corpus is listed with git, so it needs one.\n`)
+  process.stderr.write(
+    `${source} is not a git checkout. The corpus is listed with git, so it needs one.\n`
+  )
   process.exit(2)
 }
 
 if (!trackedContentFiles(source).length) {
-  process.stderr.write(`No tracked files under ${CONTENT_DIR} in ${source}. Is this a checkout of the documentation repository?\n`)
+  process.stderr.write(
+    `No tracked files under ${CONTENT_DIR} in ${source}. Is this a checkout of the documentation repository?\n`
+  )
   process.exit(1)
 }
 

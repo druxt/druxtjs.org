@@ -80,7 +80,10 @@ export function revision(version, images, next) {
   const tokens = tokenize(body).blocks
   const notes = new Defects()
   const file = `${version.path}@${version.sha.slice(0, 12)}`
-  const { blocks, presentation } = buildBlocks({ file, blocks: tokens }, notes, { keepRefused: true, images })
+  const { blocks, presentation } = buildBlocks({ file, blocks: tokens }, notes, {
+    keepRefused: true,
+    images,
+  })
   return {
     revision: {
       sha: version.sha,

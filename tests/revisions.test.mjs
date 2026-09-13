@@ -22,7 +22,8 @@ const version = (content, extra = {}) => ({
 })
 
 /** What the current version's parser makes of a body. */
-const current = (body, defects = new Defects()) => buildBlocks({ file: 'x.md', blocks: tokenize(body).blocks }, defects)
+const current = (body, defects = new Defects()) =>
+  buildBlocks({ file: 'x.md', blocks: tokenize(body).blocks }, defects)
 
 describe('revision', () => {
   test('carries the commit, the title, the description and the blocks', () => {
@@ -45,26 +46,46 @@ describe('revision', () => {
   })
 
   test('a clean version gets exactly the blocks the current parser gives it', () => {
-    const body = '# Deploy\n\n> **Before you start:** build it.\n\n```sh\nnpm run build\n```\n\n![A diagram](/images/a.png)\n\n```mermaid\nflowchart TB\n```\n\nDone.\n'
+    const body =
+      '# Deploy\n\n> **Before you start:** build it.\n\n```sh\nnpm run build\n```\n\n![A diagram](/images/a.png)\n\n```mermaid\nflowchart TB\n```\n\nDone.\n'
     const images = new Map([['/images/a.png', 'A diagram']])
-    assert.deepEqual(revision(version(FRONTMATTER + body), images, 'Later').revision.blocks, current(body).blocks)
+    assert.deepEqual(
+      revision(version(FRONTMATTER + body), images, 'Later').revision.blocks,
+      current(body).blocks
+    )
   })
 
-  test('the title is the frontmatter\'s, then the first level-one heading, then the next version\'s', () => {
-    assert.equal(revision(version(`${FRONTMATTER}# Heading\n`), NO_IMAGES, 'Later').revision.title, 'Proxy')
-    assert.equal(revision(version('# DruxtClient\n\nThe client.\n'), NO_IMAGES, 'Later').revision.title, 'DruxtClient')
-    assert.equal(revision(version('```sh\n# not a heading\n```\n\n## Nor this\n'), NO_IMAGES, 'Later').revision.title, 'Later')
+  test("the title is the frontmatter's, then the first level-one heading, then the next version's", () => {
+    assert.equal(
+      revision(version(`${FRONTMATTER}# Heading\n`), NO_IMAGES, 'Later').revision.title,
+      'Proxy'
+    )
+    assert.equal(
+      revision(version('# DruxtClient\n\nThe client.\n'), NO_IMAGES, 'Later').revision.title,
+      'DruxtClient'
+    )
+    assert.equal(
+      revision(version('```sh\n# not a heading\n```\n\n## Nor this\n'), NO_IMAGES, 'Later').revision
+        .title,
+      'Later'
+    )
   })
 
   test('a version with no description has none, rather than an empty one', () => {
-    assert.equal(revision(version('# DruxtClient\n'), NO_IMAGES, 'Later').revision.description, null)
+    assert.equal(
+      revision(version('# DruxtClient\n'), NO_IMAGES, 'Later').revision.description,
+      null
+    )
   })
 
   test('a fence the model refuses is kept, verbatim, in the prose around it', () => {
     const body = 'Wrap the component:\n\n```jsx\n<DruxtEntity />\n```\n\nThen build.\n'
     const built = revision(version(FRONTMATTER + body), NO_IMAGES, 'Later')
     assert.deepEqual(built.revision.blocks, [
-      { type: 'text', markdown: 'Wrap the component:\n\n```jsx\n<DruxtEntity />\n```\n\nThen build.' },
+      {
+        type: 'text',
+        markdown: 'Wrap the component:\n\n```jsx\n<DruxtEntity />\n```\n\nThen build.',
+      },
     ])
     assert.equal(built.rebuilds, true)
     assert.equal(built.notes.length, 1)
@@ -80,29 +101,44 @@ describe('revision', () => {
   })
 
   describe('images', () => {
-    const images = new Map([['/images/vuejs-devtools.png', 'Vue.js Devtools showing the DruxtJS integration']])
+    const images = new Map([
+      ['/images/vuejs-devtools.png', 'Vue.js Devtools showing the DruxtJS integration'],
+    ])
 
-    test('one today\'s corpus migrates with the same alt text stays an image', () => {
-      const body = '![Vue.js Devtools showing the DruxtJS integration](/images/vuejs-devtools.png)\n'
+    test("one today's corpus migrates with the same alt text stays an image", () => {
+      const body =
+        '![Vue.js Devtools showing the DruxtJS integration](/images/vuejs-devtools.png)\n'
       assert.deepEqual(revision(version(FRONTMATTER + body), images, 'Later').revision.blocks, [
-        { type: 'image', src: '/images/vuejs-devtools.png', alt: 'Vue.js Devtools showing the DruxtJS integration' },
+        {
+          type: 'image',
+          src: '/images/vuejs-devtools.png',
+          alt: 'Vue.js Devtools showing the DruxtJS integration',
+        },
       ])
     })
 
     test('one whose alt text has since changed stays in the prose, as written', () => {
-      const body = 'Open the devtools.\n\n![Vue.js Devtools integration](/images/vuejs-devtools.png)\n'
+      const body =
+        'Open the devtools.\n\n![Vue.js Devtools integration](/images/vuejs-devtools.png)\n'
       const built = revision(version(FRONTMATTER + body), images, 'Later')
       assert.deepEqual(built.revision.blocks, [
-        { type: 'text', markdown: 'Open the devtools.\n\n![Vue.js Devtools integration](/images/vuejs-devtools.png)' },
+        {
+          type: 'text',
+          markdown:
+            'Open the devtools.\n\n![Vue.js Devtools integration](/images/vuejs-devtools.png)',
+        },
       ])
       assert.equal(built.rebuilds, true)
       assert.match(built.notes[0].message, /kept as markdown: \/images\/vuejs-devtools\.png/)
     })
 
-    test('one today\'s corpus does not migrate stays in the prose, as written', () => {
+    test("one today's corpus does not migrate stays in the prose, as written", () => {
       const body = '![DruxtBlocks Storybook integration](/images/druxt-block-storybook.png)\n'
       assert.deepEqual(revision(version(FRONTMATTER + body), images, 'Later').revision.blocks, [
-        { type: 'text', markdown: '![DruxtBlocks Storybook integration](/images/druxt-block-storybook.png)' },
+        {
+          type: 'text',
+          markdown: '![DruxtBlocks Storybook integration](/images/druxt-block-storybook.png)',
+        },
       ])
     })
   })
@@ -116,7 +152,10 @@ describe('rebuilds', () => {
   })
 
   test('does not forgive a changed line', () => {
-    assert.equal(rebuilds('One.\n\nTwo.\n', [{ type: 'text', markdown: 'One.\n\nToo.' }], []), false)
+    assert.equal(
+      rebuilds('One.\n\nTwo.\n', [{ type: 'text', markdown: 'One.\n\nToo.' }], []),
+      false
+    )
   })
 
   test('does not forgive a lost line', () => {
@@ -126,12 +165,22 @@ describe('rebuilds', () => {
 
 describe('revisions', () => {
   test('oldest first, and a version with no title takes the one after it', () => {
-    const built = revisions([
-      version('Deprecated.\n', { sha: '1'.repeat(40) }),
-      version('# Deprecations\n\nDeprecated.\n', { sha: '2'.repeat(40) }),
-      version('Still deprecated.\n', { sha: '3'.repeat(40) }),
-    ], NO_IMAGES, 'Entity deprecations')
-    assert.deepEqual(built.map((entry) => entry.revision.sha[0]), ['1', '2', '3'])
-    assert.deepEqual(built.map((entry) => entry.revision.title), ['Deprecations', 'Deprecations', 'Entity deprecations'])
+    const built = revisions(
+      [
+        version('Deprecated.\n', { sha: '1'.repeat(40) }),
+        version('# Deprecations\n\nDeprecated.\n', { sha: '2'.repeat(40) }),
+        version('Still deprecated.\n', { sha: '3'.repeat(40) }),
+      ],
+      NO_IMAGES,
+      'Entity deprecations'
+    )
+    assert.deepEqual(
+      built.map((entry) => entry.revision.sha[0]),
+      ['1', '2', '3']
+    )
+    assert.deepEqual(
+      built.map((entry) => entry.revision.title),
+      ['Deprecations', 'Deprecations', 'Entity deprecations']
+    )
   })
 })

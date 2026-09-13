@@ -37,3 +37,12 @@ node_modules/
 /.env
 /.docs-source/
 /.docs-ir/
+
+# Vale and its styles, installed by .gitlab/scripts/install-vale.sh.
+/.vale/
+
+# The npm cache the pipeline keeps between jobs.
+/.npm/
+
+# Test reports written by npm run test:coverage.
+/reports/

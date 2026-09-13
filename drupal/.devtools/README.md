@@ -47,4 +47,4 @@ is made and reviewed.
 | `SITE_NAME` | `DruxtJS documentation` | Site name on a bare install |
 | `XDEBUG` | unset | Set to any value to enable Xdebug |
 | `DOCS_CHECKOUT` | unset | Build from this documentation checkout instead of the pinned commit. Refused with `--check`. |
-| `DOCS_REPOSITORY` | the pin's `repository` | Fetch the pinned commit from this URL instead. The commit does not change. |
+| `DOCS_REPOSITORY` | the pin's `repository` | Fetch the same pinned commit from this URL instead. |
