@@ -30,7 +30,7 @@ const withServer = async (listener, callback) => {
   try {
     return await callback(`http://127.0.0.1:${server.address().port}`)
   } finally {
-    server.closeAllConnections()
+    if (server.closeAllConnections) server.closeAllConnections()
     await new Promise((resolve) => server.close(resolve))
   }
 }
@@ -117,6 +117,8 @@ describe('createPageCache', () => {
       assert.ok(br.body.length < html.length)
       const gz = await cache.read('/c', 'gzip')
       assert.equal(gz.encoding, 'gzip')
+      const refused = await cache.read('/c', 'br;q=0, gzip')
+      assert.equal(refused.encoding, 'gzip')
       assert.equal(gunzipSync(gz.body).toString(), html)
       assert.equal((await cache.read('/c', '')).encoding, null)
     } finally {

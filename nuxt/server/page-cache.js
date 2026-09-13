@@ -34,6 +34,16 @@ const ENCODINGS = [
   { suffix: '.gz', encoding: 'gzip', compress: (html) => zlib.gzipSync(html, { level: 9 }) },
 ]
 
+/** Whether an Accept-Encoding header allows an encoding: named, with a quality above zero. */
+const accepts = (accept, encoding) =>
+  String(accept || '')
+    .split(',')
+    .some((part) => {
+      const [name, ...params] = part.split(';').map((s) => s.trim())
+      const q = params.find((param) => param.startsWith('q='))
+      return name === encoding && (!q || Number(q.slice(2)) > 0)
+    })
+
 /**
  * Whether a request asks for a page rather than an asset or an API.
  *
@@ -79,7 +89,7 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
   const read = async (pathname, accept = '') => {
     const file = fileFor(pathname)
     if (!file) return null
-    const choices = [...ENCODINGS.filter((e) => accept.includes(e.encoding)), { suffix: '', encoding: null }]
+    const choices = [...ENCODINGS.filter((e) => accepts(accept, e.encoding)), { suffix: '', encoding: null }]
     for (const { suffix, encoding } of choices) {
       try {
         const [body, stats] = await Promise.all([fs.promises.readFile(file + suffix), fs.promises.stat(file + suffix)])
