@@ -24,6 +24,8 @@ Druxt 1.0.0.
   lands on its redirect target and not on a `www` canonical.
 - Tables in the documentation mark their header cells with `scope`, for screen
   readers reading a row against its column.
+- The analytics tag sends hits only from druxtjs.org and its subdomains, so
+  the GA4 property counts the site's own traffic alone.
 
 ### Added
 
