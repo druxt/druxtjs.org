@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/). Versions
 count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
 Druxt 1.0.0.
 
+## [Unreleased]
+
+### Fixed
+
+- The analytics tag sends hits only from druxtjs.org and its subdomains, so
+  the GA4 property counts the site's own traffic alone.
+
 ## [0.9.0] - 2026-09-13
 
 This release is the relaunch of the site, what runs on Lagoon today, and

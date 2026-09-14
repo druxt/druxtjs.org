@@ -17,6 +17,7 @@ const isProduction = process.env.LAGOON_ENVIRONMENT_TYPE === 'production'
 const failedRoutes = []
 
 import { SITE_NAME, SITE_DESCRIPTION, SITE_ORIGIN, docTypeExpression } from './lib/site'
+import { isTrackableHostname } from './lib/analytics'
 
 /** The installed `druxt` version, shown in the header badge. Read from disk: its `exports` hides package.json. */
 const druxtVersion = JSON.parse(
@@ -61,11 +62,13 @@ export default {
       },
       // vue-meta re-runs this script on every client-side navigation, so each
       // page re-fires gtag('config'); adding a page_view plugin double-counts.
+      // The hostname gate keeps Lagoon's own routes out of the property: they
+      // pass the environment check, but they are not the site.
       ...(isProduction ? [
         { hid: 'ga-src', src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`, async: true },
         {
           hid: 'ga-init',
-          innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_MEASUREMENT_ID}',{doc_type:${docTypeExpression()}});`,
+          innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());if((${isTrackableHostname})(location.hostname)){gtag('config','${GA_MEASUREMENT_ID}',{doc_type:${docTypeExpression()}});}`,
         },
       ] : []),
     ],
