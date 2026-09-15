@@ -46,10 +46,10 @@
     "@commitlint/config-conventional": "17.8.1",
     "cspell": "7.3.9",
     "eslint": "8.28.0",
-    "eslint-config-prettier": "8.10.0",
+    "eslint-config-prettier": "8.10.2",
     "github-slugger": "1.5.0",
     "knip": "2.43.0",
     "markdownlint-cli2": "0.10.0",
-    "prettier": "3.3.3"
+    "prettier": "3.9.6"
   }
 }
