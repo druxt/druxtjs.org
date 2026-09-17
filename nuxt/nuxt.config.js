@@ -17,6 +17,7 @@ const isProduction = process.env.LAGOON_ENVIRONMENT_TYPE === 'production'
 const failedRoutes = []
 
 import { SITE_NAME, SITE_DESCRIPTION, SITE_ORIGIN, docTypeExpression } from './lib/site'
+import { isTrackableHostname } from './lib/analytics'
 
 /** The installed `druxt` version, shown in the header badge. Read from disk: its `exports` hides package.json. */
 const druxtVersion = JSON.parse(
@@ -48,8 +49,9 @@ export default {
       { hid: 'description', name: 'description', content: '' },
       { name: 'format-detection', content: 'telephone=no' },
     ],
-    // static/ ships icon.png, not a .ico. @nuxtjs/pwa generates the rest of
-    // the icon set from it.
+    // static/ ships icon.png, from which @nuxtjs/pwa generates the rest of
+    // the icon set, and favicon.ico for the consumers that ask for one by
+    // name.
     link: [{ rel: 'icon', type: 'image/png', href: '/icon.png' }],
     script: [
       // Sets data-theme before first paint, from the stored or OS preference.
@@ -61,11 +63,13 @@ export default {
       },
       // vue-meta re-runs this script on every client-side navigation, so each
       // page re-fires gtag('config'); adding a page_view plugin double-counts.
+      // The hostname gate keeps Lagoon's own routes out of the property: they
+      // pass the environment check, but they are not the site.
       ...(isProduction ? [
         { hid: 'ga-src', src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`, async: true },
         {
           hid: 'ga-init',
-          innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_MEASUREMENT_ID}',{doc_type:${docTypeExpression()}});`,
+          innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());if((${isTrackableHostname})(location.hostname)){gtag('config','${GA_MEASUREMENT_ID}',{doc_type:${docTypeExpression()}});}`,
         },
       ] : []),
     ],
@@ -289,7 +293,12 @@ export default {
     },
   },
 
-  build: {},
+  // One hashed stylesheet the browser caches across visits, instead of CSS
+  // inlined into every page's HTML on every request. The theme-init script
+  // still sets the color scheme before this loads, so dark mode doesn't flash.
+  build: {
+    extractCSS: true,
+  },
   telemetry: true,
 
   storybook: {

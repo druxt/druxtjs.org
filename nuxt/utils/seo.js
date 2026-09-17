@@ -1,7 +1,8 @@
 /**
  * Per-page SEO head fragments.
  *
- * The only place the site's Open Graph, Twitter and canonical tags are decided.
+ * The only place the site's Open Graph, Twitter, canonical and structured
+ * data tags are decided.
  */
 
 import { SITE_ORIGIN, SITE_NAME, SITE_DESCRIPTION, TITLE_SUFFIX, TWITTER_HANDLE, SECTIONS, canonicalUrl, ogImageUrl, sectionFor, titleFromPath } from '~/lib/site'
@@ -43,10 +44,74 @@ export const descriptionFor = ({ description, path }) => {
 }
 
 /**
+ * The site's publisher identity, named on every page.
+ *
+ * @returns {object} An Organization graph.
+ */
+const organizationGraph = () => ({
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE_NAME,
+  url: SITE_ORIGIN + '/',
+  logo: SITE_ORIGIN + '/icon.png',
+})
+
+/**
+ * The site itself, named on every page.
+ *
+ * @returns {object} A WebSite graph.
+ */
+const websiteGraph = () => ({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE_NAME,
+  url: SITE_ORIGIN + '/',
+})
+
+/**
+ * A documentation page, as a document rather than a marketing page.
+ *
+ * @param {object} page - What the page knows about itself.
+ * @param {string} page.heading - The page title, without the site suffix.
+ * @param {string} page.summary - The clamped description.
+ * @param {string} page.url - The canonical URL.
+ * @returns {object} A TechArticle graph.
+ */
+const techArticleGraph = ({ heading, summary, url }) => ({
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: heading,
+  description: summary,
+  url,
+  author: { '@type': 'Organization', name: SITE_NAME },
+  publisher: { '@type': 'Organization', name: SITE_NAME },
+})
+
+/**
+ * The breadcrumb a page sits under: its section, then the page itself. A
+ * section index page is its own single crumb; the homepage and any route
+ * outside the sections have none, rather than an invented one.
+ *
+ * @param {object} page - What the page knows about itself.
+ * @param {string} page.path - The route path.
+ * @param {string} page.heading - The page title, without the site suffix.
+ * @param {string} page.url - The canonical URL.
+ * @returns {object|null} A BreadcrumbList graph, or null.
+ */
+const breadcrumbGraph = ({ path, heading, url }) => {
+  const section = sectionFor(path)
+  if (!section) return null
+  const crumb = (position, name, item) => ({ '@type': 'ListItem', position, name, item })
+  const list = [crumb(1, SECTIONS[section].label, SITE_ORIGIN + '/' + section)]
+  if (path !== '/' + section) list.push(crumb(2, heading, url))
+  return { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: list }
+}
+
+/**
  * A complete `head()` fragment for a documentation page.
  *
- * Returns `title`, `meta` and `link`, ready to spread into a page's own
- * `head()`. Every tag is keyed by `hid`, so a page can override one by name.
+ * Returns `title`, `meta`, `script` and `link`, ready to spread into a page's
+ * own `head()`. Every tag is keyed by `hid`, so a page can override one by name.
  *
  * @param {object} context - The page context.
  * @param {string} context.title - The document title, without the site suffix.
@@ -67,13 +132,15 @@ export const seoHead = ({ title, description, path, image, type }) => {
   const shareTitle = heading ? heading + TITLE_SUFFIX : SITE_NAME
   // Section pages get their generated card; everything else the site card.
   const shareImage = image || ogImageUrl(path) || SITE_ORIGIN + '/og/site.png'
+  const ogType = type || 'article'
+  const breadcrumb = breadcrumbGraph({ path, heading, url })
 
   return {
     title: heading || undefined,
     meta: [
       { hid: 'description', name: 'description', content: summary },
 
-      { hid: 'og:type', property: 'og:type', content: type || 'article' },
+      { hid: 'og:type', property: 'og:type', content: ogType },
       { hid: 'og:title', property: 'og:title', content: shareTitle },
       { hid: 'og:description', property: 'og:description', content: summary },
       { hid: 'og:url', property: 'og:url', content: url },
@@ -92,6 +159,19 @@ export const seoHead = ({ title, description, path, image, type }) => {
       { hid: 'twitter:title', name: 'twitter:title', content: shareTitle },
       { hid: 'twitter:description', name: 'twitter:description', content: summary },
       { hid: 'twitter:image', name: 'twitter:image', content: shareImage },
+    ],
+    // Structured data, serialized from the json key by vue-meta. Every page
+    // names the organization and the site; a document adds itself as a
+    // TechArticle, under its breadcrumb when it has one.
+    script: [
+      { hid: 'ld-organization', type: 'application/ld+json', json: organizationGraph() },
+      { hid: 'ld-website', type: 'application/ld+json', json: websiteGraph() },
+      ...(ogType === 'article'
+        ? [{ hid: 'ld-article', type: 'application/ld+json', json: techArticleGraph({ heading, summary, url }) }]
+        : []),
+      ...(breadcrumb
+        ? [{ hid: 'ld-breadcrumbs', type: 'application/ld+json', json: breadcrumb }]
+        : []),
     ],
     link: [
       // Collapses the trailing-slash and UTM-tagged variants onto one indexed URL.
