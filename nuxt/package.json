@@ -1,7 +1,7 @@
 {
   "name": "druxtjs-org",
   "description": "The Fully Decoupled Drupal Framework",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "private": true,
   "scripts": {
     "cypress:open": "npx cypress open --project test",

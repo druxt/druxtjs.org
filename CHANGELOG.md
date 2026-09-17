@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/). Versions
 count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
 Druxt 1.0.0.
 
-## [Unreleased]
+## [0.9.2] - 2026-09-17
 
 ### Fixed
 
