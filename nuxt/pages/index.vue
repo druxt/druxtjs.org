@@ -117,11 +117,16 @@
     <section class="border-t border-base-300 bg-base-200">
       <div class="max-w-5xl mx-auto px-6 py-20 grid gap-12 items-center lg:grid-cols-[1fr,20rem]">
         <NuxtLink to="/how-to/example-apps" class="block rounded-box border border-base-300 bg-base-100 overflow-hidden hover:border-primary hover:shadow-lg transition">
-          <img
-            src="/images/examples-content-ops-console.png"
-            alt="Content Ops Console: a dark sidebar and a dense editorial table with inline difficulty and prep time editing"
-            class="block w-full h-auto"
-          >
+          <picture>
+            <source srcset="/images/examples-content-ops-console.webp" type="image/webp">
+            <img
+              src="/images/examples-content-ops-console.png"
+              alt="Content Ops Console: a dark sidebar and a dense editorial table with inline difficulty and prep time editing"
+              class="block w-full h-auto"
+              width="1440"
+              height="900"
+            >
+          </picture>
         </NuxtLink>
 
         <div>

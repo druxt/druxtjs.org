@@ -48,8 +48,9 @@ export default {
       { hid: 'description', name: 'description', content: '' },
       { name: 'format-detection', content: 'telephone=no' },
     ],
-    // static/ ships icon.png, not a .ico. @nuxtjs/pwa generates the rest of
-    // the icon set from it.
+    // static/ ships icon.png, from which @nuxtjs/pwa generates the rest of
+    // the icon set, and favicon.ico for the consumers that ask for one by
+    // name.
     link: [{ rel: 'icon', type: 'image/png', href: '/icon.png' }],
     script: [
       // Sets data-theme before first paint, from the stored or OS preference.
@@ -289,7 +290,12 @@ export default {
     },
   },
 
-  build: {},
+  // One hashed stylesheet the browser caches across visits, instead of CSS
+  // inlined into every page's HTML on every request. The theme-init script
+  // still sets the color scheme before this loads, so dark mode doesn't flash.
+  build: {
+    extractCSS: true,
+  },
   telemetry: true,
 
   storybook: {
