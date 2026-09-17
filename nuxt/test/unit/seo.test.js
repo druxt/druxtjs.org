@@ -195,6 +195,53 @@ describe('seoHead', () => {
   })
 })
 
+describe('seoHead structured data', () => {
+  const graphs = (head) =>
+    (head.script || [])
+      .filter((tag) => tag.type === 'application/ld+json')
+      .reduce((byType, tag) => ({ ...byType, [tag.json['@type']]: tag.json }), {})
+  const home = seoHead({ title: null, path: '/', type: 'website' })
+
+  it('names the organization and the site on every page', () => {
+    for (const head of [home, seoHead({ title: 'Theming', path: '/how-to/theming' })]) {
+      const json = graphs(head)
+      expect(json.Organization.name).toBe('DruxtJS')
+      expect(json.Organization.url).toBe('https://druxtjs.org/')
+      expect(json.WebSite.name).toBe('DruxtJS')
+      expect(json.WebSite.url).toBe('https://druxtjs.org/')
+    }
+  })
+
+  it('describes a document as a TechArticle, and only a document', () => {
+    const doc = graphs(seoHead({ title: 'Theming', description: 'How to theme.', path: '/how-to/theming' }))
+    expect(doc.TechArticle['@type']).toBe('TechArticle')
+    expect(doc.TechArticle.headline).toBe('Theming')
+    expect(doc.TechArticle.url).toBe('https://druxtjs.org/how-to/theming')
+    expect(doc.TechArticle.author.name).toBe('DruxtJS')
+
+    expect(graphs(home).TechArticle).toBeUndefined()
+  })
+
+  it('trails a document with its breadcrumb, the section then the page', () => {
+    const crumbs = graphs(seoHead({ title: 'Theming', path: '/how-to/theming' })).BreadcrumbList
+    expect(crumbs.itemListElement).toEqual([
+      { '@type': 'ListItem', position: 1, name: 'How-to guides', item: 'https://druxtjs.org/how-to' },
+      { '@type': 'ListItem', position: 2, name: 'Theming', item: 'https://druxtjs.org/how-to/theming' },
+    ])
+
+    // A section page is its own single crumb; the homepage has none.
+    const section = graphs(seoHead({ title: null, path: '/how-to' })).BreadcrumbList
+    expect(section.itemListElement).toHaveLength(1)
+    expect(graphs(home).BreadcrumbList).toBeUndefined()
+  })
+
+  it('gives every script tag a hid, which is what prevents duplicates', () => {
+    const doc = seoHead({ title: 'Theming', path: '/how-to/theming' })
+    expect(doc.script.every((tag) => typeof tag.hid === 'string' && tag.hid)).toBe(true)
+    expect(new Set(doc.script.map((tag) => tag.hid)).size).toBe(doc.script.length)
+  })
+})
+
 describe('SITE_ORIGIN', () => {
   const load = () => {
     jest.resetModules()

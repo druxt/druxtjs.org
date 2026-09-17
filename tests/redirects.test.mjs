@@ -12,11 +12,26 @@ describe('redirectFor', () => {
   test('sends the old guide paths to the pages they became, with or without a trailing slash', () => {
     assert.equal(redirectFor('druxtjs.org', '/guide/proxy'), '/how-to/proxy')
     assert.equal(redirectFor('druxtjs.org', '/guide/proxy/'), '/how-to/proxy')
-    assert.equal(redirectFor('www.druxtjs.org', '/guide'), '/tutorials')
+    assert.equal(redirectFor('www.druxtjs.org', '/guide'), 'https://druxtjs.org/tutorials')
     assert.equal(
       redirectFor('nuxt.example', '/guide/deprecations.html'),
       '/modules/druxt/deprecations'
     )
+  })
+
+  test('redirects www to the apex, keeping the path and query', () => {
+    assert.equal(
+      redirectFor('www.druxtjs.org', '/guide/getting-started', '?a=1'),
+      'https://druxtjs.org/tutorials/getting-started?a=1'
+    )
+    assert.equal(redirectFor('www.druxtjs.org', '/'), 'https://druxtjs.org/')
+    assert.equal(
+      redirectFor('www.druxtjs.org', '/how-to/proxy'),
+      'https://druxtjs.org/how-to/proxy'
+    )
+    assert.equal(redirectFor('www.druxtjs.org:443', '/modules'), 'https://druxtjs.org/modules')
+    // Host names are case-insensitive.
+    assert.equal(redirectFor('WWW.DRUXTJS.ORG', '/modules'), 'https://druxtjs.org/modules')
   })
 
   test('keeps the query string', () => {

@@ -187,8 +187,14 @@ export default {
         table.setAttribute('data-enhanced', '')
 
         // Column headings become data-label on every body cell; the stacked
-        // layout in app.css prints them above each value below 640px.
-        const headings = Array.from(table.querySelectorAll('thead th')).map((th) => th.textContent.trim())
+        // layout in app.css prints them above each value below 640px. Their
+        // scope is said out loud too, for screen readers that ignore the
+        // thead/tbody split.
+        const headings = Array.from(table.querySelectorAll('thead th')).map((th) => {
+          th.setAttribute('scope', 'col')
+          return th.textContent.trim()
+        })
+        table.querySelectorAll('tbody th').forEach((th) => th.setAttribute('scope', 'row'))
         table.querySelectorAll('tbody tr').forEach((row) => {
           Array.from(row.children).forEach((cell, i) => {
             if (headings[i]) cell.setAttribute('data-label', headings[i])

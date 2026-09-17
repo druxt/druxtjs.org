@@ -82,9 +82,15 @@ const HOST_PATHS = {
  * @returns {string|null} An absolute URL from a package subdomain, a path on this host, or null.
  */
 const redirectFor = (host, pathname, search = '') => {
-  const site = String(host || '').split(':')[0].replace(/^www\./, '')
+  const bare = String(host || '').split(':')[0].toLowerCase()
+  const site = bare.replace(/^www\./, '')
   const path = pathname.replace(/\/+$/, '') || '/'
   const to = (HOST_PATHS[site] || {})[path] || PATHS[path]
+  // Both hosts serve the same pages, and canonical links name the apex
+  // alone: the www host sends everything there, old paths already mapped.
+  if (bare.startsWith('www.') && site === 'druxtjs.org') {
+    return HOME + (to || pathname) + search
+  }
   if (to) return (SUBDOMAINS.includes(site) ? HOME : '') + to + search
   if (SUBDOMAINS.includes(site)) return HOME + pathname + search
   return null
