@@ -7,12 +7,31 @@
 import {
   copyCodeEvent,
   isReportableTerm,
+  isTrackableHostname,
   languageFromClass,
   normaliseTerm,
   notFoundEvent,
   searchEvent,
   searchSelectEvent,
 } from '../../lib/analytics'
+
+describe('isTrackableHostname', () => {
+  it('sends hits for the site and its subdomains', () => {
+    expect(isTrackableHostname('druxtjs.org')).toBe(true)
+    expect(isTrackableHostname('www.druxtjs.org')).toBe(true)
+    expect(isTrackableHostname('storybook.druxtjs.org')).toBe(true)
+    expect(isTrackableHostname('api.umami.demo.druxtjs.org')).toBe(true)
+  })
+
+  it('keeps hosting-platform and lookalike hosts out of the property', () => {
+    expect(isTrackableHostname('druxtjs-org.example.io')).toBe(false)
+    expect(isTrackableHostname('storybook.example.com')).toBe(false)
+    expect(isTrackableHostname('druxtjs.org.evil.example')).toBe(false)
+    expect(isTrackableHostname('notdruxtjs.org')).toBe(false)
+    expect(isTrackableHostname('.druxtjs.org')).toBe(false)
+    expect(isTrackableHostname('')).toBe(false)
+  })
+})
 
 describe('normaliseTerm', () => {
   it('lowercases, trims and collapses whitespace so one term is one row', () => {

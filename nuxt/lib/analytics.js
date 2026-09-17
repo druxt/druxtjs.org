@@ -9,6 +9,21 @@
 const MAX_TERM = 100
 
 /**
+ * Whether a hostname should send GA4 hits.
+ *
+ * The tag is emitted for every production Lagoon build, which includes the
+ * platform's own routes; only druxtjs.org and its subdomains are the site.
+ * Self-contained on purpose: nuxt.config.js embeds
+ * the function body into the inline snippet, so it must not close over
+ * anything.
+ *
+ * @param {string} hostname - location.hostname as the browser reports it.
+ * @returns {boolean} True for druxtjs.org and its subdomains.
+ */
+export const isTrackableHostname = (hostname) =>
+  /^(?:[^.]+\.)*druxtjs\.org$/.test(String(hostname || ''))
+
+/**
  * Normalise a search term for aggregation.
  *
  * Lowercased and whitespace-collapsed so "Drupal ", "drupal" and "DRUPAL"
