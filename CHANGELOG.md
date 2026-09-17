@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/). Versions
 count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
 Druxt 1.0.0.
 
+## [Unreleased]
+
+### Fixed
+
+- Every frame of `favicon.ico` keeps its transparency. The 48 pixel frame was
+  written as a 256 colour image with the alpha channel dropped, so a browser
+  that picked that size drew the logo on a solid block.
+
 ## [0.9.1] - 2026-09-17
 
 ### Fixed
