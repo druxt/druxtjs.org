@@ -59,6 +59,7 @@
         </a>
 
         <AppColorModeToggle />
+        <AppEditorMenu />
       </div>
     </div>
   </header>

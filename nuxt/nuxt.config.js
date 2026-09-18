@@ -1,7 +1,7 @@
 // GA4, as a plain gtag.js snippet: the Nuxt analytics modules need either
 // Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
-const { serviceRoute } = require('./server/backend')
+const { backendOrigin, serviceRoute } = require('./server/backend')
 const { syncDruxtComponents } = require('./lib/sync-druxt-components')
 
 // The id is interpolated into an inline script, so check its shape first.
@@ -26,6 +26,30 @@ const druxtVersion = JSON.parse(
 
 /** The Drupal backend Druxt reads, and proxies onto this origin. */
 const DRUXT_BASE_URL = process.env.DRUXT_BASE_URL || 'http://127.0.0.1:8899'
+
+/** The consumer this site is to Drupal: its decoupled settings and its OAuth client. */
+const CONSUMER_ID = process.env.DRUXT_CONSUMER_ID || 'druxtjs_org'
+
+/**
+ * Editor sign-in: the authorization code grant with PKCE, as a public client.
+ * The authorize step is a browser redirect, so it names the origin a browser
+ * reaches Drupal on; the token exchange and the user lookup go through this
+ * origin's proxy. druxt-auth builds both on the server's base URL, which is
+ * an internal service name in production, so the strategy is set here.
+ */
+const OAUTH_CLIENT = { clientId: CONSUMER_ID, scope: ['editor'] }
+const OAUTH_STRATEGY = {
+  scheme: 'oauth2',
+  endpoints: {
+    authorization: backendOrigin(process.env) + '/oauth/authorize',
+    token: '/oauth/token',
+    userInfo: '/oauth/userinfo',
+  },
+  ...OAUTH_CLIENT,
+  responseType: 'code',
+  grantType: 'authorization_code',
+  codeChallengeMethod: 'S256',
+}
 
 export default {
   // Pages render live from Drupal. In production, server/start.js serves
@@ -154,13 +178,15 @@ export default {
     // Every core module, so the playground can render every component. Its
     // layout is only added to a site without one.
     'druxt-site',
+    // Editor sign-in. The strategy it registers is replaced by `auth` below.
+    ['druxt-auth', OAUTH_CLIENT],
     // The consumer's decoupled settings and theme manifest, baked in at build.
     // A copy of the unreleased @druxt-contrib/decoupled-settings module.
     '~/modules/decoupled-settings',
   ],
 
   decoupledSettings: {
-    consumerId: process.env.DRUXT_CONSUMER_ID || 'druxtjs_org',
+    consumerId: CONSUMER_ID,
     // Each page sets its own title and description.
     applyHead: false,
   },
@@ -184,10 +210,19 @@ export default {
     },
   },
 
+  // @nuxtjs/auth-next: a signed-in editor is sent back to the page they
+  // started from, or home; the callback page is the site's own.
+  auth: {
+    redirect: { login: '/', logout: '/', home: '/', callback: '/callback' },
+    strategies: { 'drupal-authorization_code': OAUTH_STRATEGY },
+  },
+
   // changeOrigin: false keeps the browser's host, so Drupal's JSON:API links
-  // point at this origin. Registered before Druxt's own proxy entries.
+  // point at this origin. Registered before Druxt's own proxy entries. The
+  // two OAuth endpoints the browser calls are here too: the proxy module
+  // reads this list before druxt-auth adds its own entry.
   proxy: [
-    ...['/jsonapi', '/router/translate-path', '/sites/default/files'].map((context) => [
+    ...['/jsonapi', '/router/translate-path', '/sites/default/files', '/oauth/token', '/oauth/userinfo'].map((context) => [
       context,
       { target: DRUXT_BASE_URL, changeOrigin: false },
     ]),
