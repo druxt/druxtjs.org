@@ -69,6 +69,17 @@ theme's regions and settings from
 patched to expose the regions and to let a consumer select its theme, and the
 `docs_consumer` migration gives the `druxtjs_org` consumer the `druxtjs` theme.
 
+## Draft authoring
+
+`content_moderation` runs an editorial workflow on `doc_page`, so a page can
+carry a draft while its published revision stays live. A signed-in editor
+(the `editor` or `contributor` role, over `druxt-auth` PKCE against the
+`druxtjs_org` consumer) sees the draft on the page's own URL. JSON:API writes
+are enabled (`jsonapi.settings` `read_only: false`), and
+`nuxt/scripts/author-page.mjs` authors a page as a draft through
+`DruxtClient`. [docs/backend.md](docs/backend.md#draft-authoring-and-preview)
+covers it. The importer still seeds every page published.
+
 ## Layout
 
 | Path                                    | Purpose                                                                                |
@@ -99,6 +110,7 @@ npm run docs:generate         # Modules, API and Components pages, built in .doc
 npm run lint                  # every linter except prose
 npm run lint:prose            # Vale, after `npm run lint:prose:install`
 npm test                      # node tests
+node nuxt/scripts/author-page.mjs --document <ir.json> [--uuid <page>]  # author a draft over JSON:API
 bash tests/start-guardrails.sh  # also import-, validate-, post-rollout- and replacing-guardrails.sh
 cd drupal && .devtools/assemble && vendor/bin/phpunit
 ```
