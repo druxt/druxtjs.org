@@ -25,13 +25,20 @@ const displayFields = async (schema, type, mode) => {
  * for the same fields (`druxt.entity.query.schema` in nuxt.config.js), so
  * they find the page's resources complete in the store.
  *
+ * A working copy is requested without its includes: JSON:API includes are
+ * default revisions, so a paragraph drafted in place would come back as
+ * published. Left out, each paragraph is fetched on its own, as its working
+ * copy, by the page's body.
+ *
  * A query object, the form the Druxt store takes, rather than the query
  * builder: the root tests import this file without the app's packages.
  *
  * @param {object} schema - The `$druxtSchema` plugin.
- * @returns {Promise<{ include: string, fields: Object<string, string> }>} The query.
+ * @param {object} [options] - Options.
+ * @param {boolean} [options.workingCopy] - Whether the page is read as its working copy.
+ * @returns {Promise<{ include?: string, fields: Object<string, string> }>} The query.
  */
-export const pageQuery = async (schema) => {
+export const pageQuery = async (schema, { workingCopy = false } = {}) => {
   const fields = {
     'node--doc_page': [...PAGE_FIELDS, ...(await displayFields(schema, 'node--doc_page', 'full'))].join(','),
     'media--image': ['name', ...(await displayFields(schema, 'media--image', 'default'))].join(','),
@@ -40,7 +47,7 @@ export const pageQuery = async (schema) => {
     const type = `paragraph--${bundle}`
     fields[type] = [...PARAGRAPH_FIELDS, ...(await displayFields(schema, type, 'default'))].join(',')
   }
-  return { include: INCLUDE.join(','), fields }
+  return workingCopy ? { fields } : { include: INCLUDE.join(','), fields }
 }
 
 /**
@@ -61,7 +68,8 @@ export const fetchDrupalPage = async (store, path) => {
   if (!entity || entity.type !== 'node') return null
 
   const type = `node--${entity.bundle}`
-  const query = await pageQuery(store.$druxtSchema)
+  // A signed-in editor reads the page as its working copy: see plugins/working-copy.js.
+  const query = await pageQuery(store.$druxtSchema, { workingCopy: Boolean(store.$auth && store.$auth.loggedIn) })
   const resource = await store.dispatch('druxt/getResource', { type, id: entity.uuid, query })
   const data = resource && (resource.data || resource)
   if (!data || !data.attributes) throw new Error(`Drupal returned no ${type} for ${path}`)

@@ -13,14 +13,18 @@
       </ul>
     </div>
 
-    <button v-else type="button" class="btn btn-ghost btn-sm normal-case font-normal" @click="$auth.loginWith('drupal-authorization_code')">
+    <button v-else type="button" class="btn btn-ghost btn-sm normal-case font-normal" @click="$auth.loginWith(strategy)">
       Sign in
     </button>
   </div>
 </template>
 
 <script>
+import { AUTH_STRATEGY } from '~/lib/auth'
+
 export default {
+  data: () => ({ strategy: AUTH_STRATEGY }),
+
   computed: {
     /** The signed-in editor, as Drupal's userinfo names them. */
     name: ({ $auth }) => ($auth.user && ($auth.user.name || $auth.user.email)) || 'Signed in',

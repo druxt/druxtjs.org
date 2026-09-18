@@ -2,6 +2,7 @@
 // Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
 const { backendOrigin, serviceRoute } = require('./server/backend')
+const { AUTH_COOKIE_PREFIX, AUTH_STRATEGY } = require('./lib/auth')
 const { syncDruxtComponents } = require('./lib/sync-druxt-components')
 
 // The id is interpolated into an inline script, so check its shape first.
@@ -110,6 +111,8 @@ export default {
     '~/plugins/chunk-reload.client.js',
     '~/plugins/content-links.client.js',
     '~/plugins/mermaid.client.js',
+    // After the Druxt and auth plugins the modules add: it wraps the client.
+    '~/plugins/working-copy.js',
   ],
   components: true,
   // Mirrors the SITE_ORIGIN override into the client bundle so hydration
@@ -214,7 +217,8 @@ export default {
   // started from, or home; the callback page is the site's own.
   auth: {
     redirect: { login: '/', logout: '/', home: '/', callback: '/callback' },
-    strategies: { 'drupal-authorization_code': OAUTH_STRATEGY },
+    cookie: { prefix: AUTH_COOKIE_PREFIX },
+    strategies: { [AUTH_STRATEGY]: OAUTH_STRATEGY },
   },
 
   // changeOrigin: false keeps the browser's host, so Drupal's JSON:API links

@@ -8,6 +8,7 @@
  * stored once it has answered 200.
  */
 const { redirectFor } = require('./redirects')
+const { hasAuthCookie } = require('../lib/auth')
 const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')
@@ -215,6 +216,13 @@ const createHandler =
     if (pathname !== '/' && pathname.endsWith('/')) {
       res.writeHead(301, { Location: `/${pathname.replace(/^\/+|\/+$/g, '')}${search}` })
       return res.end()
+    }
+    // A signed-in editor may be shown a draft: rendered live, never stored,
+    // and not to be kept by anything between here and the browser.
+    if (hasAuthCookie(req.headers.cookie)) {
+      res.setHeader('X-Docs-Cache', 'BYPASS')
+      res.setHeader('Cache-Control', 'no-store')
+      return live(req, res)
     }
     // Only `live=1` renders past the store: any other query string, a campaign
     // tag say, is the same page and gets the stored copy.

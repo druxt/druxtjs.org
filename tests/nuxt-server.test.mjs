@@ -240,6 +240,44 @@ describe('createHandler', () => {
     })
   })
 
+  test('renders a signed-in editor live, never from the store and never into it', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'docs-cache-'))
+    let renders = 0
+    const cache = createPageCache({
+      dir,
+      ttl: 60000,
+      render: async () => ({ html: `<p>live ${++renders}</p>` }),
+    })
+    await cache.store('/how-to')
+    const stored = await cache.read('/how-to')
+    const live = (req, res) => res.end('<p>rendered for the request</p>')
+    await withServer(createHandler({ cache, live }), async (base) => {
+      const editor = await fetch(`${base}/how-to`, {
+        headers: {
+          cookie:
+            'auth.strategy=drupal-authorization_code; auth._token.drupal-authorization_code=Bearer%20abc',
+        },
+      })
+      assert.equal(await editor.text(), '<p>rendered for the request</p>')
+      assert.equal(editor.headers.get('x-docs-cache'), 'BYPASS')
+      assert.equal(editor.headers.get('cache-control'), 'no-store')
+      // The store is untouched: the next anonymous reader gets the copy from before.
+      const reader = await fetch(`${base}/how-to`)
+      assert.equal(reader.headers.get('x-docs-cache'), 'HIT')
+      assert.equal(await reader.text(), stored.body.toString())
+      // A cookie that is not the token, or a signed-out one, is an anonymous reader.
+      for (const cookie of [
+        'auth.strategy=drupal-authorization_code',
+        'auth._token.drupal-authorization_code=false',
+      ]) {
+        const other = await fetch(`${base}/how-to`, { headers: { cookie } })
+        assert.equal(other.headers.get('x-docs-cache'), 'HIT', cookie)
+      }
+    })
+    assert.equal(renders, 1)
+    rmSync(dir, { recursive: true, force: true })
+  })
+
   test('bypasses the store for live=1 only, not for any query string', async () => {
     const dir = tempDir()
     try {
