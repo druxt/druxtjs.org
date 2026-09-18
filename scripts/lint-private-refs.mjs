@@ -106,9 +106,23 @@ export function findPrivateRefs(text) {
   return found
 }
 
+/** git reads GIT_DIR and its siblings from the environment, and a commit hook sets them. */
+export function gitEnv() {
+  const env = { ...process.env }
+  for (const key of Object.keys(env)) {
+    if (key.startsWith('GIT_')) {
+      delete env[key]
+    }
+  }
+  return env
+}
+
 /** Tracked files, which is the set that actually gets published. */
 export function trackedFiles(root = ROOT) {
-  return execFileSync('git', ['-C', root, 'ls-files', '-z'], { encoding: 'utf8' })
+  return execFileSync('git', ['-C', root, 'ls-files', '-z'], {
+    encoding: 'utf8',
+    env: gitEnv(),
+  })
     .split('\0')
     .filter(Boolean)
 }
