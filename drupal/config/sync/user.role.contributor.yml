@@ -35,6 +35,7 @@ permissions:
   - 'create image media'
   - 'edit own doc_page content'
   - 'edit own image media'
+  - 'grant simple_oauth codes'
   - 'use editorial transition create_new_draft'
   - 'use text format basic_html'
   - 'use text format docs_markdown'
