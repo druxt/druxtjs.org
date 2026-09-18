@@ -36,6 +36,7 @@
         "drupal/pathauto": "^1.15",
         "drupal/redirect": "^1.13",
         "drupal/simple_oauth": "^6.1",
+        "drupal/simple_oauth_revoke": "^3.0",
         "drupal/token": "^1.17",
         "drush/drush": "^13",
         "js-cookie/js-cookie": "3.0.5"

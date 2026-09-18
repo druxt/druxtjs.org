@@ -11,3 +11,14 @@ druxt_docs.deployment:
     _access: 'TRUE'
   options:
     no_cache: 'TRUE'
+
+druxt_docs.revisions:
+  path: '/druxt-docs/doc-page/{uuid}/revisions'
+  defaults:
+    _controller: '\Drupal\druxt_docs\Controller\RevisionsController::list'
+  requirements:
+    _permission: 'view doc_page revisions'
+    uuid: '[0-9a-f-]{36}'
+  options:
+    _auth: ['oauth2', 'cookie']
+    no_cache: 'TRUE'
