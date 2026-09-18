@@ -21,6 +21,7 @@ const {
   isPage,
 } = require('../nuxt/server/page-cache.js')
 const {
+  backendOrigin,
   backendReady,
   deployedRevision,
   deploymentReady,
@@ -88,6 +89,7 @@ describe('isPage', () => {
       // Druxt's schema refresh answers JSON at a path with no extension.
       '/_druxt/schema/node--doc_page--default--view',
       '/sites/default/files/a.png',
+      '/oauth/userinfo',
       '/icon.png',
       '/sitemap.xml',
     ]) {
@@ -546,6 +548,42 @@ describe('backend', () => {
 
   test('resolveOrigin leaves an environment without routes alone', () => {
     assert.equal(resolveOrigin({}), undefined)
+  })
+
+  test('backendOrigin keeps an explicit public URL, without its trailing slash', () => {
+    assert.equal(
+      backendOrigin({
+        DRUXT_PUBLIC_URL: 'https://cms.example.com/',
+        LAGOON_ROUTES: 'https://cms.druxtjs.org',
+      }),
+      'https://cms.example.com'
+    )
+  })
+
+  test('backendOrigin names the cms route in production, never the internal service', () => {
+    const routes =
+      'https://druxtjs.org,https://nginx.main.druxtjs-org.au2.amazee.io,https://cms.druxtjs.org'
+    assert.equal(
+      backendOrigin({ LAGOON_ROUTES: routes, DRUXT_BASE_URL: 'http://nginx:8080' }),
+      'https://cms.druxtjs.org'
+    )
+  })
+
+  test('backendOrigin uses the nginx route on a preview', () => {
+    const routes =
+      'https://nuxt.feature.druxtjs-org.au2.amazee.io,https://nginx.feature.druxtjs-org.au2.amazee.io'
+    assert.equal(
+      backendOrigin({ LAGOON_ROUTES: routes, DRUXT_BASE_URL: 'http://nginx:8080' }),
+      'https://nginx.feature.druxtjs-org.au2.amazee.io'
+    )
+  })
+
+  test('backendOrigin shares the base URL locally, and has a default', () => {
+    assert.equal(
+      backendOrigin({ DRUXT_BASE_URL: 'http://127.0.0.1:8888' }),
+      'http://127.0.0.1:8888'
+    )
+    assert.equal(backendOrigin({}), 'http://127.0.0.1:8899')
   })
 
   test('is ready once the footer menu has items', async () => {
