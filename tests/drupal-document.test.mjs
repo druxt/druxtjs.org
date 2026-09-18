@@ -72,7 +72,10 @@ describe('fetchDrupalPage', () => {
       'field_content,field_content.field_media,field_content.field_media.field_media_image'
     )
     // What the page reads itself, then what its display renders.
-    assert.equal(fields['node--doc_page'], 'title,field_toc,field_description,field_content')
+    assert.equal(
+      fields['node--doc_page'],
+      'title,field_toc,moderation_state,drupal_internal__nid,field_description,field_content'
+    )
     assert.equal(fields['paragraph--docs_text'], 'behavior_settings,field_text')
     assert.equal(fields['paragraph--docs_layout_section'], 'behavior_settings')
     assert.equal(fields['media--image'], 'name,field_media_image')

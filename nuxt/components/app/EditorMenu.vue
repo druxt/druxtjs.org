@@ -8,7 +8,7 @@
 
       <ul tabindex="0" class="dropdown-content menu mt-2 p-1 shadow-lg bg-base-100 border border-base-300 rounded-box w-40">
         <li>
-          <button type="button" class="rounded-btn px-3 py-2 text-sm" @click="$auth.logout()">Sign out</button>
+          <button type="button" class="rounded-btn px-3 py-2 text-sm" @click="$signOut()">Sign out</button>
         </li>
       </ul>
     </div>
