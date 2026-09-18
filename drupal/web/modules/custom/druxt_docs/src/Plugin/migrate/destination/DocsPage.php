@@ -170,6 +170,8 @@ final class DocsPage extends EntityContentBase {
         if ($number > 0) {
           $entity->setNewRevision(TRUE);
         }
+        // Moderation would otherwise make each imported revision a draft.
+        $entity->set('moderation_state', 'published');
         $entity->setSyncing(TRUE);
         $entity->save();
       }
@@ -184,6 +186,7 @@ final class DocsPage extends EntityContentBase {
         $entity->set($field, $value);
       }
       $entity->set('field_content', []);
+      $entity->set('moderation_state', 'published');
       $entity->setNewRevision(TRUE);
       $entity->setSyncing(TRUE);
       $entity->save();
