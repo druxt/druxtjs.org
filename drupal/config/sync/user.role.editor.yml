@@ -46,6 +46,7 @@ permissions:
   - 'edit any image media'
   - 'edit own doc_page content'
   - 'edit own image media'
+  - 'grant simple_oauth codes'
   - 'revert doc_page revisions'
   - 'use editorial transition archive'
   - 'use editorial transition archived_draft'
