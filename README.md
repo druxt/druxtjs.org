@@ -97,6 +97,12 @@ An edit made here is local to this machine's database: it previews and tests
 the site, and is not how page text is published. See
 [Where changes go](#where-changes-go) for what belongs where.
 
+Editors can also sign in on <http://localhost:3000> and see a page's latest
+draft on its own URL, and `nuxt/scripts/author-page.mjs` writes a page as a
+draft over JSON:API through Druxt's client.
+[docs/backend.md](docs/backend.md#draft-authoring-and-preview) covers the
+workflow, the sign-in and the script.
+
 The Modules, API reference and Components pages come from the druxt.js
 packages. `npm run docs:generate` builds them locally, in the pinned druxt.js
 checkout. It installs and builds druxt.js first, so the first run is slow.
@@ -138,18 +144,19 @@ covers what a deployment does.
 
 ## Commands
 
-| Command                  | What it does                                          |
-| ------------------------ | ----------------------------------------------------- |
-| `npm run setup`          | Install and import the backend, then start it         |
-| `npm run dev`            | Nuxt dev server against the backend                   |
-| `npm run storybook`      | Storybook on port 3030, against the backend           |
-| `npm run start` / `stop` | Start or stop Drupal                                  |
-| `npm run info`           | Where Drupal is, and the versions it runs             |
-| `npm run login`          | One-time login link for Drupal                        |
-| `npm run docs:generate`  | Build the Modules, API reference and Components pages |
-| `npm run lint`           | Every linter except prose                             |
-| `npm run lint:prose`     | Vale, after `npm run lint:prose:install` once         |
-| `npm test`               | Node tests for the scripts and the frontend's modules |
+| Command                             | What it does                                          |
+| ----------------------------------- | ----------------------------------------------------- |
+| `npm run setup`                     | Install and import the backend, then start it         |
+| `npm run dev`                       | Nuxt dev server against the backend                   |
+| `npm run storybook`                 | Storybook on port 3030, against the backend           |
+| `npm run start` / `stop`            | Start or stop Drupal                                  |
+| `npm run info`                      | Where Drupal is, and the versions it runs             |
+| `npm run login`                     | One-time login link for Drupal                        |
+| `npm run docs:generate`             | Build the Modules, API reference and Components pages |
+| `node nuxt/scripts/author-page.mjs` | Write a documentation page as a draft over JSON:API   |
+| `npm run lint`                      | Every linter except prose                             |
+| `npm run lint:prose`                | Vale, after `npm run lint:prose:install` once         |
+| `npm test`                          | Node tests for the scripts and the frontend's modules |
 
 ## Contributing
 
