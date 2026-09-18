@@ -19,6 +19,7 @@ dependencies:
     - navigation
     - node
     - paragraphs
+    - path
     - simple_oauth
     - system
 id: editor
@@ -38,6 +39,7 @@ permissions:
   - 'administer node published status'
   - 'create doc_page content'
   - 'create image media'
+  - 'create url aliases'
   - 'delete any doc_page content'
   - 'delete any image media'
   - 'delete doc_page revisions'
