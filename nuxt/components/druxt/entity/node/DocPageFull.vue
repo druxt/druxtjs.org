@@ -36,10 +36,32 @@ export default {
     value: { type: Object, default: undefined },
   },
   async fetch() {
+    // A signed-in editor viewing a draft or an older revision reads each
+    // paragraph at the revision the node names (its `target_revision_id`),
+    // never the default: an include or a plain fetch would return published
+    // content for a paragraph changed in that revision. Anonymous and
+    // published views fetch the default, once.
+    if (this.$auth && this.$auth.loggedIn) {
+      // The same page holds different paragraphs per revision, and the store
+      // keys them by uuid, so switching version must re-fetch rather than read
+      // the last view's copies. A versioned view reads each paragraph at the
+      // revision the node names; the published view reads the default.
+      await Promise.all(this.refs.map((ref) => this.$store.dispatch('druxt/getResource', {
+        type: ref.type,
+        id: ref.id,
+        query: this.versioned ? { resourceVersion: `id:${(ref.meta || {}).target_revision_id}` } : {},
+        bypassCache: true,
+      })))
+      return
+    }
     const missing = this.refs.filter((ref) => !this.stored(ref))
     await Promise.all(missing.map((ref) => this.$store.dispatch('druxt/getResource', { type: ref.type, id: ref.id })))
   },
   computed: {
+    /** True when a signed-in editor is viewing a draft or an older revision. */
+    versioned() {
+      return Boolean(this.$auth && this.$auth.loggedIn) && this.$store.state.editor.version !== 'published'
+    },
     refs() {
       return ((((this.entity || {}).relationships || {}).field_content || {}).data) || []
     },

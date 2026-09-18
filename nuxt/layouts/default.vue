@@ -49,6 +49,11 @@
     <AppSiteFooter :version="$config.druxtVersion ? 'v' + $config.druxtVersion : null" />
 
     <AppSearch :open="searchOpen" @close="searchOpen = false" />
+
+    <!-- The editor toolbar renders only for a signed-in editor; the padding
+         keeps the fixed bar off the footer when it is there. -->
+    <AppEditorToolbar />
+    <div v-if="$auth && $auth.loggedIn" class="h-12" aria-hidden="true" />
   </div>
 </template>
 

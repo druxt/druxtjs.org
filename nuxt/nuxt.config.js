@@ -113,6 +113,7 @@ export default {
     '~/plugins/mermaid.client.js',
     // After the Druxt and auth plugins the modules add: it wraps the client.
     '~/plugins/working-copy.js',
+    '~/plugins/sign-out.client.js',
   ],
   components: true,
   // Mirrors the SITE_ORIGIN override into the client bundle so hydration
@@ -226,7 +227,19 @@ export default {
   // two OAuth endpoints the browser calls are here too: the proxy module
   // reads this list before druxt-auth adds its own entry.
   proxy: [
-    ...['/jsonapi', '/router/translate-path', '/sites/default/files', '/oauth/token', '/oauth/userinfo'].map((context) => [
+    // DRUXT_PROXY_AUTH_UI proxies Drupal's sign-in surface too, so the whole
+    // OAuth flow rides one origin. For a tunnelled dev preview, not production,
+    // where the backend has its own public origin.
+    ...[
+      '/jsonapi',
+      '/router/translate-path',
+      '/sites/default/files',
+      '/oauth/token',
+      '/oauth/userinfo',
+      '/oauth/revoke',
+      '/druxt-docs',
+      ...(process.env.DRUXT_PROXY_AUTH_UI ? ['/oauth/authorize', '/user/login', '/core'] : []),
+    ].map((context) => [
       context,
       { target: DRUXT_BASE_URL, changeOrigin: false },
     ]),
