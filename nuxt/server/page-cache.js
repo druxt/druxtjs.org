@@ -13,7 +13,7 @@ const path = require('path')
 const zlib = require('zlib')
 
 /** Paths the frontend serves that are not pages: its assets, its APIs and Drupal's. */
-const NOT_PAGES = /^\/(_nuxt|_content|_decoupled|__webpack_hmr|jsonapi|router|sites)(\/|$)/
+const NOT_PAGES = /^\/(_nuxt|_content|_decoupled|__webpack_hmr|jsonapi|oauth|router|sites)(\/|$)/
 const ASSET = /\.(js|mjs|css|map|json|xml|txt|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|webmanifest|pdf)$/i
 const LINK = /href="(\/[^"#?]*)/g
 
