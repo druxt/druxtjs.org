@@ -27,6 +27,102 @@ $settings['druxt_docs_preview_url'] = '/druxt/node/preview?vm={view_mode}#/jsona
 
 Without it, the tab says the frontend preview isn't configured.
 
+## Draft authoring and preview
+
+A page can hold a draft. The editorial workflow on `doc_page` keeps the
+published revision live while a later revision is a draft, and a signed-in
+editor sees the draft on the page's own URL. The importer still seeds every
+page published. Drafts are for changes prepared after a site is seeded.
+
+### The workflow and who may use it
+
+`content_moderation` runs an editorial workflow (draft, published, archived)
+on `doc_page`, worked by the `contributor` and `editor` roles:
+
+| Role          | May                                                                  |
+| ------------- | -------------------------------------------------------------------- |
+| `contributor` | Create a page, save a new draft, and see its own unpublished content |
+| `editor`      | Edit any page, publish and archive, and see any unpublished content  |
+
+Both roles also hold `grant simple_oauth codes`, which the OAuth authorize
+step needs, and `create url aliases`, which a new page's path needs.
+
+### Signing in
+
+The frontend signs an editor in against the `druxtjs_org` consumer with the
+authorization code grant and PKCE, no client secret, requesting the `editor`
+scope. `druxt-auth` provides the callback route, the store and
+`@nuxtjs/auth-next`; the site sets the strategy, because the authorize step
+is a browser redirect that must name the origin a browser reaches Drupal on,
+while the token exchange and the user lookup go through the frontend's own
+origin. `/oauth/token` and `/oauth/userinfo` join `/jsonapi` on the proxy,
+so the browser stays on its own origin, and Drupal does not need CORS to
+sign an editor in.
+
+A signed-in editor's requests send their bearer token on the server render
+and in the browser, because Druxt's client and `@nuxtjs/auth-next` share one
+axios instance. A "Sign in" control sits in the site header.
+
+### Seeing the draft
+
+The frontend asks JSON:API for the working copy of each page and paragraph
+for a signed-in editor, so the page's own URL shows the latest draft. Anonymous requests never ask for the working copy, and Drupal refuses
+a working-copy request from anyone without permission, so a draft is never
+shown to the public. The stored-page cache is bypassed for a request that
+presents the auth cookie, and that response is never written to the store, so
+a draft cannot leak into a cached page.
+
+### Authoring a page over JSON:API
+
+`nuxt/scripts/author-page.mjs` writes a page and its paragraphs as a draft,
+through Druxt's client. It takes one page of the intermediate representation:
+
+```sh
+# A new draft revision of an existing page:
+node nuxt/scripts/author-page.mjs --document <ir.json> --uuid <page-uuid>
+
+# A new page:
+node nuxt/scripts/author-page.mjs --document <ir.json>
+```
+
+The script signs in the same way the site does: it opens the authorize page
+in a browser and catches the redirect on a local listener at
+`http://localhost:3939/callback`, a URI registered on the consumer. It holds
+no secret. `DRUXT_TOKEN` supplies a token instead, for an unattended run.
+
+It creates each paragraph with `DruxtClient.createResource`, then the page
+with `createResource` (or `updateResource` for `--uuid`), referencing the
+paragraphs by revision and setting `moderation_state` to `draft`. JSON:API
+has no transaction, so on any failed write the script stops, exits non-zero
+and prints every entity it created, leaving a list to clean up rather than a
+search.
+
+The writes need `jsonapi.settings` set to `read_only: false`, and a hook in
+`druxt_docs` that allows a page's authors to
+create its paragraph bundles, which Paragraphs otherwise permits only inside
+an entity form. Creation is still gated by role and by the bearer token, so
+an anonymous request cannot write.
+
+The script does not upload media yet, so it refuses a page with an image
+block before writing anything. A page whose only images are ones the seeded
+site already holds can be authored once its markdown drops the image block.
+
+### The local loop
+
+The whole loop runs on one machine, with Drupal and the frontend on
+different origins, as in production:
+
+```sh
+npm run setup                 # assemble, provision, import, start Drupal
+npm run dev                   # the frontend, on another origin
+# create an editor account, sign in through the header, then:
+node nuxt/scripts/author-page.mjs --document <ir.json> --uuid <page-uuid>
+```
+
+The draft renders for the signed-in editor on the page's URL. An editor
+publishes it from Drupal's content administration, and the anonymous site
+then serves it.
+
 ## Export configuration after changing it
 
 A change made through the admin UI or `drush` stays in the database until
