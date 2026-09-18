@@ -9,7 +9,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { findPrivateRefs } from '../scripts/lint-private-refs.mjs'
+import { findPrivateRefs, gitEnv, trackedFiles } from '../scripts/lint-private-refs.mjs'
 
 const hostsIn = (text) => findPrivateRefs(text).map((ref) => ref.host)
 
@@ -72,15 +72,18 @@ describe('lint-private-refs.mjs', () => {
   const run = (files) => {
     const root = mkdtempSync(path.join(tmpdir(), 'private-refs-'))
     try {
-      execFileSync('git', ['init', '--quiet', root])
+      execFileSync('git', ['init', '--quiet', root], { env: gitEnv() })
       for (const [name, text] of Object.entries(files)) {
         writeFileSync(path.join(root, name), text)
       }
-      execFileSync('git', ['-C', root, 'add', '.'])
+      execFileSync('git', ['-C', root, 'add', '.'], { env: gitEnv() })
       try {
         return {
           code: 0,
-          out: execFileSync(process.execPath, [script, root], { encoding: 'utf8' }),
+          out: execFileSync(process.execPath, [script, root], {
+            encoding: 'utf8',
+            env: gitEnv(),
+          }),
         }
       } catch (error) {
         return { code: error.status, out: `${error.stdout}${error.stderr}` }
@@ -102,5 +105,52 @@ describe('lint-private-refs.mjs', () => {
     })
     assert.equal(code, 0)
     assert.match(out, /No private hosts referenced by tracked files\./)
+  })
+
+  // npm run lint:private runs from the pre-commit hook, which exports GIT_DIR
+  // at the repository being committed. Without the scrub, git reads that index
+  // here and the lint reports on a repository it was never pointed at.
+  test('trackedFiles reads the repository it was handed, not an ambient GIT_DIR', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'private-refs-'))
+    const decoy = mkdtempSync(path.join(tmpdir(), 'private-refs-decoy-'))
+    const before = process.env.GIT_DIR
+    try {
+      execFileSync('git', ['init', '--quiet', root], { env: gitEnv() })
+      writeFileSync(path.join(root, 'README.md'), 'See https://druxtjs.org\n')
+      execFileSync('git', ['-C', root, 'add', '.'], { env: gitEnv() })
+      execFileSync('git', ['init', '--quiet', decoy], { env: gitEnv() })
+      process.env.GIT_DIR = path.join(decoy, '.git')
+      assert.deepEqual(trackedFiles(root), ['README.md'])
+    } finally {
+      if (before === undefined) {
+        delete process.env.GIT_DIR
+      } else {
+        process.env.GIT_DIR = before
+      }
+      rmSync(root, { recursive: true, force: true })
+      rmSync(decoy, { recursive: true, force: true })
+    }
+  })
+
+  // The same trap one level up: the fixture is built with git, so an exported
+  // GIT_DIR would send git init and git add to the repository being committed.
+  test('builds its fixture in the temporary directory, not in an ambient GIT_DIR', () => {
+    const decoy = mkdtempSync(path.join(tmpdir(), 'private-refs-decoy-'))
+    const before = process.env.GIT_DIR
+    try {
+      execFileSync('git', ['init', '--quiet', decoy], { env: gitEnv() })
+      process.env.GIT_DIR = path.join(decoy, '.git')
+      const { code, out } = run({ 'README.md': 'Clone https://gitlab.example.local/a.git\n' })
+      assert.equal(code, 1)
+      assert.match(out, /README\.md:1: gitlab\.example\.local/)
+      assert.deepEqual(trackedFiles(decoy), [])
+    } finally {
+      if (before === undefined) {
+        delete process.env.GIT_DIR
+      } else {
+        process.env.GIT_DIR = before
+      }
+      rmSync(decoy, { recursive: true, force: true })
+    }
   })
 })
