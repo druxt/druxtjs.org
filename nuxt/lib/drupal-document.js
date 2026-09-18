@@ -8,7 +8,7 @@ export const PARAGRAPH_TYPES = ['docs_callout', 'docs_code', 'docs_diagram', 'do
 const INCLUDE = ['field_content', 'field_content.field_media', 'field_content.field_media.field_media_image']
 
 /** What this module reads from the page itself, beyond its display. */
-const PAGE_FIELDS = ['title', 'field_toc']
+const PAGE_FIELDS = ['title', 'field_toc', 'moderation_state', 'drupal_internal__nid']
 
 /** What Layout Paragraphs reads from every paragraph, whatever its display. */
 const PARAGRAPH_FIELDS = ['behavior_settings']
@@ -25,20 +25,21 @@ const displayFields = async (schema, type, mode) => {
  * for the same fields (`druxt.entity.query.schema` in nuxt.config.js), so
  * they find the page's resources complete in the store.
  *
- * A working copy is requested without its includes: JSON:API includes are
- * default revisions, so a paragraph drafted in place would come back as
- * published. Left out, each paragraph is fetched on its own, as its working
- * copy, by the page's body.
+ * A versioned view (a draft or an older revision) is requested without its
+ * includes: a JSON:API include always returns the default revision, so a
+ * paragraph changed in that revision would come back published. Left out,
+ * each paragraph is fetched on its own at the revision the node names, by the
+ * page's body.
  *
  * A query object, the form the Druxt store takes, rather than the query
  * builder: the root tests import this file without the app's packages.
  *
  * @param {object} schema - The `$druxtSchema` plugin.
  * @param {object} [options] - Options.
- * @param {boolean} [options.workingCopy] - Whether the page is read as its working copy.
+ * @param {boolean} [options.versioned] - Whether the page is read at a non-published revision.
  * @returns {Promise<{ include?: string, fields: Object<string, string> }>} The query.
  */
-export const pageQuery = async (schema, { workingCopy = false } = {}) => {
+export const pageQuery = async (schema, { versioned = false } = {}) => {
   const fields = {
     'node--doc_page': [...PAGE_FIELDS, ...(await displayFields(schema, 'node--doc_page', 'full'))].join(','),
     'media--image': ['name', ...(await displayFields(schema, 'media--image', 'default'))].join(','),
@@ -47,7 +48,7 @@ export const pageQuery = async (schema, { workingCopy = false } = {}) => {
     const type = `paragraph--${bundle}`
     fields[type] = [...PARAGRAPH_FIELDS, ...(await displayFields(schema, type, 'default'))].join(',')
   }
-  return workingCopy ? { fields } : { include: INCLUDE.join(','), fields }
+  return versioned ? { fields } : { include: INCLUDE.join(','), fields }
 }
 
 /**
@@ -68,11 +69,24 @@ export const fetchDrupalPage = async (store, path) => {
   if (!entity || entity.type !== 'node') return null
 
   const type = `node--${entity.bundle}`
-  // A signed-in editor reads the page as its working copy: see plugins/working-copy.js.
-  const query = await pageQuery(store.$druxtSchema, { workingCopy: Boolean(store.$auth && store.$auth.loggedIn) })
-  const resource = await store.dispatch('druxt/getResource', { type, id: entity.uuid, query })
+  // A signed-in editor reads the page at the toolbar's selected version, and
+  // never from the store's cache, so switching version always re-fetches.
+  // See plugins/working-copy.js and the editor store state.
+  const editor = Boolean(store.$auth && store.$auth.loggedIn)
+  const versioned = editor && store.state.editor.version !== 'published'
+  const query = await pageQuery(store.$druxtSchema, { versioned })
+  const resource = await store.dispatch('druxt/getResource', { type, id: entity.uuid, query, bypassCache: editor })
   const data = resource && (resource.data || resource)
   if (!data || !data.attributes) throw new Error(`Drupal returned no ${type} for ${path}`)
+
+  // What the editor toolbar needs to name and switch this page's revisions.
+  if (editor) {
+    store.commit('setEditorPage', {
+      uuid: entity.uuid,
+      nid: data.attributes.drupal_internal__nid || null,
+      moderationState: data.attributes.moderation_state || null,
+    })
+  }
 
   return {
     path,
@@ -84,5 +98,6 @@ export const fetchDrupalPage = async (store, path) => {
     title: data.attributes.title,
     description: data.attributes.field_description || '',
     toc: data.attributes.field_toc || [],
+    moderationState: data.attributes.moderation_state || null,
   }
 }

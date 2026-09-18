@@ -31,4 +31,22 @@ const hasAuthCookie = (header) =>
       return name.trim() === AUTH_COOKIE && value !== '' && value !== 'false'
     })
 
-module.exports = { AUTH_COOKIE, AUTH_COOKIE_PREFIX, AUTH_STRATEGY, hasAuthCookie }
+/**
+ * The storage keys @nuxtjs/auth-next writes for a strategy. Its `reset()`
+ * writes the string "false" into these rather than removing them, in cookies
+ * and localStorage both, so a real sign-out clears them by hand.
+ *
+ * @param {string} strategy - The strategy name.
+ * @returns {string[]} The keys to clear.
+ */
+const authStorageKeys = (strategy) => [
+  `${AUTH_COOKIE_PREFIX}_token.${strategy}`,
+  `${AUTH_COOKIE_PREFIX}_token_expiration.${strategy}`,
+  `${AUTH_COOKIE_PREFIX}_refresh_token.${strategy}`,
+  `${AUTH_COOKIE_PREFIX}_refresh_token_expiration.${strategy}`,
+  `${AUTH_COOKIE_PREFIX}${strategy}.pkce_state`,
+  `${AUTH_COOKIE_PREFIX}${strategy}.pkce_code_verifier`,
+  `${AUTH_COOKIE_PREFIX}strategy`,
+]
+
+module.exports = { AUTH_COOKIE, AUTH_COOKIE_PREFIX, AUTH_STRATEGY, authStorageKeys, hasAuthCookie }
