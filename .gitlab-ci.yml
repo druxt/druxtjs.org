@@ -174,15 +174,27 @@ lint:prose:
     - section_end "prose"
 
 # The pipeline and the GitHub configuration. Drupal's own YAML follows Drupal's
-# style, which this configuration would fight.
+# style, which this configuration would fight. actionlint covers the GitHub
+# workflow, which nothing on the GitHub side lints before a push. The binary is
+# pinned and verified by checksum, as gitleaks and lychee are.
 lint:yaml:
   stage: lint
   image: python:3.12-slim
+  variables:
+    ACTIONLINT_VERSION: '1.7.12'
+    ACTIONLINT_SHA256: '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8'
   script:
     - section_start "yamllint" "Linting YAML"
     - pip install --quiet --disable-pip-version-check yamllint==1.38.0
     - yamllint .gitlab-ci.yml .yamllint .github/
     - section_end "yamllint"
+    - section_start "actionlint" "Linting GitHub workflows"
+    - apt-get update -qq && apt-get install -y -qq curl > /dev/null
+    - curl -sSLo actionlint.tar.gz "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+    - echo "${ACTIONLINT_SHA256}  actionlint.tar.gz" | sha256sum -c -
+    - tar -xzf actionlint.tar.gz actionlint
+    - ./actionlint -color
+    - section_end "actionlint"
 
 # Links in the tracked markdown outside nuxt/. Report only, as .lychee.toml
 # explains. The binary is pinned and verified by checksum, as gitleaks is.
