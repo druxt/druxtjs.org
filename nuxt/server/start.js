@@ -12,6 +12,7 @@ const path = require('path')
 const { execFileSync, spawn } = require('child_process')
 const { deploymentReady, resolveOrigin, waitForBackend } = require('./backend')
 const { createHandler, createPageCache, crawl } = require('./page-cache')
+const { createArtefacts } = require('./artefacts')
 const { createStartingHandler } = require('./starting')
 
 const rootDir = path.join(__dirname, '..')
@@ -63,25 +64,35 @@ const main = async () => {
   env.SITE_ORIGIN = resolveOrigin(env) || 'https://druxtjs.org'
   log(`origin: ${env.SITE_ORIGIN}`)
 
-  // The machine-readable indexes `nuxt generate` used to write, from the same corpus.
-  try {
-    const { readContent } = require('../lib/content-index')
-    const { buildSitemap } = require('../lib/sitemap')
-    const { buildLlmsTxt } = require('../lib/llms-txt')
-    const { buildLlmsFullTxt } = require('../lib/llms-full-txt')
-    const docs = readContent(path.join(rootDir, 'content'))
-    const siteOrigin = env.SITE_ORIGIN || 'https://druxtjs.org'
-    fs.writeFileSync(path.join(rootDir, 'static', 'sitemap.xml'), buildSitemap(docs, { origin: siteOrigin }))
-    fs.writeFileSync(path.join(rootDir, 'static', 'llms.txt'), buildLlmsTxt(docs, { origin: siteOrigin }))
-    fs.writeFileSync(path.join(rootDir, 'static', 'llms-full.txt'), buildLlmsFullTxt(docs, { origin: siteOrigin }))
-    log(`wrote sitemap.xml, llms.txt and llms-full.txt for ${docs.length} documents`)
-  } catch (error) {
-    log(`sitemap.xml, llms.txt and llms-full.txt not written: ${error.message}`)
+  // The authored pages from Drupal and the generated reference pages, as one
+  // corpus. Built once here and held, so the share cards below and the
+  // indexes served later describe the same set of pages.
+  const artefacts = createArtefacts({
+    baseUrl,
+    contentDir: path.join(rootDir, 'content'),
+    origin: env.SITE_ORIGIN || 'https://druxtjs.org',
+    ttl: (Number(env.DOCS_INDEX_TTL) || 300) * 1000,
+    log,
+  })
+
+  // The machine-readable indexes are served from Drupal now, not written
+  // here. A copy left in static/ by an earlier release would be served
+  // instead of them, and would describe the pin rather than the site.
+  for (const name of ['sitemap.xml', 'llms.txt', 'llms-full.txt']) {
+    const stale = path.join(rootDir, 'static', name)
+    if (fs.existsSync(stale)) {
+      fs.unlinkSync(stale)
+      log(`removed the stale ${name} left in static/`)
+    }
   }
 
   // The share cards, as `nuxt generate` writes them. A child process, because
-  // satori and resvg crash when required through a patched module loader.
+  // satori and resvg crash when required through a patched module loader, so
+  // the corpus is handed over as a file rather than in memory.
   try {
+    const corpusFile = path.join(rootDir, '.cache', 'corpus.json')
+    fs.mkdirSync(path.dirname(corpusFile), { recursive: true })
+    fs.writeFileSync(corpusFile, JSON.stringify(await artefacts.corpus()))
     const cards = execFileSync(
       process.execPath,
       [
@@ -89,6 +100,7 @@ const main = async () => {
         path.join(rootDir, 'content'),
         path.join(rootDir, 'assets', 'fonts'),
         path.join(rootDir, 'static', 'og'),
+        corpusFile,
       ],
       { encoding: 'utf8' },
     )
@@ -113,12 +125,21 @@ const main = async () => {
           render: (route) => app.server.renderRoute(route),
           log,
         })
-  handler = createHandler({ cache, live: app.render, noindex: env.LAGOON_ENVIRONMENT_TYPE !== 'production' })
+  handler = createHandler({
+    cache,
+    live: app.render,
+    noindex: env.LAGOON_ENVIRONMENT_TYPE !== 'production',
+    artefacts,
+  })
   log(`serving ${env.SITE_ORIGIN || `http://${host}:${port}`}`)
 
   if (cache) {
     const warmed = Date.now()
-    const seeds = ['/', ...(await app.options.generate.routes())]
+    // Seeded from the same corpus the indexes describe, so a page authored
+    // in Drupal is pre-rendered rather than waiting for its first visitor.
+    const corpus = await artefacts.corpus().catch(() => [])
+    const authored = corpus.map((doc) => doc.route)
+    const seeds = ['/', ...new Set([...authored, ...(await app.options.generate.routes())])]
     const { stored, visited } = await crawl({ seeds, store: cache.store })
     log(`pre-rendered ${stored} of ${visited} pages in ${Math.round((Date.now() - warmed) / 1000)}s`)
   }
