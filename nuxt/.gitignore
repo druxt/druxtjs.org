@@ -114,3 +114,4 @@ styles/
 # Written into static/ by server/start.js as the server starts.
 /static/sitemap.xml
 /static/llms.txt
+/static/llms-full.txt

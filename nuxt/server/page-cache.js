@@ -178,7 +178,7 @@ const crawl = async ({ seeds, store, concurrency = 2, limit = 5000 }) => {
  * @returns {Function} An HTTP request listener.
  */
 const createHandler =
-  ({ cache, live, noindex = false }) =>
+  ({ cache, live, noindex = false, artefacts = null }) =>
   async (req, res) => {
     for (const [name, value] of Object.entries(SECURITY_HEADERS)) res.setHeader(name, value)
     if (String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https') {
@@ -204,6 +204,11 @@ const createHandler =
       res.writeHead(301, { Location: elsewhere })
       return res.end()
     }
+    // The machine-readable indexes are built from Drupal, not served from
+    // `static/`, so they must be answered before the asset test below sends
+    // every `.xml` and `.txt` to the static middleware.
+    if (artefacts && artefacts.isArtefact(req.method, pathname)) return artefacts.handle(req, res)
+
     if (!isPage(req.method, pathname)) return live(req, res)
 
     // Canonical page URLs carry no trailing slash.
