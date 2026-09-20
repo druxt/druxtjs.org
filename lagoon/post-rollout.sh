@@ -34,3 +34,19 @@ if [ ! -s "$keys/private.key" ] || [ ! -s "$keys/public.key" ]; then
 fi
 
 drush cache:rebuild
+
+# Record the revision this rollout applied, now that its updates and its
+# configuration import have succeeded. The frontend waits for this to match
+# the revision it was built from before it builds, so it is written last:
+# writing it earlier would tell the frontend the site was ready while the
+# steps above were still running, which is the failure it prevents.
+#
+# `set -e` means an earlier failure never reaches this line, so an
+# interrupted rollout leaves the previous revision in place rather than
+# claiming this one.
+if [ -n "${LAGOON_GIT_SHA:-}" ]; then
+  echo "Recording the deployed revision ${LAGOON_GIT_SHA}."
+  drush state:set druxt_docs.deployed_revision "$LAGOON_GIT_SHA" --input-format=string --yes
+else
+  echo "No LAGOON_GIT_SHA in this environment; leaving the deployed revision unset."
+fi
