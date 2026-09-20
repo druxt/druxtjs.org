@@ -8,6 +8,20 @@ routes:
   autogenerate:
     insecure: Redirect
 
+# The database is the documentation's only copy: nothing exports it back to
+# this repository. These are the platform's own defaults except for `monthly`,
+# which defaults to 0, so a fault found more than six weeks late would have
+# had nothing left to restore from.
+backup-retention:
+  production:
+    monthly: 6
+    weekly: 6
+    daily: 7
+    hourly: 0
+
+backup-schedule:
+  production: 'M H(22-2) * * *'
+
 # Production's own hosts. The package subdomains answer with a redirect to
 # the site; the frontend's server does that.
 environments:
