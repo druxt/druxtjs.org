@@ -93,7 +93,7 @@ else
 fi
 
 app="$(build_app yes)"
-run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=production LAGOON_ENVIRONMENT=somethingelse > /dev/null
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=production LAGOON_ENVIRONMENT=staging > /dev/null
 if called "$app" "sql:sync"; then
   no "production by type alone: a sync was attempted"
 else
