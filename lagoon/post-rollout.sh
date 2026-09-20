@@ -1,26 +1,125 @@
 #!/bin/sh
-# After each rollout: install or update Drupal, seed a new site's
-# documentation, and give Simple OAuth its keys.
+# After each rollout: bring this environment's database to the branch it is
+# deploying, and record what it deployed.
+#
+# The documentation lives in production's database. A non-production
+# environment therefore starts from a sanitised copy of it, and the branch's
+# updates and configuration are applied on top, so it holds real content on
+# new code before anything reads it.
+#
+# On Lagoon there is always a database to be had, because production's can
+# be copied, so seeding from the pinned corpus is the last resort and not
+# the routine. It happens only when the sync was turned off and nothing is
+# installed. A local checkout is the other way round: a contributor has no
+# production to copy, so `npm run setup` seeds from the pin, and this script
+# is not part of that path.
+#
+# DOCS_SKIP_SYNC=1 turns the sync off for an environment that wants to keep
+# the database it has.
+#
+# Production syncs from nothing and seeds from nothing. It is the source.
 set -eu
 
 app=$(cd "$(dirname "$0")/.." && pwd)
 export PATH="$app/drupal/vendor/bin:$PATH"
 cd "$app/drupal"
 
+environment_type="${LAGOON_ENVIRONMENT_TYPE:-}"
+environment_name="${LAGOON_ENVIRONMENT:-}"
+production_alias="@lagoon.druxtjs-org-main"
+
+# Two independent tests, because what follows begins by dropping a database.
+# An environment that cannot say what it is does not get synced: the answer
+# to "is this production?" must be a clear no, not an absent yes.
+is_production() {
+  [ "$environment_type" = "production" ] || [ "$environment_name" = "main" ]
+}
+
+may_sync() {
+  if [ "${DOCS_SKIP_SYNC:-}" = "1" ]; then
+    echo "DOCS_SKIP_SYNC is set; keeping the database this environment already has."
+    return 1
+  fi
+  if [ -z "$environment_type" ] && [ -z "$environment_name" ]; then
+    echo "This environment does not say what it is, so it will not be synced."
+    return 1
+  fi
+  if is_production; then
+    return 1
+  fi
+  return 0
+}
+
+# Production writes a dump on a schedule for exactly this. Copying that file
+# costs production a read of a file; running `sql:sync` costs it a full
+# mysqldump of the live database, per rollout, per environment. So the file
+# is tried first and the live sync is the fallback.
+load_from_production() {
+  dump="/tmp/production.sql.gz"
+  rm -f "$dump" "${dump%.gz}"
+
+  if drush rsync -y "${production_alias}:%files/private/environment-dump/latest.sql.gz" "$dump" 2>/dev/null && [ -s "$dump" ]; then
+    echo "  using production's scheduled dump."
+    gunzip -f "$dump"
+    drush sql:drop --yes
+    drush sql:query --file="${dump%.gz}"
+    rm -f "${dump%.gz}"
+    return 0
+  fi
+
+  echo "  no scheduled dump to copy; reading the live database instead."
+  drush sql:sync "$production_alias" @self --yes
+}
+
+# Remove what a contributor should never be handed. `sql:sanitize` covers
+# the accounts; the rest is what this site carries beyond them. The consumer
+# rows stay, because the frontend authenticates against one, but their
+# secrets do not survive the copy.
+sanitise() {
+  echo "Sanitising the copy."
+  drush sql:sanitize --yes
+
+  for table in sessions oauth2_token oauth2_token__scopes watchdog flood key_value_expire admin_audit_trail; do
+    drush sql:query "TRUNCATE TABLE ${table};" || echo "  no ${table} table to clear."
+  done
+
+  drush sql:query "UPDATE consumer_field_data SET secret = CONCAT('sanitised-', client_id);"
+
+  # Prove it rather than assume it: a sanitiser that silently did nothing
+  # would leave production credentials in an environment meant to be safe.
+  remaining=$(drush sql:query "SELECT COUNT(*) FROM sessions;" | tr -cd '0-9')
+  if [ "${remaining:-1}" != "0" ]; then
+    echo "Sanitisation did not clear the sessions table; refusing to leave this environment usable."
+    exit 1
+  fi
+  echo "Sanitised."
+}
+
+if may_sync; then
+  echo "Replacing this environment's database with a copy of production."
+  echo "  target: ${environment_name:-unnamed} (${environment_type:-untyped})"
+  echo "  source: ${production_alias}"
+  load_from_production
+  sanitise
+fi
+
 if drush status --field=bootstrap 2>/dev/null | grep -q Successful; then
-  echo "Updating the installed site."
+  echo "Updating the site."
   drush deploy --yes
+  seed_needed=0
 else
-  echo "Installing the site from its committed configuration."
+  echo "No database to update. Installing the site from its committed configuration."
   # A password drush did not generate is one it does not print into the deploy log.
   drush site:install --existing-config --yes --account-pass="$(head -c 32 /dev/urandom | base64)"
   # Without this, the first import on Lagoon found no migrations and the web found no field types.
   drush cache:rebuild
+  # Nothing was synced and nothing was installed before this, so the pinned
+  # corpus is the only content there is.
+  seed_needed=1
 fi
 
-pages=$(drush php:eval 'echo \Drupal::entityQuery("node")->accessCheck(FALSE)->condition("type", "doc_page")->count()->execute();')
-if [ "$pages" = "0" ]; then
-  echo "No documentation yet. Importing it from the pinned source."
+if [ "$seed_needed" = "1" ]; then
+  echo "Nothing was copied and nothing was installed before this, so the pinned source is the only content there is."
   php .devtools/import
 fi
 

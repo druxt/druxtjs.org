@@ -50,6 +50,15 @@ environments:
           - storybook.druxtjs.org
       - nginx:
           - cms.druxtjs.org
+    # One dump a night for the other environments to start from, so a
+    # rollout copies a file instead of asking the live database for a full
+    # mysqldump of itself. Scheduled after the backup window so the two are
+    # not reading the database at once.
+    cronjobs:
+      - name: Dump the database for the other environments
+        schedule: 'M 3 * * *'
+        command: sh /app/lagoon/dump-for-environments.sh
+        service: cli
 
 tasks:
   post-rollout:
