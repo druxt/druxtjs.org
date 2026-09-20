@@ -10,7 +10,7 @@ const fs = require('fs')
 const http = require('http')
 const path = require('path')
 const { execFileSync, spawn } = require('child_process')
-const { resolveOrigin, waitForBackend } = require('./backend')
+const { deploymentReady, resolveOrigin, waitForBackend } = require('./backend')
 const { createHandler, createPageCache, crawl } = require('./page-cache')
 const { createStartingHandler } = require('./starting')
 
@@ -45,8 +45,17 @@ const main = async () => {
   await new Promise((resolve) => server.listen(port, host, resolve))
   log(`starting page on http://${host}:${port}`)
 
-  await waitForBackend(baseUrl, { log })
-  log(`Drupal is ready at ${baseUrl}`)
+  // Wait for Drupal to report the revision this build is from, so the build
+  // never reads the previous release's display configuration. Without a
+  // revision of its own, and against a backend with no such endpoint, this
+  // falls back to the check it replaces.
+  const revision = env.LAGOON_GIT_SHA
+  if (revision) log(`waiting for Drupal to finish deploying ${revision}`)
+  const ready = await waitForBackend(baseUrl, {
+    log,
+    ready: (url) => deploymentReady(url, { revision }),
+  })
+  log(ready ? `Drupal is ready at ${baseUrl}` : `building against ${baseUrl} without waiting further`)
   setPhase('building')
 
   // Canonical links and share cards name this environment's own origin: the

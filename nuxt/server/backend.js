@@ -47,25 +47,88 @@ const backendReady = async (baseUrl) => {
 }
 
 /**
+ * The revision Drupal reports having finished deploying.
+ *
+ * Three answers, and the caller needs to tell them apart: a revision
+ * string, `null` where the endpoint answered but no rollout has recorded
+ * one yet, and `undefined` where there is no endpoint to ask, which is
+ * every backend deployed before it existed.
+ *
+ * @param {string} baseUrl - Drupal's base URL.
+ * @returns {Promise<string|null|undefined>} The revision, or null, or undefined.
+ */
+const deployedRevision = async (baseUrl) => {
+  const body = await getJson(new URL('/druxt-docs/deployment', baseUrl).href)
+  if (!body || typeof body !== 'object' || !('revision' in body)) return undefined
+  return typeof body.revision === 'string' && body.revision !== '' ? body.revision : null
+}
+
+/**
+ * Whether Drupal has finished deploying the revision this build is from.
+ *
+ * The footer-menu check this replaces asks whether the documentation is
+ * there, which an established site answers yes to throughout a rollout,
+ * including while its database updates and configuration import are still
+ * running. A frontend that builds then reads the previous release's
+ * display configuration. Comparing revisions asks the question that
+ * actually matters.
+ *
+ * It gives way rather than blocking, in two cases. Without a revision of
+ * its own there is nothing to compare, so the gate does not apply: that is
+ * local development. Where the endpoint is absent the backend predates
+ * this check, so it falls back to the footer-menu probe.
+ *
+ * @param {string} baseUrl - Drupal's base URL.
+ * @param {object} [options] - Options.
+ * @param {string} [options.revision] - The revision this build is from.
+ * @param {Function} [options.fallback] - The check used when there is no endpoint.
+ * @returns {Promise<boolean>} True once Drupal is ready to build against.
+ */
+const deploymentReady = async (baseUrl, { revision, fallback = backendReady } = {}) => {
+  if (!revision) return fallback(baseUrl)
+  const reported = await deployedRevision(baseUrl)
+  if (reported === undefined) return fallback(baseUrl)
+  return reported === revision
+}
+
+/**
  * Wait until Drupal is ready, logging once a minute until it is.
+ *
+ * The wait is bounded. Holding the port indefinitely behind the starting
+ * page is a worse failure for a documentation site than building against a
+ * backend that is a release behind, and the next rollout corrects the
+ * latter. Passing the bound is logged plainly so it is never mistaken for
+ * a clean start.
  *
  * @param {string} baseUrl - Drupal's base URL.
  * @param {object} [options] - Options.
  * @param {number} [options.interval] - Milliseconds between checks.
+ * @param {number} [options.timeout] - Milliseconds before giving up and proceeding.
  * @param {Function} [options.log] - Logs a line.
  * @param {Function} [options.ready] - The readiness check.
- * @returns {Promise<void>} Resolves when Drupal is ready.
+ * @returns {Promise<boolean>} True if Drupal became ready, false if the wait was abandoned.
  */
-const waitForBackend = async (baseUrl, { interval = 5000, log = () => {}, ready = backendReady } = {}) => {
+const waitForBackend = async (
+  baseUrl,
+  { interval = 5000, timeout = 900000, log = () => {}, ready = backendReady } = {},
+) => {
   const started = Date.now()
   let logged = 0
   while (!(await ready(baseUrl))) {
+    const waited = Date.now() - started
+    if (timeout > 0 && waited >= timeout) {
+      log(
+        `giving up waiting for Drupal at ${baseUrl} after ${Math.round(waited / 1000)}s, and building anyway: this build may be against a backend that has not finished deploying`,
+      )
+      return false
+    }
     if (Date.now() - logged >= 60000) {
-      log(`waiting for Drupal at ${baseUrl} (${Math.round((Date.now() - started) / 1000)}s)`)
+      log(`waiting for Drupal at ${baseUrl} (${Math.round(waited / 1000)}s)`)
       logged = Date.now()
     }
     await new Promise((resolve) => setTimeout(resolve, interval))
   }
+  return true
 }
 
 /**
@@ -142,4 +205,12 @@ const resolveOrigin = (env) => {
   return origin.replace(/\/+$/, '')
 }
 
-module.exports = { backendReady, getJson, resolveOrigin, serviceRoute, waitForBackend }
+module.exports = {
+  backendReady,
+  deployedRevision,
+  deploymentReady,
+  getJson,
+  resolveOrigin,
+  serviceRoute,
+  waitForBackend,
+}
