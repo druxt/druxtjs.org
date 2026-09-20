@@ -43,12 +43,20 @@ subdomains, are set in `.lagoon.yml`.
    pages that `npm run docs:generate` writes locally.
 2. The containers start. Until the app is ready, `nuxt` answers every
    request with the starting page, which names the step it is on.
-3. The post-rollout task, `lagoon/post-rollout.sh`, runs in `cli`. On a new
-   environment it installs Drupal from `drupal/config/sync` and imports the
-   documentation from the pinned commit. On an existing one it runs
-   `drush deploy`. It also creates Simple OAuth's keys, once, on the files
-   volume.
-4. Once Drupal's footer menu has items, `nuxt` builds the app against it and
+3. The post-rollout task, `lagoon/post-rollout.sh`, runs in `cli`. A
+   non-production environment first replaces its database with a sanitised
+   copy of production's, so the updates that follow run against real
+   content. It copies the dump production writes nightly
+   (`lagoon/dump-for-environments.sh`, under the private files directory
+   nginx does not serve) and falls back to reading production's live
+   database only when that file is not there. `DOCS_SKIP_SYNC=1` keeps the
+   database an environment already has. Production syncs from nothing. Either
+   way it then runs `drush deploy`, or installs from `drupal/config/sync`
+   when there is no database at all. It seeds from the pinned commit only
+   in that last case, or when `DOCS_SEED=1` asks for it. It also creates
+   Simple OAuth's keys, once, on the files volume, and records the
+   revision it deployed.
+4. Once Drupal reports that revision, `nuxt` builds the app against it and
    starts serving. It then renders every page it can reach into its page
    cache.
 

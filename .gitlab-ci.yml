@@ -321,6 +321,17 @@ test:import-guardrails:
   script:
     - bash tests/import-guardrails.sh
 
+# The rollout runs against a stub drush that records what it was asked to
+# do, so this needs bash and nothing else: no database, no network, no
+# Lagoon. It is the check on a script whose first act is to drop a database.
+test:post-rollout-guardrails:
+  stage: test
+  image: alpine:3.20
+  before_script:
+    - apk add --no-cache bash coreutils
+  script:
+    - bash tests/post-rollout-guardrails.sh
+
 # The fixture is written by the test itself, so this needs node, git and
 # bash but no checkout of the documentation and no provision.
 test:validate-guardrails:
