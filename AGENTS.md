@@ -30,8 +30,8 @@ Nuxt application.
   it. A non-production environment takes a sanitised copy of production's
   database on every rollout and applies the branch's updates to it, so it
   holds real content on new code. The importer seeds from the commit pinned
-  in `docs-source.json` only when there is no database to start from, or when
-  `DOCS_SEED=1` asks for a deliberate rebuild from the pin.
+  in `docs-source.json` only when there is no database to start from.
+  `DOCS_SKIP_SYNC=1` keeps the database an environment already has.
 - **The pin is the API reference's version, not the site's content.** docgen
   reads the pinned `druxt.js` to generate the `api/`, `components/` and module
   pages, which have no Drupal representation. The authored pages come from the
