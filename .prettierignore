@@ -3,6 +3,7 @@ node_modules/
 .vale/
 .docs-ir/
 .docs-source/
+.docs-api/
 package-lock.json
 
 # PHP, Drupal's exports and Composer's files. Drupal has its own coding

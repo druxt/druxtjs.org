@@ -18,6 +18,7 @@
     ".vale/**",
     ".docs-ir/**",
     ".docs-source/**",
+    ".docs-api/**",
     "drupal/vendor/**",
     "drupal/web/core/**",
     "drupal/web/libraries/**",

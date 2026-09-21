@@ -38,9 +38,9 @@ subdomains, are set in `.lagoon.yml`.
 
 ## Deployment steps
 
-1. Lagoon builds the images. The `nuxt` image clones the druxt.js commit
-   pinned in `docs-source.json` and runs docgen, which writes the generated
-   pages that `npm run docs:generate` writes locally.
+1. Lagoon builds the images. The `nuxt` image runs docgen over druxt.js at
+   the `docgenRef` in `docs-source.json`, and lays the generated pages over the
+   authored markdown at `ref`, as `npm run docs:generate` does locally.
 2. The containers start. Until the app is ready, `nuxt` answers every
    request with the starting page, which names the step it is on.
 3. The post-rollout task, `lagoon/post-rollout.sh`, runs in `cli`. A

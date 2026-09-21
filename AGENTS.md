@@ -32,12 +32,15 @@ Nuxt application.
   holds real content on new code. The importer seeds from the commit pinned
   in `docs-source.json` only when there is no database to start from.
   `DOCS_SKIP_SYNC=1` keeps the database an environment already has.
-- **The pin is the API reference's version, not the site's content.** docgen
-  reads the pinned `druxt.js` to generate the `api/`, `components/` and module
-  pages, which have no Drupal representation. The authored pages come from the
-  database, and the sitemap and the `llms` files describe both.
-- **Move the pin with its baseline.** A new `ref` in `docs-source.json` needs
-  `npm run survey:content` run again, and the two are committed together.
+- **`docs-source.json` pins two commits.** `docgenRef` is the API reference's
+  version: docgen reads that `druxt.js` commit to generate the `api/`,
+  `components/` and module pages, which have no Drupal representation. Move it
+  with the Druxt packages `nuxt/` installs. `ref` is the authored markdown the
+  importer seeds from. druxt.js removed that markdown after `ref`, so `ref`
+  stays where it is. The authored pages come from the database, and the
+  sitemap and the `llms` files describe both.
+- **Move `ref` with its baseline.** A new `ref` needs `npm run survey:content`
+  run again, and the two are committed together. `docgenRef` has no baseline.
 - **`github-slugger` stays at 1.5.0.** `druxt_docs` computes the table of
   contents with a PHP port of that version, and the import fails when the two
   disagree. Renovate is configured not to offer it.
@@ -80,7 +83,7 @@ patched to expose the regions and to let a consumer select its theme, and the
 | `drupal/content/`                       | The Tome backup described above                                                        |
 | `drupal/web/modules/custom/druxt_docs/` | Migrate plugins, the table of contents, hooks and Drush commands for the content model |
 | `drupal/web/themes/custom/druxtjs/`     | The frontend's regions and blocks                                                      |
-| `docs-source.json`                      | The documentation repository and commit the content is seeded from                     |
+| `docs-source.json`                      | The druxt.js commits the content is seeded from and the API reference is generated at  |
 | `scripts/`                              | The IR builder, the corpus survey and its baseline, content validation, the host lint  |
 | `tests/`                                | Node tests, and bash guardrail tests for `.devtools` and the scripts                   |
 | `docs/`                                 | Notes on the backend: previews, configuration, the importer and page history           |

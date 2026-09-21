@@ -19,6 +19,7 @@
     ".vale/",
     ".docs-ir/",
     ".docs-source/",
+    ".docs-api/",
     "package-lock.json",
     "*.lock",
     "*.svg",

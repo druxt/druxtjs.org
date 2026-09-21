@@ -43,7 +43,9 @@ importer seeds it from the pinned documentation.
 ## The documentation source
 
 `docs-source.json` pins the documentation repository and the exact commit
-the content is seeded from. Nothing here reads a branch. The content depends
+the content is seeded from, `ref`. Nothing here reads a branch. Its `docgenRef`
+is the commit the API reference is generated at, and nothing on this page
+reads it. The content depends
 only on that commit, the importer and the content model. On every pipeline,
 CI builds from the pin into a throwaway site to prove the importer still
 produces it.

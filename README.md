@@ -98,8 +98,9 @@ the site, and is not how page text is published. See
 [Where changes go](#where-changes-go) for what belongs where.
 
 The Modules, API reference and Components pages come from the druxt.js
-packages. `npm run docs:generate` builds them locally, in the pinned druxt.js
-checkout. It installs and builds druxt.js first, so the first run is slow.
+packages. `npm run docs:generate` builds them locally, from druxt.js at the
+`docgenRef` in `docs-source.json`, in `.docs-api`. It installs and builds druxt.js
+first, so the first run is slow.
 
 ### Where changes go
 
