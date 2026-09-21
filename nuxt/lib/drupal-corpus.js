@@ -190,14 +190,19 @@ const documentOf = (page, byId) => {
 /**
  * Every published documentation page Drupal holds.
  *
- * Returns an empty array rather than throwing when Drupal cannot be read:
- * the caller merges this with the generated pages, and an index missing the
- * authored pages is a better answer than no index at all.
+ * Throws when any page of results cannot be read. Returning what it managed
+ * to collect would be worse than failing: the caller caches the result as a
+ * good one, so a moment of Drupal being unreachable would publish a sitemap
+ * with the authored pages missing, and hold it for the time to live. A
+ * crawler reads that as those pages having been removed. Failing instead
+ * leaves the previous answer standing, which is the whole point of holding
+ * one.
  *
  * @param {string} baseUrl - Drupal's base URL.
  * @param {object} [options] - Options.
  * @param {Function} [options.fetch] - The JSON getter, for tests.
  * @param {Function} [options.log] - Logs a line.
+ * @throws {Error} When Drupal cannot be read, or answers something unusable.
  * @returns {Promise<Array<object>>} The documents.
  */
 const fetchDrupalDocs = async (baseUrl, { fetch = getJson, log = () => {} } = {}) => {
@@ -209,8 +214,8 @@ const fetchDrupalDocs = async (baseUrl, { fetch = getJson, log = () => {} } = {}
     requests += 1
     const body = await fetch(next)
     if (!body || !Array.isArray(body.data)) {
-      log(`drupal corpus: ${requests === 1 ? 'no answer from' : 'a page of results failed at'} ${next}`)
-      return requests === 1 ? [] : documents
+      log(`drupal corpus: no usable answer from ${next}`)
+      throw new Error(`Drupal did not answer with a page of documents: ${next}`)
     }
 
     const byId = indexIncluded(body.included)

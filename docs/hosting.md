@@ -53,7 +53,7 @@ subdomains, are set in `.lagoon.yml`.
    database an environment already has. Production syncs from nothing. Either
    way it then runs `drush deploy`, or installs from `drupal/config/sync`
    when there is no database at all. It seeds from the pinned commit only
-   in that last case, or when `DOCS_SEED=1` asks for it. It also creates
+   in that last case. It also creates
    Simple OAuth's keys, once, on the files volume, and records the
    revision it deployed.
 4. Once Drupal reports that revision, `nuxt` builds the app against it and

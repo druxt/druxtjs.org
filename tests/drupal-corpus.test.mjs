@@ -147,26 +147,28 @@ describe('fetchDrupalDocs', () => {
     )
   })
 
-  test('answers empty rather than throwing when Drupal cannot be read', async () => {
+  // Returning a partial corpus would be cached as a good answer, and an
+  // index that has silently lost the authored pages reads to a crawler as
+  // those pages having been removed. Failing keeps the previous answer.
+  test('fails rather than reporting a corpus it could not read', async () => {
     const lines = []
-    const docs = await fetchDrupalDocs('http://drupal', {
-      fetch: async () => null,
-      log: (line) => lines.push(line),
-    })
-    assert.deepEqual(docs, [])
-    assert.match(lines[0], /no answer from/)
+    await assert.rejects(
+      () =>
+        fetchDrupalDocs('http://drupal', {
+          fetch: async () => null,
+          log: (line) => lines.push(line),
+        }),
+      /did not answer with a page of documents/
+    )
+    assert.match(lines[0], /no usable answer/)
   })
 
-  test('keeps the pages it already has when a later request fails', async () => {
+  test('fails when a later page of results is unreadable, rather than truncating', async () => {
     const answers = [{ data: [page('/a')], links: { next: { href: 'http://drupal/next' } } }, null]
     let call = 0
-    const docs = await fetchDrupalDocs('http://drupal', {
-      fetch: async () => answers[call++],
-      log: () => {},
-    })
-    assert.deepEqual(
-      docs.map((doc) => doc.route),
-      ['/a']
+    await assert.rejects(
+      () => fetchDrupalDocs('http://drupal', { fetch: async () => answers[call++], log: () => {} }),
+      /did not answer with a page of documents/
     )
   })
 
@@ -294,6 +296,52 @@ describe('artefacts', () => {
       const stale = await get(`${base}/sitemap.xml`)
       assert.equal(stale.status, 200)
       assert.match(stale.body, /how-to\/proxy/)
+    })
+  })
+
+  // The defect this guards: the fetcher used to swallow a Drupal failure and
+  // answer with an empty list, which the cache then held as a good corpus.
+  // The two are wired together here rather than with an injected stub, so a
+  // regression in either one is caught.
+  test('a Drupal failure leaves the previous index standing, rather than publishing one without it', async () => {
+    let drupalUp = true
+    const artefacts = createArtefacts({
+      baseUrl: 'http://drupal',
+      contentDir: '/nowhere',
+      origin: 'https://druxtjs.org',
+      ttl: 20,
+      readGenerated: () => [
+        {
+          route: '/api/druxt',
+          title: 'API',
+          description: 'x',
+          weight: 0,
+          section: 'api',
+          content: '',
+        },
+      ],
+      // The real fetcher, given a reader that fails the way getJson does.
+      fetchDocs: (url, options) =>
+        fetchDrupalDocs(url, {
+          ...options,
+          log: () => {},
+          fetch: async () => (drupalUp ? { data: [page('/how-to/proxy')] } : null),
+        }),
+    })
+    const handler = createHandler({ cache: null, artefacts, live: (req, res) => res.end() })
+    await withServer(handler, async (base) => {
+      const first = await get(`${base}/sitemap.xml`)
+      assert.match(first.body, /how-to\/proxy/, 'the authored page is there while Drupal answers')
+
+      drupalUp = false
+      await new Promise((resolve) => setTimeout(resolve, 40))
+      const after = await get(`${base}/sitemap.xml`)
+      assert.equal(after.status, 200)
+      assert.match(
+        after.body,
+        /how-to\/proxy/,
+        'the authored page survives Drupal being unreachable'
+      )
     })
   })
 

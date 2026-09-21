@@ -32,15 +32,20 @@ chmod 700 "$target"
 # Written beside the destination and moved into place, so a rollout that
 # reads it while this runs gets the previous dump whole rather than this
 # one half-written.
-staging="$target/.latest.sql.gz.$$"
+#
+# `--gzip` appends `.gz` to whatever `--result-file` names, so the name given
+# to drush must not already end in it, and the file to check for is the one
+# drush actually wrote.
+uncompressed="$target/.latest.$$.sql"
+staging="${uncompressed}.gz"
 final="$target/latest.sql.gz"
 
 echo "Dumping production for the other environments."
-drush sql:dump --gzip --extra-dump=--no-tablespaces --result-file="${staging%.gz}"
+drush sql:dump --gzip --extra-dump=--no-tablespaces --result-file="$uncompressed"
 
 if [ ! -s "$staging" ]; then
   echo "The dump produced nothing; leaving any previous dump in place."
-  rm -f "$staging" "${staging%.gz}"
+  rm -f "$staging" "$uncompressed"
   exit 1
 fi
 
