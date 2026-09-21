@@ -6449,7 +6449,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vue/devtools-api@npm:^6.5.0":
+"@vue/devtools-api@npm:^6.6.4":
   version: 6.6.4
   resolution: "@vue/devtools-api@npm:6.6.4"
   checksum: beccd79c7c7794ea511e35581fbbe5411d3c5d63b2418bc3771efc66959966df4cbfc391ff5954028e2728eb0f0e37b41722e1c39fde61295f2814a143d2ef0e
@@ -7412,16 +7412,6 @@ __metadata:
     "@babel/runtime": ^7.15.4
     is-retry-allowed: ^2.2.0
   checksum: 44e574ad559e4ee638e735662e9b9fcb69a1da6652adc3a75ca4b060e0fd40bdd7ac718e7743f51c0dad54149a6f3c09109275bf90298042542e80a17740a4e5
-  languageName: node
-  linkType: hard
-
-"axios@npm:0.27.2":
-  version: 0.27.2
-  resolution: "axios@npm:0.27.2"
-  dependencies:
-    follow-redirects: ^1.14.9
-    form-data: ^4.0.0
-  checksum: 38cb7540465fe8c4102850c4368053c21683af85c5fdf0ea619f9628abbcb59415d1e22ebc8a6390d2bbc9b58a9806c874f139767389c862ec9b772235f06854
   languageName: node
   linkType: hard
 
@@ -9038,7 +9028,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:3.50.0, core-js@npm:^3.31.0":
+"core-js@npm:3.50.0, core-js@npm:^3.50.0":
   version: 3.50.0
   resolution: "core-js@npm:3.50.0"
   checksum: 3a3a0330731fbb98bb47fd676d90f9208171d6eacb42f9e0eb962d18f521fee412a5301c8aca533f5c3add550034824517e764d7fd9f6d4269cbca421027c193
@@ -10852,7 +10842,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"drupal-jsonapi-params@npm:2.3.2, drupal-jsonapi-params@npm:^2.2.0":
+"drupal-jsonapi-params@npm:2.3.2, drupal-jsonapi-params@npm:^2.3.2":
   version: 2.3.2
   resolution: "drupal-jsonapi-params@npm:2.3.2"
   dependencies:
@@ -10861,54 +10851,52 @@ __metadata:
   languageName: node
   linkType: hard
 
-"druxt-blocks@npm:0.17.3, druxt-blocks@npm:^0.17.1, druxt-blocks@npm:^0.17.3":
-  version: 0.17.3
-  resolution: "druxt-blocks@npm:0.17.3"
+"druxt-blocks@npm:0.17.4-dev.20260921034536":
+  version: 0.17.4-dev.20260921034536
+  resolution: "druxt-blocks@npm:0.17.4-dev.20260921034536"
   dependencies:
-    axios: 0.27.2
-    drupal-jsonapi-params: ^2.2.0
-    druxt: ^0.23.0
-    druxt-entity: ^0.28.1
-    druxt-router: ^0.30.0
-    vue: ^2.7.14
+    axios: 0.33.0
+    drupal-jsonapi-params: ^2.3.2
+    druxt: 0.25.0-dev.20260921034536
+    vue: ^2.7.16
     vuex: ^3.6.2
   dependenciesMeta:
     vue:
       optional: true
     vuex:
       optional: true
-  checksum: a7d2d051ed1c3ca3f4d1ff5edc1bdd7c34ad1a7c522e0fe7a9df9762cd849c7f49e908d707f4d6407e8bca86ee12d6f6e0724ad5a46c9191f12dac12230214f5
+  checksum: 4e5e7448fe3941abfd5ef0d32a38117ea6db9df09d1a231fe1e62985d774fc4a4b9c99bdf4bf004427a684bf5c9cfdbc7121936a4989d016451ff519679e8bfb
   languageName: node
   linkType: hard
 
-"druxt-breadcrumb@npm:0.17.2, druxt-breadcrumb@npm:^0.17.1":
-  version: 0.17.2
-  resolution: "druxt-breadcrumb@npm:0.17.2"
+"druxt-breadcrumb@npm:0.17.3-dev.20260921034536":
+  version: 0.17.3-dev.20260921034536
+  resolution: "druxt-breadcrumb@npm:0.17.3-dev.20260921034536"
   dependencies:
-    druxt: ^0.23.0
-    druxt-blocks: ^0.17.3
-    druxt-router: ^0.30.0
-    vue: ^2.7.14
+    druxt: 0.25.0-dev.20260921034536
+    druxt-blocks: 0.17.4-dev.20260921034536
+    druxt-router: 0.31.1-dev.20260921034536
+    vue: ^2.7.16
     vuex: ^3.6.2
   dependenciesMeta:
     vue:
       optional: true
     vuex:
       optional: true
-  checksum: 44f08614d1d5d895f30b6e8c7325d6e2659afea1681d1f0f135fee01a8020f6cec69f0d4190e11f576e380cfa564161a68833ed8681445c23ef01ccddd95f49d
+  checksum: df12be6dd60c59b11b09377bfac8657768910edf616a1b467547ea0d23765d38a28bbb52fc40d03fe349e248c6d891d35f44513a40583acadeccddee5166f04d
   languageName: node
   linkType: hard
 
-"druxt-entity@npm:0.28.1, druxt-entity@npm:^0.28.0, druxt-entity@npm:^0.28.1":
-  version: 0.28.1
-  resolution: "druxt-entity@npm:0.28.1"
+"druxt-entity@npm:0.29.0-dev.20260921034536":
+  version: 0.29.0-dev.20260921034536
+  resolution: "druxt-entity@npm:0.29.0-dev.20260921034536"
   dependencies:
     deepmerge: ^4.3.1
-    drupal-jsonapi-params: ^2.2.0
-    druxt: ^0.23.0
-    druxt-router: ^0.30.0
-    druxt-schema: ^0.11.3
-  checksum: 5c0c129d43686a725550b072ed050aaee7ab76a4fb2a1bb52551ed673b28894c7bebb1f3d258ea46a672e4a82d6603cc11851d69ab67b61ad6965f029c60b917
+    drupal-jsonapi-params: ^2.3.2
+    druxt: 0.25.0-dev.20260921034536
+    druxt-router: 0.31.1-dev.20260921034536
+    druxt-schema: 0.11.4-dev.20260921034536
+  checksum: 180947728e6e889ee08ec3346e242e71facd57ea98b15bd31cdab7fe0d4a1983a135a344394f1bb43615ff14127df89a4928e5a8f2a0bf4410d5dd9c7af64f28
   languageName: node
   linkType: hard
 
@@ -10919,32 +10907,32 @@ __metadata:
   languageName: node
   linkType: hard
 
-"druxt-menu@npm:0.21.0, druxt-menu@npm:^0.21.0":
-  version: 0.21.0
-  resolution: "druxt-menu@npm:0.21.0"
+"druxt-menu@npm:0.21.1-dev.20260921034536":
+  version: 0.21.1-dev.20260921034536
+  resolution: "druxt-menu@npm:0.21.1-dev.20260921034536"
   dependencies:
     deepmerge: ^4.3.1
-    drupal-jsonapi-params: ^2.2.0
-    druxt: ^0.24.0
-    druxt-blocks: ^0.17.1
-    vue: ^2.7.14
+    drupal-jsonapi-params: ^2.3.2
+    druxt: 0.25.0-dev.20260921034536
+    druxt-blocks: 0.17.4-dev.20260921034536
+    vue: ^2.7.16
     vuex: ^3.6.2
   dependenciesMeta:
     vue:
       optional: true
     vuex:
       optional: true
-  checksum: a133353ef3caa93bf304a71d6b29378a3765881a3cd0d7b05b4e44b02ab4b4e796e455bbf7c488d6d06bd659397eb5b8bb944078551c36ac79d28df1fe4ea54e
+  checksum: 03e778f626c72cb95c227ebdff9c74a03000676473bd8f70171bdfbacc9041debbd0b0c58f85fa211bdd55415c487ceb076d80566771ef3ae19d99a69757bf57
   languageName: node
   linkType: hard
 
-"druxt-router@npm:0.31.0":
-  version: 0.31.0
-  resolution: "druxt-router@npm:0.31.0"
+"druxt-router@npm:0.31.1-dev.20260921034536":
+  version: 0.31.1-dev.20260921034536
+  resolution: "druxt-router@npm:0.31.1-dev.20260921034536"
   dependencies:
-    druxt: ^0.24.0
+    druxt: 0.25.0-dev.20260921034536
     url-parse: ^1.5.10
-    vue: ^2.7.14
+    vue: ^2.7.16
     vuex: ^3.6.2
   peerDependencies:
     drupal-jsonapi-params: "*"
@@ -10953,134 +10941,95 @@ __metadata:
       optional: true
     vuex:
       optional: true
-  checksum: 475560dd92d6d99d44e06af4fc57a21b91b877200cb00ec7df1fd322d10207482916cd39da4f412a67101b717b4a3762acf4985c2e808faeda9174289040d194
+  checksum: 5bdde460ae4d1e11a99803740beddbe092e9fee6fe7eedfffdad50e4aceb379a2732256bf615a28e54220b49c7f81e8258b080d5f9717c5624030e830cd05328
   languageName: node
   linkType: hard
 
-"druxt-router@npm:^0.29.1":
-  version: 0.29.1
-  resolution: "druxt-router@npm:0.29.1"
-  dependencies:
-    druxt: ^0.22.0
-    url-parse: ^1.5.10
-    vue: ^2.7.14
-    vuex: ^3.6.2
-  peerDependencies:
-    drupal-jsonapi-params: "*"
-  dependenciesMeta:
-    vue:
-      optional: true
-    vuex:
-      optional: true
-  checksum: 1cb8e7f2fab230921b408a665deebe71636ade4f0df777c608b2e1bf8c3302c4adba5a025f160cc9abc0b68be7c3a11a63cf80ac628137a5dec469ac668fd4f4
-  languageName: node
-  linkType: hard
-
-"druxt-router@npm:^0.30.0":
-  version: 0.30.0
-  resolution: "druxt-router@npm:0.30.0"
-  dependencies:
-    druxt: ^0.23.0
-    url-parse: ^1.5.10
-    vue: ^2.7.14
-    vuex: ^3.6.2
-  peerDependencies:
-    drupal-jsonapi-params: "*"
-  dependenciesMeta:
-    vue:
-      optional: true
-    vuex:
-      optional: true
-  checksum: bd98f7c27000ac1d93c58ae0e9fc6a70f6e1e5a64d7b0278eef60f09a96de9a222c2044311d3be766280b0b9af4badd0239e446eaec29365c5a52054fc95a91a
-  languageName: node
-  linkType: hard
-
-"druxt-schema@npm:0.11.3, druxt-schema@npm:^0.11.2, druxt-schema@npm:^0.11.3":
-  version: 0.11.3
-  resolution: "druxt-schema@npm:0.11.3"
+"druxt-schema@npm:0.11.4-dev.20260921034536":
+  version: 0.11.4-dev.20260921034536
+  resolution: "druxt-schema@npm:0.11.4-dev.20260921034536"
   dependencies:
     consola: ^2.15.3
-    drupal-jsonapi-params: ^2.2.0
-    druxt: ^0.23.0
-    vue: ^2.7.14
+    drupal-jsonapi-params: ^2.3.2
+    druxt: 0.25.0-dev.20260921034536
+    vue: ^2.7.16
     vuex: ^3.6.2
   dependenciesMeta:
     vue:
       optional: true
     vuex:
       optional: true
-  checksum: f77f414b63c6c2754def61e5b65b735bfff8d7e258f980dc6ec0181f2f319f5cf71aefc217652ab80837c0f88f59914d743e19bf48d65e5c44d084a908c7d5fe
+  checksum: 85d001fc275cf0c9dace8acd100a32388b3968d1b9594bc3b26263e036740cbd8f1dcd84b28237f1f90cc3a71030cb99355be87d692d084a6796c49b85c88408
   languageName: node
   linkType: hard
 
-"druxt-site@npm:0.14.3":
-  version: 0.14.3
-  resolution: "druxt-site@npm:0.14.3"
+"druxt-site@npm:0.14.4-dev.20260921034536":
+  version: 0.14.4-dev.20260921034536
+  resolution: "druxt-site@npm:0.14.4-dev.20260921034536"
   dependencies:
-    drupal-jsonapi-params: ^2.2.0
-    druxt: ^0.22.0
-    druxt-blocks: ^0.17.1
-    druxt-breadcrumb: ^0.17.1
-    druxt-entity: ^0.28.0
-    druxt-menu: ^0.21.0
-    druxt-router: ^0.29.1
-    druxt-schema: ^0.11.2
-    druxt-views: ^0.22.0
-    md5: ^2.3.0
-    vue: ^2.7.14
+    drupal-jsonapi-params: ^2.3.2
+    druxt: 0.25.0-dev.20260921034536
+    druxt-blocks: 0.17.4-dev.20260921034536
+    druxt-breadcrumb: 0.17.3-dev.20260921034536
+    druxt-entity: 0.29.0-dev.20260921034536
+    druxt-menu: 0.21.1-dev.20260921034536
+    druxt-router: 0.31.1-dev.20260921034536
+    druxt-schema: 0.11.4-dev.20260921034536
+    druxt-views: 0.22.3-dev.20260921034536
+    vue: ^2.7.16
     vuex: ^3.6.2
   dependenciesMeta:
     vue:
       optional: true
     vuex:
       optional: true
-  checksum: a433cb4c821a0a557acedac10860f3e5c154de8a46b554ed4bcedd37ef086c3b67d27ef3c7f9f5086b38a25f5414f5efefd182f1726d60ffac0e899a93b2628e
+  checksum: 1819399d1f07a7f765f977f9972ab7806cf65c6cac8b218740ae359ddc5b1efe39c5c43acb6ee877923c3905a5595a45c246d63b88b68959a67f2ff206f5a4ba
   languageName: node
   linkType: hard
 
-"druxt-views@npm:0.22.2, druxt-views@npm:^0.22.0":
-  version: 0.22.2
-  resolution: "druxt-views@npm:0.22.2"
+"druxt-views@npm:0.22.3-dev.20260921034536":
+  version: 0.22.3-dev.20260921034536
+  resolution: "druxt-views@npm:0.22.3-dev.20260921034536"
   dependencies:
-    axios: 0.27.2
+    axios: 0.33.0
     deepmerge: ^4.3.1
-    drupal-jsonapi-params: ^2.2.0
-    druxt: ^0.23.0
-    druxt-blocks: ^0.17.3
-    druxt-entity: ^0.28.1
-    druxt-router: ^0.30.0
+    drupal-jsonapi-params: ^2.3.2
+    druxt: 0.25.0-dev.20260921034536
+    druxt-blocks: 0.17.4-dev.20260921034536
+    druxt-entity: 0.29.0-dev.20260921034536
+    druxt-router: 0.31.1-dev.20260921034536
     md5: ^2.3.0
-    vue: ^2.7.14
+    vue: ^2.7.16
     vuex: ^3.6.2
   dependenciesMeta:
     vue:
       optional: true
     vuex:
       optional: true
-  checksum: bcefbaaa515142a901b0191fa005f151e54d79eff6dfa7542fe290abf0d34b56593ae6f42a5303724cbfaa60d412c25dbb1eaa650c6a6b41667e2073d71c8cc6
+  checksum: 5da1db78a65786d3e392137a621f7c36800f28c73c31339a411dec13310a823b51d04058221d9ad8af85e1a878403f4aa23d4bd9b86aa39e05fa0a0eb787ba76
   languageName: node
   linkType: hard
 
-"druxt@npm:0.24.0, druxt@npm:^0.24.0":
-  version: 0.24.0
-  resolution: "druxt@npm:0.24.0"
+"druxt@npm:0.25.0-dev.20260921034536":
+  version: 0.25.0-dev.20260921034536
+  resolution: "druxt@npm:0.25.0-dev.20260921034536"
   dependencies:
     "@nuxtjs/axios": ^5.13.6
     "@nuxtjs/proxy": ^2.1.0
-    "@vue/devtools-api": ^6.5.0
+    "@vue/devtools-api": ^6.6.4
     chalk: ^4.1.2
-    core-js: ^3.31.0
+    core-js: ^3.50.0
     deepmerge: ^4.3.1
-    drupal-jsonapi-params: ^2.2.0
-    express-rate-limit: ^6.7.0
-    launch-editor: ^2.6.0
+    drupal-jsonapi-params: ^2.3.2
+    express-rate-limit: ^7.5.1
+    launch-editor: ^2.14.1
     md5: ^2.3.0
     querystring: ^0.2.1
     scule: ^0.3.2
-    vue: ^2.7.14
+    vue: ^2.7.16
     vuex: ^3.6.2
   peerDependencies:
-    axios: "*"
+    axios: 0.28.0
     consola: "*"
   dependenciesMeta:
     core-js:
@@ -11089,71 +11038,7 @@ __metadata:
       optional: true
     vuex:
       optional: true
-  checksum: a20c6106652c01491f89d8cb4aaaabcb8a31a499cce00eb19c8b57522b515fbaf056c74502ab6e51726ea767a370bcf53e184e3a8bbccbd125df7fa336d414a7
-  languageName: node
-  linkType: hard
-
-"druxt@npm:^0.22.0":
-  version: 0.22.0
-  resolution: "druxt@npm:0.22.0"
-  dependencies:
-    "@nuxtjs/axios": ^5.13.6
-    "@nuxtjs/proxy": ^2.1.0
-    "@vue/devtools-api": ^6.5.0
-    chalk: ^4.1.2
-    core-js: ^3.31.0
-    deepmerge: ^4.3.1
-    drupal-jsonapi-params: ^2.2.0
-    express-rate-limit: ^6.7.0
-    launch-editor: ^2.6.0
-    md5: ^2.3.0
-    querystring: ^0.2.1
-    scule: ^0.3.2
-    vue: ^2.7.14
-    vuex: ^3.6.2
-  peerDependencies:
-    axios: "*"
-    consola: "*"
-  dependenciesMeta:
-    core-js:
-      optional: true
-    vue:
-      optional: true
-    vuex:
-      optional: true
-  checksum: ca6f8ccdede5f21555490c6ed616576ccd0d665579a31f19f8ac2a6824acbc8d697c948275ec8fe7ad6dcaac678f9e0882da1cf8f72463bf2d2919a46f02c247
-  languageName: node
-  linkType: hard
-
-"druxt@npm:^0.23.0":
-  version: 0.23.0
-  resolution: "druxt@npm:0.23.0"
-  dependencies:
-    "@nuxtjs/axios": ^5.13.6
-    "@nuxtjs/proxy": ^2.1.0
-    "@vue/devtools-api": ^6.5.0
-    chalk: ^4.1.2
-    core-js: ^3.31.0
-    deepmerge: ^4.3.1
-    drupal-jsonapi-params: ^2.2.0
-    express-rate-limit: ^6.7.0
-    launch-editor: ^2.6.0
-    md5: ^2.3.0
-    querystring: ^0.2.1
-    scule: ^0.3.2
-    vue: ^2.7.14
-    vuex: ^3.6.2
-  peerDependencies:
-    axios: "*"
-    consola: "*"
-  dependenciesMeta:
-    core-js:
-      optional: true
-    vue:
-      optional: true
-    vuex:
-      optional: true
-  checksum: 25d7defa9e07ccc2275869d60592f27bf32dd24daa2439c4d222d1930e92810f8888d56f6598b632eef6214f9121b42c35e0ccbbee06a04c4235b6d93e64e981
+  checksum: 24915e3c11aeb1bdfc55643344518a96743ce6d92cb7087a53e18b137fff01b8e84c687f3163152fd931fe840b34a76b8a6349efe1a897c026aaeff9aca0f2b4
   languageName: node
   linkType: hard
 
@@ -11176,16 +11061,16 @@ __metadata:
     core-js: 3.50.0
     daisyui: 1.25.4
     drupal-jsonapi-params: 2.3.2
-    druxt: 0.24.0
-    druxt-blocks: 0.17.3
-    druxt-breadcrumb: 0.17.2
-    druxt-entity: 0.28.1
+    druxt: 0.25.0-dev.20260921034536
+    druxt-blocks: 0.17.4-dev.20260921034536
+    druxt-breadcrumb: 0.17.3-dev.20260921034536
+    druxt-entity: 0.29.0-dev.20260921034536
     druxt-layout-paragraphs: 0.4.1
-    druxt-menu: 0.21.0
-    druxt-router: 0.31.0
-    druxt-schema: 0.11.3
-    druxt-site: 0.14.3
-    druxt-views: 0.22.2
+    druxt-menu: 0.21.1-dev.20260921034536
+    druxt-router: 0.31.1-dev.20260921034536
+    druxt-schema: 0.11.4-dev.20260921034536
+    druxt-site: 0.14.4-dev.20260921034536
+    druxt-views: 0.22.3-dev.20260921034536
     github-slugger: 1.5.0
     mermaid: 8.14.0
     nuxt: 2.18.1
@@ -11815,12 +11700,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-rate-limit@npm:^6.7.0":
-  version: 6.11.2
-  resolution: "express-rate-limit@npm:6.11.2"
+"express-rate-limit@npm:^7.5.1":
+  version: 7.5.1
+  resolution: "express-rate-limit@npm:7.5.1"
   peerDependencies:
-    express: ^4 || ^5
-  checksum: 3cc4032ee2f7063647f45e338e10c9a67d8595a0f9a5a291d6633b6d96aab6201c8943bae74491f824cb6230a59921daec95ef4e22c1112759a766456c0f1f19
+    express: ">= 4.11"
+  checksum: 544fdd576a846a7d3ed0203a011cec6d65ad8e5eab58dbe045a0bdefd119060c140c38b327e32713b56342cc901a3ca5c99f13cce4ceee08408e775ec4742c16
   languageName: node
   linkType: hard
 
@@ -12214,7 +12099,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.14.0, follow-redirects@npm:^1.14.9, follow-redirects@npm:^1.15.4":
+"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.14.0, follow-redirects@npm:^1.15.4":
   version: 1.16.0
   resolution: "follow-redirects@npm:1.16.0"
   peerDependenciesMeta:
@@ -12307,7 +12192,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"form-data@npm:^4.0.0, form-data@npm:^4.0.4":
+"form-data@npm:^4.0.4":
   version: 4.0.6
   resolution: "form-data@npm:4.0.6"
   dependencies:
@@ -15051,7 +14936,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"launch-editor@npm:^2.6.0":
+"launch-editor@npm:^2.14.1":
   version: 2.14.1
   resolution: "launch-editor@npm:2.14.1"
   dependencies:
@@ -22856,7 +22741,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vue-server-renderer@npm:^2.7.16":
+"vue-server-renderer@npm:2.7.16":
   version: 2.7.16
   resolution: "vue-server-renderer@npm:2.7.16"
   dependencies:
@@ -22899,7 +22784,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vue@npm:^2.7.14, vue@npm:^2.7.16":
+"vue@npm:2.7.16":
   version: 2.7.16
   resolution: "vue@npm:2.7.16"
   dependencies:
