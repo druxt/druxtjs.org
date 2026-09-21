@@ -228,6 +228,15 @@ const fetchDrupalDocs = async (baseUrl, { fetch = getJson, log = () => {} } = {}
     next = link && typeof link.href === 'string' ? link.href : null
   }
 
+  // The guard against following `next` forever must not become a quiet way
+  // of returning half the corpus. Reaching it with pages still to read is
+  // the same failure as a page that could not be read, and gets the same
+  // answer: fail, and leave the previous index standing.
+  if (next) {
+    log(`drupal corpus: still paginating after ${MAX_REQUESTS} requests`)
+    throw new Error(`Drupal has more pages than ${MAX_REQUESTS} requests can read`)
+  }
+
   return documents
 }
 

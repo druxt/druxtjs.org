@@ -172,6 +172,26 @@ describe('fetchDrupalDocs', () => {
     )
   })
 
+  // The same truncation as an unreadable page, reached by a different door:
+  // running out of requests while Drupal still has pages to give.
+  test('fails rather than stopping halfway when there are more pages than it will read', async () => {
+    const lines = []
+    let served = 0
+    await assert.rejects(
+      () =>
+        fetchDrupalDocs('http://drupal', {
+          log: (line) => lines.push(line),
+          // Always another page, so the request limit is what ends it.
+          fetch: async () => ({
+            data: [page(`/how-to/page-${served++}`)],
+            links: { next: { href: 'http://drupal/next' } },
+          }),
+        }),
+      /more pages than/
+    )
+    assert.match(lines[0], /still paginating/)
+  })
+
   test('skips a page with no usable alias', async () => {
     const broken = { type: 'node--doc_page', id: 'x', attributes: { title: 'No alias', path: {} } }
     const docs = await fetchDrupalDocs('http://drupal', { fetch: async () => ({ data: [broken] }) })
