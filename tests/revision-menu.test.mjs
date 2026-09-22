@@ -1,8 +1,9 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 
-const { hasDraft, kindOf, versionOf, viewing, whenOf } = (await import('../nuxt/lib/revisions.js'))
-  .default
+const { actionsFor, hasDraft, kindOf, versionOf, viewing, whenOf } = (
+  await import('../nuxt/lib/revisions.js')
+).default
 
 const draft = { vid: 125, latest: true, default: false }
 const live = { vid: 120, latest: false, default: true }
@@ -56,5 +57,24 @@ describe('viewing', () => {
   it('treats published and nothing as live', () => {
     assert.equal(viewing([draft, live], 'published').kind, 'live')
     assert.equal(viewing([], undefined).kind, 'live')
+  })
+})
+
+describe('actionsFor', () => {
+  const revisions = [draft, live, old]
+
+  it('does not offer to view the revision already on screen', () => {
+    assert.deepEqual(actionsFor(draft, revisions, 'working-copy'), ['diff'])
+    assert.deepEqual(actionsFor(live, revisions, 'published'), [])
+    assert.deepEqual(actionsFor(old, revisions, 'id:90'), ['diff'])
+  })
+
+  it('offers to view the others', () => {
+    assert.deepEqual(actionsFor(draft, revisions, 'published'), ['view', 'diff'])
+    assert.deepEqual(actionsFor(old, revisions, 'working-copy'), ['view', 'diff'])
+  })
+
+  it('never offers to compare the live revision with itself', () => {
+    assert.deepEqual(actionsFor(live, revisions, 'working-copy'), ['view'])
   })
 })

@@ -69,17 +69,17 @@
               data-flyout-item
               role="menuitem"
               tabindex="-1"
-              :aria-label="`${row.when}, ${row.kind}, by ${row.author.name}`"
+              :aria-label="`${row.when}, ${row.viewing ? 'the revision you are reading' : row.kind}, by ${row.author.name}`"
               @keydown.enter.prevent="show(row.revision, false)"
               @keydown.space.prevent="show(row.revision, false)"
             >
               <AppAvatar :account="row.author" :size="24" class="row-span-2" />
               <span class="text-[13px] font-medium truncate">{{ row.when }}</span>
               <span class="revision-row-end row-span-2">
-                <span class="revision-tag" :class="row.kind">{{ row.kind }}</span>
-                <span class="revision-actions">
-                  <button type="button" class="revision-chip" tabindex="-1" @click="show(row.revision, false)">View</button>
-                  <button v-if="row.kind !== 'live'" type="button" class="revision-chip" data-testid="revision-diff" tabindex="-1" @click="show(row.revision, true)">Diff</button>
+                <span class="revision-tag" :class="row.viewing ? 'viewing' : row.kind">{{ row.viewing ? 'Viewing' : row.kind }}</span>
+                <span v-if="row.actions.length" class="revision-actions">
+                  <button v-if="row.actions.includes('view')" type="button" class="revision-chip" tabindex="-1" @click="show(row.revision, false)">View</button>
+                  <button v-if="row.actions.includes('diff')" type="button" class="revision-chip" data-testid="revision-diff" tabindex="-1" @click="show(row.revision, true)">Diff</button>
                 </span>
               </span>
               <span class="text-[11.5px] text-base-content/70 truncate">{{ row.author.name }}</span>
@@ -141,7 +141,7 @@
 
 <script>
 import { accountOf } from '~/lib/account'
-import { hasDraft, kindOf, versionOf, whenOf } from '~/lib/revisions'
+import { actionsFor, hasDraft, kindOf, versionOf, whenOf } from '~/lib/revisions'
 
 /** How many revisions the flyout lists. */
 const RECENT = 5
@@ -177,12 +177,18 @@ export default {
     allRevisions: ({ $store }) => ($store && $store.state.editor && $store.state.editor.revisions) || [],
     revisionCount: ({ allRevisions }) => allRevisions.length,
     /** The latest few, each with who made it and when. */
-    recent: ({ allRevisions }) => allRevisions.slice(0, RECENT).map((revision) => ({
-      revision,
-      kind: kindOf(revision),
-      when: whenOf(revision.date),
-      author: accountOf({ name: (revision.author || {}).name || 'Unknown', picture: (revision.author || {}).picture }),
-    })),
+    recent: ({ allRevisions, $store }) => allRevisions.slice(0, RECENT).map((revision) => {
+      const actions = actionsFor(revision, allRevisions, $store.state.editor.version)
+      return {
+        revision,
+        kind: kindOf(revision),
+        when: whenOf(revision.date),
+        actions,
+        // The row being read: it has nothing to offer but its own diff.
+        viewing: !actions.includes('view'),
+        author: accountOf({ name: (revision.author || {}).name || 'Unknown', picture: (revision.author || {}).picture }),
+      }
+    }),
     path: () => (typeof window === 'undefined' ? '' : window.location.pathname),
   },
 
