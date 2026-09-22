@@ -1065,10 +1065,17 @@ html {
   background: hsl(var(--b1) / 0.15);
 }
 .revision-pill-btn {
+  /* A flex row, or the label sits on its baseline inside the fixed height
+     and reads as though it has been pushed down. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
   height: 1.75rem;
   padding: 0 0.6875rem;
   border-radius: 9999px;
   font-weight: 600;
+  line-height: 1;
 }
 .revision-pill-btn.ghost {
   opacity: 0.85;
@@ -1266,4 +1273,26 @@ del.v-diff-del {
   .revision-pill-btn.ghost .icon {
     display: none;
   }
+}
+
+/* The row you are reading keeps its label where another row shows buttons:
+   there is nothing to offer but its own diff. */
+.revision-tag.viewing {
+  color: hsl(var(--pf));
+  border: 1px solid hsl(var(--pf) / 0.45);
+}
+.revision-row:hover .revision-tag.viewing,
+.revision-row:focus .revision-tag.viewing,
+.revision-row:focus-within .revision-tag.viewing {
+  display: inline-flex;
+}
+
+/* A revision whose content did not arrive says so, rather than showing a
+   blank page that reads as a broken site. */
+.docs-revision-missing {
+  padding: 0.75rem 1rem;
+  border: 1px solid hsl(var(--b3));
+  border-radius: 0.6rem;
+  background: hsl(var(--b2));
+  font-size: 0.875rem;
 }

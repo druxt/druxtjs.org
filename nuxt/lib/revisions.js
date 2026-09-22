@@ -77,4 +77,25 @@ const viewing = (revisions, version) => {
   return { kind: revision ? kindOf(revision) : 'old', revision }
 }
 
-module.exports = { hasDraft, kindOf, versionOf, viewing, whenOf }
+/**
+ * What a row in the list can offer, given what is on screen.
+ *
+ * Viewing the revision you are already reading does nothing, so the row you
+ * are on offers no `view`. The live revision has nothing to compare itself
+ * with, so it never offers `diff`.
+ *
+ * @param {object} revision - The row's revision.
+ * @param {object[]} revisions - The page's revisions.
+ * @param {string} version - The editor store's version.
+ * @returns {Array<'view'|'diff'>} What the row offers.
+ */
+const actionsFor = (revision, revisions, version) => {
+  const shown = viewing(revisions, version).revision || {}
+  const current = revision.vid === shown.vid
+  const actions = []
+  if (!current) actions.push('view')
+  if (kindOf(revision) !== 'live') actions.push('diff')
+  return actions
+}
+
+module.exports = { actionsFor, hasDraft, kindOf, versionOf, viewing, whenOf }
