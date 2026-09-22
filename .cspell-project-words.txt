@@ -82,3 +82,8 @@ zipfile
 cachetags
 docroot
 druxtjsorg
+endcode
+itok
+Revisionable
+SAMESITE
+SIMPLETEST
