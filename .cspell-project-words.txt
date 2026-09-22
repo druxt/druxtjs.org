@@ -74,3 +74,5 @@ vfox
 webp
 yarnrc
 zipfile
+cachetags
+docroot

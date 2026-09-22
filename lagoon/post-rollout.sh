@@ -28,6 +28,17 @@ environment_type="${LAGOON_ENVIRONMENT_TYPE:-}"
 environment_name="${LAGOON_ENVIRONMENT:-}"
 production_alias="@lagoon.druxtjs-org-main"
 
+# Copied without their rows: what a request writes, and what production's
+# visitors leave behind. Drupal rebuilds the caches, and the rest is no one
+# else's to hold.
+volatile_tables="cache,cache_*,cachetags,semaphore,sessions,watchdog,flood,key_value_expire,oauth2_token,oauth2_token__scopes,admin_audit_trail"
+
+# While this exists Drupal answers every web request with a 503
+# (settings.replacing.php). A request that bootstraps Drupal against a
+# half-imported database writes into it, and the import then collides with
+# its own rows.
+replacing="$app/drupal/web/sites/default/files/private/.replacing-database"
+
 # Two independent tests, because what follows begins by dropping a database.
 # An environment that cannot say what it is does not get synced: the answer
 # to "is this production?" must be a clear no, not an absent yes.
@@ -55,6 +66,10 @@ may_sync() {
 # mysqldump of the live database, per rollout, per environment. So the file
 # is tried first and the live sync is the fallback.
 load_from_production() {
+  mkdir -p "$(dirname "$replacing")"
+  : > "$replacing"
+  trap 'rm -f "$replacing"' EXIT
+
   dump="/tmp/production.sql.gz"
   rm -f "$dump" "${dump%.gz}"
 
@@ -68,7 +83,7 @@ load_from_production() {
   fi
 
   echo "  no scheduled dump to copy; reading the live database instead."
-  drush sql:sync "$production_alias" @self --yes
+  drush sql:sync "$production_alias" @self --yes --structure-tables-list="$volatile_tables"
 }
 
 # Remove what a contributor should never be handed. `sql:sanitize` covers

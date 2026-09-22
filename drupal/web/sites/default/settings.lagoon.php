@@ -9,6 +9,9 @@
  * container, so one image serves every environment.
  */
 
+// First, so a request during a database replacement touches nothing.
+require __DIR__ . '/settings.replacing.php';
+
 $databases['default']['default'] = [
   'driver' => 'mysql',
   'database' => getenv('MARIADB_DATABASE') ?: 'drupal',
