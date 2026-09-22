@@ -2,6 +2,10 @@
   <!-- .nuxt-content so content-links.client.js routes internal links, as it does for markdown. -->
   <!-- Only once every paragraph is in: the layout keeps the children it is first given. -->
   <div v-if="!$fetchState.pending" class="nuxt-content">
+    <p v-if="missing" class="docs-revision-missing" data-testid="revision-missing">
+      This revision's content could not be read.
+      <button type="button" class="link link-primary" @click="retry">Try again</button>
+    </p>
     <template v-for="paragraph in roots">
       <DruxtLayoutParagraph
         v-if="layoutOf(paragraph).layout"
@@ -33,6 +37,10 @@ export default {
     // Bumped when fetch() finishes. Vue 2 cannot track a store key that did
     // not exist when the list was last computed, so the list reads this too.
     fetched: 0,
+    // Whether the revision's paragraphs came back at all, and whether the one
+    // retry has been spent.
+    missing: false,
+    retried: false,
   }),
 
   props: {
@@ -52,7 +60,10 @@ export default {
       const ids = (list) => list.map((ref) => `${ref.id}@${(ref.meta || {}).target_revision_id}`).join()
       // Not $fetch(): Nuxt ignores it while the first fetch is still running,
       // which is exactly when a switched revision replaces the list.
-      if (ids(next) !== ids(previous)) this.loadParagraphs()
+      if (ids(next) === ids(previous)) return
+      this.retried = false
+      this.missing = false
+      this.loadParagraphs()
     },
   },
 
@@ -74,6 +85,13 @@ export default {
   },
   methods: {
     layoutOf,
+
+    /** Asks again for a revision the store would not give back. */
+    retry() {
+      this.retried = false
+      this.missing = false
+      this.loadParagraphs()
+    },
 
     /**
      * The page's paragraphs, at the revision the page names. Called by
@@ -97,6 +115,15 @@ export default {
         bypassCache: true,
       })))
       this.fetched = Date.now()
+      await this.$nextTick()
+      // A revision whose paragraphs the store would not give back leaves a
+      // blank page, which reads as a broken site rather than a failed fetch.
+      // One retry covers a request that lost a race; after that, say so.
+      if (this.refs.length && !this.paragraphs.length && !this.retried) {
+        this.retried = true
+        return this.loadParagraphs()
+      }
+      this.missing = Boolean(this.refs.length) && !this.paragraphs.length
       return
     }
     const missing = this.refs.filter((ref) => !this.stored(ref))
