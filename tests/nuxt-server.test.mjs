@@ -302,6 +302,31 @@ describe('createHandler', () => {
     }
   })
 
+  test("hands Drupal's own paths to the live app and never stores them", async () => {
+    const dir = tempDir()
+    try {
+      const cache = createPageCache({
+        dir,
+        ttl: 60000,
+        render: async () => ({ html: '<p>stored</p>' }),
+      })
+      await cache.store('/user/login')
+      await cache.store('/page')
+      const passThrough = (pathname) => pathname.startsWith('/user')
+      await withServer(createHandler({ cache, live: live(), passThrough }), async (base) => {
+        const login = await request(`${base}/user/login`)
+        assert.equal(login.body, 'live')
+        assert.equal(login.headers['x-docs-cache'], undefined)
+        const trailing = await request(`${base}/user/`)
+        assert.equal(trailing.status, 200, 'not redirected to drop the slash')
+        const page = await request(`${base}/page`)
+        assert.equal(page.headers['x-docs-cache'], 'HIT')
+      })
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
   test('renders a missing page live, then serves it stored', async () => {
     const dir = tempDir()
     try {
