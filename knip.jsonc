@@ -6,7 +6,8 @@
   "project": ["scripts/**/*.mjs", "tests/**/*.mjs"],
   "ignore": ["nuxt/**", "drupal/**", ".docs-source/**", ".docs-ir/**"],
   // node --test's built-in reporters, which knip reads as packages in the
-  // test:coverage script. druxt-auth is nuxt/'s, reached from the tests
-  // through nuxt/server/page-cache.js and resolved from nuxt/node_modules.
-  "ignoreDependencies": ["junit", "spec", "druxt-auth"]
+  // test:coverage script, and two of nuxt/'s packages the tests reach
+  // through nuxt/: the diff package through nuxt/lib/diff.js, and druxt-auth
+  // through nuxt/server/page-cache.js. Both belong to nuxt/'s manifest.
+  "ignoreDependencies": ["junit", "spec", "@druxt-contrib/diff", "druxt-auth"]
 }
