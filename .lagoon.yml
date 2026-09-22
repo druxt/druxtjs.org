@@ -67,6 +67,10 @@ environments:
     routes:
       - nuxt:
           - dev.druxtjs.org
+      - storybook:
+          - storybook.dev.druxtjs.org
+      - nginx:
+          - cms.dev.druxtjs.org
 
 tasks:
   post-rollout:
