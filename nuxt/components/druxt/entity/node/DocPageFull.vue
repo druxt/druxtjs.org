@@ -1,7 +1,8 @@
 <template>
   <!-- .nuxt-content so content-links.client.js routes internal links, as it does for markdown. -->
   <!-- Only once every paragraph is in: the layout keeps the children it is first given. -->
-  <div v-if="!$fetchState.pending" class="nuxt-content">
+  <!-- v-druxt-admin: an editor gets this page's Drupal operations, a reader nothing. -->
+  <div v-if="!$fetchState.pending" v-druxt-admin="entity" class="nuxt-content">
     <template v-for="paragraph in roots">
       <DruxtLayoutParagraph
         v-if="layoutOf(paragraph).layout"

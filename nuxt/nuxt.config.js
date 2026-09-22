@@ -51,6 +51,10 @@ const OAUTH_STRATEGY = {
   grantType: 'authorization_code',
   codeChallengeMethod: 'S256',
 }
+// Drupal's login, its editing screens and their assets, served on this origin
+// so an editor's session is first party. The same test tells the page cache
+// in server/start.js which requests are Drupal's, so none of them is stored.
+const { shouldProxy } = require('./modules/druxt-admin/proxy')
 
 export default {
   // Pages render live from Drupal. In production, server/start.js serves
@@ -105,7 +109,11 @@ export default {
   },
 
   css: ['~/assets/css/app.css', '~/assets/css/code.css'],
+  // Read by server/start.js: a request Drupal answers is never stored.
+  docsPassThrough: (path) => shouldProxy(path),
+
   plugins: [
+    '~/plugins/entity-operations.js',
     '~/plugins/color-mode-theme.client.js',
     '~/plugins/analytics.client.js',
     '~/plugins/chunk-reload.client.js',
@@ -243,6 +251,24 @@ export default {
       context,
       { target: DRUXT_BASE_URL, changeOrigin: false },
     ]),
+    // Drupal's login and editing screens, for an editor. The Host is kept, so
+    // Drupal builds its links and redirects for this origin, and its session
+    // cookie is made this origin's: no Domain, and Secure only over HTTPS,
+    // where a browser will store it.
+    [
+      (pathname) => shouldProxy(pathname),
+      {
+        target: DRUXT_BASE_URL,
+        changeOrigin: false,
+        cookieDomainRewrite: '',
+        onProxyRes: (proxyRes, req) => {
+          const https = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https' || req.socket.encrypted
+          const cookies = proxyRes.headers['set-cookie']
+          if (https || !cookies) return
+          proxyRes.headers['set-cookie'] = cookies.map((cookie) => cookie.replace(/;\s*secure/gi, ''))
+        },
+      },
+    ],
     // The Umami demo backend, for the live component examples. Proxied so the
     // browser stays on this origin and Umami's CORS allowlist never applies.
     [

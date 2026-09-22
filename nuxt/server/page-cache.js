@@ -176,10 +176,11 @@ const crawl = async ({ seeds, store, concurrency = 2, limit = 5000 }) => {
  * @param {object|null} options.cache - The page cache, or null to render every page live.
  * @param {Function} options.live - Nuxt's renderer, `(req, res) => void`.
  * @param {boolean} [options.noindex] - Ask search engines not to index this environment.
+ * @param {Function} [options.passThrough] - True for a path the backend answers, which is never stored.
  * @returns {Function} An HTTP request listener.
  */
 const createHandler =
-  ({ cache, live, noindex = false, artefacts = null }) =>
+  ({ cache, live, noindex = false, artefacts = null, passThrough = null }) =>
   async (req, res) => {
     for (const [name, value] of Object.entries(SECURITY_HEADERS)) res.setHeader(name, value)
     if (String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https') {
@@ -210,6 +211,8 @@ const createHandler =
     // every `.xml` and `.txt` to the static middleware.
     if (artefacts && artefacts.isArtefact(req.method, pathname)) return artefacts.handle(req, res)
 
+    // Drupal's login and editing screens, proxied: an editor's page, never a stored one.
+    if (passThrough && passThrough(pathname)) return live(req, res)
     if (!isPage(req.method, pathname)) return live(req, res)
 
     // Canonical page URLs carry no trailing slash.
