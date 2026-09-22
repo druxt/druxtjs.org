@@ -8,7 +8,8 @@
     <AppHeader
       class="sticky top-0 z-50"
       title="DruxtJS"
-      :version="$config.druxtVersion ? 'v' + $config.druxtVersion : null"
+      :version="badge && badge.label"
+      :version-title="badge && badge.title"
       :docs="isDocs"
       @open-search="searchOpen = true"
       @open-nav="sidebar = true"
@@ -46,13 +47,14 @@
     </template>
 
     <!-- Outside both layouts above, so it renders on every route. -->
-    <AppSiteFooter :version="$config.druxtVersion ? 'v' + $config.druxtVersion : null" />
+    <AppSiteFooter :version="badge && badge.label" :version-title="badge && badge.title" />
 
     <AppSearch :open="searchOpen" @close="searchOpen = false" />
   </div>
 </template>
 
 <script>
+import { versionBadge } from '~/lib/version'
 import { trapTab } from '~/utils/focus'
 
 export default {
@@ -64,6 +66,10 @@ export default {
   }),
 
   computed: {
+    /** The installed druxt version's badge: a snapshot's build time moves to the title. */
+    badge() {
+      return versionBadge(this.$config.druxtVersion)
+    },
     isDocs: ({ $route }) => $route.path !== '/',
     /** The playground has no prose to cap and no headings to list. */
     wide: ({ $route }) => $route.path.replace(/\/$/, '') === '/playground',

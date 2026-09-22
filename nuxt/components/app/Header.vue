@@ -20,7 +20,7 @@
         v-if="version"
         class="badge badge-sm badge-outline min-h-[24px] hidden sm:inline-flex hover:border-primary hover:text-primary-focus"
         to="/api/packages/druxt/CHANGELOG"
-        :title="'Druxt ' + version + ' release notes'"
+        :title="versionTitle || 'Druxt ' + version + ' release notes'"
       >{{ version }}</NuxtLink>
 
       <div class="flex-1" />
@@ -70,6 +70,8 @@ import { MAC_SHORTCUT, searchShortcut } from '~/utils/platform'
 export default {
   props: {
     version: { type: String, default: null },
+    /** The badge's title, where it says more than the label, such as a snapshot's build time. */
+    versionTitle: { type: String, default: null },
     /** True on documentation pages, which keep a sidebar from `lg`. */
     docs: { type: Boolean, default: true },
   },

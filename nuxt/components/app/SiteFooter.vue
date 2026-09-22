@@ -18,7 +18,7 @@
             v-if="version"
             class="badge badge-sm badge-outline min-h-[24px] hover:border-primary hover:text-primary-focus"
             to="/api/packages/druxt/CHANGELOG"
-            :title="'Druxt ' + version + ' release notes'"
+            :title="versionTitle || 'Druxt ' + version + ' release notes'"
           >{{ version }}</NuxtLink>
           <a
             v-if="$config.storybookUrl"
@@ -48,6 +48,8 @@ export default {
   props: {
     /** e.g. "v0.24.0"; the badge is hidden when the version is unavailable. */
     version: { type: String, default: null },
+    /** The badge's title, where it says more than the label, such as a snapshot's build time. */
+    versionTitle: { type: String, default: null },
   },
 
   computed: {
