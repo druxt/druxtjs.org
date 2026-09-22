@@ -32,11 +32,39 @@
           {{ draft ? 'Edit draft' : 'Edit' }}
           <kbd class="kbd kbd-xs ml-auto">E</kbd>
         </a>
-        <a v-if="revisions" :href="revisions.href" target="_self" class="account-item" @click="toRevisions">
-          <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" /><path d="M12 7v5l3 2" /></svg>
-          Revisions
-          <span v-if="revisionCount" class="ml-auto text-[11.5px] text-base-content/50 tabular-nums">{{ revisionCount }}</span>
-        </a>
+        <!-- Revisions: a flyout of the latest few, opening to the left, where there is room. -->
+        <div v-if="revisions || recent.length" class="revisions-parent relative">
+          <a :href="revisions ? revisions.href : '#'" target="_self" class="account-item" aria-haspopup="true" @click="toggleFlyout">
+            <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" /><path d="M12 7v5l3 2" /></svg>
+            Revisions
+            <span class="ml-auto flex items-center gap-1 text-[11.5px] text-base-content/50 tabular-nums">
+              <template v-if="revisionCount">{{ revisionCount }}</template>
+              <svg class="account-icon !w-3.5 !h-3.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>
+            </span>
+          </a>
+          <div v-if="recent.length" class="revisions-flyout" :class="{ open: flyout }" role="menu" aria-label="Recent revisions">
+            <div v-for="row of recent" :key="row.revision.vid" class="revision-row" data-testid="revision-row">
+              <AppAvatar :account="row.author" :size="24" class="row-span-2" />
+              <span class="text-[13px] font-medium truncate">{{ row.when }}</span>
+              <span class="revision-row-end row-span-2">
+                <span class="revision-tag" :class="row.kind">{{ row.kind }}</span>
+                <span class="revision-actions">
+                  <button type="button" class="revision-chip" @click="show(row.revision, false)">View</button>
+                  <button v-if="row.kind !== 'live'" type="button" class="revision-chip" data-testid="revision-diff" @click="show(row.revision, true)">Diff</button>
+                </span>
+              </span>
+              <span class="text-[11.5px] text-base-content/70 truncate">{{ row.author.name }}</span>
+            </div>
+            <template v-if="revisions">
+              <div class="h-px bg-base-300 -mx-1.5 my-1.5" />
+              <a :href="revisions.href" target="_self" class="account-item">
+                <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
+                All revisions
+                <span v-if="revisionCount" class="ml-auto text-[11.5px] text-base-content/50 tabular-nums">{{ revisionCount }}</span>
+              </a>
+            </template>
+          </div>
+        </div>
         <a v-for="operation of others" :key="operation.key" :href="operation.href" target="_self" class="account-item">
           <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></svg>
           {{ operation.title }}
@@ -82,13 +110,19 @@
 </template>
 
 <script>
+import { accountOf } from '~/lib/account'
+import { hasDraft, kindOf, versionOf, whenOf } from '~/lib/revisions'
+
+/** How many revisions the flyout lists. */
+const RECENT = 5
+
 /**
  * The operations Drupal offers the signed-in user on one entity.
  *
  * Mounted by the `v-druxt-admin` directive in the browser only, so a reader's
  * page carries none of it. Edit and the other screens are Drupal's, served on
- * this origin by the proxy; Revisions opens the editor toolbar's switcher when
- * the page has one; Delete is confirmed here and sent over JSON:API.
+ * this origin by the proxy; Revisions lists the latest few to view or diff on
+ * the page; Delete is confirmed here and sent over JSON:API.
  */
 export default {
   props: {
@@ -100,7 +134,7 @@ export default {
     state: { type: String, default: null },
   },
 
-  data: () => ({ confirming: false, deleting: false, error: null }),
+  data: () => ({ confirming: false, deleting: false, error: null, flyout: false }),
 
   computed: {
     byKey: ({ operations }) => Object.fromEntries(operations.map((o) => [o.key, o])),
@@ -108,8 +142,17 @@ export default {
     revisions: ({ byKey }) => byKey['version-history'] || null,
     remove: ({ byKey, resource }) => (resource && byKey['delete-form']) || null,
     others: ({ operations }) => operations.filter((o) => !['edit-form', 'version-history', 'delete-form'].includes(o.key)),
-    draft: ({ state }) => Boolean(state && state !== 'published'),
-    revisionCount: ({ $store }) => (($store && $store.state.editor && $store.state.editor.revisions) || []).length,
+    /** A pending draft, from the revisions when they are in, else the page's state. */
+    draft: ({ allRevisions, state }) => (allRevisions.length ? hasDraft(allRevisions) : Boolean(state && state !== 'published')),
+    allRevisions: ({ $store }) => ($store && $store.state.editor && $store.state.editor.revisions) || [],
+    revisionCount: ({ allRevisions }) => allRevisions.length,
+    /** The latest few, each with who made it and when. */
+    recent: ({ allRevisions }) => allRevisions.slice(0, RECENT).map((revision) => ({
+      revision,
+      kind: kindOf(revision),
+      when: whenOf(revision.date),
+      author: accountOf({ name: (revision.author || {}).name || 'Unknown', picture: (revision.author || {}).picture }),
+    })),
     path: () => (typeof window === 'undefined' ? '' : window.location.pathname),
   },
 
@@ -142,20 +185,24 @@ export default {
       window.location.href = this.edit.href
     },
 
-    /** The toolbar's revision switcher, when this page has the toolbar. */
-    toRevisions(event) {
-      const select = document.getElementById('editor-version')
-      if (!select) return
+    /** Opens the flyout on a click, for touch, where nothing hovers. */
+    toggleFlyout(event) {
+      if (!this.recent.length) return
       event.preventDefault()
+      this.flyout = !this.flyout
+    },
+
+    /** Shows a revision on the page, with its diff against live or without. */
+    show(revision, diff) {
+      this.flyout = false
       if (document.activeElement) document.activeElement.blur()
-      select.focus()
-      if (select.showPicker) {
-        try {
-          select.showPicker()
-        } catch (e) {
-          // Focus alone is enough where the picker cannot open programmatically.
-        }
-      }
+      this.$store.commit('setEditorCompare', diff)
+      const version = versionOf(revision)
+      // Only a different revision needs fetching; a refresh would re-render
+      // the page under the diff's marks and drop them.
+      if (version === this.$store.state.editor.version) return
+      this.$store.commit('setEditorVersion', version)
+      this.$nuxt.refresh()
     },
 
     cancel() {
