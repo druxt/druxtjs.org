@@ -59,11 +59,31 @@ final class RevisionsController extends ControllerBase {
         'default' => $revision->isDefaultRevision(),
         'latest' => (int) $vid === $latest,
         'log' => $revision->getRevisionLogMessage(),
+        'author' => $this->authorOf($revision),
       ];
     }
 
     // The list follows the page: a new draft or a publish changes it.
     return (new JsonResponse(['data' => $revisions]))->setPrivate()->setMaxAge(0);
+  }
+
+  /**
+   * Who made a revision: their name, and their picture when they have one.
+   *
+   * @return array{name: string, picture: string|null}|null
+   *   The author, or NULL when the revision has none.
+   */
+  private function authorOf($revision): ?array {
+    $user = $revision->getRevisionUser();
+    if (!$user) {
+      return NULL;
+    }
+    $picture = NULL;
+    if ($user->hasField('user_picture') && ($file = $user->get('user_picture')->entity)) {
+      $style = $this->entityTypeManager()->getStorage('image_style')->load('thumbnail');
+      $picture = $style ? $style->buildUrl($file->getFileUri()) : NULL;
+    }
+    return ['name' => $user->getDisplayName(), 'picture' => $picture];
   }
 
 }
