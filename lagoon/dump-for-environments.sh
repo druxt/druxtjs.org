@@ -41,7 +41,10 @@ staging="${uncompressed}.gz"
 final="$target/latest.sql.gz"
 
 echo "Dumping production for the other environments."
-drush sql:dump --gzip --extra-dump=--no-tablespaces --result-file="$uncompressed"
+# Without the rows a request writes, or that visitors leave behind: the
+# receiving environment has no use for them, and they are not its to hold.
+drush sql:dump --gzip --extra-dump=--no-tablespaces --result-file="$uncompressed" \
+  --structure-tables-list="cache,cache_*,cachetags,semaphore,sessions,watchdog,flood,key_value_expire,oauth2_token,oauth2_token__scopes,admin_audit_trail"
 
 if [ ! -s "$staging" ]; then
   echo "The dump produced nothing; leaving any previous dump in place."

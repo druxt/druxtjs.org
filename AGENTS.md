@@ -99,7 +99,7 @@ npm run docs:generate         # Modules, API and Components pages, built in .doc
 npm run lint                  # every linter except prose
 npm run lint:prose            # Vale, after `npm run lint:prose:install`
 npm test                      # node tests
-bash tests/start-guardrails.sh  # also import-, validate- and post-rollout-guardrails.sh
+bash tests/start-guardrails.sh  # also import-, validate-, post-rollout- and replacing-guardrails.sh
 cd drupal && .devtools/assemble && vendor/bin/phpunit
 ```
 

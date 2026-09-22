@@ -51,6 +51,9 @@ build_app() {
 #!/usr/bin/env bash
 printf 'drush %s\n' "\$*" >> "$app/calls.log"
 case "\$*" in
+  *"sql:sync"*)
+    [ -e "$app/drupal/web/sites/default/files/private/.replacing-database" ] && echo "marker present during sync" >> "$app/calls.log"
+    [ "\${STUB_SYNC_FAILS:-}" = "1" ] && exit 1 ;;
   *"status --field=bootstrap"*) [ "$bootstrap" = "yes" ] && echo "Successful" ;;
   *"SELECT COUNT(*) FROM sessions"*) echo "$sessions" ;;
 esac
@@ -235,6 +238,57 @@ if called "$app" "state:set druxt_docs.deployed_revision"; then
 else
   ok "no revision to record: left it unset, and said so"
 fi
+
+# --------------------------------------------------------------------------
+# Drupal refuses web requests while its database is replaced, so nothing
+# writes into a half-imported database, and the copy leaves out what a
+# request would write.
+# --------------------------------------------------------------------------
+
+marker_of() { printf '%s/drupal/web/sites/default/files/private/.replacing-database' "$1"; }
+
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
+if called "$app" "marker present during sync"; then
+  ok "replacing the database: the site refuses requests during the sync"
+else
+  no "replacing the database: the site was open to requests during the sync"
+fi
+if [ -e "$(marker_of "$app")" ]; then
+  no "replacing the database: still refusing requests after the rollout"
+else
+  ok "replacing the database: open again once the rollout is done"
+fi
+
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x STUB_SYNC_FAILS=1 > /dev/null
+if [ -e "$(marker_of "$app")" ]; then
+  no "a failed sync: left the site refusing requests"
+else
+  ok "a failed sync: the site is open again, to show what failed"
+fi
+
+# The negative control: an environment that keeps its database never closes.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x DOCS_SKIP_SYNC=1 > /dev/null
+if [ -e "$(marker_of "$app")" ] || called "$app" "marker present"; then
+  no "no sync: the site refused requests anyway"
+else
+  ok "no sync: the site never refused requests"
+fi
+
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
+sync_line="$(grep 'sql:sync' "$app/calls.log")"
+# The list as the sync was given it, one table per line, compared exactly.
+structure="$(printf '%s' "$sync_line" | sed -n 's/.*--structure-tables-list=\([^ ]*\).*/\1/p' | tr ',' '\n')"
+for table in 'cache' 'cache_*' 'cachetags' 'sessions' 'watchdog'; do
+  if printf '%s\n' "$structure" | grep -qxF -- "$table"; then
+    ok "copied as structure only: ${table}"
+  else
+    no "copied with its rows: ${table}"
+  fi
+done
 
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]

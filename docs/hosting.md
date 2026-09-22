@@ -46,7 +46,9 @@ subdomains, are set in `.lagoon.yml`.
 3. The post-rollout task, `lagoon/post-rollout.sh`, runs in `cli`. A
    non-production environment first replaces its database with a sanitised
    copy of production's, so the updates that follow run against real
-   content. It copies the dump production writes nightly
+   content. Drupal answers every web request with a 503 until the task is
+   done, so nothing writes into the database while it is half-imported, and
+   caches, sessions, logs and tokens are copied without their rows. It copies the dump production writes nightly
    (`lagoon/dump-for-environments.sh`, under the private files directory
    nginx does not serve) and falls back to reading production's live
    database only when that file is not there. `DOCS_SKIP_SYNC=1` keeps the
