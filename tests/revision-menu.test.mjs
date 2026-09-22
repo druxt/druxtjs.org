@@ -1,7 +1,8 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 
-const { hasDraft, kindOf, versionOf, viewing, whenOf } = (await import('../nuxt/lib/revisions.js')).default
+const { hasDraft, kindOf, versionOf, viewing, whenOf } = (await import('../nuxt/lib/revisions.js'))
+  .default
 
 const draft = { vid: 125, latest: true, default: false }
 const live = { vid: 120, latest: false, default: true }
@@ -41,7 +42,10 @@ describe('hasDraft', () => {
 describe('viewing', () => {
   it('reads the working copy as the draft when there is one, and as live when not', () => {
     assert.deepEqual(viewing([draft, live], 'working-copy'), { kind: 'draft', revision: draft })
-    assert.deepEqual(viewing([{ ...live, latest: true }], 'working-copy'), { kind: 'live', revision: { ...live, latest: true } })
+    assert.deepEqual(viewing([{ ...live, latest: true }], 'working-copy'), {
+      kind: 'live',
+      revision: { ...live, latest: true },
+    })
   })
 
   it('finds a revision by id, and knows an id that is the live one', () => {
