@@ -14,6 +14,7 @@
 import { seoHead } from '~/utils/seo'
 import { documentDescription } from '~/utils/content'
 import { fetchDrupalPage, sectionOf } from '~/lib/drupal-document'
+import { versionFromQuery } from '~/lib/revisions'
 
 /** Pages docgen writes into the authored sections; they come from its corpus, not Drupal. */
 const GENERATED = ['/how-to/contributing']
@@ -31,6 +32,13 @@ export default {
     const path = route.path.replace(/\/$/, '') || '/'
 
     if ($config.docsSource !== 'markdown' && !GENERATED.includes(path)) {
+      // A shared URL carries the revision and whether its diff is on, so the
+      // page a reader was sent is the page they are sent to.
+      if (store.$auth && store.$auth.loggedIn) {
+        const asked = versionFromQuery(route.query)
+        if (asked) store.commit('setEditorVersion', asked)
+        store.commit('setEditorCompare', Boolean(route.query.diff))
+      }
       const document = await fetchDrupalPage(store, path)
       if (!document) return error({ statusCode: 404, message: 'Document not found' })
       // Drupal matches aliases in any case; one spelling is the page.
