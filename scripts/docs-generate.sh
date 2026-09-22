@@ -23,12 +23,17 @@ fi
 pin() { node -p "const p = require('./docs-source.json'); p.$1 || p.ref"; }
 repository=${DOCS_REPOSITORY:-$(pin repository)}
 ref=$(pin docgenRef)
+snapshot=$(node -p "require('./docs-source.json').snapshot || ''")
+# A snapshot's release notes need the history, so a blobless fetch; otherwise
+# one commit is enough.
+depth="--depth 1"
+[ -n "$snapshot" ] && depth="--filter=blob:none"
 
 src="$PWD/.docs-api"
 if [ "$(git -C "$src" rev-parse HEAD 2>/dev/null)" != "$ref" ]; then
   rm -rf "$src"
   git init -q "$src"
-  git -C "$src" fetch -q --depth 1 "$repository" "$ref"
+  git -C "$src" fetch -q $depth "$repository" "$ref"
   git -C "$src" checkout -q FETCH_HEAD
 fi
 cd "$src"
@@ -43,5 +48,8 @@ run() {
 
 run corepack yarn install
 run corepack yarn build
+if [ -n "$snapshot" ]; then
+  run sh "$OLDPWD/scripts/snapshot-changelog.sh" "$src" "$snapshot"
+fi
 run node packages/docgen/bin/druxt-docgen.js --destination "$content"
 echo "Generated pages from druxt.js ${ref} are in .docs-source/docs/nuxt/content, which nuxt/content links to."

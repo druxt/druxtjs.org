@@ -163,6 +163,37 @@ Lagoon, and `sqlite` for local sites and CI. Drupal refuses to uninstall the
 module that provides the database it runs on, so a configuration without
 the driver fails to install on that database.
 
+## The development snapshot
+
+`dev.druxtjs.org` runs the site on the latest Druxt development release, so a
+change merged to druxt.js can be seen on a real site before it is released.
+
+| Part          | Where                                                              |
+| ------------- | ------------------------------------------------------------------ |
+| Branch        | `dev-snapshot`, rebuilt by `.github/workflows/dev-snapshot.yml`    |
+| Packages      | Every Druxt package at the npm `dev` tag, one build, one copy each |
+| API reference | Generated at the druxt.js commit the build came from (`docgenRef`) |
+| Release notes | The pending changesets, headed with the version the site installs  |
+| Version badge | `v0.25.0-dev`, with the build time in its title                    |
+
+druxt.js publishes a snapshot on each merge to its develop branch. The
+workflow looks for a new one every 20 minutes, or at once when druxt.js
+sends a `druxt-dev-snapshot` repository dispatch. It finds the commit a
+snapshot came from in druxt.js's Release runs, and refuses a snapshot that no
+run accounts for. The branch is this repository's base plus one commit, and
+is pushed only when the snapshot or the base has changed, so it is replaced
+each time and never committed to by hand.
+
+On that branch, `docs-source.json` has `snapshot`, the build time. With it
+set, docgen fetches druxt.js without its file contents but with its history,
+which changesets needs to link each entry to its commit, and runs
+`scripts/snapshot-changelog.sh` before generating. `npm run docs:generate`
+does the same locally.
+
+To rebuild it by hand, run the workflow from the Actions tab. `base` picks the
+branch to start from, and the `DEV_SNAPSHOT_BASE` repository variable changes
+the default, which is `develop`.
+
 ## Going to production
 
 What the cutover from the druxt.js build needs, in order.

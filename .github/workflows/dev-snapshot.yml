@@ -1,0 +1,98 @@
+---
+name: Dev snapshot
+
+# Keeps the `dev-snapshot` branch on the latest Druxt development snapshot,
+# which Lagoon deploys to dev.druxtjs.org.
+#
+# druxt.js publishes a snapshot to the npm `dev` tag on each merge to its
+# develop branch. This finds it, and the commit it came from, and rebuilds
+# the branch as this repository's base plus one commit: the snapshot's
+# packages, and the API reference generated at that commit with the pending
+# changesets as its release notes. The branch belongs to this workflow and is
+# replaced each time, so nobody commits to it by hand.
+#
+# It runs on a schedule, by hand, and when druxt.js sends a
+# `druxt-dev-snapshot` repository dispatch. Nothing is pushed unless the
+# snapshot or the base has changed.
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+    inputs:
+      base:
+        description: The branch the snapshot build starts from
+        required: false
+  repository_dispatch:
+    types: [druxt-dev-snapshot]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dev-snapshot
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BASE: ${{ inputs.base || vars.DEV_SNAPSHOT_BASE || 'develop' }}
+    steps:
+      # Actions are pinned to commit SHAs, not tags. A tag is a mutable
+      # reference to code that runs with this repository's credentials.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ env.BASE }}
+          fetch-depth: 0
+
+      # The script reads the npm registry and the GitHub API with fetch.
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+
+      - id: snapshot
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          read -r stamp sha <<< "$(node scripts/dev-snapshot.mjs)"
+          echo "stamp=$stamp" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "Snapshot $stamp, from druxt.js $sha."
+
+      # The branch is the base plus one commit. The same snapshot on the same
+      # base is the same build, so nothing is pushed.
+      - id: current
+        env:
+          STAMP: ${{ steps.snapshot.outputs.stamp }}
+        run: |
+          if git fetch -q origin dev-snapshot 2>/dev/null; then
+            built=$(git show FETCH_HEAD:docs-source.json | node -p "JSON.parse(require('fs').readFileSync(0)).snapshot || ''")
+            parent=$(git rev-parse FETCH_HEAD^)
+            if [ "$built" = "$STAMP" ] && [ "$parent" = "$(git rev-parse HEAD)" ]; then
+              echo "dev-snapshot already has $STAMP on this base."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      # The lockfile is rewritten on the Node and Yarn the frontend builds with.
+      - if: steps.current.outputs.skip != 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+
+      - if: steps.current.outputs.skip != 'true'
+        working-directory: nuxt
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: 'false'
+        run: corepack enable && yarn install --mode=update-lockfile
+
+      - if: steps.current.outputs.skip != 'true'
+        env:
+          STAMP: ${{ steps.snapshot.outputs.stamp }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add nuxt/package.json nuxt/yarn.lock docs-source.json
+          git commit -q -m "chore(deps): take the druxt dev snapshot $STAMP"
+          git push --force origin HEAD:refs/heads/dev-snapshot

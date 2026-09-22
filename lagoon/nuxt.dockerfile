@@ -3,11 +3,18 @@
 FROM amazeeio/node:16-builder@sha256:4dd9a540c732a011258fec4ef1465bda8641c91c77939ca9e494c53a2ff7ef1c AS api
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0 CYPRESS_INSTALL_BINARY=0 HUSKY=0
 COPY docs-source.json /tmp/docs-source.json
-RUN git init -q /src \
-  && git -C /src fetch -q --depth 1 "$(node -p "require('/tmp/docs-source.json').repository")" "$(node -p "const p = require('/tmp/docs-source.json'); p.docgenRef || p.ref")" \
+COPY scripts/snapshot-changelog.sh /tmp/snapshot-changelog.sh
+# A development snapshot's release notes need druxt.js's history, which a
+# blobless fetch carries and a shallow one does not.
+RUN snapshot="$(node -p "require('/tmp/docs-source.json').snapshot || ''")" \
+  && depth="--depth 1" && if [ -n "$snapshot" ]; then depth="--filter=blob:none"; fi \
+  && git init -q /src \
+  && git -C /src fetch -q $depth "$(node -p "require('/tmp/docs-source.json').repository")" "$(node -p "const p = require('/tmp/docs-source.json'); p.docgenRef || p.ref")" \
   && git -C /src checkout -q FETCH_HEAD
 WORKDIR /src
 RUN corepack enable && yarn install --immutable && yarn build \
+  && snapshot="$(node -p "require('/tmp/docs-source.json').snapshot || ''")" \
+  && if [ -n "$snapshot" ]; then sh /tmp/snapshot-changelog.sh /src "$snapshot"; fi \
   && node packages/docgen/bin/druxt-docgen.js --destination /generated
 
 # The authored markdown the generated pages sit beside, at `ref`. druxt.js no

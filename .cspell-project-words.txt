@@ -76,3 +76,5 @@ yarnrc
 zipfile
 cachetags
 docroot
+blobless
+npmjs
