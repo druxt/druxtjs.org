@@ -46,4 +46,14 @@ export default {
   setSignIn(state, open) {
     state.signIn = Boolean(open)
   },
+
+  /** Turns the page's diff against live on or off. */
+  setEditorCompare(state, on) {
+    state.editor = { ...state.editor, compare: Boolean(on) }
+  },
+
+  /** The page's normalised diff, or null. */
+  setEditorDiff(state, diff) {
+    state.editor = { ...state.editor, diff: diff || null }
+  },
 }
