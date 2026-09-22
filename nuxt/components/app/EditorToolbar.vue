@@ -28,10 +28,7 @@
         </optgroup>
       </select>
 
-      <div class="flex-1" />
-
-      <span class="text-base-content/70 hidden md:inline truncate max-w-[12rem]" data-testid="editor-account">{{ accountName }}</span>
-      <button type="button" class="btn btn-ghost btn-sm" data-testid="editor-signout" @click="signOut">Sign out</button>
+      <!-- The account and signing out are in the header's account menu. -->
     </div>
   </div>
 </template>
@@ -48,10 +45,15 @@ export default {
 
     revisions: ({ $store }) => $store.state.editor.revisions,
 
-    /** The selected view, read from and written to the store. Changing it re-fetches the page. */
+    /**
+     * The selected view, read from and written to the store. Changing it
+     * re-fetches the page. The working copy of a page with no draft is the
+     * published page, so it reads as that.
+     */
     version: {
       get() {
-        return this.$store.state.editor.version
+        const version = this.$store.state.editor.version
+        return version === 'working-copy' && !this.hasDraft ? 'published' : version
       },
       set(value) {
         if (value === this.$store.state.editor.version) return
@@ -70,8 +72,6 @@ export default {
     history() {
       return this.revisions
     },
-
-    accountName: ({ $auth }) => ($auth.user && ($auth.user.name || $auth.user.preferred_username || $auth.user.email)) || 'Signed in',
 
     stateLabel() {
       if (this.version === 'published') return 'Published'
@@ -115,10 +115,6 @@ export default {
       } finally {
         this.loading = false
       }
-    },
-
-    signOut() {
-      this.$signOut()
     },
   },
 }

@@ -41,4 +41,9 @@ export default {
     if (!value) return
     state.searches = [value, ...state.searches.filter((o) => o !== value)].slice(0, SEARCH_LIMIT)
   },
+
+  /** Opens or closes the sign-in dialog. */
+  setSignIn(state, open) {
+    state.signIn = Boolean(open)
+  },
 }
