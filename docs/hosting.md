@@ -168,6 +168,8 @@ the driver fails to install on that database.
 `dev.druxtjs.org` runs the site on the latest Druxt development release, so a
 change merged to druxt.js can be seen on a real site before it is released.
 
+Its Storybook is `storybook.dev.druxtjs.org`, and its Drupal `cms.dev.druxtjs.org`.
+
 | Part          | Where                                                              |
 | ------------- | ------------------------------------------------------------------ |
 | Branch        | `dev-snapshot`, rebuilt by `.github/workflows/dev-snapshot.yml`    |
