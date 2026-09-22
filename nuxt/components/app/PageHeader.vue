@@ -10,7 +10,11 @@
       />
     </div>
 
-    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight" v-text="title" />
+    <!-- `group`: hovering the title row reveals an editor's page operations. -->
+    <div class="group flex items-start gap-4">
+      <h1 class="flex-1 min-w-0 text-3xl sm:text-4xl font-bold tracking-tight" v-text="title" />
+      <div v-if="entity" v-druxt-admin="entity" class="page-ops-slot flex-none mt-1.5" />
+    </div>
 
     <p v-if="description" class="mt-3 text-lg text-base-content/70" v-text="description" />
 
@@ -25,6 +29,8 @@ export default {
     description: { type: String, default: null },
     /** [{ text, class }] */
     badges: { type: Array, default: () => [] },
+    /** The Drupal entity the page is, `{ type, id, attributes: { title }, state }`, for its operations. */
+    entity: { type: Object, default: null },
   },
 }
 </script>
