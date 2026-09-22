@@ -12,7 +12,7 @@
       @keydown.esc.prevent="close"
       @keydown.tab="onTab"
     >
-      <div class="relative w-full sm:max-w-[380px] bg-base-100 border border-base-300 rounded-t-2xl sm:rounded-2xl shadow-2xl px-5 pt-3 pb-6 sm:p-6">
+      <div class="sign-in-sheet relative w-full sm:max-w-[380px] bg-base-100 border border-base-300 rounded-t-2xl sm:rounded-2xl shadow-2xl px-5 pt-3 sm:p-6">
         <div class="sm:hidden w-9 h-1 rounded bg-base-300 mx-auto mb-4" aria-hidden="true" />
         <div class="hidden sm:flex items-center justify-between mb-4">
           <AppLogo class="h-6 w-auto" />
