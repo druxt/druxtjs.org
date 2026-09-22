@@ -31,8 +31,12 @@
       </template>
       <span v-else-if="editor.compare && editor.diff && editor.diff.error" class="opacity-80">Couldn't compare</span>
 
-      <button type="button" class="revision-pill-btn ghost" data-testid="revision-pill-diff" @click="toggleDiff">
-        {{ editor.compare ? 'Hide diff' : shown.kind === 'draft' ? 'Show diff' : 'Diff with live' }}
+      <button type="button" class="revision-pill-btn ghost" data-testid="revision-pill-diff" :aria-label="diffLabel" @click="toggleDiff">
+        <span class="label">{{ diffLabel }}</span>
+        <svg class="icon account-icon !text-current !w-4 !h-4" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" />
+          <path v-if="editor.compare" d="M4 4l16 16" />
+        </svg>
       </button>
       <button type="button" class="revision-pill-btn solid" data-testid="revision-pill-exit" @click="exit">Exit</button>
     </div>
@@ -70,6 +74,7 @@ export default {
       const root = (diff.rootFields || []).length
       return { changed: count('changed') + count('moved') + root, added: count('added'), removed: count('removed') }
     },
+    diffLabel: ({ editor, shown }) => (editor.compare ? 'Hide diff' : shown.kind === 'draft' ? 'Show diff' : 'Diff with live'),
     total: ({ counts }) => counts.changed + counts.added + counts.removed,
     countLabel: ({ counts }) => `${counts.changed} changed, ${counts.added} added, ${counts.removed} removed`,
   },
