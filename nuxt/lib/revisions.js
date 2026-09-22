@@ -98,4 +98,30 @@ const actionsFor = (revision, revisions, version) => {
   return actions
 }
 
-module.exports = { actionsFor, hasDraft, kindOf, versionOf, viewing, whenOf }
+/** The version a shared URL asks for, or null where it asks for nothing. */
+const versionFromQuery = (query = {}) => {
+  const asked = String((query || {}).revision || '').trim()
+  if (!asked) return null
+  if (asked === 'live' || asked === 'published') return 'published'
+  if (asked === 'draft' || asked === 'working-copy') return 'working-copy'
+  return /^\d+$/.test(asked) ? `id:${asked}` : null
+}
+
+/**
+ * The query that carries a view, so an editor can send someone the page as
+ * they are reading it. The working copy is what an editor sees by default, so
+ * it is left out and the URL stays clean.
+ *
+ * @param {string} version - The editor store's version.
+ * @param {boolean} compare - Whether the diff is on.
+ * @returns {{ revision?: string, diff?: string }} The query to carry.
+ */
+const queryFor = (version, compare) => {
+  const query = {}
+  if (version === 'published') query.revision = 'live'
+  else if (/^id:\d+$/.test(String(version))) query.revision = String(version).slice(3)
+  if (compare) query.diff = '1'
+  return query
+}
+
+module.exports = { actionsFor, hasDraft, kindOf, queryFor, versionFromQuery, versionOf, viewing, whenOf }

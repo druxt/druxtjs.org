@@ -45,6 +45,7 @@
 
 <script>
 import { accountOf } from '~/lib/account'
+import revisionUrl from '~/mixins/revision-url'
 import { viewing, whenOf } from '~/lib/revisions'
 
 /**
@@ -56,6 +57,8 @@ import { viewing, whenOf } from '~/lib/revisions'
  */
 export default {
   name: 'AppRevisionPill',
+
+  mixins: [revisionUrl],
 
   data: () => ({ cursor: -1 }),
 
@@ -104,11 +107,13 @@ export default {
 
     toggleDiff() {
       this.$store.commit('setEditorCompare', !this.editor.compare)
+      this.carryRevisionInUrl()
     },
 
-    exit() {
+    async exit() {
       this.$store.commit('setEditorCompare', false)
       this.$store.commit('setEditorVersion', 'published')
+      await this.carryRevisionInUrl()
       this.$nuxt.refresh()
     },
 

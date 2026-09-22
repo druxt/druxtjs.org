@@ -140,6 +140,7 @@
 </template>
 
 <script>
+import revisionUrl from '~/mixins/revision-url'
 import { accountOf } from '~/lib/account'
 import { actionsFor, hasDraft, kindOf, versionOf, whenOf } from '~/lib/revisions'
 
@@ -155,6 +156,8 @@ const RECENT = 5
  * the page; Delete is confirmed here and sent over JSON:API.
  */
 export default {
+  mixins: [revisionUrl],
+
   props: {
     operations: { type: Array, required: true },
     label: { type: String, default: 'this page' },
@@ -297,16 +300,18 @@ export default {
     },
 
     /** Shows a revision on the page, with its diff against live or without. */
-    show(revision, diff) {
+    async show(revision, diff) {
       this.flyout = false
       if (document.activeElement) document.activeElement.blur()
+      const was = this.$store.state.editor.version
       this.$store.commit('setEditorCompare', diff)
       const version = versionOf(revision)
+      this.$store.commit('setEditorVersion', version)
+      // Before the refresh: asyncData reads the query on the way back in.
+      await this.carryRevisionInUrl()
       // Only a different revision needs fetching; a refresh would re-render
       // the page under the diff's marks and drop them.
-      if (version === this.$store.state.editor.version) return
-      this.$store.commit('setEditorVersion', version)
-      this.$nuxt.refresh()
+      if (version !== was) this.$nuxt.refresh()
     },
 
     cancel() {

@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 
-const { actionsFor, hasDraft, kindOf, versionOf, viewing, whenOf } = (
+const { actionsFor, hasDraft, kindOf, queryFor, versionFromQuery, versionOf, viewing, whenOf } = (
   await import('../nuxt/lib/revisions.js')
 ).default
 
@@ -76,5 +76,38 @@ describe('actionsFor', () => {
 
   it('never offers to compare the live revision with itself', () => {
     assert.deepEqual(actionsFor(live, revisions, 'working-copy'), ['view'])
+  })
+})
+
+describe('versionFromQuery', () => {
+  it('reads the revision a shared URL asks for', () => {
+    assert.equal(versionFromQuery({ revision: 'live' }), 'published')
+    assert.equal(versionFromQuery({ revision: 'draft' }), 'working-copy')
+    assert.equal(versionFromQuery({ revision: '27' }), 'id:27')
+  })
+
+  it('asks for nothing where the URL says nothing, or says nonsense', () => {
+    assert.equal(versionFromQuery({}), null)
+    assert.equal(versionFromQuery({ revision: 'latest; drop table' }), null)
+    assert.equal(versionFromQuery(undefined), null)
+  })
+})
+
+describe('queryFor', () => {
+  it('carries the revision and the diff', () => {
+    assert.deepEqual(queryFor('published', false), { revision: 'live' })
+    assert.deepEqual(queryFor('id:27', true), { revision: '27', diff: '1' })
+  })
+
+  it('leaves the working copy out, because that is what an editor already sees', () => {
+    assert.deepEqual(queryFor('working-copy', false), {})
+    assert.deepEqual(queryFor('working-copy', true), { diff: '1' })
+  })
+
+  it('round-trips through the URL', () => {
+    for (const version of ['published', 'working-copy', 'id:27']) {
+      const query = queryFor(version, true)
+      assert.equal(versionFromQuery(query) || 'working-copy', version)
+    }
   })
 })
