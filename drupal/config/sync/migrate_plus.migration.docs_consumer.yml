@@ -62,6 +62,7 @@ process:
       - authenticated
       - editor
       - contributor
+      - administrator
   redirect: redirect
   decoupled_settings_theme: constants/theme
 destination:
