@@ -22,6 +22,7 @@
         "drupal/environment_indicator": "^4.0",
         "drupal/field_group": "^4.0",
         "drupal/field_tokens": "^2.0",
+        "drupal/jsonapi_hypermedia": "^1.10",
         "drupal/jsonapi_node_preview": "^1.0@beta",
         "drupal/jsonapi_node_preview_tab": "^1.0.2",
         "drupal/jsonapi_resources": "^1.8",
