@@ -13,6 +13,9 @@
     <testsuite name="druxt_docs">
       <directory>web/modules/custom/druxt_docs/tests</directory>
     </testsuite>
+    <testsuite name="druxtjsorg">
+      <directory>web/modules/custom/druxtjsorg/tests</directory>
+    </testsuite>
   </testsuites>
   <php>
     <env name="SIMPLETEST_DB" value="sqlite://localhost/:memory:"/>
@@ -20,6 +23,7 @@
   <source>
     <include>
       <directory>web/modules/custom/druxt_docs/src</directory>
+      <directory>web/modules/custom/druxtjsorg/src</directory>
     </include>
   </source>
 </phpunit>
