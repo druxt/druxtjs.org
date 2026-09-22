@@ -811,6 +811,13 @@ html {
     height: 2.75rem;
   }
 }
+/* iOS zooms into any field set below 16px when it takes focus, and leaves
+   the page zoomed, so the sheet runs off the side. 16px on anything touch. */
+@media (max-width: 639px), (pointer: coarse) {
+  .sign-in-input {
+    font-size: 1rem;
+  }
+}
 
 /* The page's Edit control: hidden until the page header is hovered or holds
    focus, and always shown where nothing can hover. */
@@ -847,4 +854,19 @@ html {
 [data-theme='dark'] .page-ops-delete {
   background: hsl(var(--er));
   color: #1a0c07;
+}
+
+/* The sign-in sheet stays within the visible viewport, keyboard included,
+   and clears the home indicator. */
+.sign-in-sheet {
+  max-height: 100vh;
+  max-height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 640px) {
+  .sign-in-sheet {
+    padding-bottom: 1.5rem;
+  }
 }
