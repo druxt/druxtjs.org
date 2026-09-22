@@ -40,7 +40,9 @@ const CONSUMER_ID = process.env.DRUXT_CONSUMER_ID || 'druxtjs_org'
  * shown. druxt-auth builds the endpoints on the server's base URL, which is
  * an internal service name in production, so the strategy is set here.
  */
-const OAUTH_CLIENT = { clientId: CONSUMER_ID, scope: ['editor'] }
+// Every role scope an editor might hold: a token carries only the roles its
+// scopes name that the account also has, so each person gets exactly their own.
+const OAUTH_CLIENT = { clientId: CONSUMER_ID, scope: ['editor', 'contributor', 'administrator'] }
 const OAUTH_STRATEGY = {
   scheme: '~/modules/druxt-auth/drupal-scheme.js',
   endpoints: {
