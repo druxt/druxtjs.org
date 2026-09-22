@@ -115,3 +115,6 @@ styles/
 /static/sitemap.xml
 /static/llms.txt
 /static/llms-full.txt
+
+# Vendored packages ship their built dist.
+!vendor/*/dist/
