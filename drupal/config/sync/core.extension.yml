@@ -28,6 +28,7 @@ module:
   diff: 0
   druxt: 0
   druxt_docs: 0
+  druxtjsorg: 0
   dynamic_page_cache: 0
   editor: 0
   entity_reference_revisions: 0
@@ -41,6 +42,7 @@ module:
   image: 0
   js_cookie: 0
   jsonapi: 0
+  jsonapi_hypermedia: 0
   jsonapi_menu_items: 0
   jsonapi_node_preview: 0
   jsonapi_node_preview_tab: 0
