@@ -85,3 +85,8 @@ coretags
 httpbundled
 lateruntime
 druxtjsorg
+endcode
+itok
+Revisionable
+SAMESITE
+SIMPLETEST
