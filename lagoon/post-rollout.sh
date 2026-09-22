@@ -160,6 +160,11 @@ if [ "$seed_needed" = "1" ]; then
   php .devtools/import
 fi
 
+# The frontend's consumer comes from production's database, where neither
+# this environment's callback nor the sign-in settings may be.
+echo "Allowing this environment's frontend to sign editors in."
+drush druxtjsorg:oauth-client
+
 keys="$app/drupal/web/sites/default/files/private/oauth"
 if [ ! -s "$keys/private.key" ] || [ ! -s "$keys/public.key" ]; then
   echo "Generating the Simple OAuth keys."

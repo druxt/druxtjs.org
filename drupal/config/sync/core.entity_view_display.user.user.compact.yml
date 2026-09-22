@@ -1,17 +1,18 @@
-uuid: d2510326-8ea3-4963-87f7-d352d0b2ceca
+uuid: bb72463e-972d-4576-975e-5d6ceb1b221b
 langcode: en
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.user.compact
     - field.field.user.user.user_picture
     - image.style.thumbnail
   module:
     - image
     - user
-id: user.user.default
+id: user.user.compact
 targetEntityType: user
 bundle: user
-mode: default
+mode: compact
 content:
   member_for:
     settings: {  }
