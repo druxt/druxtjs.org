@@ -39,20 +39,28 @@ const flush = async () => {
   )
 }
 
-const mount = ({ el, label }, operations) => {
+const mount = ({ el, label, state, resource, parent }, operations) => {
   if (!el.isConnected || el.__druxtOperations) return
   const holder = document.createElement('div')
   // Last, so Vue's own children keep their places around it.
   el.appendChild(holder)
   el.classList.add('relative')
-  el.__druxtOperations = new Menu({ propsData: { operations, label } }).$mount(holder)
+  // A child of the page's component, so it reaches the store and the router.
+  el.__druxtOperations = new Menu({ parent, propsData: { operations, label, state, resource } }).$mount(holder)
 }
 
 Vue.directive('druxt-admin', {
-  inserted(el, { value }) {
+  inserted(el, { value }, vnode) {
     if (!value || !value.type || !value.id || !hasEditorHint(document.cookie)) return
     const byId = pending.get(value.type) || new Map()
-    byId.set(value.id, [...(byId.get(value.id) || []), { el, label: (value.attributes || {}).title || 'this page' }])
+    const target = {
+      el,
+      label: (value.attributes || {}).title || 'this page',
+      state: value.state || null,
+      resource: { type: value.type, id: value.id },
+      parent: vnode.context,
+    }
+    byId.set(value.id, [...(byId.get(value.id) || []), target])
     pending.set(value.type, byId)
     if (!scheduled) {
       scheduled = true

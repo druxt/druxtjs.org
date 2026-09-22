@@ -93,4 +93,7 @@ export default () => ({
     revisions: [],
     page: null,
   },
+
+  // The sign-in dialog, opened from the header and by the auth middleware.
+  signIn: false,
 })

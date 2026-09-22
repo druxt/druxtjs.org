@@ -1,6 +1,6 @@
 <template>
   <article>
-    <AppPageHeader :title="document.title" :description="document.description" :badges="editorBadges" />
+    <AppPageHeader :title="document.title" :description="document.description" :badges="editorBadges" :entity="operationsEntity" />
     <AppProse v-if="!drupal" :document="document" />
     <!-- Keyed so each page gets a fresh AppProse, whose enhance() runs on mount. -->
     <AppProse v-else :key="document.path" :title="document.title">
@@ -75,6 +75,11 @@ export default {
     })
   },
   computed: {
+    /** The page's Drupal node, for an editor's operations; none for markdown. */
+    operationsEntity() {
+      if (!this.drupal || !this.document.uuid) return null
+      return { type: this.document.type, id: this.document.uuid, attributes: { title: this.document.title }, state: this.document.moderationState }
+    },
     /**
      * A badge when a signed-in editor is viewing something other than the
      * published page: the latest draft, or a specific revision.

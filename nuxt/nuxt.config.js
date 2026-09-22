@@ -1,7 +1,7 @@
 // GA4, as a plain gtag.js snippet: the Nuxt analytics modules need either
 // Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
-const { backendOrigin, serviceRoute } = require('./server/backend')
+const { serviceRoute } = require('./server/backend')
 const { AUTH_COOKIE_PREFIX, AUTH_STRATEGY } = require('./lib/auth')
 const { syncDruxtComponents } = require('./lib/sync-druxt-components')
 
@@ -32,17 +32,19 @@ const DRUXT_BASE_URL = process.env.DRUXT_BASE_URL || 'http://127.0.0.1:8899'
 const CONSUMER_ID = process.env.DRUXT_CONSUMER_ID || 'druxtjs_org'
 
 /**
- * Editor sign-in: the authorization code grant with PKCE, as a public client.
- * The authorize step is a browser redirect, so it names the origin a browser
- * reaches Drupal on; the token exchange and the user lookup go through this
- * origin's proxy. druxt-auth builds both on the server's base URL, which is
+ * Editor sign-in: the authorization code grant with PKCE, as a public client,
+ * on druxt-auth's Drupal scheme. The site's own form signs in through
+ * Drupal's JSON login, and every step after it (authorize, token, userinfo)
+ * runs on this origin through the proxy, so the Drupal session the login
+ * starts is the one the authorize step finds, and nothing of Drupal's is
+ * shown. druxt-auth builds the endpoints on the server's base URL, which is
  * an internal service name in production, so the strategy is set here.
  */
 const OAUTH_CLIENT = { clientId: CONSUMER_ID, scope: ['editor'] }
 const OAUTH_STRATEGY = {
-  scheme: 'oauth2',
+  scheme: '~/modules/druxt-auth/drupal-scheme.js',
   endpoints: {
-    authorization: backendOrigin(process.env) + '/oauth/authorize',
+    authorization: '/oauth/authorize',
     token: '/oauth/token',
     userInfo: '/oauth/userinfo',
   },
@@ -51,6 +53,7 @@ const OAUTH_STRATEGY = {
   grantType: 'authorization_code',
   codeChallengeMethod: 'S256',
 }
+
 // Drupal's login, its editing screens and their assets, served on this origin
 // so an editor's session is first party. The same test tells the page cache
 // in server/start.js which requests are Drupal's, so none of them is stored.
@@ -225,7 +228,7 @@ export default {
   // @nuxtjs/auth-next: a signed-in editor is sent back to the page they
   // started from, or home; the callback page is the site's own.
   auth: {
-    redirect: { login: '/', logout: '/', home: '/', callback: '/callback' },
+    redirect: { login: '/login', logout: '/', home: '/', callback: '/callback' },
     cookie: { prefix: AUTH_COOKIE_PREFIX },
     strategies: { [AUTH_STRATEGY]: OAUTH_STRATEGY },
   },
@@ -235,18 +238,15 @@ export default {
   // two OAuth endpoints the browser calls are here too: the proxy module
   // reads this list before druxt-auth adds its own entry.
   proxy: [
-    // DRUXT_PROXY_AUTH_UI proxies Drupal's sign-in surface too, so the whole
-    // OAuth flow rides one origin. For a tunnelled dev preview, not production,
-    // where the backend has its own public origin.
     ...[
       '/jsonapi',
       '/router/translate-path',
       '/sites/default/files',
+      '/oauth/authorize',
       '/oauth/token',
       '/oauth/userinfo',
       '/oauth/revoke',
       '/druxt-docs',
-      ...(process.env.DRUXT_PROXY_AUTH_UI ? ['/oauth/authorize', '/user/login', '/core'] : []),
     ].map((context) => [
       context,
       { target: DRUXT_BASE_URL, changeOrigin: false },
