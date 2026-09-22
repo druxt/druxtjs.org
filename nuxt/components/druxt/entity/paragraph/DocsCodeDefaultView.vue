@@ -1,5 +1,7 @@
 <template>
-  <DuiCodeBlock v-if="entity" :code="entity.attributes.field_code || ''" :language="entity.attributes.field_language || 'text'" />
+  <div :data-druxt-entity="(entity || {}).id || false" :data-druxt-type="(entity || {}).type" data-druxt-field="field_code">
+    <DuiCodeBlock v-if="entity" :code="entity.attributes.field_code || ''" :language="entity.attributes.field_language || 'text'" />
+  </div>
 </template>
 
 <script>

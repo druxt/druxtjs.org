@@ -1,0 +1,22 @@
+{
+  "name": "@druxt-contrib/anchors",
+  "version": "0.0.0",
+  "description": "The shared DOM anchor contract for Druxt: how a rendered entity and field name themselves so a diff, an editor or a canvas can find them again.",
+  "keywords": [
+    "druxt",
+    "anchors",
+    "jsonapi"
+  ],
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "require": "./dist/index.ssr.js",
+      "import": "./dist/index.esm.js"
+    }
+  },
+  "main": "dist/index.ssr.js",
+  "module": "dist/index.esm.js",
+  "files": [
+    "dist"
+  ]
+}
