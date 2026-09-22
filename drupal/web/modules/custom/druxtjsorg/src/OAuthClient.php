@@ -22,7 +22,7 @@ final class OAuthClient {
   /**
    * The scopes an editor's sign-in may ask for.
    */
-  public const SCOPES = ['authenticated', 'editor', 'contributor'];
+  public const SCOPES = ['authenticated', 'editor', 'contributor', 'administrator'];
 
   /**
    * The field values the consumer needs.
