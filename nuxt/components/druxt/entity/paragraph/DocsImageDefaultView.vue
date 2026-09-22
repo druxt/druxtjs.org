@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :data-druxt-entity="(entity || {}).id || false" :data-druxt-type="(entity || {}).type" data-druxt-field="field_media">
     <slot name="field_media" />
   </div>
 </template>
