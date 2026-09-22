@@ -96,6 +96,10 @@ export const fetchDrupalPage = async (store, path) => {
   const versioned = editor && store.state.editor.version !== 'published'
   const read = async (wanted) => {
     const query = await pageQuery(store.$druxtSchema, { versioned: wanted })
+    // The store keys a resource by its id alone, so another revision of this
+    // page may be sitting there; getResource() returns that copy when its fetch
+    // fails, and merges into it when it succeeds. Start from nothing.
+    if (editor && ((store.state.druxt || {}).resources || {})[type]) store.commit('druxt/flushResource', { type, id: entity.uuid })
     const resource = await store.dispatch('druxt/getResource', { type, id: entity.uuid, query, bypassCache: editor })
     return resource && (resource.data || resource)
   }
