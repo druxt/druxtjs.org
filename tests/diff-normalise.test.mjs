@@ -11,6 +11,7 @@ import assert from 'node:assert/strict'
 const { normaliseDiff, wordDiff, groupRuns, condenseRuns, anchorUuid } = await import(
   '@druxt-contrib/diff'
 )
+const { blockFor, anchorsOf } = await import('../nuxt/lib/diff-anchors.js')
 
 /** A jsonapi_diff document: a node whose field_content children are listed. */
 const doc = (children) => ({
@@ -270,7 +271,6 @@ describe('the vendored engine names both sides of a block', () => {
 // listing whose body stays the live content still has a diff against a
 // revision, and its elements carry the left uuid.
 describe('finding a block among the elements a page rendered', () => {
-  const { blockFor, anchorsOf } = require('../nuxt/lib/diff-anchors.js')
   const block = { status: 'changed', uuid: 'left-1', uuids: { left: 'left-1', right: 'right-1' } }
 
   test('the rendered side comes first, and both are looked for', () => {
