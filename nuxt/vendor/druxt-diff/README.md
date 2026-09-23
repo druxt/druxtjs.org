@@ -26,6 +26,12 @@ const view = normaliseDiff(jsonapiDiffDocument)
   `summary` covers only the root's fields), re-pairs a rebuilt draft so an edit
   shows where it happened, and anchors each removed block to a surviving
   sibling.
+- `anchorUuid(block, side)` is the uuid to look for in the page. A diff has two
+  sides and a page renders one of them, and the two are not always the same
+  entity: a backend that matches children by position pairs the blocks of a site
+  that rebuilds its paragraphs on every import, where each revision has its own
+  uuids. Every block carries `uuids: { left, right }`, and a removed block
+  carries its neighbour's pair as `placeUuids`.
 - `wordDiff(left, right)` is an LCS word diff with a semantic cleanup: a short
   common word wedged between two changes folds into the rewrite, and each token
   carries its trailing whitespace so grouping keeps spacing.
@@ -48,6 +54,12 @@ Vue.directive('diff', diff)
 ```vue
 <p v-diff="fieldDiff">…the rendered field…</p>
 ```
+
+Added words are wrapped in `<ins class="v-diff-ins">` where they are, and
+removed words are struck as `<del class="v-diff-del">` before the word that
+followed them. Words removed from the end of a field have no word after them,
+so they are appended as `<del class="v-diff-del v-diff-del--trailing">`, which a
+site can style as a block.
 
 Bound to `{ left, right }` it wraps added words in `<ins>`, groups a rewritten
 run into one strike then one addition, spans punctuation and edge whitespace so
