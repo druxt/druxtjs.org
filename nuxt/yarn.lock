@@ -3369,10 +3369,10 @@ __metadata:
 
 "@druxt-contrib/user@file:vendor/druxt-user::locator=druxtjs-org%40workspace%3A.":
   version: 0.0.0
-  resolution: "@druxt-contrib/user@file:vendor/druxt-user#vendor/druxt-user::hash=b07df1&locator=druxtjs-org%40workspace%3A."
+  resolution: "@druxt-contrib/user@file:vendor/druxt-user#vendor/druxt-user::hash=06dbb2&locator=druxtjs-org%40workspace%3A."
   dependencies:
     drupal-jsonapi-params: ^2.3.1
-  checksum: 44e0b7d33ac8868cf87ea7f1f88a37b3f638a9e7e72c7b5308f0dcd93e509633029129c7f87f7623a8974d9287371d299ad9f214a5edb85ce2b2d7625850ea3d
+  checksum: 5e09161a85f9275b9ac300860749706e7e8fd92fd2681b4682f2f90d3f0ed30f0db85ec30335602652e54326c72b558f52bd3c0231dc1a6fdbf4bba7a2a3a873
   languageName: node
   linkType: hard
 
