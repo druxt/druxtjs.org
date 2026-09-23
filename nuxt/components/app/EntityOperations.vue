@@ -1,7 +1,7 @@
 <template>
   <!-- Edit, and the rest behind the dots. Shown while the page header is hovered or focused. -->
   <div class="page-ops flex items-center h-[30px] border border-base-300 rounded-lg bg-base-100 shadow-sm text-[12.5px] font-medium" data-druxt-operations>
-    <a v-if="edit" :href="edit.href" target="_self" class="page-ops-seg px-2.5 rounded-l-lg" :aria-label="`Edit ${label}`">
+    <a v-if="edit" :href="back(edit.href)" target="_self" class="page-ops-seg px-2.5 rounded-l-lg" :aria-label="`Edit ${label}`">
       <svg class="account-icon !w-[15px] !h-[15px]" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
       Edit
     </a>
@@ -34,7 +34,7 @@
         </div>
         <div class="h-px bg-base-300 -mx-1.5 my-1.5" />
 
-        <a v-if="edit" :href="edit.href" target="_self" class="account-item" data-menu-item role="menuitem">
+        <a v-if="edit" :href="back(edit.href)" target="_self" class="account-item" data-menu-item role="menuitem">
           <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
           {{ draft ? 'Edit draft' : 'Edit' }}
           <kbd class="kbd kbd-xs ml-auto">E</kbd>
@@ -86,7 +86,7 @@
             </div>
             <template v-if="revisions">
               <div class="h-px bg-base-300 -mx-1.5 my-1.5" />
-              <a :href="revisions.href" target="_self" class="account-item" data-flyout-item role="menuitem">
+              <a :href="back(revisions.href)" target="_self" class="account-item" data-flyout-item role="menuitem">
                 <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
                 All revisions
                 <span v-if="revisionCount" class="ml-auto text-[11.5px] text-base-content/50 tabular-nums">{{ revisionCount }}</span>
@@ -95,7 +95,7 @@
             </div>
           </div>
         </div>
-        <a v-for="operation of others" :key="operation.key" :href="operation.href" target="_self" class="account-item" data-menu-item role="menuitem">
+        <a v-for="operation of others" :key="operation.key" :href="back(operation.href)" target="_self" class="account-item" data-menu-item role="menuitem">
           <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></svg>
           {{ operation.title }}
         </a>
@@ -211,6 +211,20 @@ export default {
 
   methods: {
     /**
+     * A Drupal link that comes back here when it is done. Without it Drupal
+     * decides where to go, which is its own page: saving a profile leaves the
+     * reader on `/user/2` rather than the page they were reading.
+     *
+     * @param {string} href - The operation's path.
+     * @returns {string} The path with a `destination` back to this page.
+     */
+    back(href) {
+      if (!href) return href
+      const to = encodeURIComponent(this.$route.fullPath)
+      return `${href}${href.includes('?') ? '&' : '?'}destination=${to}`
+    },
+
+    /**
      * E opens the edit form, unless the reader is typing, something has
      * already acted on the key, or the delete dialog is open. The dialog puts
      * focus on its Cancel button, which is not a text field, so without this
@@ -221,7 +235,7 @@ export default {
       if (!this.edit || event.key !== 'e' || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return
       const target = event.target || {}
       if (target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName || '')) return
-      window.location.href = this.edit.href
+      window.location.href = this.back(this.edit.href)
     },
 
     /**
