@@ -16,6 +16,7 @@ const {
   blockResource,
   layoutSections,
   pageResource,
+  assertDocument,
   parseArgs,
   pkcePair,
   sectionResource,
@@ -387,5 +388,42 @@ describe('sign-in', () => {
       uuid: 'u',
     })
     assert.throws(() => parseArgs(['a.json']), /Unexpected argument/)
+  })
+})
+
+// Sign-in opens a browser and waits for a person. A document that cannot be
+// authored is rejected before that, not with a TypeError after it.
+describe('assertDocument', () => {
+  const good = {
+    title: 'Configure CORS',
+    section: 'how-to',
+    url: '/how-to/cors',
+    blocks: [{ type: 'text' }],
+  }
+
+  test('accepts a page that can be authored', () => {
+    assert.doesNotThrow(() => assertDocument(good))
+    // Revising an existing page takes its section and path from the page.
+    assert.doesNotThrow(() =>
+      assertDocument({ title: 'x', blocks: [{ type: 'text' }] }, { uuid: 'u-1' })
+    )
+  })
+
+  test('names the missing field rather than failing inside the block walk', () => {
+    assert.throws(() => assertDocument({ ...good, blocks: undefined }), /needs a "blocks" array/)
+    assert.throws(() => assertDocument({ ...good, blocks: [] }), /no blocks to author/)
+    assert.throws(() => assertDocument({ ...good, title: '  ' }), /needs a "title"/)
+    assert.throws(() => assertDocument({ ...good, section: undefined }), /needs a "section"/)
+    assert.throws(() => assertDocument({ ...good, url: undefined }), /needs a "url"/)
+  })
+
+  test('says so when the file is a whole IR rather than one of its pages', () => {
+    assert.throws(() => assertDocument({ pages: [good] }), /whole IR: pass one of its pages/)
+  })
+
+  test('refuses what is not a document at all', () => {
+    for (const value of [null, undefined, 'a string', 42, [good]]) {
+      assert.throws(() => assertDocument(value), /must be a JSON object/, String(value))
+    }
   })
 })
