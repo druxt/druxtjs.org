@@ -1,28 +1,39 @@
 <template>
-  <!-- Where whole blocks were removed, a marker in the margin opens to what was there. -->
-  <div v-if="active && removed.length" class="page-diff-removed" aria-live="polite">
-    <div
-      v-for="marker of removed"
-      :key="marker.key"
-      class="absolute z-30"
-      :style="{ top: marker.top + 'px', left: marker.left + 'px', width: marker.width + 'px' }"
-    >
-      <button
-        type="button"
-        class="page-diff-removed-dot"
-        :aria-expanded="String(open === marker.key)"
-        :aria-label="`${goneLabel}: ${marker.blocks.length} ${marker.blocks.length === 1 ? 'block' : 'blocks'}`"
-        @click="open = open === marker.key ? null : marker.key"
-      >−</button>
-      <div v-if="open === marker.key" class="page-diff-removed-card">
-        <p class="text-xs font-semibold mb-2">{{ goneLabel }}</p>
-        <div v-for="(block, i) of marker.blocks" :key="i" class="mb-2 last:mb-0">
-          <AppDiffField v-for="field of block.fields" :key="field.name" :field="field" :condense="false" />
-          <p v-if="!block.fields.length" class="text-xs text-base-content/60">A block with nothing to compare.</p>
+  <div v-if="active">
+    <!-- Where the changes are on a long page, from @druxt-contrib/diff. -->
+    <DiffMinimap
+      v-if="(editor.diff || {}).blocks"
+      :blocks="editor.diff.blocks"
+      side="right"
+      label="Changes against the live page"
+      :name="markName"
+    />
+
+    <!-- Where whole blocks were removed, a marker in the margin opens to what was there. -->
+    <div v-if="removed.length" class="page-diff-removed" aria-live="polite">
+      <div
+        v-for="marker of removed"
+        :key="marker.key"
+        class="absolute z-30"
+        :style="{ top: marker.top + 'px', left: marker.left + 'px', width: marker.width + 'px' }"
+      >
+        <button
+          type="button"
+          class="page-diff-removed-dot"
+          :aria-expanded="String(open === marker.key)"
+          :aria-label="`${goneLabel}: ${marker.blocks.length} ${marker.blocks.length === 1 ? 'block' : 'blocks'}`"
+          @click="open = open === marker.key ? null : marker.key"
+        >−</button>
+        <div v-if="open === marker.key" class="page-diff-removed-card">
+          <p class="text-xs font-semibold mb-2">{{ goneLabel }}</p>
+          <div v-for="(block, i) of marker.blocks" :key="i" class="mb-2 last:mb-0">
+            <AppDiffField v-for="field of block.fields" :key="field.name" :field="field" :condense="false" />
+            <p v-if="!block.fields.length" class="text-xs text-base-content/60">A block with nothing to compare.</p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+    </div>
 </template>
 
 <script>
@@ -99,6 +110,12 @@ export default {
   },
 
   methods: {
+    /** What a reader hears a mark on the rail called. */
+    markName(block, index, total) {
+      const what = { changed: 'Changed', added: 'Added', moved: 'Moved', removed: this.goneLabel }[block.status] || block.status
+      return `${what}, ${index + 1} of ${total}`
+    },
+
     async load() {
       const key = this.key
       try {
