@@ -339,8 +339,10 @@ const trailingRemovals = (tokens, from) => {
 const anchorUuid = (block, side = "right") => {
   if (!block)
     return null;
-  const uuids = block.uuids || block.placeUuids || {};
-  return uuids[side] || block.uuid || null;
+  const uuids = block.placeUuids || block.uuids;
+  if (uuids)
+    return uuids[side] || null;
+  return block.uuid || null;
 };
 
 const pin = (value) => Math.min(100, Math.max(0, value || 0));

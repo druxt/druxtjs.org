@@ -19,15 +19,11 @@
 
 <script>
 
-// The package by name, not a relative path. siroc bundles the engine into
-// `dist/index.*` and mkdist transpiles components into `dist/components`, so
-// `../lib/diff` does not exist once built and webpack cannot resolve it.
-import {
-  condenseRuns,
-  groupRuns,
-  looksLikeMarkup,
-  wordDiff,
-} from '@druxt-contrib/diff'
+// The engine by a relative path, which `exports` maps and mkdist copies to
+// `dist/lib/`. Not the package index: that is the Nuxt module, so it carries
+// Node's `path`, and importing it from a component puts a polyfill of it in
+// every reader's bundle for code the browser never runs.
+import { condenseRuns, groupRuns, looksLikeMarkup, wordDiff } from '../lib/diff'
 
 export default {
   name: 'AppDiffField',

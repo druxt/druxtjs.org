@@ -8,11 +8,13 @@
     "jsonapi"
   ],
   "license": "MIT",
+  "type": "module",
   "exports": {
     ".": {
       "require": "./dist/index.ssr.js",
       "import": "./dist/index.esm.js"
     },
+    "./lib/*": "./dist/lib/*",
     "./components/*": "./dist/components/*"
   },
   "main": "dist/index.ssr.js",
@@ -28,5 +30,12 @@
     "vue": {
       "optional": true
     }
+  },
+  "packageManager": "npm@8.19.4",
+  "engines": {
+    "node": ">=16.20.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

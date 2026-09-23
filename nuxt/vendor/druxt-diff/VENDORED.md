@@ -7,7 +7,7 @@ scripts and development dependencies, the licence and the README.
 | | |
 | --- | --- |
 | Package | `@druxt-contrib/diff` |
-| Commit | `bf81b0f` |
+| Commit | `3b0d832` |
 
 Replace `file:vendor/druxt-diff` in `package.json` with the published version
 once it is on npm, and delete this directory.
