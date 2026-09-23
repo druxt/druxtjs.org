@@ -44,3 +44,31 @@ describe('shouldRefresh', () => {
     assert.equal(shouldRefresh(undefined, signedIn), false)
   })
 })
+
+// Each refresh rotates the tokens and revokes the access token the one before
+// it issued. Sharing only the in-flight promise is not enough: a burst fails
+// in waves, and the wave arriving just after a refresh finishes starts
+// another, which kills the token the first one handed out.
+describe('a burst of refusals earns one refresh', () => {
+  const GRACE = 5000
+
+  /** The rule the plugin follows, with the clock handed in. */
+  const needsRefresh = ({ refreshing, refreshedAt, now }) =>
+    !refreshing && now - refreshedAt >= GRACE
+
+  test('the first refusal refreshes', () => {
+    assert.equal(needsRefresh({ refreshing: false, refreshedAt: 0, now: 10_000 }), true)
+  })
+
+  test('a refusal while a refresh is in flight waits for it', () => {
+    assert.equal(needsRefresh({ refreshing: true, refreshedAt: 0, now: 10_000 }), false)
+  })
+
+  test('a refusal just after a good refresh retries with what it produced', () => {
+    assert.equal(needsRefresh({ refreshing: false, refreshedAt: 9_800, now: 10_000 }), false)
+  })
+
+  test('a refusal long after refreshes again, because that token is stale too', () => {
+    assert.equal(needsRefresh({ refreshing: false, refreshedAt: 1_000, now: 10_000 }), true)
+  })
+})
