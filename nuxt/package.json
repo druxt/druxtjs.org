@@ -15,6 +15,7 @@
   "dependencies": {
     "@druxt-contrib/anchors": "file:vendor/druxt-anchors",
     "@druxt-contrib/diff": "file:vendor/druxt-diff",
+    "@druxt-contrib/user": "file:vendor/druxt-user",
     "@nuxt/content": "1.15.1",
     "@nuxtjs/proxy": "2.1.0",
     "@tailwindcss/typography": "0.4.1",

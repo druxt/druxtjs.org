@@ -1,7 +1,14 @@
 <template>
   <!-- Only while an editor is looking at something other than the live page. -->
   <transition name="fade">
-    <div v-if="visible" class="revision-pill" role="region" aria-label="Revision" data-testid="revision-pill" data-diff-ignore>
+    <div
+      v-if="visible"
+      :class="bare ? 'revision-pill-bare' : 'revision-pill'"
+      :role="bare ? null : 'region'"
+      :aria-label="bare ? null : 'Revision'"
+      data-testid="revision-pill"
+      data-diff-ignore
+    >
       <template v-if="shown.kind === 'draft'">
         <span>{{ editor.compare ? 'Draft vs live' : 'Viewing the draft' }}</span>
       </template>
@@ -52,13 +59,18 @@ import { viewing, whenOf } from '~/lib/revisions'
  * The pill at the bottom of the page while an editor views a draft or an old
  * revision: what it is, its diff against live, and the way back to live.
  *
- * It also keeps the page's revisions in the store, for the Revisions submenu
+ * The editor bar keeps the page's revisions in the store, for the submenu
  * and the Draft label beside the title.
  */
 export default {
   name: 'AppRevisionPill',
 
   mixins: [revisionUrl],
+
+  props: {
+    /** Rendered inside the editor bar, which brings its own shell. */
+    bare: { type: Boolean, default: false },
+  },
 
   data: () => ({ cursor: -1 }),
 
@@ -83,28 +95,12 @@ export default {
   },
 
   watch: {
-    uuid: {
-      immediate: true,
-      handler(uuid) {
-        if (uuid && this.signedIn) this.loadRevisions(uuid)
-      },
-    },
     'editor.version'() {
       this.cursor = -1
     },
   },
 
   methods: {
-    async loadRevisions(uuid) {
-      try {
-        const { data } = await this.$druxt.axios.get(`/druxt-docs/doc-page/${uuid}/revisions`)
-        this.$store.commit('setEditorRevisions', (data && data.data) || [])
-      } catch (e) {
-        // Without the list there is no submenu, and the page still reads.
-        this.$store.commit('setEditorRevisions', [])
-      }
-    },
-
     toggleDiff() {
       this.$store.commit('setEditorCompare', !this.editor.compare)
       this.carryRevisionInUrl()
