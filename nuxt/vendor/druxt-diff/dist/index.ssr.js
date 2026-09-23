@@ -206,12 +206,13 @@ const wordDiff = (left, right) => {
   const split = (s) => String(s).match(/\S+\s*/g) || [];
   const a = split(left);
   const b = split(right);
+  const same = (x, y) => x === y || x.trim() === y.trim();
   const n = a.length;
   const m = b.length;
   const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
   for (let i2 = n - 1; i2 >= 0; i2 -= 1) {
     for (let j2 = m - 1; j2 >= 0; j2 -= 1) {
-      dp[i2][j2] = a[i2] === b[j2] ? dp[i2 + 1][j2 + 1] + 1 : Math.max(dp[i2 + 1][j2], dp[i2][j2 + 1]);
+      dp[i2][j2] = same(a[i2], b[j2]) ? dp[i2 + 1][j2 + 1] + 1 : Math.max(dp[i2 + 1][j2], dp[i2][j2 + 1]);
     }
   }
   const runs = [];
@@ -225,8 +226,8 @@ const wordDiff = (left, right) => {
   let i = 0;
   let j = 0;
   while (i < n && j < m) {
-    if (a[i] === b[j]) {
-      push("=", a[i]);
+    if (same(a[i], b[j])) {
+      push("=", b[j]);
       i += 1;
       j += 1;
     } else if (dp[i + 1][j] >= dp[i][j + 1]) {
@@ -378,16 +379,21 @@ const mark = (root, diff) => {
     return;
   const words = renderedWords(root);
   const edits = new Map();
+  const matches = (token, rw) => token.type !== "-" && token.word === rw.word;
   let p = 0;
   for (const rw of words) {
     let scan = p;
+    let skipped = 0;
     const removed = [];
-    while (scan < tokens.length && scan - p < LOOKAHEAD && tokens[scan].word !== rw.word) {
-      if (tokens[scan].type === "-" && tokens[scan].word)
-        removed.push(tokens[scan].text);
+    while (scan < tokens.length && skipped < LOOKAHEAD && !matches(tokens[scan], rw)) {
+      if (tokens[scan].type === "-") {
+        if (tokens[scan].word)
+          removed.push(tokens[scan].text);
+      } else
+        skipped += 1;
       scan += 1;
     }
-    if (scan >= tokens.length || scan - p >= LOOKAHEAD || tokens[scan].word !== rw.word)
+    if (scan >= tokens.length || skipped >= LOOKAHEAD || !matches(tokens[scan], rw))
       continue;
     const token = tokens[scan];
     if (token.type === "+" || removed.length) {
