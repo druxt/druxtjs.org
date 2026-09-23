@@ -95,6 +95,46 @@ const sideText = (resource, key) =>
 // so a pair is only trusted when its content still reads as the same block.
 const PAIR_THRESHOLD = 0.4
 
+// A block that changed position has no position to vouch for it, so a move is
+// only read where the content is close to the same. Below this the two are a
+// removal and an addition that happen to rhyme.
+const MOVE_THRESHOLD = 0.8
+
+/**
+ * Which of a parent's pairs are still in reading order.
+ *
+ * Moving one block past three others changes the position of all four, and
+ * calling all four moved tells a reader nothing. The longest run of pairs
+ * whose old and new positions agree is taken as the order that held, and what
+ * is left over is what moved.
+ *
+ * @param {Array<{from: number, to: number}>} pairs - Old and new positions.
+ * @returns {Set<number>} The indices of the pairs that held their order.
+ */
+const inOrder = (pairs) => {
+  const order = pairs
+    .map((pair, index) => ({ ...pair, index }))
+    .sort((a, b) => a.to - b.to)
+  // The longest run whose old positions only ever go forwards.
+  const runs = order.map(() => 1)
+  const prior = order.map(() => -1)
+  let end = 0
+  for (let i = 0; i < order.length; i += 1) {
+    for (let j = 0; j < i; j += 1) {
+      if (order[j].from < order[i].from && runs[j] + 1 > runs[i]) {
+        runs[i] = runs[j] + 1
+        prior[i] = j
+      }
+    }
+    if (runs[i] > runs[end]) end = i
+  }
+  const kept = new Set()
+  for (let at = order.length ? end : -1; at >= 0; at = prior[at]) {
+    kept.add(order[at].index)
+  }
+  return kept
+}
+
 /**
  * Merge a removed resource and the added resource that replaced it into one
  * field list a wrapper can diff: the old value from the removed side, the new
@@ -201,6 +241,12 @@ const normaliseDiff = (document) => {
     const removed = items.filter((it) => it.side === 'removed')
     const taken = new Set()
     const pairFor = new Map()
+    const moved = new Set()
+    const claim = (it, match, isMove) => {
+      taken.add(match)
+      pairFor.set(it, match)
+      if (isMove) moved.add(it)
+    }
     for (const it of items) {
       if (it.side !== 'added') continue
       const match = removed.find(
@@ -211,11 +257,37 @@ const normaliseDiff = (document) => {
           similarity(sideText(r.res, 'left'), sideText(it.res, 'right')) >=
             PAIR_THRESHOLD
       )
-      if (match) {
-        taken.add(match)
-        pairFor.set(it, match)
-      }
+      if (match) claim(it, match, false)
     }
+    // Then the same block at another position. An editor who moves a section
+    // leaves a removal and an addition that the position test cannot pair, and
+    // every word of it is struck and written again: the page says the whole
+    // section changed when nothing in it did. Read second, so a block that
+    // stayed where it was is never claimed by one that moved.
+    for (const it of items) {
+      if (it.side !== 'added' || pairFor.has(it)) continue
+      const match = removed.find(
+        (r) =>
+          !taken.has(r) &&
+          (r.meta.field || null) === (it.meta.field || null) &&
+          similarity(sideText(r.res, 'left'), sideText(it.res, 'right')) >=
+            MOVE_THRESHOLD
+      )
+      if (match) claim(it, match, false)
+    }
+
+    // What moved is what broke the order, rather than everything a move
+    // pushed along in front of it.
+    const paired = [...pairFor.entries()]
+    const held = inOrder(
+      paired.map(([add, rem]) => ({
+        from: rem.meta.left_delta,
+        to: add.meta.right_delta,
+      }))
+    )
+    paired.forEach(([add], index) => {
+      if (!held.has(index)) moved.add(add)
+    })
 
     for (const it of items) {
       if (it.side === 'removed' && taken.has(it)) continue
@@ -223,22 +295,24 @@ const normaliseDiff = (document) => {
         const rem = pairFor.get(it)
         const merged = mergePair(rem.res, it.res)
         const changed = merged.filter((f) => f.status !== 'same')
+        const isMove = moved.has(it)
         const refMeta = {
-          status: 'same',
+          status: isMove ? 'moved' : 'same',
           field: it.meta.field,
           left_delta: rem.meta.left_delta,
           right_delta: it.meta.right_delta,
         }
+        // A block that moved is marked moved either way. Its words are marked
+        // only where they differ: striking and reinserting text that did not
+        // change says everything changed, and dropping the marks on text that
+        // did change hides the edit behind the move.
+        const status = isMove ? 'moved' : changed.length ? 'changed' : 'same'
         // Two resources, one block: its left is the removed one's, its right
         // the added one's.
-        push(
-          it.res,
-          refMeta,
-          depth,
-          changed,
-          changed.length ? 'changed' : 'same',
-          { left: sideUuids(rem.res).left, right: sideUuids(it.res).right }
-        )
+        push(it.res, refMeta, depth, changed, status, {
+          left: sideUuids(rem.res).left,
+          right: sideUuids(it.res).right,
+        })
         children(it.res, depth + 1)
         continue
       }
