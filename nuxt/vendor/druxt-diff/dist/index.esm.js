@@ -331,6 +331,22 @@ const anchorUuid = (block, side = "right") => {
   return uuids[side] || block.uuid || null;
 };
 
+const pin = (value) => Math.min(100, Math.max(0, value || 0));
+const MIN_HEIGHT = 0.6;
+const placeMarks = (boxes, total, minHeight = MIN_HEIGHT) => {
+  if (!total)
+    return [];
+  return (boxes || []).map((box) => ({
+    top: pin((box.top || 0) / total * 100),
+    height: Math.min(Math.max(pin((box.height || 0) / total * 100), minHeight), 100)
+  }));
+};
+const placeViewport = (at, shown, total) => {
+  if (!total)
+    return { top: 0, height: 0 };
+  return { top: pin(at / total * 100), height: pin(shown / total * 100) };
+};
+
 const diffTokens = (diff) => {
   const out = [];
   for (const run of wordDiff(diff.left, diff.right)) {
@@ -512,4 +528,4 @@ const NuxtModule = function(moduleOptions = {}) {
   }
 };
 
-export { DEFAULTS, anchorUuid, changedFields, condenseRuns, NuxtModule as default, directive as diffDirective, groupRuns, label, looksLikeMarkup, normaliseDiff, resolveOptions, trailingRemovals, wordDiff };
+export { DEFAULTS, anchorUuid, changedFields, condenseRuns, NuxtModule as default, directive as diffDirective, groupRuns, label, looksLikeMarkup, normaliseDiff, placeMarks, placeViewport, resolveOptions, trailingRemovals, wordDiff };
