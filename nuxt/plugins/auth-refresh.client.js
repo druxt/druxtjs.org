@@ -9,9 +9,14 @@ import { RETRIED, shouldRefresh } from '~/lib/auth-retry'
  * asking for a new access token puts the editor back where they were without
  * them seeing anything.
  *
- * The refresh is shared: a page that fires several requests at once must not
- * fire several refreshes, because each one rotates the refresh token and the
- * losers of that race would be left holding a token that no longer works.
+ * The refresh is shared, and for longer than it is in flight. Each refresh
+ * rotates the tokens and revokes the access token the one before it issued,
+ * so a second refresh kills the token the first just handed out and the
+ * request carrying it is refused. Sharing only the in-flight promise is not
+ * enough: a burst of requests fails in waves, and the wave that arrives just
+ * after a refresh finishes would start another. So a refusal that lands
+ * within a moment of a good refresh is retried with the token that refresh
+ * produced, and asks for nothing new.
  */
 export default function (context) {
   const { $druxt, $axios } = context
@@ -21,11 +26,22 @@ export default function (context) {
   // as an argument would hold nothing and quietly never retry anything.
   const auth = () => context.$auth || (context.app && context.app.$auth)
 
+  /** How long a fresh token is taken to be fresh, in milliseconds. */
+  const GRACE = 5000
+
   let refreshing = null
+  let refreshedAt = 0
   const refresh = () => {
+    // Just refreshed: the token in hand is the one a refresh would fetch, so
+    // the request is retried with it rather than rotating the tokens again.
+    if (!refreshing && Date.now() - refreshedAt < GRACE) return Promise.resolve()
     if (!refreshing) {
       refreshing = auth()
         .refreshTokens()
+        .then((result) => {
+          refreshedAt = Date.now()
+          return result
+        })
         .finally(() => {
           refreshing = null
         })
