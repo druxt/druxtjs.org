@@ -52,6 +52,25 @@ export const pageQuery = async (schema, { versioned = false } = {}) => {
 }
 
 /**
+ * Drops a revision selection that belongs to the page being left.
+ *
+ * `id:<vid>` names a revision of one node, and the selection is one value for
+ * the whole app. Carried to the next page it asks for a revision that page does
+ * not have, and the page fails to load. `published` and `working-copy` name a
+ * view every page has, so they are kept. The history goes either way: it is the
+ * previous page's.
+ *
+ * @param {object} store - The Vuex store.
+ * @param {string} uuid - The page being read.
+ */
+const leaveRevisionBehind = (store, uuid) => {
+  const { page, version } = store.state.editor
+  if (!page || page.uuid === uuid) return
+  if (/^id:/.test(String(version))) store.commit('setEditorVersion', 'working-copy')
+  store.commit('setEditorRevisions', [])
+}
+
+/**
  * Resolves a path through the Druxt router, and loads the page it names.
  *
  * Only what the page header, table of contents and footer need is read from
@@ -73,10 +92,23 @@ export const fetchDrupalPage = async (store, path) => {
   // never from the store's cache, so switching version always re-fetches.
   // See plugins/working-copy.js and the editor store state.
   const editor = Boolean(store.$auth && store.$auth.loggedIn)
+  if (editor) leaveRevisionBehind(store, entity.uuid)
   const versioned = editor && store.state.editor.version !== 'published'
-  const query = await pageQuery(store.$druxtSchema, { versioned })
-  const resource = await store.dispatch('druxt/getResource', { type, id: entity.uuid, query, bypassCache: editor })
-  const data = resource && (resource.data || resource)
+  const read = async (wanted) => {
+    const query = await pageQuery(store.$druxtSchema, { versioned: wanted })
+    const resource = await store.dispatch('druxt/getResource', { type, id: entity.uuid, query, bypassCache: editor })
+    return resource && (resource.data || resource)
+  }
+
+  let data = await read(versioned)
+  // Drupal refuses a revision this account may not read, and the Druxt store
+  // returns that as an empty resource. The published page is the one every
+  // reader may see, so it is shown instead of an error, and the toolbar is put
+  // back to the version being shown.
+  if (versioned && (!data || !data.attributes)) {
+    store.commit('setEditorVersion', 'published')
+    data = await read(false)
+  }
   if (!data || !data.attributes) throw new Error(`Drupal returned no ${type} for ${path}`)
 
   // What the editor toolbar needs to name and switch this page's revisions.
