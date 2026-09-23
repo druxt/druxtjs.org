@@ -1,7 +1,11 @@
 // A copy of druxt-auth's templates/drupal-scheme.js from druxt/druxt-auth#69,
-// until a release carries it. Keep the two identical.
+// until a release carries it. Keep the two identical, apart from the check
+// that the reused Drupal session belongs to whoever typed the credentials,
+// which is owed upstream: see `login()` and `isSignedInAs`.
 
 import { Oauth2Scheme } from '~auth/runtime'
+
+import { isSignedInAs } from '~/lib/account'
 
 /**
  * The authorization code grant, with a sign-in form of the site's own.
@@ -41,22 +45,38 @@ export default class DrupalScheme extends Oauth2Scheme {
    * Signs in to Drupal with credentials when given them, then starts the
    * authorization code flow.
    *
+   * A session already open is reused, because Drupal refuses a JSON login
+   * while one is. That session belongs to whoever left it there, so when it is
+   * reused the account it signed in as is checked against the name that was
+   * typed, and a sign-in that landed on somebody else is undone. Without this,
+   * the next person to use a shared browser is authorized as the last one.
+   *
    * @param {object} [options] - oauth2's login options, plus `credentials`.
    * @param {object} [options.credentials] - `{ name, pass }`.
    */
   async login ({ credentials, ...options } = {}) {
-    if (credentials) {
-      await this.drupalLogin(credentials)
+    if (!credentials) {
+      return super.login(options)
     }
-    return super.login(options)
+    const reused = await this.drupalLogin(credentials)
+    const result = await super.login(options)
+    if (reused && !isSignedInAs(this.$auth.user, credentials.name)) {
+      await this.logout()
+      throw new Error(
+        'Somebody else is still signed in to this browser. Sign them out, then try again.'
+      )
+    }
+    return result
   }
 
   /**
    * Starts a Drupal session through its JSON login.
    *
-   * A session that is already signed in answers 403, and is used as it is.
+   * A session that is already signed in answers 403. Drupal will not replace
+   * it, so it is reused and `login()` checks afterwards whose it is.
    *
    * @param {object} credentials - `{ name, pass }`.
+   * @returns {Promise<boolean>} True when an open session was reused rather than started.
    */
   async drupalLogin ({ name, pass }) {
     try {
@@ -70,10 +90,11 @@ export default class DrupalScheme extends Oauth2Scheme {
       if (data && data.logout_token) {
         this.$auth.$storage.setUniversal(this.logoutTokenKey, data.logout_token)
       }
+      return false
     } catch (error) {
       const { status, data } = error.response || {}
       if (status === 403 && /anonymous users/i.test((data || {}).message || '')) {
-        return
+        return true
       }
       throw error
     }
