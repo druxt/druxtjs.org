@@ -57,11 +57,15 @@ html {
 /* Windows high-contrast / forced colours: keep borders that are drawn with
    background colours visible. */
 @media (forced-colors: active) {
-  .border-base-300 { border-color: CanvasText; }
+  .border-base-300 {
+    border-color: CanvasText;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -333,7 +337,7 @@ html {
 }
 /* Mermaid 8 writes the actor height into the lifeline's class attribute
    (class="200"), so lifelines are matched by id. */
-.docs-diagram line[id^="actor"],
+.docs-diagram line[id^='actor'],
 .docs-diagram .actor-line {
   stroke: hsl(var(--bc) / 0.25) !important;
   stroke-width: 1px !important;
@@ -1021,10 +1025,11 @@ body.has-editor-bar main {
   z-index: 55;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  /* Room between the controls: two buttons a pixel apart read as one. */
+  gap: 0.625rem;
   max-width: calc(100vw - 1.5rem);
-  height: 2.5rem;
-  padding: 0 0.375rem 0 0.75rem;
+  height: 2.75rem;
+  padding: 0 0.5rem 0 0.875rem;
   border-radius: 9999px;
   background: hsl(var(--bc));
   color: hsl(var(--b1));
@@ -1075,8 +1080,25 @@ body.has-editor-bar main {
 .editor-bar-sep {
   width: 1px;
   height: 18px;
+  margin: 0 0.125rem;
   background: hsl(var(--b1) / 0.22);
   flex: none;
+}
+/* One filled button, which is Edit. Everything else beside it is quieter, so
+   the eye finds the primary action rather than a row of equals. */
+.editor-bar .revision-pill-btn.solid {
+  background: transparent;
+  color: hsl(var(--b1) / 0.85);
+  border: 1px solid hsl(var(--b1) / 0.3);
+}
+.editor-bar .revision-pill-btn.solid:hover,
+.editor-bar .revision-pill-btn.solid:focus-visible {
+  background: hsl(var(--b1) / 0.12);
+  color: hsl(var(--b1));
+}
+.editor-bar .revision-pill-btn {
+  height: 1.875rem;
+  padding: 0 0.6875rem;
 }
 .editor-bar-btn {
   display: inline-flex;
@@ -1109,11 +1131,15 @@ body.has-editor-bar main {
   box-shadow: none;
   color: hsl(var(--b1));
 }
+.editor-bar-ops {
+  gap: 0.25rem;
+}
 .editor-bar-ops .page-ops-seg {
   border-radius: 9999px;
   background: hsl(var(--b1));
   color: hsl(var(--bc));
-  height: 1.75rem;
+  height: 1.875rem;
+  padding: 0 0.75rem;
 }
 .editor-bar-ops .page-ops-seg:hover {
   background: hsl(var(--b1) / 0.88);
@@ -1121,8 +1147,50 @@ body.has-editor-bar main {
 .editor-bar-ops .dropdown > button {
   color: hsl(var(--b1) / 0.8);
   border: 0;
-  height: 1.75rem;
-  padding: 0 0.375rem;
+  height: 1.875rem;
+  min-width: 1.875rem;
+  padding: 0 0.5rem;
+  border-radius: 9999px;
+}
+.editor-bar-ops .dropdown > button:focus-visible {
+  background: hsl(var(--b1) / 0.12);
+}
+/* Clear of the bar: the menu opens upward, and a card touching the bar reads
+   as one object with it. */
+/* The card clears the bar, not the button that opened it. The dropdown
+   wrapper stops being the thing it is measured from, so the offset is read
+   against the bar, which is what a reader sees it sitting above. */
+.editor-bar-ops .dropdown {
+  position: static;
+}
+.editor-bar-ops .ops-menu {
+  top: auto;
+  left: auto;
+  right: 0.25rem;
+  bottom: calc(100% + 0.625rem);
+  margin: 0;
+}
+/* The menu opens above the bar, so the list it flies out grows upward from
+   its own row and stays on the screen rather than running off the bottom. */
+.editor-bar-ops .revisions-flyout {
+  top: auto;
+  bottom: -0.375rem;
+  /* Clear of the menu it flies out of, so the two read as two cards. */
+  right: calc(100% + 0.75rem);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+/* A finger needs more than a pointer does. */
+@media (pointer: coarse) {
+  .editor-bar-ops .page-ops-seg,
+  .editor-bar-ops .dropdown > button,
+  .editor-bar .revision-pill-btn {
+    height: 2.25rem;
+    min-width: 2.25rem;
+  }
+  .editor-bar {
+    height: 3rem;
+  }
 }
 .editor-bar-ops .dropdown > button:hover {
   color: hsl(var(--b1));
