@@ -1157,6 +1157,15 @@ body.has-editor-bar main {
 }
 /* Clear of the bar: the menu opens upward, and a card touching the bar reads
    as one object with it. */
+/* The cards are the page's, not the bar's. Inside a bar whose own text is
+   near-white, anything that does not set a colour inherits one: the date on
+   a revision row came out white on a white card, which is text nobody can
+   read rather than text that looks wrong. */
+.editor-bar .ops-menu,
+.editor-bar .revisions-flyout {
+  color: hsl(var(--bc));
+}
+
 /* The card clears the bar, not the button that opened it. The dropdown
    wrapper stops being the thing it is measured from, so the offset is read
    against the bar, which is what a reader sees it sitting above. */
