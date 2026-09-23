@@ -233,7 +233,12 @@ secret-detection:
     - curl -sSLo gitleaks.tar.gz "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
     - echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
     - tar -xzf gitleaks.tar.gz gitleaks
-    - ./gitleaks detect --source . --no-banner --redact --verbose
+    # `--log-opts=HEAD` scans the history this branch has, and nothing else.
+    # The runner reuses its checkout between jobs, so the default scan reads
+    # every object left in it, including commits from branches that were
+    # rewritten away. One such commit failed this job on a branch that never
+    # contained it, and no rerun could clear it.
+    - ./gitleaks detect --source . --log-opts=HEAD --no-banner --redact --verbose
     - section_end "gitleaks"
     # A scan that finds nothing looks identical to a scan that cannot find
     # anything. Plant three credentials outside the repository and assert all
