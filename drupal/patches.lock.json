@@ -1,5 +1,5 @@
 {
-    "_hash": "de4f7c66907b8b386b72079ec97aa968f9f2c896659c0e39b99eace23db5ff14",
+    "_hash": "c1ffd8eb12d75cf784c11ba36807bf4ff9779821898f752cf384a9aefc1aba7e",
     "patches": {
         "drupal/decoupled_settings": [
             {
@@ -19,6 +19,18 @@
                 "description": "Issue #3367724: resolve includes from the previewed entity",
                 "url": "https://git.drupalcode.org/project/jsonapi_node_preview/-/merge_requests/4.diff",
                 "sha256": "cb4051a1c809d67a58024e35805b9b5bd7dcc9c8d5e23ec9686f729dbc1fa665",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/druxt": [
+            {
+                "package": "drupal/druxt",
+                "description": "Stand aside for a path the wildcard resolver cannot rebuild, so the entity resolver answers it",
+                "url": "patches/druxt-wildcard-stands-aside.patch",
+                "sha256": "96515a192dcd64a8e98acdd1d9b1b4f38ff529eb488df5272efab7edc657b8f1",
                 "depth": 1,
                 "extra": {
                     "provenance": "root"
