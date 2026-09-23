@@ -37,7 +37,8 @@
 </template>
 
 <script>
-import { anchorUuid, normaliseDiff } from '~/lib/diff'
+import { normaliseDiff } from '~/lib/diff'
+import { anchorsOf } from '~/lib/diff-anchors'
 import { findAnchor } from '~/lib/anchors'
 import { viewing } from '~/lib/revisions'
 
@@ -139,9 +140,9 @@ export default {
      * or an element, because an image block never has any text.
      */
     rendered(view) {
-      const uuids = (view.blocks || []).filter((b) => b.status === 'changed').map((b) => anchorUuid(b, 'right'))
-      const ready = () => uuids.every((uuid) => {
-        const el = findAnchor(document, { entity: uuid })
+      const changed = (view.blocks || []).filter((b) => b.status === 'changed')
+      const ready = () => changed.every((block) => {
+        const el = anchorsOf(block).map((uuid) => findAnchor(document, { entity: uuid })).find(Boolean)
         return el && (el.textContent.trim() || el.children.length > 0)
       })
       return new Promise((resolve) => {
@@ -170,7 +171,7 @@ export default {
       // uuid that is actually in the markup.
       for (const block of diff.blocks) {
         if (!MARKED.includes(block.status)) continue
-        const el = findAnchor(document, { entity: anchorUuid(block, 'right') })
+        const el = anchorsOf(block).map((uuid) => findAnchor(document, { entity: uuid })).find(Boolean)
         if (!el) continue
         el.setAttribute('data-diff', block.status)
         this.marked.push(el)
@@ -184,14 +185,15 @@ export default {
       const lastOnPage = () => {
         const els = diff.blocks
           .filter((b) => b.status !== 'removed')
-          .map((b) => findAnchor(document, { entity: anchorUuid(b, 'right') }))
+          .map((b) => anchorsOf(b).map((uuid) => findAnchor(document, { entity: uuid })).find(Boolean))
           .filter(Boolean)
         return els[els.length - 1] || document.querySelector('article') || null
       }
       for (const block of diff.rebuilt ? [] : diff.blocks) {
         if (block.status !== 'removed') continue
-        const neighbour = block.placeAfter || block.placeBefore
-        const anchor = neighbour ? anchorUuid({ placeUuids: block.placeUuids, uuid: neighbour }, 'right') : null
+        const hasNeighbour = Boolean(block.placeAfter || block.placeBefore)
+        const neighbour = { placeUuids: block.placeUuids, uuid: block.placeAfter || block.placeBefore }
+        const anchor = hasNeighbour ? anchorsOf(neighbour).find((uuid) => findAnchor(document, { entity: uuid })) : null
         const el = anchor ? findAnchor(document, { entity: anchor }) : lastOnPage()
         if (!el) continue
         const side = block.placeBefore && anchor ? 'before' : 'after'
