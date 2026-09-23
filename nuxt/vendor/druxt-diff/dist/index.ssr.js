@@ -322,11 +322,19 @@ const condenseRuns = (runs, context = 60) => runs.map((run, idx) => {
   };
 });
 const looksLikeMarkup = (value) => /^\s*<[a-z]/i.test(String(value));
+const readableWord = (word) => {
+  let text = String(word || "");
+  text = text.replace(/\]\([^)\s]*\)/g, "");
+  text = text.replace(/^[[`*_~>#]+/, "").replace(/[`*_~]+$/, "");
+  text = text.replace(/^[|-]+$/, "");
+  return text;
+};
+const readableWords = (words) => (words || []).map(readableWord).filter((word) => /[\p{L}\p{N}]/u.test(word));
 const trailingRemovals = (tokens, from) => {
   const rest = tokens.slice(from);
   if (!rest.every((token) => token.type === "-" || !token.word))
     return [];
-  return rest.filter((token) => token.type === "-" && token.word).map((token) => token.text);
+  return rest.filter((token) => token.type === "-" && token.word && !token.block).map((token) => token.text);
 };
 const anchorUuid = (block, side = "right") => {
   if (!block)
@@ -354,12 +362,14 @@ const placeViewport = (at, shown, total) => {
 const diffTokens = (diff) => {
   const out = [];
   for (const run of wordDiff(diff.left, diff.right)) {
+    const block = run.type === "-" && /\n/.test(run.text);
     for (const piece of run.text.match(/\S+|\s+/g) || []) {
       if (/^\s+$/.test(piece))
         continue;
       out.push({
         type: run.type,
         text: piece,
+        block,
         word: piece.replace(/[^\p{L}\p{N}]/gu, "").toLowerCase()
       });
     }
@@ -396,6 +406,7 @@ const mark = (root, diff) => {
   const words = renderedWords(root);
   const edits = new Map();
   const matches = (token, rw) => token.type !== "-" && token.word === rw.word;
+  const blocks = new Set();
   let p = 0;
   for (const rw of words) {
     let scan = p;
@@ -403,8 +414,12 @@ const mark = (root, diff) => {
     const removed = [];
     while (scan < tokens.length && skipped < LOOKAHEAD && !matches(tokens[scan], rw)) {
       if (tokens[scan].type === "-") {
-        if (tokens[scan].word)
-          removed.push(tokens[scan].text);
+        if (tokens[scan].word) {
+          if (tokens[scan].block)
+            blocks.add(scan);
+          else
+            removed.push(tokens[scan].text);
+        }
       } else
         skipped += 1;
       scan += 1;
@@ -424,12 +439,13 @@ const mark = (root, diff) => {
     }
     p = scan + 1;
   }
-  const trailing = trailingRemovals(tokens, p);
+  const removedBlocks = [...blocks].sort((a, b) => a - b).map((index) => tokens[index].text);
+  const trailing = [...removedBlocks, ...trailingRemovals(tokens, p)];
   const bridgeable = (s) => !/[\p{L}\p{N}]/u.test(s);
   const del = (words2) => {
     const el = document.createElement("del");
     el.className = "v-diff-del";
-    el.textContent = `${words2.join(" ")} `;
+    el.textContent = `${readableWords(words2).join(" ")} `;
     return el;
   };
   for (const [node, list] of edits) {
@@ -544,6 +560,8 @@ exports.looksLikeMarkup = looksLikeMarkup;
 exports.normaliseDiff = normaliseDiff;
 exports.placeMarks = placeMarks;
 exports.placeViewport = placeViewport;
+exports.readableWord = readableWord;
+exports.readableWords = readableWords;
 exports.resolveOptions = resolveOptions;
 exports.trailingRemovals = trailingRemovals;
 exports.wordDiff = wordDiff;
