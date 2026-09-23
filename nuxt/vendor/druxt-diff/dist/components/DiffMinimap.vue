@@ -161,7 +161,9 @@ export default {
 
     /** The element the page scrolls, and what it scrolls by. */
     scroller() {
-      return this.container || document.scrollingElement || document.documentElement
+      return (
+        this.container || document.scrollingElement || document.documentElement
+      )
     },
 
     /** Measures every marked block that is on the page, and where the reader is. */
@@ -169,7 +171,9 @@ export default {
       const scroller = this.scroller()
       if (!scroller) return
       const total = scroller.scrollHeight || 0
-      const scrolled = this.container ? this.container.scrollTop : window.scrollY
+      const scrolled = this.container
+        ? this.container.scrollTop
+        : window.scrollY
       const origin = this.container
         ? this.container.getBoundingClientRect().top - this.container.scrollTop
         : 0
@@ -180,7 +184,12 @@ export default {
         const el = this.elementFor(block)
         if (!el) continue
         const box = el.getBoundingClientRect()
-        found.push({ block, el, top: box.top - origin + scrolled, height: box.height })
+        found.push({
+          block,
+          el,
+          top: box.top - origin + scrolled,
+          height: box.height,
+        })
       }
 
       const placed = placeMarks(found, total)
@@ -195,7 +204,9 @@ export default {
         ...placed[index],
       }))
 
-      const shown = this.container ? this.container.clientHeight : window.innerHeight
+      const shown = this.container
+        ? this.container.clientHeight
+        : window.innerHeight
       this.viewport = placeViewport(scrolled, shown, total)
     },
 
