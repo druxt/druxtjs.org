@@ -52,7 +52,14 @@ subdomains, are set in `.lagoon.yml`.
    (`lagoon/dump-for-environments.sh`, under the private files directory
    nginx does not serve) and falls back to reading production's live
    database only when that file is not there. `DOCS_SKIP_SYNC=1` keeps the
-   database an environment already has. Production syncs from nothing. Either
+   database an environment already has. Production syncs from nothing.
+   Sanitising replaces every password and every address, so two things are
+   put back: an address at the maintainers' domain
+   (`DOCS_MAINTAINER_DOMAIN`, `druxtjs.org` by default), and the password of
+   the account named by `DOCS_MAINTAINER_NAME`, read from
+   `DOCS_MAINTAINER_PASSWORD`. Without them a rollout hands back an
+   environment nobody can sign in to. Both are restored after the check that
+   the sanitise happened, and never on production. Either
    way it then runs `drush deploy`, or installs from `drupal/config/sync`
    when there is no database at all. It seeds from the pinned commit only
    in that last case. It also creates

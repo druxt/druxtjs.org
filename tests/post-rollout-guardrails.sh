@@ -63,6 +63,8 @@ case "\$*" in
     [ "\${STUB_SYNC_FAILS:-}" = "1" ] && exit 1 ;;
   *"status --field=bootstrap"*) [ "$bootstrap" = "yes" ] && echo "Successful" ;;
   *"SELECT COUNT(*) FROM sessions"*) echo "$sessions" ;;
+  *"mail LIKE"*) [ -n "\${STUB_KEPT_ADDRESSES:-}" ] && printf '%b\n' "\${STUB_KEPT_ADDRESSES}" ;;
+  *"user:password"*) [ "\${STUB_NO_SUCH_USER:-}" = "1" ] && exit 1 ;;
 esac
 exit 0
 EOF
@@ -313,6 +315,111 @@ for table in 'cache' 'cache_*' 'cachetags' 'sessions' 'watchdog'; do
     no "copied with its rows: ${table}"
   fi
 done
+
+# --------------------------------------------------------------------------
+# A maintainer keeps their address and their password through the sanitise.
+# Without this, every rollout hands back an environment nobody can sign in
+# to, and an account named user+2@localhost.
+# --------------------------------------------------------------------------
+
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  STUB_KEPT_ADDRESSES='2\tmaintainer@druxtjs.org' > /dev/null
+if called "$app" "UPDATE users_field_data SET mail = 'maintainer@druxtjs.org', init = 'maintainer@druxtjs.org' WHERE uid = 2;"; then
+  ok "a maintainer's address is written back after the sanitise"
+else
+  no "a maintainer's address was not written back"
+  sed 's/^/       /' "$app/calls.log"
+fi
+
+# The negative control: with no maintainer address in the copy, nothing is
+# written back, so the assertion above is about the address and not about a
+# script that updates rows regardless.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
+if called "$app" "UPDATE users_field_data SET mail"; then
+  no "no maintainer address: a row was written back anyway"
+else
+  ok "no maintainer address: nothing was written back"
+fi
+
+# A row that is not a plain address is skipped rather than built into SQL.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  STUB_KEPT_ADDRESSES="2\tno'quote@druxtjs.org" > /dev/null
+if called "$app" "UPDATE users_field_data SET mail"; then
+  no "an address with a quote in it was built into SQL"
+else
+  ok "an address with a quote in it is skipped"
+fi
+
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password > /dev/null
+if called "$app" "user:password A Maintainer" && called "$app" "user:unblock A Maintainer"; then
+  ok "the maintainer's password is set again after the sanitise"
+else
+  no "the maintainer's password was not set again"
+  sed 's/^/       /' "$app/calls.log"
+fi
+
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
+if called "$app" "user:password"; then
+  no "no maintainer configured: a password was set anyway"
+else
+  ok "no maintainer configured: no password was set"
+fi
+
+# A name without a password says so rather than setting an empty one.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer")"
+if called "$app" "user:password"; then
+  no "a name without a password: a password was set"
+elif printf '%s' "$output" | grep -q "without DOCS_MAINTAINER_PASSWORD"; then
+  ok "a name without a password: nothing was set, and it said why"
+else
+  no "a name without a password: nothing was set, and nothing said why"
+fi
+
+# An account the copy does not have is not a reason to fail the rollout.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
+  STUB_NO_SUCH_USER=1)"
+status=$?
+if [ "$status" -ne 0 ]; then
+  no "an account that is not in the copy: the rollout failed"
+elif printf '%s' "$output" | grep -q "nothing to restore"; then
+  ok "an account that is not in the copy: the rollout carried on, and said so"
+else
+  no "an account that is not in the copy: the rollout carried on without saying so"
+fi
+
+# Nothing is restored into a copy that was not sanitised: a sanitise that
+# left the sessions behind stops the rollout before this point.
+app="$(build_app yes 12)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
+  STUB_KEPT_ADDRESSES='2\tmaintainer@druxtjs.org' > /dev/null
+if called "$app" "user:password" || called "$app" "UPDATE users_field_data SET mail"; then
+  no "a failed sanitisation: an address or a password was restored anyway"
+else
+  ok "a failed sanitisation: nothing was restored"
+fi
+
+# Production is never sanitised, so it is never restored either, however the
+# variables are set.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=production LAGOON_ENVIRONMENT=main \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
+  STUB_KEPT_ADDRESSES='2\tmaintainer@druxtjs.org' > /dev/null
+if called "$app" "user:password" || called "$app" "UPDATE users_field_data SET mail"; then
+  no "production: an account was rewritten"
+else
+  ok "production: no account was touched"
+fi
 
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]

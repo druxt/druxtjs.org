@@ -108,12 +108,58 @@ load_from_production() {
   drush sql:sync "$production_alias" @self --yes --structure-tables-list="$volatile_tables"
 }
 
+# The addresses that survive the sanitise: this site's own maintainers, so
+# someone editing a non-production environment is the person they are in
+# production. Every other address is scrubbed.
+maintainer_domain="${DOCS_MAINTAINER_DOMAIN:-druxtjs.org}"
+kept_addresses="/tmp/kept-addresses.tsv"
+
+# Written back over the sanitised addresses. An address is Drupal's handle
+# on a person: it names them in the interface, it is who a mail would go to,
+# and a maintainer testing their own site is not user+2@localhost.
+restore_addresses() {
+  [ -s "$kept_addresses" ] || return 0
+  while IFS="$(printf '\t')" read -r uid mail; do
+    # The header row a client may print, and anything that is not a plain
+    # address, are skipped rather than built into SQL.
+    case "$uid" in '' | *[!0-9]*) continue ;; esac
+    case "$mail" in '' | *"'"* | *'\'*) continue ;; esac
+    drush sql:query "UPDATE users_field_data SET mail = '${mail}', init = '${mail}' WHERE uid = ${uid};"
+    echo "  kept ${mail}."
+  done < "$kept_addresses"
+}
+
+# A password the sanitise would otherwise take with it. Every rollout
+# replaces this environment's database, so without this a maintainer is
+# locked out of their own environment until someone sets a password by hand.
+# It comes from a Lagoon variable rather than being generated, so it is the
+# same password after every rollout, and it is never printed.
+restore_maintainer_login() {
+  [ -n "${DOCS_MAINTAINER_NAME:-}" ] || return 0
+  if [ -z "${DOCS_MAINTAINER_PASSWORD:-}" ]; then
+    echo "  DOCS_MAINTAINER_NAME is set without DOCS_MAINTAINER_PASSWORD; the account stays sanitised."
+    return 0
+  fi
+  if drush user:password "$DOCS_MAINTAINER_NAME" "$DOCS_MAINTAINER_PASSWORD" > /dev/null 2>&1; then
+    drush user:unblock "$DOCS_MAINTAINER_NAME" > /dev/null 2>&1 || :
+    echo "  ${DOCS_MAINTAINER_NAME} can sign in again."
+  else
+    echo "  no ${DOCS_MAINTAINER_NAME} account in this copy; nothing to restore."
+  fi
+}
+
 # Remove what a contributor should never be handed. `sql:sanitize` covers
 # the accounts; the rest is what this site carries beyond them. The consumer
 # rows stay, because the frontend authenticates against one, but their
 # secrets do not survive the copy.
 sanitise() {
   echo "Sanitising the copy."
+
+  # Read before sanitising: `sql:sanitize` overwrites every address, and
+  # what it replaced is not recoverable afterwards.
+  rm -f "$kept_addresses"
+  drush sql:query "SELECT uid, mail FROM users_field_data WHERE mail LIKE '%@${maintainer_domain}';" > "$kept_addresses" 2>/dev/null || :
+
   drush sql:sanitize --yes
 
   for table in sessions oauth2_token oauth2_token__scopes watchdog flood key_value_expire admin_audit_trail; do
@@ -129,6 +175,10 @@ sanitise() {
     echo "Sanitisation did not clear the sessions table; refusing to leave this environment usable."
     exit 1
   fi
+  # After the check, never before it: a sanitise that did not happen must
+  # not be handed an address or a password to put back.
+  restore_addresses
+  restore_maintainer_login
   echo "Sanitised."
 }
 
