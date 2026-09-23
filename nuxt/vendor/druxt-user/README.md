@@ -10,8 +10,8 @@ and whoever is signed in. Only the first is one `DruxtEntity` can take, so
 It reads the profile out of the resource too, so a site has something to draw
 without asking Drupal for more. The name Drupal shows and the picture come
 first, then the roles with their labels and the date the account was made. A
-reader with no picture falls back to their gravatar, and a reader with neither
-has their initials.
+reader with no picture has their initials, and a site that asks for it can try
+gravatar first.
 
 ## Install
 
@@ -66,7 +66,7 @@ that slot does not need it.
 | `subjectKey`   | Where the signed-in user's uuid is, `sub` by default         |
 | `include`      | What to load with the user, the picture and roles by default |
 | `pictureField` | The image field, `user_picture` by default                   |
-| `gravatar`     | Whether a reader with no picture falls back to a gravatar    |
+| `gravatar`     | Try gravatar for a reader with no picture, off by default    |
 | `gravatarSize` | The size to ask gravatar for, 96 by default                  |
 | `mode`         | The Drupal display mode, `default` by default                |
 | `type`         | The resource type, `user--user` by default                   |
@@ -76,16 +76,27 @@ avatar, picture, initials, roles, since, type, mode }`.
 
 ## The gravatar
 
-A reader with no picture in Drupal usually has one at gravatar. The address is
-hashed in the browser with SHA-256 and only the hash is sent, so the address
-itself never leaves the site, and the request asks gravatar for `d=404` so a
-reader with no gravatar falls back to the initials rather than to a stranger's
-silhouette.
+Off by default. A gravatar is a request to a third party, and that request
+tells the third party that this site rendered this person, to this browser, at
+this moment. A site decides whether to make it, so `gravatar` is opt in:
 
-Drupal sends an email address only to a reader allowed to see it, so most
-readers do not get a gravatar at all. `gravatar: false` turns it off, and the
-reading is exported on its own to build another service's address:
-`emailHash(email, subtle)` and `gravatarUrl(hash, { size })`.
+```vue
+<DruxtUser :id="$route.params.id" gravatar />
+```
+
+The address is hashed in the browser with SHA-256 and only the hash is sent,
+so the address itself never leaves the site. A hash does not make the address
+private, because anyone who can guess an address can hash it. The request asks
+gravatar for `d=404`, so a reader with no gravatar falls back to their
+initials rather than to a stranger's silhouette.
+
+Initials are the usual case in any event. Drupal sends an email address only
+to a reader allowed to see it, which is the account's owner and an
+administrator, so on most sites there is no address to hash and nothing is
+requested.
+
+The reading is exported on its own, for a site building another service's
+address: `emailHash(email, subtle)` and `gravatarUrl(hash, { size })`.
 
 ## Who may see a profile
 
