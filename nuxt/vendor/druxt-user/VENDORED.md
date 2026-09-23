@@ -7,7 +7,7 @@ development dependencies, the licence and the README.
 | | |
 | --- | --- |
 | Package | `@druxt-contrib/user` |
-| Commit | `20e7b26` |
+| Commit | `a854d48` |
 
 Replace `file:vendor/druxt-user` in `package.json` with the published version
 once it is on npm, and delete this directory.

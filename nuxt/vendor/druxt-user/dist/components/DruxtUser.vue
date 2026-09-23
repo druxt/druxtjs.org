@@ -31,8 +31,8 @@ const INCLUDE = ['user_picture', 'roles']
  *
  * It reads the profile out of the resource too: the name Drupal shows, the
  * picture, the roles with their labels, and when the account was made. A
- * reader with no picture has a gravatar, and a reader with neither has their
- * initials, so a site has something to draw without asking for more data.
+ * reader with no picture has their initials, and a site that asks for it can
+ * fall back to a gravatar first.
  *
  * A user Drupal will not show the reader is not an error to handle: `user` is
  * undefined and the wrapper renders nothing, because who may see a profile is
@@ -118,13 +118,17 @@ export default {
     /**
      * Whether a reader with no picture falls back to their gravatar.
      *
-     * The address is hashed in the browser and only the hash is sent, so the
-     * address itself never leaves the site. A site that would rather send
-     * nothing at all turns this off, and the initials remain.
+     * Off unless a site asks for it. The address is hashed in the browser and
+     * only the hash is sent, but the request still tells a third party that
+     * this site rendered this person, from the reader's own browser and with
+     * their address. A hash is not anonymity either: addresses are
+     * enumerable, and hashes of common ones are published. That is a fine
+     * trade for some sites and unacceptable for others, so it is the site's
+     * to make.
      */
     gravatar: {
       type: Boolean,
-      default: true,
+      default: false,
     },
 
     /** The size to ask gravatar for, in pixels. */
@@ -298,7 +302,11 @@ export default {
       try {
         if (uuid) {
           this.take(
-            await this.getResource({ type: this.type, id: uuid, query: this.query() })
+            await this.getResource({
+              type: this.type,
+              id: uuid,
+              query: this.query(),
+            })
           )
           return
         }
