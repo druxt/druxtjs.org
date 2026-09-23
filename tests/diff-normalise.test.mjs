@@ -265,3 +265,35 @@ describe('the vendored engine names both sides of a block', () => {
     assert.equal(anchorUuid(block, 'right'), 'in-revision')
   })
 })
+
+// Which side a page renders is not always the side that was asked for: a
+// listing whose body stays the live content still has a diff against a
+// revision, and its elements carry the left uuid.
+describe('finding a block among the elements a page rendered', () => {
+  const { blockFor, anchorsOf } = require('../nuxt/lib/diff-anchors.js')
+  const block = { status: 'changed', uuid: 'left-1', uuids: { left: 'left-1', right: 'right-1' } }
+
+  test('the rendered side comes first, and both are looked for', () => {
+    assert.deepEqual(anchorsOf(block), ['right-1', 'left-1'])
+  })
+
+  test('a page rendering either side finds its block', () => {
+    assert.equal(blockFor([block], 'right-1', 'changed'), block)
+    assert.equal(blockFor([block], 'left-1', 'changed'), block)
+  })
+
+  test('a block of another status is not the one asked for', () => {
+    assert.equal(blockFor([block], 'right-1', 'removed'), null)
+  })
+
+  test('an element that is no block of this diff finds nothing', () => {
+    assert.equal(blockFor([block], 'someone-else', 'changed'), null)
+    assert.equal(blockFor([block], undefined), null)
+  })
+
+  test('a one-sided block is found by the side it has', () => {
+    const gone = { status: 'removed', uuid: 'only', uuids: { left: 'only', right: null } }
+    assert.deepEqual(anchorsOf(gone), ['only'])
+    assert.equal(blockFor([gone], 'only'), gone)
+  })
+})
