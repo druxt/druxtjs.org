@@ -31,11 +31,11 @@
         <div class="h-px bg-base-300 -mx-1.5 my-1.5" />
 
         <!-- Drupal's own screens, on this origin through the proxy. -->
-        <a href="/admin/content/moderated" class="account-item" target="_self">
+        <a :href="back('/admin/content/moderated')" class="account-item" target="_self">
           <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6v18h12V7z" /><path d="M14 3v4h4" /><path d="M9 13h6M9 17h4" /></svg>
           Your drafts
         </a>
-        <a v-if="account.id" :href="`/user/${account.id}/edit`" class="account-item" target="_self">
+        <a v-if="account.id" :href="back(`/user/${account.id}/edit`)" class="account-item" target="_self">
           <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
           Profile and picture
         </a>
@@ -96,6 +96,19 @@ export default {
 
   computed: {
     account: ({ $auth }) => accountOf($auth && $auth.user),
+  },
+
+  methods: {
+    /**
+     * A Drupal link that comes back here when it is done, rather than leaving
+     * the reader on a Drupal page once they have saved.
+     *
+     * @param {string} href - The Drupal path.
+     * @returns {string} The path with a `destination` back to this page.
+     */
+    back(href) {
+      return `${href}?destination=${encodeURIComponent(this.$route.fullPath)}`
+    },
   },
 }
 </script>
