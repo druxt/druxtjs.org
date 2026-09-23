@@ -92,6 +92,118 @@ describe('fetchDrupalPage', () => {
   })
 })
 
+// A revision id names a revision of one node. The selection is one value for
+// the whole app, so carrying `id:52` from the page it was chosen on to the next
+// page asked Drupal for a revision that page does not have, and every page
+// after it failed to load until the editor changed the selection back.
+describe('fetchDrupalPage, signed in, moving between pages', () => {
+  /** A store for a signed-in editor, carrying the editor state and its commits. */
+  const editorStore = (uuid, editor, calls = []) => ({
+    $druxtSchema: schema,
+    $auth: { loggedIn: true },
+    state: { editor },
+    commit: (name, payload) => {
+      calls.push({ commit: name, payload })
+      if (name === 'setEditorVersion') editor.version = payload || 'published'
+      if (name === 'setEditorPage') editor.page = payload || null
+      if (name === 'setEditorRevisions') editor.revisions = payload || []
+    },
+    dispatch: async (action, payload) => {
+      calls.push({ action, payload })
+      return action === 'druxtRouter/get'
+        ? { route: { entity: { type: 'node', bundle: 'doc_page', uuid } }, redirect: false }
+        : node
+    },
+  })
+
+  test('a revision id chosen on another page is dropped', async () => {
+    const calls = []
+    const editor = { version: 'id:52', revisions: [{ vid: 52 }], page: { uuid: 'u-1' } }
+    await fetchDrupalPage(editorStore('u-2', editor, calls), '/how-to/other')
+
+    assert.equal(editor.version, 'working-copy', 'back to the page-independent default')
+    assert.deepEqual(editor.revisions, [], "and not the previous page's history")
+    const { payload } = calls.find((call) => call.action === 'druxt/getResource')
+    assert.equal(payload.query.include, undefined, 'still the versioned query shape')
+  })
+
+  test('a revision id is kept on the page it was chosen on', async () => {
+    const editor = { version: 'id:52', revisions: [{ vid: 52 }], page: { uuid: 'u-1' } }
+    await fetchDrupalPage(editorStore('u-1', editor), '/tutorials/getting-started')
+
+    assert.equal(editor.version, 'id:52')
+    assert.deepEqual(editor.revisions, [{ vid: 52 }])
+  })
+
+  test('a view that belongs to no single page survives the move', async () => {
+    for (const version of ['working-copy', 'published']) {
+      const editor = { version, revisions: [], page: { uuid: 'u-1' } }
+      await fetchDrupalPage(editorStore('u-2', editor), '/how-to/other')
+      assert.equal(editor.version, version)
+    }
+  })
+
+  test('the first page an editor opens keeps the default view', async () => {
+    const editor = { version: 'working-copy', revisions: [], page: null }
+    await fetchDrupalPage(editorStore('u-1', editor), '/tutorials/getting-started')
+    assert.equal(editor.version, 'working-copy')
+  })
+})
+
+// A contributor may read only their own unpublished work, so Drupal refuses
+// the latest revision of somebody else's draft. The Druxt store turns that
+// refusal into an empty resource, which read as "no such page" and sent the
+// reader to the error page instead of the published page that is right there.
+describe('fetchDrupalPage, when the working copy is refused', () => {
+  const denied = (uuid, editor, calls = []) => ({
+    $druxtSchema: schema,
+    $auth: { loggedIn: true },
+    state: { editor },
+    commit: (name, payload) => {
+      calls.push({ commit: name, payload })
+      if (name === 'setEditorVersion') editor.version = payload || 'published'
+    },
+    dispatch: async (action, payload) => {
+      calls.push({ action, payload })
+      if (action === 'druxtRouter/get') {
+        return { route: { entity: { type: 'node', bundle: 'doc_page', uuid } }, redirect: false }
+      }
+      // Denied while a version is asked for; the published default is readable.
+      return payload.query.include ? node : {}
+    },
+  })
+
+  test('falls back to the published page rather than failing', async () => {
+    const calls = []
+    const editor = { version: 'working-copy', revisions: [], page: null }
+    const doc = await fetchDrupalPage(denied('u-1', editor, calls), '/tutorials/getting-started')
+
+    assert.equal(doc.title, 'Getting started')
+    assert.equal(editor.version, 'published', 'and the toolbar says which version this is')
+    const fetches = calls.filter((call) => call.action === 'druxt/getResource')
+    assert.equal(fetches.length, 2, 'the working copy, then the published page')
+    assert.equal(
+      fetches[1].payload.query.include,
+      'field_content,field_content.field_media,field_content.field_media.field_media_image'
+    )
+  })
+
+  test('a page that is missing outright is still an error, not a silent blank', async () => {
+    const editor = { version: 'published', revisions: [], page: null }
+    const store = {
+      $druxtSchema: schema,
+      $auth: { loggedIn: true },
+      state: { editor },
+      commit: () => {},
+      dispatch: async (action) =>
+        action === 'druxtRouter/get'
+          ? { route: { entity: { type: 'node', bundle: 'doc_page', uuid: 'u-9' } } }
+          : {},
+    }
+    await assert.rejects(() => fetchDrupalPage(store, '/gone'), /returned no node--doc_page/)
+  })
+})
+
 describe('PARAGRAPH_TYPES', () => {
   test('names every paragraph type this site has a view wrapper for', () => {
     const wrappers = readdirSync(
