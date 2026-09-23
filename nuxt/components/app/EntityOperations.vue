@@ -1,12 +1,20 @@
 <template>
-  <!-- Edit, and the rest behind the dots. Shown while the page header is hovered or focused. -->
-  <div class="page-ops flex items-center h-[30px] border border-base-300 rounded-lg bg-base-100 shadow-sm text-[12.5px] font-medium" data-druxt-operations>
-    <a v-if="edit" :href="back(edit.href)" target="_self" class="page-ops-seg px-2.5 rounded-l-lg" :aria-label="`Edit ${label}`">
+  <!-- Edit, and the rest behind the dots. In the bar, or beside a page's title. -->
+  <div
+    class="page-ops flex items-center font-medium"
+    :class="
+      bar
+        ? 'editor-bar-ops h-[28px] text-[12.5px]'
+        : 'h-[30px] border border-base-300 rounded-lg bg-base-100 shadow-sm text-[12.5px]'
+    "
+    data-druxt-operations
+  >
+    <a v-if="edit" :href="editTarget" target="_self" class="page-ops-seg px-2.5 rounded-l-lg" :aria-label="editAria" :title="bar ? editAria : null">
       <svg class="account-icon !w-[15px] !h-[15px]" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
       Edit
     </a>
 
-    <div class="dropdown dropdown-end h-full">
+    <div class="dropdown dropdown-end h-full" :class="{ 'dropdown-top': bar }">
       <button
         type="button"
         tabindex="0"
@@ -163,6 +171,12 @@ export default {
     label: { type: String, default: 'this page' },
     /** The JSON:API resource: `{ type, id }`. */
     resource: { type: Object, default: null },
+    /** `bar` renders for the floating editor bar, which is dark and opens upward. */
+    variant: { type: String, default: 'page' },
+    /** Where Edit goes, when the bar has decided (a block opens the page's form). */
+    editHref: { type: String, default: null },
+    /** What Edit promises, when the bar has decided. */
+    editLabel: { type: String, default: null },
     /** The page's moderation state, when it has one. */
     state: { type: String, default: null },
   },
@@ -170,6 +184,10 @@ export default {
   data: () => ({ confirming: false, deleting: false, error: null, flyout: false }),
 
   computed: {
+    bar: ({ variant }) => variant === 'bar',
+    /** The bar's target when it has one, else Drupal's own link. */
+    editTarget: ({ edit, editHref, back }) => editHref || (edit ? back(edit.href) : null),
+    editAria: ({ editLabel, label }) => editLabel || `Edit ${label}`,
     byKey: ({ operations }) => Object.fromEntries(operations.map((o) => [o.key, o])),
     edit: ({ byKey }) => byKey['edit-form'] || null,
     revisions: ({ byKey }) => byKey['version-history'] || null,
@@ -235,7 +253,7 @@ export default {
       if (!this.edit || event.key !== 'e' || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return
       const target = event.target || {}
       if (target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName || '')) return
-      window.location.href = this.back(this.edit.href)
+      window.location.href = this.editTarget
     },
 
     /**
