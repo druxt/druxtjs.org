@@ -233,7 +233,12 @@ secret-detection:
     - curl -sSLo gitleaks.tar.gz "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
     - echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
     - tar -xzf gitleaks.tar.gz gitleaks
-    - ./gitleaks detect --source . --no-banner --redact --verbose
+    # `--log-opts=HEAD` scans the history this branch has, and nothing else.
+    # The runner reuses its checkout between jobs, so the default scan reads
+    # every object left in it, including commits from branches that were
+    # rewritten away. One such commit failed this job on a branch that never
+    # contained it, and no rerun could clear it.
+    - ./gitleaks detect --source . --log-opts=HEAD --no-banner --redact --verbose
     - section_end "gitleaks"
     # A scan that finds nothing looks identical to a scan that cannot find
     # anything. Plant three credentials outside the repository and assert all
@@ -320,6 +325,27 @@ test:import-guardrails:
     - npm ci --ignore-scripts
   script:
     - bash tests/import-guardrails.sh
+
+# The rollout runs against a stub drush that records what it was asked to
+# do, so this needs bash and nothing else: no database, no network, no
+# Lagoon. It is the check on a script whose first act is to drop a database.
+test:post-rollout-guardrails:
+  stage: test
+  image: alpine:3.20
+  before_script:
+    - apk add --no-cache bash coreutils
+  script:
+    - bash tests/post-rollout-guardrails.sh
+
+# Real requests to the guard that holds the site closed while its database
+# is replaced, so this needs PHP's built-in server and curl.
+test:replacing-guardrails:
+  stage: test
+  image: php:8.3-cli-alpine
+  before_script:
+    - apk add --no-cache bash coreutils curl
+  script:
+    - bash tests/replacing-guardrails.sh
 
 # The fixture is written by the test itself, so this needs node, git and
 # bash but no checkout of the documentation and no provision.

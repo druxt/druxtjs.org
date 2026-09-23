@@ -1,26 +1,31 @@
 # Add a term here rather than switching the check off for a file.
 # Words this project uses that the standard dictionaries do not carry.
+Codespaces
+DDEV
+Diataxis
+Fqix
+Ksection
+PCRE
 aarch
 amazee
+amazeeio
 automerge
 bmewburn
 brotli
 bsdtar
 callout
 callouts
-Codespaces
 commitlint
 corepack
+coreutils
 cweagans
 databaseless
 davidanson
 dbaeumer
-DDEV
 dealerdirect
 devcontainer
 devcontainers
 devpod
-Diataxis
 distutils
 docgen
 drush
@@ -28,7 +33,6 @@ druxt
 druxtjs
 esbenp
 fatalled
-Fqix
 freetype
 frontmatter
 getsockname
@@ -36,7 +40,6 @@ hsts
 hverlin
 intelephense
 knip
-Ksection
 libfreetype
 libjpeg
 libsqlite
@@ -48,13 +51,13 @@ loglevel
 markdownlint
 maxlength
 mktemp
+mysqldump
 nosniff
 nproc
 nuxt
 nvmrc
 opencode
 pathauto
-PCRE
 phpcodesniffer
 phpize
 pidfile
@@ -62,6 +65,7 @@ pullrequests
 serialiser
 setuptools
 starterkit
+tablespaces
 toplevel
 unindexed
 urandom
@@ -70,3 +74,5 @@ vfox
 webp
 yarnrc
 zipfile
+cachetags
+docroot

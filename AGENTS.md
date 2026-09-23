@@ -27,7 +27,15 @@ Nuxt application.
   `drupal/config/sync/`.
 - **The database holds the content.** `drupal/content/` is a Tome export kept
   as a backup from before the database became canonical, and nothing writes to
-  it. The importer seeds a site from the commit pinned in `docs-source.json`.
+  it. A non-production environment takes a sanitised copy of production's
+  database on every rollout and applies the branch's updates to it, so it
+  holds real content on new code. The importer seeds from the commit pinned
+  in `docs-source.json` only when there is no database to start from.
+  `DOCS_SKIP_SYNC=1` keeps the database an environment already has.
+- **The pin is the API reference's version, not the site's content.** docgen
+  reads the pinned `druxt.js` to generate the `api/`, `components/` and module
+  pages, which have no Drupal representation. The authored pages come from the
+  database, and the sitemap and the `llms` files describe both.
 - **Move the pin with its baseline.** A new `ref` in `docs-source.json` needs
   `npm run survey:content` run again, and the two are committed together.
 - **`github-slugger` stays at 1.5.0.** `druxt_docs` computes the table of
@@ -91,7 +99,7 @@ npm run docs:generate         # Modules, API and Components pages, built in .doc
 npm run lint                  # every linter except prose
 npm run lint:prose            # Vale, after `npm run lint:prose:install`
 npm test                      # node tests
-bash tests/start-guardrails.sh  # also import-guardrails.sh and validate-guardrails.sh
+bash tests/start-guardrails.sh  # also import-, validate-, post-rollout- and replacing-guardrails.sh
 cd drupal && .devtools/assemble && vendor/bin/phpunit
 ```
 

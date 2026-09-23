@@ -1,0 +1,13 @@
+druxt_docs.deployment:
+  path: '/druxt-docs/deployment'
+  defaults:
+    _controller: '\Drupal\druxt_docs\Controller\DeploymentController::deployment'
+    _title: 'Deployment'
+  methods: [GET]
+  requirements:
+    # The frontend reads this while it starts, before it has any credential
+    # to present, so it cannot be gated. It answers the deployed revision
+    # and nothing else, and the revision is a commit in a public repository.
+    _access: 'TRUE'
+  options:
+    no_cache: 'TRUE'
