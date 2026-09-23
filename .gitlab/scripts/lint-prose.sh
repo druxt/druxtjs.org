@@ -142,11 +142,8 @@ fi
 # nobody's to answer for here: the checks read what a person wrote. Anything
 # between an auto-generated marker and its end is dropped before linting.
 if [ -f "$inputs/merge-request.md" ]; then
-  awk '
-    /^<!-- (This is an )?auto-generated comment/ { skip = 1 }
-    !skip { print }
-    /^<!-- end of auto-generated comment/ { skip = 0 }
-  ' "$inputs/merge-request.md" > "$inputs/merge-request.trimmed" &&
+  awk -f "$(dirname "$0")/strip-generated.awk" "$inputs/merge-request.md" \
+    > "$inputs/merge-request.trimmed" &&
     mv "$inputs/merge-request.trimmed" "$inputs/merge-request.md"
 fi
 
