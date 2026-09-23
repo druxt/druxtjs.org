@@ -154,3 +154,29 @@ describe('subjectsOn', () => {
     )
   })
 })
+
+// `/user` is proxied to Drupal whole, because a login form that posts to
+// another origin sets its cookie there. The profile pages this site renders
+// itself sit inside that path, so they are named as the exception.
+describe('which /user paths this site claims', () => {
+  const { isProfilePath } = require('../nuxt/lib/profile-path.js')
+
+  test('Drupal keeps its own screens under /user', () => {
+    assert.equal(isProfilePath('/user/login'), false)
+    assert.equal(isProfilePath('/user/logout'), false)
+    assert.equal(isProfilePath('/user/password'), false)
+    assert.equal(isProfilePath('/user/2/edit'), false)
+    assert.equal(isProfilePath('/user/2/cancel'), false)
+  })
+
+  test('a profile is this site to render, query and all', () => {
+    assert.equal(isProfilePath('/user/2'), true)
+    assert.equal(isProfilePath('/user/2?x=1'), true)
+  })
+
+  test('nothing else is', () => {
+    assert.equal(isProfilePath('/users/2'), false)
+    assert.equal(isProfilePath('/how-to/proxy'), false)
+    assert.equal(isProfilePath(''), false)
+  })
+})

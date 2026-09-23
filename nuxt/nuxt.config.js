@@ -64,6 +64,7 @@ const OAUTH_STRATEGY = {
 // so an editor's session is first party. The same test tells the page cache
 // in server/start.js which requests are Drupal's, so none of them is stored.
 const { shouldProxy } = require('./modules/druxt-admin/proxy')
+const { PROFILE_PATH, isProfilePath } = require('./lib/profile-path')
 
 export default {
   // Pages render live from Drupal. In production, server/start.js serves
@@ -118,8 +119,10 @@ export default {
   },
 
   css: ['~/assets/css/app.css', '~/assets/css/code.css'],
-  // Read by server/start.js: a request Drupal answers is never stored.
-  docsPassThrough: (path) => shouldProxy(path),
+  // Read by server/start.js: a request Drupal answers is never stored. A
+  // profile is this site's page and still never stored, because what it shows
+  // depends on who is reading it.
+  docsPassThrough: (path) => shouldProxy(path) || isProfilePath(path),
 
   plugins: [
     '~/plugins/entity-operations.js',
@@ -267,7 +270,7 @@ export default {
     // cookie is made this origin's: no Domain, and Secure only over HTTPS,
     // where a browser will store it.
     [
-      (pathname) => shouldProxy(pathname),
+      (pathname) => shouldProxy(pathname, { except: [PROFILE_PATH] }),
       {
         target: DRUXT_BASE_URL,
         changeOrigin: false,
