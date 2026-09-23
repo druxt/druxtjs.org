@@ -114,6 +114,18 @@ load_from_production() {
 maintainer_domain="${DOCS_MAINTAINER_DOMAIN:-druxtjs.org}"
 kept_addresses="/tmp/kept-addresses.tsv"
 
+# The domain goes into the query that decides which addresses survive, so
+# only a hostname is accepted. A value carrying a quote would rewrite that
+# query, and `%@' OR 1=1 -- ` would hand production's whole address book
+# back to a non-production environment and print it into the rollout log.
+is_hostname() {
+  case "$1" in
+    '' | *[!a-zA-Z0-9.-]* | .* | *. | -* | *- | *..*) return 1 ;;
+    *.*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 # Written back over the sanitised addresses. An address is Drupal's handle
 # on a person: it names them in the interface, it is who a mail would go to,
 # and a maintainer testing their own site is not user+2@localhost.
@@ -134,17 +146,36 @@ restore_addresses() {
 # locked out of their own environment until someone sets a password by hand.
 # It comes from a Lagoon variable rather than being generated, so it is the
 # same password after every rollout, and it is never printed.
+#
+# Drupal reads both the name and the password out of the environment rather
+# than taking them as arguments: an argument is in the process list for
+# anything else in the container to read, and the variables are there
+# already. The password and the unblock are one call, so an account cannot
+# be reported as usable while it is still blocked.
+#
+# 3 says the account is not in this copy, which is not a failure; anything
+# else is, and says so rather than claiming the account was missing.
 restore_maintainer_login() {
   [ -n "${DOCS_MAINTAINER_NAME:-}" ] || return 0
   if [ -z "${DOCS_MAINTAINER_PASSWORD:-}" ]; then
     echo "  DOCS_MAINTAINER_NAME is set without DOCS_MAINTAINER_PASSWORD; the account stays sanitised."
     return 0
   fi
-  if drush user:password "$DOCS_MAINTAINER_NAME" "$DOCS_MAINTAINER_PASSWORD" > /dev/null 2>&1; then
-    drush user:unblock "$DOCS_MAINTAINER_NAME" > /dev/null 2>&1 || :
+  if drush php:eval '
+    $account = user_load_by_name(getenv("DOCS_MAINTAINER_NAME"));
+    if (!$account) { exit(3); }
+    $account->setPassword(getenv("DOCS_MAINTAINER_PASSWORD"));
+    $account->activate();
+    $account->save();
+  ' > /dev/null 2>&1; then
     echo "  ${DOCS_MAINTAINER_NAME} can sign in again."
   else
-    echo "  no ${DOCS_MAINTAINER_NAME} account in this copy; nothing to restore."
+    status=$?
+    if [ "$status" = "3" ]; then
+      echo "  no ${DOCS_MAINTAINER_NAME} account in this copy; nothing to restore."
+    else
+      echo "  could not restore ${DOCS_MAINTAINER_NAME}'s login (drush exited ${status}); the account stays sanitised."
+    fi
   fi
 }
 
@@ -158,7 +189,11 @@ sanitise() {
   # Read before sanitising: `sql:sanitize` overwrites every address, and
   # what it replaced is not recoverable afterwards.
   rm -f "$kept_addresses"
-  drush sql:query "SELECT uid, mail FROM users_field_data WHERE mail LIKE '%@${maintainer_domain}';" > "$kept_addresses" 2>/dev/null || :
+  if is_hostname "$maintainer_domain"; then
+    drush sql:query "SELECT uid, mail FROM users_field_data WHERE mail LIKE '%@${maintainer_domain}';" > "$kept_addresses" 2>/dev/null || :
+  else
+    echo "  DOCS_MAINTAINER_DOMAIN is not a hostname, so no address is kept."
+  fi
 
   drush sql:sanitize --yes
 

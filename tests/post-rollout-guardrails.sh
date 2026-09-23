@@ -64,7 +64,8 @@ case "\$*" in
   *"status --field=bootstrap"*) [ "$bootstrap" = "yes" ] && echo "Successful" ;;
   *"SELECT COUNT(*) FROM sessions"*) echo "$sessions" ;;
   *"mail LIKE"*) [ -n "\${STUB_KEPT_ADDRESSES:-}" ] && printf '%b\n' "\${STUB_KEPT_ADDRESSES}" ;;
-  *"user:password"*) [ "\${STUB_NO_SUCH_USER:-}" = "1" ] && exit 1 ;;
+  *"php:eval"*) [ "\${STUB_NO_SUCH_USER:-}" = "1" ] && exit 3
+    [ "\${STUB_EVAL_FAILS:-}" = "1" ] && exit 1 ;;
 esac
 exit 0
 EOF
@@ -356,16 +357,63 @@ fi
 app="$(build_app yes)"
 run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
   DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password > /dev/null
-if called "$app" "user:password A Maintainer" && called "$app" "user:unblock A Maintainer"; then
-  ok "the maintainer's password is set again after the sanitise"
+if called "$app" "setPassword" && called "$app" "activate()"; then
+  ok "the maintainer's password is set again, and the account activated with it"
 else
   no "the maintainer's password was not set again"
   sed 's/^/       /' "$app/calls.log"
 fi
 
+# The password is read from the environment inside Drupal, so it is never in
+# a command line that anything else in the container can read.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password > /dev/null
+if grep -qF "not-a-real-password" "$app/calls.log"; then
+  no "the password was passed as an argument"
+else
+  ok "the password is never passed as an argument"
+fi
+
+# A drush that fails for any other reason is reported as a failure, not as
+# an account the copy does not have.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
+  STUB_EVAL_FAILS=1)"
+if printf '%s' "$output" | grep -q "could not restore"; then
+  ok "a drush that fails another way: the rollout says the login was not restored"
+else
+  no "a drush that fails another way: the failure was reported as a missing account"
+fi
+
+# The domain decides a SQL predicate, so a value that is not a hostname is
+# refused rather than interpolated.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_DOMAIN="x' OR 1=1 -- " STUB_KEPT_ADDRESSES='2\tsomeone@example.com')"
+if called "$app" "OR 1=1"; then
+  no "a domain that is not a hostname: it reached the query"
+elif printf '%s' "$output" | grep -q "not a hostname"; then
+  ok "a domain that is not a hostname: no address is kept, and it says why"
+else
+  no "a domain that is not a hostname: nothing was kept, and nothing said why"
+fi
+
+# The negative control for the check above: a hostname is used.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_DOMAIN="example.org" STUB_KEPT_ADDRESSES='2\tsomeone@example.org' > /dev/null
+if called "$app" "mail LIKE '%@example.org'"; then
+  ok "a hostname: it is the domain the query asks for"
+else
+  no "a hostname: the query did not ask for it"
+  sed 's/^/       /' "$app/calls.log"
+fi
+
 app="$(build_app yes)"
 run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
-if called "$app" "user:password"; then
+if called "$app" "setPassword"; then
   no "no maintainer configured: a password was set anyway"
 else
   ok "no maintainer configured: no password was set"
@@ -375,7 +423,7 @@ fi
 app="$(build_app yes)"
 output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
   DOCS_MAINTAINER_NAME="A Maintainer")"
-if called "$app" "user:password"; then
+if called "$app" "setPassword"; then
   no "a name without a password: a password was set"
 elif printf '%s' "$output" | grep -q "without DOCS_MAINTAINER_PASSWORD"; then
   ok "a name without a password: nothing was set, and it said why"
@@ -403,7 +451,7 @@ app="$(build_app yes 12)"
 run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
   DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
   STUB_KEPT_ADDRESSES='2\tmaintainer@druxtjs.org' > /dev/null
-if called "$app" "user:password" || called "$app" "UPDATE users_field_data SET mail"; then
+if called "$app" "setPassword" || called "$app" "UPDATE users_field_data SET mail"; then
   no "a failed sanitisation: an address or a password was restored anyway"
 else
   ok "a failed sanitisation: nothing was restored"
@@ -415,7 +463,7 @@ app="$(build_app yes)"
 run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=production LAGOON_ENVIRONMENT=main \
   DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
   STUB_KEPT_ADDRESSES='2\tmaintainer@druxtjs.org' > /dev/null
-if called "$app" "user:password" || called "$app" "UPDATE users_field_data SET mail"; then
+if called "$app" "setPassword" || called "$app" "UPDATE users_field_data SET mail"; then
   no "production: an account was rewritten"
 else
   ok "production: no account was touched"
