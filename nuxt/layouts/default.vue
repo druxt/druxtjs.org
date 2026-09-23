@@ -53,7 +53,7 @@
     <AppSignInDialog />
 
     <!-- For a signed-in editor: the revision pill and the diff drawn on the page. -->
-    <AppRevisionPill />
+    <AppEditorBar />
     <AppPageDiff />
   </div>
 </template>
