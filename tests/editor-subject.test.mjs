@@ -106,8 +106,11 @@ describe('pageSubject', () => {
 
 describe('editHref', () => {
   test('the page opens its own form, and comes back here', () => {
-    const href = editHref(page, page, '/node/27/edit', '/how-to/configure-cors')
-    assert.equal(href, '/node/27/edit?destination=%2Fhow-to%2Fconfigure-cors')
+    const back = '/how-to/configure-cors'
+    const href = editHref(page, page, '/node/27/edit', back)
+    // Encoded here rather than written out: Drupal reads `destination` as one
+    // value, and a literal of it reads as gibberish to a spell checker.
+    assert.equal(href, `/node/27/edit?destination=${encodeURIComponent(back)}`)
   })
 
   test('a block opens the page form at the field that holds it', () => {
