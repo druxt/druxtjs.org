@@ -6,10 +6,10 @@
  * a diff against a revision, and its elements carry the left uuid. So a
  * lookup that insists on one side finds nothing on half the pages.
  *
- * Plain CommonJS, so the tests read it without the app.
+ * ES modules, because the package this reads from is one.
  */
 
-const { anchorUuid } = require('@druxt-contrib/diff')
+import { anchorUuid } from '@druxt-contrib/diff'
 
 /**
  * Both uuids a block may be rendered under, the rendered side first.
@@ -17,7 +17,7 @@ const { anchorUuid } = require('@druxt-contrib/diff')
  * @param {object} block - A block from normaliseDiff().
  * @returns {string[]} The uuids to look for.
  */
-const anchorsOf = (block) => {
+export const anchorsOf = (block) => {
   const right = anchorUuid(block, 'right')
   const left = anchorUuid(block, 'left')
   return [right, left].filter((uuid, index, all) => uuid && all.indexOf(uuid) === index)
@@ -31,7 +31,7 @@ const anchorsOf = (block) => {
  * @param {string} [status] - Only match a block with this status.
  * @returns {object|null} The block, or null.
  */
-const blockFor = (blocks, uuid, status) => {
+export const blockFor = (blocks, uuid, status) => {
   if (!uuid) return null
   return (
     (blocks || []).find(
@@ -39,5 +39,3 @@ const blockFor = (blocks, uuid, status) => {
     ) || null
   )
 }
-
-module.exports = { anchorsOf, blockFor }
