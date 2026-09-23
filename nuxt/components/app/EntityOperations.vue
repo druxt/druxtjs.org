@@ -128,8 +128,14 @@ export default {
   },
 
   methods: {
-    /** E opens the edit form, unless the reader is typing. */
+    /**
+     * E opens the edit form, unless the reader is typing, something has
+     * already acted on the key, or the delete dialog is open. The dialog puts
+     * focus on its Cancel button, which is not a text field, so without this
+     * an E while it is open navigates away and the dialog vanishes unanswered.
+     */
     onKey(event) {
+      if (this.confirming || event.defaultPrevented) return
       if (!this.edit || event.key !== 'e' || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return
       const target = event.target || {}
       if (target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName || '')) return
