@@ -207,3 +207,61 @@ describe('wordDiff', () => {
     assert.ok(runs.some((r) => r.type === '=' && /fox/.test(r.text)))
   })
 })
+
+// The page renders one side of the comparison. This site rebuilds its
+// paragraphs on every import, so the two sides are different entities and only
+// the rendered side's uuid is in the markup: the anchor has to follow it.
+describe('the vendored engine names both sides of a block', () => {
+  const { anchorUuid } = require('../nuxt/lib/diff.js')
+
+  const positional = (leftUuid, rightUuid) => ({
+    data: {
+      id: 'node:28:27',
+      type: 'jsonapi_diff--diff',
+      attributes: { fields: {} },
+      relationships: {
+        children: {
+          data: [
+            {
+              id: `${leftUuid}:79:431`,
+              meta: {
+                field: 'field_content',
+                left_delta: 0,
+                right_delta: 0,
+                status: 'same',
+                match: 'position',
+              },
+            },
+          ],
+        },
+      },
+    },
+    included: [
+      {
+        id: `${leftUuid}:79:431`,
+        type: 'jsonapi_diff--diff',
+        attributes: {
+          fields: {
+            field_text: {
+              label: 'Text',
+              status: 'changed',
+              left: 'the table and a closing section',
+              right: 'the table',
+              ops: [],
+            },
+          },
+        },
+        relationships: {
+          left: { data: { type: 'paragraph--docs_text', id: leftUuid } },
+          right: { data: { type: 'paragraph--docs_text', id: rightUuid } },
+        },
+      },
+    ],
+  })
+
+  test('an old revision is anchored by the uuid the page rendered', () => {
+    const [block] = normaliseDiff(positional('in-live', 'in-revision')).blocks
+    assert.equal(block.status, 'changed')
+    assert.equal(anchorUuid(block, 'right'), 'in-revision')
+  })
+})

@@ -99,9 +99,20 @@ const normaliseDiff = (document) => {
   const byId = index(document);
   const blocks = [];
   const uuidOf = (resource) => String(resource.id || "").split(":")[0];
-  const push = (resource, refMeta, depth, fields, status) => {
+  const sideUuids = (resource) => {
+    const rel = resource.relationships || {};
+    const idOf = (key) => ((rel[key] || {}).data || {}).id || null;
+    const side = sideOf(resource.id);
+    const fallback = uuidOf(resource);
+    return {
+      left: idOf("left") || (side === "added" ? null : fallback),
+      right: idOf("right") || (side === "removed" ? null : fallback)
+    };
+  };
+  const push = (resource, refMeta, depth, fields, status, uuids) => {
     blocks.push({
       uuid: uuidOf(resource),
+      uuids: uuids || sideUuids(resource),
       depth,
       refStatus: refMeta.status || "same",
       status,
@@ -142,7 +153,7 @@ const normaliseDiff = (document) => {
           left_delta: rem.meta.left_delta,
           right_delta: it.meta.right_delta
         };
-        push(it.res, refMeta, depth, changed, changed.length ? "changed" : "same");
+        push(it.res, refMeta, depth, changed, changed.length ? "changed" : "same", { left: sideUuids(rem.res).left, right: sideUuids(it.res).right });
         children(it.res, depth + 1);
         continue;
       }
@@ -168,10 +179,13 @@ const normaliseDiff = (document) => {
       if (b.fromDelta > gone.fromDelta && (!succ || b.fromDelta < succ.fromDelta))
         succ = b;
     }
-    if (pred)
+    if (pred) {
       gone.placeAfter = pred.uuid;
-    else if (succ)
+      gone.placeUuids = pred.uuids;
+    } else if (succ) {
       gone.placeBefore = succ.uuid;
+      gone.placeUuids = succ.uuids;
+    }
   }
   return {
     blocks,
@@ -303,6 +317,18 @@ const condenseRuns = (runs, context = 60) => runs.map((run, idx) => {
   };
 });
 const looksLikeMarkup = (value) => /^\s*<[a-z]/i.test(String(value));
+const trailingRemovals = (tokens, from) => {
+  const rest = tokens.slice(from);
+  if (!rest.every((token) => token.type === "-" || !token.word))
+    return [];
+  return rest.filter((token) => token.type === "-" && token.word).map((token) => token.text);
+};
+const anchorUuid = (block, side = "right") => {
+  if (!block)
+    return null;
+  const uuids = block.uuids || block.placeUuids || {};
+  return uuids[side] || block.uuid || null;
+};
 
 const diffTokens = (diff) => {
   const out = [];
@@ -372,6 +398,7 @@ const mark = (root, diff) => {
     }
     p = scan + 1;
   }
+  const trailing = trailingRemovals(tokens, p);
   const bridgeable = (s) => !/[\p{L}\p{N}]/u.test(s);
   const del = (words2) => {
     const el = document.createElement("del");
@@ -421,6 +448,11 @@ const mark = (root, diff) => {
     }
     frag.appendChild(document.createTextNode(value.slice(cursor)));
     node.parentNode.replaceChild(frag, node);
+  }
+  if (trailing.length) {
+    const el = del(trailing);
+    el.className = "v-diff-del v-diff-del--trailing";
+    root.appendChild(el);
   }
 };
 const apply = (el, diff) => {
@@ -474,4 +506,4 @@ const NuxtModule = function(moduleOptions = {}) {
   }
 };
 
-export { DEFAULTS, changedFields, condenseRuns, NuxtModule as default, directive as diffDirective, groupRuns, label, looksLikeMarkup, normaliseDiff, resolveOptions, wordDiff };
+export { DEFAULTS, anchorUuid, changedFields, condenseRuns, NuxtModule as default, directive as diffDirective, groupRuns, label, looksLikeMarkup, normaliseDiff, resolveOptions, trailingRemovals, wordDiff };
