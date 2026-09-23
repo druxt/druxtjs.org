@@ -30,8 +30,8 @@ const view = normaliseDiff(jsonapiDiffDocument)
   sides and a page renders one of them, and the two are not always the same
   entity: a backend that matches children by position pairs the blocks of a site
   that rebuilds its paragraphs on every import, where each revision has its own
-  uuids. Every block carries `uuids: { left, right }`, and a removed block
-  carries its neighbour's pair as `placeUuids`.
+  uuids. Each block has `uuids: { left, right }`, and a removed block has its
+  neighbour's pair as `placeUuids`.
 - `wordDiff(left, right)` is an LCS word diff with a semantic cleanup: a short
   common word wedged between two changes folds into the rewrite, and each token
   carries its trailing whitespace so grouping keeps spacing.
@@ -39,12 +39,29 @@ const view = normaliseDiff(jsonapiDiffDocument)
 - `condenseRuns(runs, context)` trims long unchanged runs to a little context
   each side of a change.
 
-The engine is framework-agnostic CommonJS and depends on nothing.
+The engine is framework-agnostic CommonJS and depends on nothing. It holds no
+DOM: measuring a page is a component's work, so a host can drive the engine
+from anywhere.
+
+### A backend that recreates its blocks
+
+Some backends do not keep a child entity between revisions. A site whose
+content is generated and imported, rather than typed into Drupal, usually
+rebuilds its paragraphs on every import: each revision then has its own uuids
+and nothing matches by identity. Such a backend matches children by position
+instead, and a diff resource stands for two entities that are not the same
+entity.
+
+So a block names both sides. The page renders one of them, so the
+uuid to look for is the rendered side's, and `anchorUuid(block, side)` is the
+one to ask. A site that renders an older revision reads `right`; one rendering
+the working copy against what is published reads whichever side it asked the
+backend for.
 
 ## `v-diff` directive
 
-A decorator, not an overlay: it marks the change inside the element a field
-wrapper already rendered, so the page keeps its formatting.
+A decorator. It marks the change inside the element a field wrapper already
+rendered, so the page keeps its formatting.
 
 ```js
 import diff from '@druxt-contrib/diff/directive'
@@ -78,13 +95,44 @@ Renders a field's old/new word diff (grouped, Okabe-Ito, with a non-colour
 channel), condensed to the changes and a little context unless `condense` is
 false.
 
+## `DiffMinimap` component
+
+```vue
+<DruxtDiffMinimap :blocks="diff.blocks" side="right" />
+```
+
+A rail down the edge of the page with a mark at each change, the way an editor
+marks changed lines beside its scrollbar. A reader comparing a long page can
+see where the changes are and go to one. Each mark is a button with a name a
+screen reader reads, and the marks differ in width as well as colour.
+
+It finds a block by the anchor its wrapper wrote, for the side the page
+renders, and measures it. Measuring is a component's work, so the engine holds
+no DOM: the arithmetic alone is `placeMarks(boxes, total)` and
+`placeViewport(at, shown, total)`, exported for a site that draws its own rail
+another way. Nothing renders on the server, where there is no page to measure.
+
+| Prop        | What it is                                                                 |
+| ----------- | -------------------------------------------------------------------------- |
+| `blocks`    | The blocks from `normaliseDiff()`                                          |
+| `side`      | The side the page renders, `right` by default                              |
+| `statuses`  | Which statuses are marked                                                  |
+| `resolve`   | `(uuid, block) => Element`, for a site that anchors its blocks its own way |
+| `name`      | `(block, index, total) => string`, what a reader hears a mark called       |
+| `container` | The element that scrolls, for a site that scrolls a panel                  |
+| `label`     | What a reader hears the rail called                                        |
+
+The default slot hands over `{ marks, viewport, scrollTo }` for a site that
+wants its own markup, and `go` is emitted when a reader takes a mark.
+
 ## The adapter (the injection seam)
 
-The orchestration a full panel and overlay need — the current diff, whether a
-comparison is on, fetching a diff for an entity, resolving a block to its
-rendered element — is **not** owned here, because a library must not reach into
-a host's store or grab the single field-wrapper name the Druxt cascade resolves
-(two libraries claiming it collide, and the loser silently does not render).
+A full panel and overlay need orchestration. This package owns none of it: not
+the current diff, not whether a comparison is on, not the fetch for an entity's
+diff, not the way a block resolves to its rendered element. A library must stay
+out of a host's store, and it must not claim the field-wrapper name the Druxt
+cascade resolves, because two libraries claiming that name collide and the
+loser does not render.
 
 Instead the host provides an adapter, and a feature that needs a method it does
 not have is simply absent, never broken:

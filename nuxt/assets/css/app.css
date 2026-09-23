@@ -1129,6 +1129,53 @@ del.v-diff-del--trailing {
   background: #3d1d14;
   color: #ffab93;
 }
+/* The minimap rail, from @druxt-contrib/diff. The module gives it geometry
+   and uses currentColor; the palette is the page's own. */
+.diff-minimap {
+  top: 6.5rem;
+  bottom: 5.5rem;
+  right: 0.375rem;
+  width: 0.5rem;
+  color: #6b7280;
+}
+.diff-minimap__mark {
+  opacity: 0.85;
+  transition: opacity 120ms ease;
+}
+.diff-minimap__mark:hover,
+.diff-minimap__mark:focus-visible {
+  opacity: 1;
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+.diff-minimap__mark--changed {
+  color: #b86e00;
+}
+.diff-minimap__mark--added {
+  color: #0d6b4f;
+}
+.diff-minimap__mark--removed {
+  color: #a3361a;
+}
+[data-theme='dark'] .diff-minimap {
+  color: #9ca3af;
+}
+[data-theme='dark'] .diff-minimap__mark--changed {
+  color: #e2a33c;
+}
+[data-theme='dark'] .diff-minimap__mark--added {
+  color: #7fe0bd;
+}
+[data-theme='dark'] .diff-minimap__mark--removed {
+  color: #ffab93;
+}
+@media (max-width: 767px) {
+  /* A phone has no room beside the text for a rail. */
+  .diff-minimap {
+    display: none;
+  }
+}
+
 [data-diff] {
   position: relative;
 }
