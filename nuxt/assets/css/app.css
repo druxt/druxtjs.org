@@ -1457,6 +1457,29 @@ del.v-diff-del--trailing {
 [data-diff='added']::before {
   background: hsl(var(--su));
 }
+/* A block that moved has nothing marked inside it, so the rule says why it is
+   marked at all: dashed rather than solid, and named in the margin. */
+[data-diff='moved']::before {
+  background: repeating-linear-gradient(
+    hsl(var(--in)) 0 6px,
+    transparent 6px 10px
+  );
+}
+[data-diff='moved']::after {
+  content: 'Moved';
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.625rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.35rem;
+  border-radius: 0.25rem;
+  color: hsl(var(--inc, var(--bc)));
+  background: hsl(var(--in) / 0.9);
+  pointer-events: none;
+}
 .page-diff-removed {
   position: absolute;
   top: 0;
