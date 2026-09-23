@@ -1,7 +1,9 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 
-const { accountOf, hueOf, initials, roleLabel, signInError } = (await import('../nuxt/lib/account.js')).default
+const { accountOf, hueOf, initials, roleLabel, signInError } = (
+  await import('../nuxt/lib/account.js')
+).default
 
 describe('initials', () => {
   it('takes the first and last words', () => {
@@ -49,8 +51,22 @@ describe('roleLabel', () => {
 describe('accountOf', () => {
   it('reads the userinfo claims', () => {
     assert.deepEqual(
-      accountOf({ sub: '3', name: 'demo-editor', preferred_username: 'demo-editor', picture: 'http://127.0.0.1:8921/sites/default/files/styles/thumbnail/p.png?itok=x', roles: ['editor'] }),
-      { id: '3', name: 'demo-editor', username: 'demo-editor', picture: '/sites/default/files/styles/thumbnail/p.png?itok=x', initials: 'DE', hue: 0, role: 'Editor' },
+      accountOf({
+        sub: '3',
+        name: 'demo-editor',
+        preferred_username: 'demo-editor',
+        picture: 'http://127.0.0.1:8921/sites/default/files/styles/thumbnail/p.png?itok=x',
+        roles: ['editor'],
+      }),
+      {
+        id: '3',
+        name: 'demo-editor',
+        username: 'demo-editor',
+        picture: '/sites/default/files/styles/thumbnail/p.png?itok=x',
+        initials: 'DE',
+        hue: 0,
+        role: 'Editor',
+      }
     )
   })
 
@@ -70,8 +86,17 @@ describe('signInError', () => {
   })
 
   it('names flood control and blocked accounts', () => {
-    assert.match(signInError(403, 'There have been more than 5 failed login attempts for this account. It is temporarily blocked.'), /Too many/)
-    assert.match(signInError(403, 'The user has not been activated or is blocked.'), /can't sign in/)
+    assert.match(
+      signInError(
+        403,
+        'There have been more than 5 failed login attempts for this account. It is temporarily blocked.'
+      ),
+      /Too many/
+    )
+    assert.match(
+      signInError(403, 'The user has not been activated or is blocked.'),
+      /can't sign in/
+    )
   })
 
   it('treats a missing or server answer as unreachable', () => {
