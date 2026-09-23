@@ -70,6 +70,28 @@ const similarity = (a, b) => {
 };
 const sideText = (resource, key) => Object.values(fieldMap(resource)).map((f) => f && f[key] || "").join(" ");
 const PAIR_THRESHOLD = 0.4;
+const MOVE_THRESHOLD = 0.8;
+const inOrder = (pairs) => {
+  const order = pairs.map((pair, index2) => ({ ...pair, index: index2 })).sort((a, b) => a.to - b.to);
+  const runs = order.map(() => 1);
+  const prior = order.map(() => -1);
+  let end = 0;
+  for (let i = 0; i < order.length; i += 1) {
+    for (let j = 0; j < i; j += 1) {
+      if (order[j].from < order[i].from && runs[j] + 1 > runs[i]) {
+        runs[i] = runs[j] + 1;
+        prior[i] = j;
+      }
+    }
+    if (runs[i] > runs[end])
+      end = i;
+  }
+  const kept = new Set();
+  for (let at = order.length ? end : -1; at >= 0; at = prior[at]) {
+    kept.add(order[at].index);
+  }
+  return kept;
+};
 const mergePair = (removed, added) => {
   const rf = fieldMap(removed);
   const af = fieldMap(added);
@@ -135,15 +157,36 @@ const normaliseDiff = (document) => {
     const removed = items.filter((it) => it.side === "removed");
     const taken = new Set();
     const pairFor = new Map();
+    const moved = new Set();
+    const claim = (it, match, isMove) => {
+      taken.add(match);
+      pairFor.set(it, match);
+      if (isMove)
+        moved.add(it);
+    };
     for (const it of items) {
       if (it.side !== "added")
         continue;
       const match = removed.find((r) => !taken.has(r) && (r.meta.field || null) === (it.meta.field || null) && r.meta.left_delta === it.meta.right_delta && similarity(sideText(r.res, "left"), sideText(it.res, "right")) >= PAIR_THRESHOLD);
-      if (match) {
-        taken.add(match);
-        pairFor.set(it, match);
-      }
+      if (match)
+        claim(it, match, false);
     }
+    for (const it of items) {
+      if (it.side !== "added" || pairFor.has(it))
+        continue;
+      const match = removed.find((r) => !taken.has(r) && (r.meta.field || null) === (it.meta.field || null) && similarity(sideText(r.res, "left"), sideText(it.res, "right")) >= MOVE_THRESHOLD);
+      if (match)
+        claim(it, match, false);
+    }
+    const paired = [...pairFor.entries()];
+    const held = inOrder(paired.map(([add, rem]) => ({
+      from: rem.meta.left_delta,
+      to: add.meta.right_delta
+    })));
+    paired.forEach(([add], index2) => {
+      if (!held.has(index2))
+        moved.add(add);
+    });
     for (const it of items) {
       if (it.side === "removed" && taken.has(it))
         continue;
@@ -151,13 +194,18 @@ const normaliseDiff = (document) => {
         const rem = pairFor.get(it);
         const merged = mergePair(rem.res, it.res);
         const changed = merged.filter((f) => f.status !== "same");
+        const isMove = moved.has(it);
         const refMeta = {
-          status: "same",
+          status: isMove ? "moved" : "same",
           field: it.meta.field,
           left_delta: rem.meta.left_delta,
           right_delta: it.meta.right_delta
         };
-        push(it.res, refMeta, depth, changed, changed.length ? "changed" : "same", { left: sideUuids(rem.res).left, right: sideUuids(it.res).right });
+        const status = isMove ? "moved" : changed.length ? "changed" : "same";
+        push(it.res, refMeta, depth, changed, status, {
+          left: sideUuids(rem.res).left,
+          right: sideUuids(it.res).right
+        });
         children(it.res, depth + 1);
         continue;
       }
