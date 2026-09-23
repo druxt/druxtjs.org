@@ -41,6 +41,20 @@ describe('auth cookie', () => {
       assert.equal(hasAuthCookie(header), false, String(header))
     }
   })
+
+  // A client sends whatever it likes in a Cookie header, and `%` on its own is
+  // not valid percent-encoding. Decoding every value before reading its name
+  // threw URIError out of the page cache's async handler, where nothing caught
+  // it: one request with `Cookie: x=%` ended the process.
+  test('a value no decoder accepts is not a token, and is not an exception', () => {
+    for (const header of ['x=%', 'x=%E0%A4%A', `${AUTH_COOKIE}=ok; junk=%`, 'x=%; y=%%%']) {
+      assert.doesNotThrow(() => hasAuthCookie(header), String(header))
+    }
+    assert.equal(hasAuthCookie('x=%'), false)
+    assert.equal(hasAuthCookie(`${AUTH_COOKIE}=Bearer abc; junk=%`), true)
+    // The token's own value, undecodable: not a usable token, and not a throw.
+    assert.equal(hasAuthCookie(`${AUTH_COOKIE}=%`), false)
+  })
 })
 
 // cspell:ignore Bnode Btitle

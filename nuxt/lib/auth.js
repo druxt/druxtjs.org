@@ -19,6 +19,10 @@ const AUTH_COOKIE = `${AUTH_COOKIE_PREFIX}_token.${AUTH_STRATEGY}`
  * Whether a Cookie header carries a token. Signing out leaves the cookie as
  * `false` until it expires, which is not a token.
  *
+ * The name is read before the value is decoded, and the decode cannot throw: a
+ * client sends any bytes it likes, `%` alone is not valid percent-encoding, and
+ * this runs in the page cache's async handler where a throw reaches nothing.
+ *
  * @param {string} [header] - The request's Cookie header.
  * @returns {boolean} True when the auth cookie holds a value.
  */
@@ -27,8 +31,16 @@ const hasAuthCookie = (header) =>
     .split(';')
     .some((pair) => {
       const [name, ...rest] = pair.split('=')
-      const value = decodeURIComponent(rest.join('=').trim())
-      return name.trim() === AUTH_COOKIE && value !== '' && value !== 'false'
+      if (name.trim() !== AUTH_COOKIE) return false
+      const raw = rest.join('=').trim()
+      let value
+      try {
+        value = decodeURIComponent(raw)
+      } catch (e) {
+        // Undecodable: never something @nuxtjs/auth-next wrote, so not a token.
+        return false
+      }
+      return value !== '' && value !== 'false'
     })
 
 /**
