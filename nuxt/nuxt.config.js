@@ -125,6 +125,9 @@ export default {
   docsPassThrough: (path) => shouldProxy(path) || isProfilePath(path),
 
   plugins: [
+    // A token Drupal revoked is replaced before the reader notices. Ordered
+    // after the modules that create the clients it attaches to.
+    '~/plugins/auth-refresh.client.js',
     '~/plugins/entity-operations.js',
     '~/plugins/color-mode-theme.client.js',
     '~/plugins/analytics.client.js',
