@@ -123,6 +123,11 @@ export const fetchDrupalPage = async (store, path) => {
   if (editor) {
     store.commit('setEditorPage', {
       uuid: entity.uuid,
+      // The JSON:API resource type, not the router's entity type: the bar
+      // asks Drupal for this page's operations by it.
+      type,
+      // The editor bar names the page, so it carries the title too.
+      title: data.attributes.title || null,
       nid: data.attributes.drupal_internal__nid || null,
       moderationState: data.attributes.moderation_state || null,
     })
