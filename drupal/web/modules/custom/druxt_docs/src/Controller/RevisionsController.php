@@ -6,6 +6,7 @@ namespace Drupal\druxt_docs\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -29,6 +30,14 @@ final class RevisionsController extends ControllerBase {
     $node = $nodes ? reset($nodes) : NULL;
     if ($node === NULL) {
       throw new NotFoundHttpException();
+    }
+
+    // The permission on the route says this role reads revision lists; it does
+    // not say which pages. A contributor may view only their own unpublished
+    // work, and a revision's date, state and log message describe the page it
+    // belongs to, so the page's own access decides.
+    if (!$node->access('view')) {
+      throw new AccessDeniedHttpException();
     }
 
     $vids = $storage->getQuery()
