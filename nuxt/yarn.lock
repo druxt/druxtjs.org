@@ -3357,13 +3357,13 @@ __metadata:
 
 "@druxt-contrib/diff@file:vendor/druxt-diff::locator=druxtjs-org%40workspace%3A.":
   version: 0.0.0
-  resolution: "@druxt-contrib/diff@file:vendor/druxt-diff#vendor/druxt-diff::hash=53c9e7&locator=druxtjs-org%40workspace%3A."
+  resolution: "@druxt-contrib/diff@file:vendor/druxt-diff#vendor/druxt-diff::hash=831661&locator=druxtjs-org%40workspace%3A."
   peerDependencies:
     vue: ^2.7.0
   peerDependenciesMeta:
     vue:
       optional: true
-  checksum: b60cfcccc05c865912d46d56c58faafe5bc2b726e870e81687780615f46d201f20950b975c644df1efc00f779fda6367c818a89f3dc3232e2c650e61c5611106
+  checksum: 9d92451727018bf97ce3e91c0bcb6de91e35b757639750cb7c7571ab887ddc1b759ea4f6297a981667371858883d76ed552a2c86a23bd548ae551abbe7b32000
   languageName: node
   linkType: hard
 
