@@ -203,6 +203,9 @@ export default {
     ['druxt-auth', OAUTH_CLIENT],
     // The revision diff: registers `v-diff`, which marks a changed field in place.
     '@druxt-contrib/diff',
+    // A Drupal user, by uuid, by the number a path carries, or whoever is
+    // signed in. The profile pages use it.
+    '@druxt-contrib/user',
     // The consumer's decoupled settings and theme manifest, baked in at build.
     // A copy of the unreleased @druxt-contrib/decoupled-settings module.
     '~/modules/decoupled-settings',

@@ -3367,6 +3367,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@druxt-contrib/user@file:vendor/druxt-user::locator=druxtjs-org%40workspace%3A.":
+  version: 0.0.0
+  resolution: "@druxt-contrib/user@file:vendor/druxt-user#vendor/druxt-user::hash=25d6b2&locator=druxtjs-org%40workspace%3A."
+  checksum: f60583d39df2e02f0eb19f02f376197fe9d69f754fe4e905dbed3531dfda9444bbb673fd1207d7a9c827a0c135e84ab46ee5c40014ea14a0ed9e9d14471677bc
+  languageName: node
+  linkType: hard
+
 "@emotion/cache@npm:^10.0.27":
   version: 10.0.29
   resolution: "@emotion/cache@npm:10.0.29"
@@ -11250,6 +11257,7 @@ __metadata:
     "@babel/plugin-proposal-private-property-in-object": ^7.21.11
     "@druxt-contrib/anchors": "file:vendor/druxt-anchors"
     "@druxt-contrib/diff": "file:vendor/druxt-diff"
+    "@druxt-contrib/user": "file:vendor/druxt-user"
     "@nuxt/content": 1.15.1
     "@nuxt/postcss8": 1.1.3
     "@nuxtjs/color-mode": 2.1.1
