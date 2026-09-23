@@ -26,6 +26,12 @@ const view = normaliseDiff(jsonapiDiffDocument)
   `summary` covers only the root's fields), re-pairs a rebuilt draft so an edit
   shows where it happened, and anchors each removed block to a surviving
   sibling.
+- A block that changed position is `moved` rather than a removal and an
+  addition. Its words are marked only where the text differs, so a section
+  dragged somewhere else does not read as though every word of it changed, and
+  an edit made on the way is still there to read. Moving one block past three
+  others moves all four, so the longest run of blocks still in their old order
+  is taken as the order that held, and what is left over is what moved.
 - `anchorUuid(block, side)` is the uuid to look for in the page. A diff has two
   sides and a page renders one of them, and the two are not always the same
   entity: a backend that matches children by position pairs the blocks of a site
