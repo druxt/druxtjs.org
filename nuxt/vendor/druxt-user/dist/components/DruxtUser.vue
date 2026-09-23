@@ -1,11 +1,13 @@
 <script>
 
 import DruxtModule from 'druxt/dist/components/DruxtModule.vue'
+import { DrupalJsonApiParams } from 'drupal-jsonapi-params'
 import { mapActions } from 'vuex'
 
-// The package by name, not a relative path. siroc bundles the reading into
-// `dist/index.*` and mkdist transpiles components into `dist/components`, so
-// `../lib/profile` does not exist once built and webpack cannot resolve it.
+// The reading, by a relative path that survives the build: `exports` maps
+// `./lib/*`, so mkdist copies `src/lib/profile.js` to `dist/lib/profile.mjs`
+// beside the component. Importing the package by name instead would pull the
+// index, which is the Nuxt module, and put Node's `path` in a reader's bundle.
 import {
   emailHash,
   gravatarUrl,
@@ -14,7 +16,7 @@ import {
   pictureOf,
   rolesOf,
   sinceOf,
-} from '@druxt-contrib/user'
+} from '../lib/profile'
 
 /** What a profile needs from Drupal, and nothing else. */
 const INCLUDE = ['user_picture', 'roles']
@@ -223,9 +225,24 @@ export default {
       return me[this.subjectKey] || me.uuid || undefined
     },
 
-    /** The query that loads a profile: the user, and what it is made of. */
-    query(settings = {}) {
-      return { ...(settings.query || {}), include: this.include }
+    /**
+     * The query that loads a profile: the user, and what it is made of.
+     *
+     * A `DrupalJsonApiParams`, because that is what the Druxt store's query
+     * takes. A plain object looks like it works and does not: its filter
+     * serialises to `filter=` and the request comes back a 400, which the
+     * resolver above swallows, so the profile renders as nothing at all.
+     *
+     * @param {(number|string)} [id] - A user's number in Drupal, to filter by.
+     * @returns {DrupalJsonApiParams} The query.
+     */
+    query(id) {
+      const query = new DrupalJsonApiParams()
+      if (this.include.length) query.addInclude(this.include)
+      if (id !== undefined && id !== null && id !== '') {
+        query.addFilter('drupal_internal__uid', String(id))
+      }
+      return query
     },
 
     /**
@@ -261,13 +278,10 @@ export default {
     },
 
     /** The one user with this number in Drupal, or none. */
-    async byId(id, settings) {
+    async byId(id) {
       const collection = await this.getCollection({
         type: this.type,
-        query: {
-          ...this.query(settings),
-          filter: { drupal_internal__uid: id },
-        },
+        query: this.query(id),
       })
       this.user = ((collection || {}).data || [])[0]
       this.included = (collection || {}).included || []
@@ -278,26 +292,18 @@ export default {
    * Druxt hooks.
    */
   druxt: {
-    /**
-     * Fetches the user, by whichever of the three the site gave.
-     *
-     * @param {object} settings - The module settings object.
-     */
-    async fetchData(settings) {
+    /** Fetches the user, by whichever of the three the site gave. */
+    async fetchData() {
       const uuid = this.uuid || (this.me ? this.myUuid() : undefined)
       try {
         if (uuid) {
           this.take(
-            await this.getResource({
-              type: this.type,
-              id: uuid,
-              query: this.query(settings),
-            })
+            await this.getResource({ type: this.type, id: uuid, query: this.query() })
           )
           return
         }
         if (this.id !== undefined && this.id !== null && this.id !== '') {
-          await this.byId(this.id, settings)
+          await this.byId(this.id)
         }
       } catch (e) {
         // Drupal decides who may see a profile, and it said no. The wrapper

@@ -3369,8 +3369,10 @@ __metadata:
 
 "@druxt-contrib/user@file:vendor/druxt-user::locator=druxtjs-org%40workspace%3A.":
   version: 0.0.0
-  resolution: "@druxt-contrib/user@file:vendor/druxt-user#vendor/druxt-user::hash=25d6b2&locator=druxtjs-org%40workspace%3A."
-  checksum: f60583d39df2e02f0eb19f02f376197fe9d69f754fe4e905dbed3531dfda9444bbb673fd1207d7a9c827a0c135e84ab46ee5c40014ea14a0ed9e9d14471677bc
+  resolution: "@druxt-contrib/user@file:vendor/druxt-user#vendor/druxt-user::hash=b07df1&locator=druxtjs-org%40workspace%3A."
+  dependencies:
+    drupal-jsonapi-params: ^2.3.1
+  checksum: 44e0b7d33ac8868cf87ea7f1f88a37b3f638a9e7e72c7b5308f0dcd93e509633029129c7f87f7623a8974d9287371d299ad9f214a5edb85ce2b2d7625850ea3d
   languageName: node
   linkType: hard
 
@@ -10933,7 +10935,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"drupal-jsonapi-params@npm:2.3.2, drupal-jsonapi-params@npm:^2.2.0":
+"drupal-jsonapi-params@npm:2.3.2, drupal-jsonapi-params@npm:^2.2.0, drupal-jsonapi-params@npm:^2.3.1":
   version: 2.3.2
   resolution: "drupal-jsonapi-params@npm:2.3.2"
   dependencies:
