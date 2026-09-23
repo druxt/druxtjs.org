@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 
-const { accountOf, hueOf, initials, roleLabel, signInError } = (
+const { accountOf, hueOf, initials, isSignedInAs, roleLabel, signInError } = (
   await import('../nuxt/lib/account.js')
 ).default
 
@@ -102,5 +102,29 @@ describe('signInError', () => {
   it('treats a missing or server answer as unreachable', () => {
     assert.match(signInError(undefined), /couldn't be reached/)
     assert.match(signInError(502, 'Bad gateway'), /couldn't be reached/)
+  })
+})
+
+// A browser that already holds a Drupal session signs in as whoever left it
+// there, because Drupal refuses a JSON login while one is open. The claims are
+// the only proof of who that is, and they arrive after the token does.
+describe('isSignedInAs', () => {
+  it('accepts the account that was asked for, however it is cased or spaced', () => {
+    assert.equal(isSignedInAs({ preferred_username: 'editor' }, 'editor'), true)
+    assert.equal(isSignedInAs({ preferred_username: 'Editor' }, '  editor '), true)
+    assert.equal(isSignedInAs({ name: 'Stuart Clark' }, 'Stuart Clark'), true)
+  })
+
+  it('refuses somebody else, which is the session left open on a shared browser', () => {
+    assert.equal(isSignedInAs({ preferred_username: 'someone-else' }, 'editor'), false)
+    assert.equal(isSignedInAs({ preferred_username: 'editor2' }, 'editor'), false)
+  })
+
+  it('refuses what it cannot prove, because thin claims name nobody', () => {
+    for (const claims of [undefined, null, {}, { sub: '2' }, { preferred_username: '' }]) {
+      assert.equal(isSignedInAs(claims, 'editor'), false, JSON.stringify(claims))
+    }
+    assert.equal(isSignedInAs({ preferred_username: 'editor' }, ''), false)
+    assert.equal(isSignedInAs({ preferred_username: 'editor' }, undefined), false)
   })
 })

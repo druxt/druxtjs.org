@@ -107,4 +107,35 @@ const signInError = (status, message) => {
   return text || "Sign-in didn't work. Try again."
 }
 
-module.exports = { ROLES, accountOf, hueOf, initials, roleLabel, sameOrigin, signInError }
+/**
+ * Whether the signed-in account is the one whose credentials were submitted.
+ *
+ * Drupal refuses a JSON login while a session is already open, so a browser
+ * that still holds one signs in as whoever left it there. On a shared machine
+ * that is the previous editor. Nothing proves whose session it is until the
+ * token comes back, so the claims are checked against what was typed.
+ *
+ * Claims that name nobody answer false: the scopes an account holds decide
+ * what userinfo returns, so an unprovable identity is treated as the wrong one.
+ *
+ * @param {object} [claims] - `$auth.user`, the userinfo claims.
+ * @param {string} [name] - The username that was submitted.
+ * @returns {boolean} True when the claims name that account.
+ */
+const isSignedInAs = (claims, name) => {
+  const account = (claims || {}).preferred_username || (claims || {}).name
+  const wanted = String(name || '').trim()
+  if (!account || !wanted) return false
+  return String(account).trim().toLowerCase() === wanted.toLowerCase()
+}
+
+module.exports = {
+  ROLES,
+  accountOf,
+  hueOf,
+  initials,
+  isSignedInAs,
+  roleLabel,
+  sameOrigin,
+  signInError,
+}
