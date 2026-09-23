@@ -5,10 +5,12 @@
 // page.
 import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
-import { createRequire } from 'node:module'
 
-const require = createRequire(import.meta.url)
-const { normaliseDiff, wordDiff, groupRuns, condenseRuns } = require('../nuxt/lib/diff.js')
+// The package, which the repository installs from `nuxt/vendor` until it is
+// published, so the tests read the same engine the frontend does.
+const { normaliseDiff, wordDiff, groupRuns, condenseRuns, anchorUuid } = await import(
+  '@druxt-contrib/diff'
+)
 
 /** A jsonapi_diff document: a node whose field_content children are listed. */
 const doc = (children) => ({
@@ -212,8 +214,6 @@ describe('wordDiff', () => {
 // paragraphs on every import, so the two sides are different entities and only
 // the rendered side's uuid is in the markup: the anchor has to follow it.
 describe('the vendored engine names both sides of a block', () => {
-  const { anchorUuid } = require('../nuxt/lib/diff.js')
-
   const positional = (leftUuid, rightUuid) => ({
     data: {
       id: 'node:28:27',
