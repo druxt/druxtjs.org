@@ -355,6 +355,41 @@ const openBrowser = (url) => {
   }
 }
 
+/**
+ * Checks a document has what authoring reads from it, and says what is missing.
+ *
+ * Sign-in opens a browser and waits for a person, so a document that cannot be
+ * authored is rejected before that rather than after it, where the failure was
+ * a TypeError from somewhere inside the block walk.
+ *
+ * @param {object} document - The parsed document.
+ * @param {object} [options] - `{ uuid }`, set when revising an existing page.
+ * @throws {Error} When a required field is missing or the wrong shape.
+ */
+export const assertDocument = (document, { uuid } = {}) => {
+  if (!document || typeof document !== 'object' || Array.isArray(document)) {
+    throw new Error('The document must be a JSON object describing one page.')
+  }
+  if (!Array.isArray(document.blocks)) {
+    // A whole intermediate representation is the near miss: it holds pages.
+    const hint = Array.isArray(document.pages) ? ' This looks like a whole IR: pass one of its pages.' : ''
+    throw new Error(`The document needs a "blocks" array.${hint}`)
+  }
+  if (!document.blocks.length) throw new Error('The document has no blocks to author.')
+  if (typeof document.title !== 'string' || !document.title.trim()) {
+    throw new Error('The document needs a "title".')
+  }
+  // A new page is filed under a section and lives at a path; a revision of an
+  // existing page keeps both from the page it revises.
+  if (!uuid) {
+    for (const field of ['section', 'url']) {
+      if (typeof document[field] !== 'string' || !document[field].trim()) {
+        throw new Error(`A new page needs a "${field}". Pass --uuid to revise an existing page.`)
+      }
+    }
+  }
+}
+
 /** The command line, as `--name value` pairs. */
 export const parseArgs = (argv) => {
   const args = {}
@@ -371,6 +406,8 @@ const main = async () => {
   const args = parseArgs(process.argv.slice(2))
   if (!args.document) throw new Error('--document <ir.json> is required.')
   const document = JSON.parse(readFileSync(args.document, 'utf8'))
+  // Before the browser opens, so a bad document costs nobody a sign-in.
+  assertDocument(document, { uuid: args.uuid })
   const backend = (args.backend || process.env.DRUXT_BASE_URL || 'http://127.0.0.1:8888').replace(/\/+$/, '')
   // druxt is the frontend's dependency: loaded here, so the pure parts above need nothing installed.
   const { DruxtClient } = createRequire(import.meta.url)('druxt')
