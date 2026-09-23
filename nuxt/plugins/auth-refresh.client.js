@@ -34,7 +34,12 @@ export default function (context) {
   const refresh = () => {
     // Just refreshed: the token in hand is the one a refresh would fetch, so
     // the request is retried with it rather than rotating the tokens again.
-    if (!refreshing && Date.now() - refreshedAt < GRACE) return Promise.resolve()
+    // `refreshedAt` guards the subtraction: before the first refresh it is 0,
+    // and against a clock that starts at 0 the first refusal would take the
+    // grace path and never refresh at all.
+    if (!refreshing && refreshedAt && Date.now() - refreshedAt < GRACE) {
+      return Promise.resolve()
+    }
     if (!refreshing) {
       refreshing = auth()
         .refreshTokens()
