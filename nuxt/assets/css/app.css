@@ -1112,6 +1112,14 @@ del.v-diff-del {
   border-radius: 3px;
   padding: 0 2px;
 }
+/* Words cut from the end of a block have no word after them to sit before, so
+   they are struck at the end of it, as their own paragraph. */
+del.v-diff-del--trailing {
+  display: block;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.625rem;
+  line-height: 1.6;
+}
 [data-theme='dark'] ins.v-diff-ins {
   background: #12342b;
   color: #7fe0bd;

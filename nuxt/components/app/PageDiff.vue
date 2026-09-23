@@ -11,11 +11,11 @@
         type="button"
         class="page-diff-removed-dot"
         :aria-expanded="String(open === marker.key)"
-        :aria-label="`${marker.blocks.length} removed ${marker.blocks.length === 1 ? 'block' : 'blocks'}`"
+        :aria-label="`${goneLabel}: ${marker.blocks.length} ${marker.blocks.length === 1 ? 'block' : 'blocks'}`"
         @click="open = open === marker.key ? null : marker.key"
       >−</button>
       <div v-if="open === marker.key" class="page-diff-removed-card">
-        <p class="text-xs font-semibold mb-2">Removed</p>
+        <p class="text-xs font-semibold mb-2">{{ goneLabel }}</p>
         <div v-for="(block, i) of marker.blocks" :key="i" class="mb-2 last:mb-0">
           <AppDiffField v-for="field of block.fields" :key="field.name" :field="field" :condense="false" />
           <p v-if="!block.fields.length" class="text-xs text-base-content/60">A block with nothing to compare.</p>
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { normaliseDiff } from '~/lib/diff'
+import { anchorUuid, normaliseDiff } from '~/lib/diff'
 import { findAnchor } from '~/lib/anchors'
 import { viewing } from '~/lib/revisions'
 
@@ -53,9 +53,24 @@ export default {
     shown: ({ editor }) => viewing(editor.revisions, editor.version),
     /** On while comparing something other than live itself. */
     active: ({ signedIn, editor, shown }) => signedIn && editor.compare && shown.kind !== 'live',
+    /**
+     * The live revision is the left side: what the reader of the site gets.
+     * `rel:latest-version` is not it, because on a page with a draft the
+     * latest version is the draft, and a draft compared with itself is empty.
+     */
+    leftVersion: ({ editor }) => {
+      const live = viewing(editor.revisions, 'published').revision
+      return live ? `id:${live.vid}` : null
+    },
+    /**
+     * What a block the live page has and this view does not means: a draft
+     * dropped it, an older revision never had it.
+     */
+    goneLabel: ({ shown }) => (shown.kind === 'draft' ? 'Removed in this draft' : 'Not in this revision'),
     /** The jsonapi_diff version on the right: the draft, or a revision by id. */
     rightVersion: ({ shown }) => (shown.kind === 'draft' ? 'rel:working-copy' : shown.revision ? `id:${shown.revision.vid}` : null),
-    key: ({ editor, rightVersion, active }) => (active && editor.page ? `${editor.page.uuid}@${rightVersion}` : null),
+    key: ({ editor, leftVersion, rightVersion, active }) =>
+      active && editor.page && leftVersion ? `${editor.page.uuid}@${leftVersion}..${rightVersion}` : null,
   },
 
   watch: {
@@ -88,7 +103,7 @@ export default {
       const key = this.key
       try {
         const { data } = await this.$druxt.axios.get(`/jsonapi/diff/node/doc_page/${this.editor.page.uuid}`, {
-          params: { leftVersion: 'rel:latest-version', rightVersion: this.rightVersion },
+          params: { leftVersion: this.leftVersion, rightVersion: this.rightVersion },
           headers: { Accept: 'application/vnd.api+json' },
         })
         const view = normaliseDiff(data)
@@ -103,7 +118,7 @@ export default {
 
     /** Resolves once every changed block is rendered with its text, or after a few seconds. */
     rendered(view) {
-      const uuids = (view.blocks || []).filter((b) => b.status === 'changed').map((b) => b.uuid)
+      const uuids = (view.blocks || []).filter((b) => b.status === 'changed').map((b) => anchorUuid(b, 'right'))
       const ready = () => uuids.every((uuid) => {
         const el = findAnchor(document, { entity: uuid })
         return el && el.textContent.trim()
@@ -129,9 +144,12 @@ export default {
       this.marked = []
       if (!this.active || !diff || !diff.blocks) return
 
+      // The page renders the right side of the comparison, and a rebuilt
+      // paragraph has a different uuid on each side, so the mark goes on the
+      // uuid that is actually in the markup.
       for (const block of diff.blocks) {
         if (!MARKED.includes(block.status)) continue
-        const el = findAnchor(document, { entity: block.uuid })
+        const el = findAnchor(document, { entity: anchorUuid(block, 'right') })
         if (!el) continue
         el.setAttribute('data-diff', block.status)
         this.marked.push(el)
@@ -141,7 +159,7 @@ export default {
       const groups = new Map()
       for (const block of diff.rebuilt ? [] : diff.blocks) {
         if (block.status !== 'removed') continue
-        const anchor = block.placeAfter || block.placeBefore
+        const anchor = anchorUuid({ placeUuids: block.placeUuids, uuid: block.placeAfter || block.placeBefore }, 'right')
         if (!anchor) continue
         const side = block.placeAfter ? 'after' : 'before'
         const key = `${side}:${anchor}`
