@@ -64,8 +64,9 @@ case "\$*" in
   *"status --field=bootstrap"*) [ "$bootstrap" = "yes" ] && echo "Successful" ;;
   *"SELECT COUNT(*) FROM sessions"*) echo "$sessions" ;;
   *"mail LIKE"*) [ -n "\${STUB_KEPT_ADDRESSES:-}" ] && printf '%b\n' "\${STUB_KEPT_ADDRESSES}" ;;
-  *"php:eval"*) [ "\${STUB_NO_SUCH_USER:-}" = "1" ] && exit 3
-    [ "\${STUB_EVAL_FAILS:-}" = "1" ] && exit 1 ;;
+  *"php:eval"*)
+    [ "\${STUB_EVAL_FAILS:-}" = "1" ] && exit 1
+    if [ "\${STUB_NO_SUCH_USER:-}" = "1" ]; then printf 'no-account'; else printf 'login-restored'; fi ;;
 esac
 exit 0
 EOF
@@ -355,13 +356,27 @@ else
 fi
 
 app="$(build_app yes)"
-run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
-  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password > /dev/null
-if called "$app" "setPassword" && called "$app" "activate()"; then
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password)"
+if called "$app" "setPassword" && called "$app" "activate()" &&
+  printf '%s' "$output" | grep -q "A Maintainer can sign in again"; then
   ok "the maintainer's password is set again, and the account activated with it"
 else
   no "the maintainer's password was not set again"
   sed 's/^/       /' "$app/calls.log"
+fi
+
+# The rollout says an account can sign in only when Drupal says it changed
+# one. Reading drush's exit status instead would call a broken bootstrap a
+# restored login, because drush reports a PHP exit() as its own failure.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
+  STUB_NO_SUCH_USER=1)"
+if printf '%s' "$output" | grep -q "can sign in again"; then
+  no "an account Drupal did not find: the rollout said it can sign in"
+else
+  ok "an account Drupal did not find: the rollout did not claim a login"
 fi
 
 # The password is read from the environment inside Drupal, so it is never in

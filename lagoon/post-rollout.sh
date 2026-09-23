@@ -153,30 +153,30 @@ restore_addresses() {
 # already. The password and the unblock are one call, so an account cannot
 # be reported as usable while it is still blocked.
 #
-# 3 says the account is not in this copy, which is not a failure; anything
-# else is, and says so rather than claiming the account was missing.
+# It says what it did on its own output rather than in an exit status:
+# drush reports a PHP `exit()` as its own failure, so a missing account and
+# a broken bootstrap would look the same.
 restore_maintainer_login() {
   [ -n "${DOCS_MAINTAINER_NAME:-}" ] || return 0
   if [ -z "${DOCS_MAINTAINER_PASSWORD:-}" ]; then
     echo "  DOCS_MAINTAINER_NAME is set without DOCS_MAINTAINER_PASSWORD; the account stays sanitised."
     return 0
   fi
-  if drush php:eval '
-    $account = user_load_by_name(getenv("DOCS_MAINTAINER_NAME"));
-    if (!$account) { exit(3); }
+  restored=$(drush php:eval '
+    $accounts = \Drupal::entityTypeManager()->getStorage("user")
+      ->loadByProperties(["name" => getenv("DOCS_MAINTAINER_NAME")]);
+    $account = reset($accounts);
+    if (!$account) { print "no-account"; return; }
     $account->setPassword(getenv("DOCS_MAINTAINER_PASSWORD"));
     $account->activate();
     $account->save();
-  ' > /dev/null 2>&1; then
-    echo "  ${DOCS_MAINTAINER_NAME} can sign in again."
-  else
-    status=$?
-    if [ "$status" = "3" ]; then
-      echo "  no ${DOCS_MAINTAINER_NAME} account in this copy; nothing to restore."
-    else
-      echo "  could not restore ${DOCS_MAINTAINER_NAME}'s login (drush exited ${status}); the account stays sanitised."
-    fi
-  fi
+    print "login-restored";
+  ' 2>/dev/null || :)
+  case "$restored" in
+    *login-restored*) echo "  ${DOCS_MAINTAINER_NAME} can sign in again." ;;
+    *no-account*) echo "  no ${DOCS_MAINTAINER_NAME} account in this copy; nothing to restore." ;;
+    *) echo "  could not restore ${DOCS_MAINTAINER_NAME}'s login; the account stays sanitised." ;;
+  esac
 }
 
 # Remove what a contributor should never be handed. `sql:sanitize` covers

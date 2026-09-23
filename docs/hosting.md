@@ -58,7 +58,8 @@ subdomains, are set in `.lagoon.yml`.
    (`DOCS_MAINTAINER_DOMAIN`, `druxtjs.org` by default, and a hostname or
    nothing is kept), and the password of the account named by
    `DOCS_MAINTAINER_NAME`, read from `DOCS_MAINTAINER_PASSWORD` by Drupal
-   itself rather than passed on a command line. Without them a rollout hands back an
+   itself rather than passed on a command line, which would put it in the
+   container's process list. Without them a rollout hands back an
    environment nobody can sign in to. Both are restored after the check that
    the sanitise happened, and never on production. Either
    way it then runs `drush deploy`, or installs from `drupal/config/sync`
