@@ -75,9 +75,21 @@ else
   no "during a replacement: no Retry-After"
 fi
 
+# The rollout touches the marker while it works, so a long copy is still a
+# copy. Under the old rule this request reached Drupal against a database
+# that was still being replaced.
 touch -d '2 hours ago' "$marker"
+touch "$marker"
+code="$(request)"
+if [ "$code" = "503" ] && ! grep -q drupal "$scratch/body"; then
+  ok "a copy that has run for hours: still turned away while the rollout says so"
+else
+  no "a copy that has run for hours: ${code}, and the request reached Drupal"
+fi
+
+touch -d '5 minutes ago' "$marker"
 if [ "$(request)" = "200" ]; then
-  ok "a marker left by a killed rollout: ignored after an hour"
+  ok "a marker left by a killed rollout: ignored once nothing touches it"
 else
   no "a marker left by a killed rollout: still holding the site down"
 fi

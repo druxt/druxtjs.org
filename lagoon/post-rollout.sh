@@ -39,6 +39,13 @@ volatile_tables="cache,cache_*,cachetags,semaphore,sessions,watchdog,flood,key_v
 # its own rows.
 replacing="$app/drupal/web/sites/default/files/private/.replacing-database"
 
+# How often the marker says the rollout is still going, and the pid of the
+# process saying it. The guard ignores a marker that has stopped being
+# touched, so this has to be well inside the guard's window, which is a
+# minute. Shortened by the guardrail tests, which cannot wait that long.
+heartbeat_interval="${DOCS_REPLACING_HEARTBEAT:-15}"
+heartbeat=""
+
 # Two independent tests, because what follows begins by dropping a database.
 # An environment that cannot say what it is does not get synced: the answer
 # to "is this production?" must be a clear no, not an absent yes.
@@ -68,7 +75,22 @@ may_sync() {
 load_from_production() {
   mkdir -p "$(dirname "$replacing")"
   : > "$replacing"
-  trap 'rm -f "$replacing"' EXIT
+  # The guard reads the marker's age, so the marker says "still going" every
+  # few seconds for as long as this runs. A copy that takes longer than the
+  # guard's patience would otherwise let requests in against a database that
+  # is still half-replaced, which is the thing the marker exists to prevent.
+  while : ; do
+    sleep "$heartbeat_interval"
+    touch "$replacing" 2>/dev/null || exit 0
+  done &
+  heartbeat=$!
+  # Waited for, not just signalled: a touch that lands after the marker is
+  # removed would put it back, and the site would refuse requests until
+  # something noticed.
+  # Each step is allowed to fail: `set -e` would otherwise abandon the trap
+  # on the status a killed child returns, and leave the marker behind with
+  # the site refusing every request.
+  trap 'kill "$heartbeat" 2>/dev/null || :; wait "$heartbeat" 2>/dev/null || :; rm -f "$replacing"' EXIT
 
   dump="/tmp/production.sql.gz"
   rm -f "$dump" "${dump%.gz}"

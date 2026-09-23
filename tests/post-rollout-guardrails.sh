@@ -53,6 +53,13 @@ printf 'drush %s\n' "\$*" >> "$app/calls.log"
 case "\$*" in
   *"sql:sync"*)
     [ -e "$app/drupal/web/sites/default/files/private/.replacing-database" ] && echo "marker present during sync" >> "$app/calls.log"
+    if [ -n "\${STUB_SYNC_SLOW:-}" ]; then
+      sleep "\${STUB_SYNC_SLOW}"
+      # How old the marker is by the end of a slow copy: the guard opens on
+      # this number, so the test reads what the guard would read.
+      marker="$app/drupal/web/sites/default/files/private/.replacing-database"
+      [ -e "\$marker" ] && expr "\$(date +%s)" - "\$(date -r "\$marker" +%s)" > "$app/marker-age.log"
+    fi
     [ "\${STUB_SYNC_FAILS:-}" = "1" ] && exit 1 ;;
   *"status --field=bootstrap"*) [ "$bootstrap" = "yes" ] && echo "Successful" ;;
   *"SELECT COUNT(*) FROM sessions"*) echo "$sessions" ;;
@@ -258,6 +265,23 @@ if [ -e "$(marker_of "$app")" ]; then
   no "replacing the database: still refusing requests after the rollout"
 else
   ok "replacing the database: open again once the rollout is done"
+fi
+
+# The guard reads the marker's age, so a copy that outlives the guard's
+# window has to keep saying it is still going. Under the rule this replaced,
+# an hour-long copy ended with the site open and the database half-replaced.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_REPLACING_HEARTBEAT=1 STUB_SYNC_SLOW=3 STUB_MARKER_AGE=1 > /dev/null
+if [ -s "$app/marker-age.log" ] && [ "$(cat "$app/marker-age.log")" -le 2 ]; then
+  ok "a copy that outlasts the guard: the marker was still being touched"
+else
+  no "a copy that outlasts the guard: the marker went stale after $(cat "$app/marker-age.log" 2>/dev/null) seconds"
+fi
+if [ -e "$(marker_of "$app")" ]; then
+  no "a copy that outlasts the guard: a leftover heartbeat put the marker back"
+else
+  ok "a copy that outlasts the guard: the heartbeat stopped with the rollout"
 fi
 
 app="$(build_app yes)"
