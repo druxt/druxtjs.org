@@ -6,6 +6,10 @@
  * reader is on. The page is always the fallback, because every page has one.
  *
  * Plain CommonJS, so the tests read it without the app.
+ *
+ * The attribute names come from @druxt-contrib/anchors rather than being
+ * written here. The diff view and the field wrappers read the same contract,
+ * and a second copy of the strings is a contract that drifts.
  */
 
 /** What Drupal calls each paragraph the site renders, for a reader. */
@@ -20,6 +24,8 @@ const KINDS = {
 }
 
 /** What a field is called, where its machine name is not what to show. */
+const { ENTITY, FIELD, TYPE } = require('./anchors')
+
 const FIELDS = {
   field_text: 'text',
   field_rich_text: 'text',
@@ -57,12 +63,12 @@ const kindOf = (type) => {
  */
 const subjectFromElement = (el, { closest } = {}) => {
   const find = closest || ((node, selector) => (node && node.closest ? node.closest(selector) : null))
-  const anchor = find(el, '[data-druxt-entity]')
+  const anchor = find(el, `[${ENTITY}]`)
   if (!anchor || !anchor.getAttribute) return null
-  const uuid = anchor.getAttribute('data-druxt-entity')
+  const uuid = anchor.getAttribute(ENTITY)
   if (!uuid || uuid === 'false') return null
-  const type = anchor.getAttribute('data-druxt-type') || ''
-  const field = anchor.getAttribute('data-druxt-field') || null
+  const type = anchor.getAttribute(TYPE) || ''
+  const field = anchor.getAttribute(FIELD) || null
   const kind = kindOf(type)
   return {
     uuid,
@@ -143,7 +149,7 @@ const subjectsOn = (root, page) => {
   // Without the elements: a list a view renders has to be plain data, and an
   // element in it would be walked by the framework's reactivity.
   if (page) found.push({ ...page, el: null })
-  const nodes = root && root.querySelectorAll ? root.querySelectorAll('[data-druxt-entity]') : []
+  const nodes = root && root.querySelectorAll ? root.querySelectorAll(`[${ENTITY}]`) : []
   for (const node of nodes) {
     const subject = subjectFromElement(node, { closest: (el) => el })
     if (subject && !found.some((other) => other.uuid === subject.uuid)) found.push({ ...subject, el: null })
