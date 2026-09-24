@@ -66,6 +66,7 @@
 </template>
 
 <script>
+import { findAnchor } from '~/lib/anchors'
 import { hasEditorHint, operationsUrl, operationsOf } from '~/lib/entity-operations'
 import { editHref, editLabel, pageSubject, subjectFromElement, subjectsOn } from '~/lib/editor-subject'
 import { hasDraft, viewing } from '~/lib/revisions'
@@ -239,7 +240,9 @@ export default {
     /** Takes the reader to a chosen subject, and binds the bar to it. */
     choose(subject) {
       this.choosing = false
-      const el = subject.el || (subject.uuid && document.querySelector(`[data-druxt-entity="${subject.uuid}"]`))
+      // findAnchor escapes the value; a hand-built selector breaks on an id
+      // that is not a uuid, and every id here comes from JSON:API.
+      const el = subject.el || (subject.uuid && findAnchor(document, { entity: subject.uuid }))
       const { el: _, ...rest } = subject
       this.active = subject.uuid === (this.page || {}).uuid ? null : Object.freeze(rest)
       this.mark(this.active ? el : null)
