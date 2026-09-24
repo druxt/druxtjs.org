@@ -45,6 +45,11 @@ const CONSUMER_ID = process.env.DRUXT_CONSUMER_ID || 'druxtjs_org'
  */
 // Every role scope an editor might hold: a token carries only the roles its
 // scopes name that the account also has, so each person gets exactly their own.
+// `druxt.proxy.api` below is what turns the module's own proxy entries on: it
+// takes `/user/login`, `/user/logout` and `/user/password` for POST alone, and
+// `/oauth/authorize` and `/oauth/userinfo` whole, so the site lists none of
+// them itself. POST alone is what lets the login page it adds render at
+// `/user/login` while that form still posts to Drupal.
 const OAUTH_CLIENT = { clientId: CONSUMER_ID, scope: ['editor', 'contributor', 'administrator'] }
 const OAUTH_STRATEGY = {
   // The package's `exports` map does not expose `./templates`, so the file is
@@ -82,6 +87,13 @@ const OAUTH_STRATEGY = {
 // in server/start.js which requests are Drupal's, so none of them is stored.
 const { shouldProxy } = require('./modules/druxt-admin/proxy')
 const { PROFILE_PATH, isProfilePath } = require('./lib/profile-path')
+
+/**
+ * The sign-in page druxt-auth adds, which the site renders rather than Drupal.
+ * Drupal still answers a POST to it, through the module's own proxy entry, so
+ * its form keeps working for anyone who reaches it from inside Drupal.
+ */
+const LOGIN_PATH = /^\/user\/login\/?$/
 
 export default {
   // Pages render live from Drupal. In production, server/start.js serves
@@ -139,7 +151,7 @@ export default {
   // Read by server/start.js: a request Drupal answers is never stored. A
   // profile is this site's page and still never stored, because what it shows
   // depends on who is reading it.
-  docsPassThrough: (path) => shouldProxy(path) || isProfilePath(path),
+  docsPassThrough: (path) => (shouldProxy(path) && !LOGIN_PATH.test(path)) || isProfilePath(path),
 
   plugins: [
     // A token Drupal revoked is replaced before the reader notices. Ordered
@@ -276,9 +288,7 @@ export default {
       '/jsonapi',
       '/router/translate-path',
       '/sites/default/files',
-      '/oauth/authorize',
       '/oauth/token',
-      '/oauth/userinfo',
       '/oauth/revoke',
       '/druxt-docs',
     ].map((context) => [
@@ -290,7 +300,7 @@ export default {
     // cookie is made this origin's: no Domain, and Secure only over HTTPS,
     // where a browser will store it.
     [
-      (pathname) => shouldProxy(pathname, { except: [PROFILE_PATH] }),
+      (pathname) => shouldProxy(pathname, { except: [PROFILE_PATH, LOGIN_PATH] }),
       {
         target: DRUXT_BASE_URL,
         changeOrigin: false,

@@ -255,8 +255,7 @@ describe('createHandler', () => {
       await withServer(createHandler({ cache, live }), async (base) => {
         const editor = await request(`${base}/how-to`, {
           headers: {
-            cookie:
-              'auth.strategy=drupal-authorization_code; auth._token.drupal-authorization_code=Bearer%20abc',
+            cookie: 'auth.strategy=drupal-password; auth._token.drupal-password=Bearer%20abc',
           },
         })
         assert.equal(editor.body, '<p>rendered for the request</p>')
@@ -268,8 +267,8 @@ describe('createHandler', () => {
         assert.equal(reader.body, stored.body.toString())
         // A cookie that is not the token, or a signed-out one, is an anonymous reader.
         for (const cookie of [
-          'auth.strategy=drupal-authorization_code',
-          'auth._token.drupal-authorization_code=false',
+          'auth.strategy=drupal-password',
+          'auth._token.drupal-password=false',
         ]) {
           const other = await request(`${base}/how-to`, { headers: { cookie } })
           assert.equal(other.headers['x-docs-cache'], 'HIT', cookie)
