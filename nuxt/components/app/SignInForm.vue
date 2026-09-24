@@ -180,7 +180,15 @@ export default {
             scope: SCOPES.join(' '),
           },
         })
-        this.$router.push(this.destination || this.$route.fullPath)
+        // The password grant returns rather than redirecting, so nothing
+        // tears this down for us: the dialog has to be closed and the reader
+        // moved on from here. The redirect flow did both by navigating away.
+        this.$store.commit('setSignIn', false)
+        // The spinner is this component's, and this component survives: the
+        // redirect flow used to take the whole page with it.
+        this.busy = false
+        const to = this.destination || this.$route.fullPath
+        if (to !== this.$route.fullPath) this.$router.push(to)
       } catch (error) {
         // A session already open is refused by the scheme rather than reused,
         // so it arrives as an error of its own with nothing from Drupal on it.

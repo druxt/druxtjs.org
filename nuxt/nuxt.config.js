@@ -2,7 +2,7 @@
 // Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
 const { serviceRoute } = require('./server/backend')
-const { AUTH_COOKIE_PREFIX, AUTH_STRATEGY } = require('./lib/auth')
+const { AUTH_COOKIE_PREFIX } = require('./lib/auth')
 const { syncDruxtComponents } = require('./lib/sync-druxt-components')
 
 // The id is interpolated into an inline script, so check its shape first.
@@ -50,7 +50,15 @@ const CONSUMER_ID = process.env.DRUXT_CONSUMER_ID || 'druxtjs_org'
 // `/oauth/authorize` and `/oauth/userinfo` whole, so the site lists none of
 // them itself. POST alone is what lets the login page it adds render at
 // `/user/login` while that form still posts to Drupal.
-const OAUTH_CLIENT = { clientId: CONSUMER_ID, scope: ['editor', 'contributor', 'administrator'] }
+const OAUTH_CLIENT = {
+  clientId: CONSUMER_ID,
+  scope: ['editor', 'contributor', 'administrator'],
+  // The password grant issues a token and nothing else, and this site's
+  // editing is Drupal's own forms proxied onto this origin, which need a
+  // Drupal session. With this on, the credentials open one through the
+  // proxied login before the grant, and signing out ends both.
+  passwordSession: true,
+}
 const OAUTH_STRATEGY = {
   // The package's `exports` map does not expose `./templates`, so the file is
   // reached from the package root the way the module reaches it itself.
@@ -276,7 +284,11 @@ export default {
   auth: {
     redirect: { login: '/login', logout: '/', home: '/', callback: '/callback' },
     cookie: { prefix: AUTH_COOKIE_PREFIX },
-    strategies: { [AUTH_STRATEGY]: OAUTH_STRATEGY },
+    // Keyed by name, not by AUTH_STRATEGY: this is the authorization code
+    // strategy's configuration, and the site now signs in with the password
+    // one, which druxt-auth registers and needs no override. Keying it by the
+    // strategy in use would replace that registration with this.
+    strategies: { 'drupal-authorization_code': OAUTH_STRATEGY },
   },
 
   // changeOrigin: false keeps the browser's host, so Drupal's JSON:API links
@@ -288,6 +300,13 @@ export default {
       '/jsonapi',
       '/router/translate-path',
       '/sites/default/files',
+      // druxt-auth registers these itself from `druxt.proxy.api`, but its
+      // entries do not survive in this app's module order: `/oauth/authorize`
+      // answered 404 here while its own token middleware worked. Listed until
+      // that is understood, because a missing userinfo proxy fails the
+      // sign-in after the token is already issued.
+      '/oauth/authorize',
+      '/oauth/userinfo',
       '/oauth/token',
       '/oauth/revoke',
       '/druxt-docs',
@@ -300,7 +319,14 @@ export default {
     // cookie is made this origin's: no Domain, and Secure only over HTTPS,
     // where a browser will store it.
     [
-      (pathname) => shouldProxy(pathname, { except: [PROFILE_PATH, LOGIN_PATH] }),
+      // The login path is excepted for GET alone, so the page druxt-auth adds
+      // renders while the form still posts to Drupal. Excepting it for every
+      // method sends the POST to Nuxt, which answers 200 and sets no session,
+      // so a sign-in appears to work and Drupal never hears of it.
+      (pathname, req) =>
+        shouldProxy(pathname, {
+          except: [PROFILE_PATH, ...((req || {}).method === 'GET' ? [LOGIN_PATH] : [])],
+        }),
       {
         target: DRUXT_BASE_URL,
         changeOrigin: false,
