@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ * Hooks for the druxtjs.org frontend's integration with Drupal.
+ */
+
+declare(strict_types=1);
+
+use Drupal\simple_oauth\Authentication\TokenAuthUserInterface;
+
+/**
+ * Implements hook_druxt_resources_alter().
+ *
+ * Adds the resources a consumer may read beyond the ones everybody may.
+ *
+ * `druxt.settings` has one audience: everything it lists is readable by
+ * whoever holds `access druxt resources`, which here is anonymous. That is
+ * right for the theme, the menus and the workflow, and wrong for anything
+ * describing who may do what. This gives the list a second axis, so a
+ * resource can be readable by a named consumer without being readable by the
+ * world.
+ *
+ * The consumer is taken from the OAuth token and from nowhere else. The
+ * consumers negotiator reads an `X-Consumer-ID` header and a `consumerId`
+ * query parameter, both of which any caller may set, so it names a consumer
+ * without proving one. A token's `client` was issued by Drupal.
+ *
+ * This is a proof of concept for druxt issue 15, which designs the same axis
+ * as a `content_resources` key with per-consumer overrides. The hook runs
+ * after `druxt_resources()` has rechecked the stored list, which is where the
+ * module documents that a module may expose what configuration may not.
+ *
+ * @param string[] $resources
+ *   The resource type ids, altered in place.
+ */
+function druxtjsorg_druxt_resources_alter(array &$resources): void {
+  $account = \Drupal::currentUser()->getAccount();
+  if (!$account instanceof TokenAuthUserInterface) {
+    return;
+  }
+
+  $consumer = $account->getConsumer();
+  $scoped = \Drupal::config('druxtjsorg.settings')->get('consumer_resources') ?? [];
+  $extra = $scoped[$consumer->getClientId()] ?? [];
+  if (!$extra) {
+    return;
+  }
+
+  $resources = array_values(array_unique(array_merge($resources, $extra)));
+}
