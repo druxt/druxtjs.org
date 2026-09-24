@@ -46,20 +46,25 @@ const DRUXT_BASE_URL = process.env.DRUXT_BASE_URL || 'http://127.0.0.1:8899'
 const CONSUMER_ID = process.env.DRUXT_CONSUMER_ID || 'druxtjs_org'
 
 /**
- * Editor sign-in: druxt-auth's authorization code strategy, as a public
- * client. The site's own form signs in through Drupal's JSON login, and with
- * `druxt.proxy.api` on, every step after it runs on this origin, so the
- * session the login starts is the one the authorize step finds. A session
- * left open in the browser is ended through drupal/logout_token's route.
+ * Editor sign-in: druxt-auth's password grant, with a Drupal session opened
+ * alongside it. A session left open in the browser is ended through
+ * drupal/logout_token's route. The scopes are every role an editor might
+ * hold: a token carries only those the account also has.
  */
-// Every role scope an editor might hold: a token carries only the roles its
-// scopes name that the account also has, so each person gets exactly their own.
 // `druxt.proxy.api` below is what turns the module's own proxy entries on: it
 // takes `/user/login`, `/user/logout` and `/user/password` for POST alone, and
 // `/oauth/authorize` and `/oauth/userinfo` whole, so the site lists none of
 // them itself. POST alone is what lets the login page it adds render at
 // `/user/login` while that form still posts to Drupal.
-const OAUTH_CLIENT = { clientId: CONSUMER_ID, scope: ['editor', 'contributor', 'administrator'] }
+const OAUTH_CLIENT = {
+  clientId: CONSUMER_ID,
+  scope: ['editor', 'contributor', 'administrator'],
+  // The password grant issues a token and nothing else, and this site's
+  // editing is Drupal's own forms proxied onto this origin, which need a
+  // Drupal session. With this on, the credentials open one through the
+  // proxied login before the grant, and signing out ends both.
+  passwordSession: true,
+}
 const OAUTH_STRATEGY = { endpoints: { logoutToken: '/session/logout/token' } }
 
 // Drupal's login, its editing screens and their assets, served on this origin
@@ -286,7 +291,7 @@ export default {
   // started from, or home; the callback page is the site's own.
   auth: {
     redirect: { login: '/login', logout: '/', home: '/', callback: '/callback' },
-    strategies: { 'drupal-authorization_code': OAUTH_STRATEGY },
+    strategies: { 'drupal-password': OAUTH_STRATEGY },
   },
 
   // changeOrigin: false keeps the browser's host, so Drupal's JSON:API links
@@ -298,6 +303,13 @@ export default {
       '/jsonapi',
       '/router/translate-path',
       '/sites/default/files',
+      // druxt-auth registers these itself from `druxt.proxy.api`, but its
+      // entries do not survive in this app's module order: `/oauth/authorize`
+      // answered 404 here while its own token middleware worked. Listed until
+      // that is understood, because a missing userinfo proxy fails the
+      // sign-in after the token is already issued.
+      '/oauth/authorize',
+      '/oauth/userinfo',
       '/oauth/token',
       '/oauth/revoke',
       '/druxt-docs',
@@ -310,7 +322,14 @@ export default {
     // cookie is made this origin's: no Domain, and Secure only over HTTPS,
     // where a browser will store it.
     [
-      (pathname) => shouldProxy(pathname, { except: [PROFILE_PATH, LOGIN_PATH] }),
+      // The login path is excepted for GET alone, so the page druxt-auth adds
+      // renders while the form still posts to Drupal. Excepting it for every
+      // method sends the POST to Nuxt, which answers 200 and sets no session,
+      // so a sign-in appears to work and Drupal never hears of it.
+      (pathname, req) =>
+        shouldProxy(pathname, {
+          except: [PROFILE_PATH, ...((req || {}).method === 'GET' ? [LOGIN_PATH] : [])],
+        }),
       {
         target: DRUXT_BASE_URL,
         changeOrigin: false,
