@@ -15,3 +15,4 @@ resources:
   - view--view
   - editor--editor
   - filter_format--filter_format
+  - workflow--workflow
