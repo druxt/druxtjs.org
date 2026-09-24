@@ -52,10 +52,9 @@
 
     <AppSignInDialog />
 
-    <!-- The editor toolbar renders only for a signed-in editor; the padding
-         keeps the fixed bar off the footer when it is there. -->
-    <AppEditorToolbar />
-    <div v-if="$auth && $auth.loggedIn" class="h-12" aria-hidden="true" />
+    <!-- For a signed-in editor: the revision pill and the diff drawn on the page. -->
+    <AppRevisionPill />
+    <AppPageDiff />
   </div>
 </template>
 

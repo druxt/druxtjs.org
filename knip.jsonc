@@ -6,6 +6,7 @@
   "project": ["scripts/**/*.mjs", "tests/**/*.mjs"],
   "ignore": ["nuxt/**", "drupal/**", ".docs-source/**", ".docs-ir/**"],
   // node --test's built-in reporters, which knip reads as packages in the
-  // test:coverage script.
-  "ignoreDependencies": ["junit", "spec"]
+  // test:coverage script, and the frontend's diff package, which a test
+  // reaches through nuxt/lib/diff.js: it belongs to nuxt/'s manifest.
+  "ignoreDependencies": ["junit", "spec", "@druxt-contrib/diff"]
 }

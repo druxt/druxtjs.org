@@ -1,0 +1,19 @@
+uuid: fa1e18b4-ef4d-4e66-8d1d-a7c77abc314d
+langcode: en
+status: true
+dependencies: {  }
+id: administrator
+name: administrator
+description: 'Everything an administrator may do, for someone who is an administrator.'
+grant_types:
+  authorization_code:
+    status: true
+    description: 'Everything an administrator may do, for someone who is an administrator.'
+  refresh_token:
+    status: true
+    description: 'Everything an administrator may do, for someone who is an administrator.'
+umbrella: false
+parent: null
+granularity_id: role
+granularity_configuration:
+  role: administrator

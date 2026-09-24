@@ -71,13 +71,14 @@ const sameOrigin = (url) => {
  * The account as the menu shows it, from the userinfo claims.
  *
  * @param {object} [user] - `$auth.user`.
- * @returns {{ name: string, username: string|null, picture: string|null, initials: string, hue: number, role: string|null, id: string|null }} The account.
+ * @returns {{ name: string, username: string|null, email: string|null, picture: string|null, initials: string, hue: number, role: string|null, id: string|null }} The account.
  */
 const accountOf = (user) => {
   const claims = user || {}
   const name = claims.name || claims.preferred_username || claims.email || 'Signed in'
   return {
     id: claims.sub ? String(claims.sub) : null,
+    email: claims.email || null,
     name,
     username: claims.preferred_username || null,
     picture: sameOrigin(claims.picture),

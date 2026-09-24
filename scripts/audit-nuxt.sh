@@ -10,6 +10,9 @@ export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 cp nuxt/package.json nuxt/yarn.lock "$work/"
+# Packages carried in the tree rather than installed from the registry: the
+# lockfile resolves to them by path, so the copy cannot install without them.
+[ -d nuxt/vendor ] && cp -R nuxt/vendor "$work/vendor"
 printf 'nodeLinker: node-modules\nenableGlobalCache: true\n' > "$work/.yarnrc.yml"
 cd "$work"
 corepack yarn@4.9.2 install --mode=update-lockfile > /dev/null

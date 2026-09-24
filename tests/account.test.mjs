@@ -55,6 +55,7 @@ describe('accountOf', () => {
         sub: '3',
         name: 'demo-editor',
         preferred_username: 'demo-editor',
+        email: 'demo-editor@example.com',
         picture: 'http://127.0.0.1:8921/sites/default/files/styles/thumbnail/p.png?itok=x',
         roles: ['editor'],
       }),
@@ -62,6 +63,7 @@ describe('accountOf', () => {
         id: '3',
         name: 'demo-editor',
         username: 'demo-editor',
+        email: 'demo-editor@example.com',
         picture: '/sites/default/files/styles/thumbnail/p.png?itok=x',
         initials: 'DE',
         hue: 0,
@@ -74,6 +76,7 @@ describe('accountOf', () => {
     const account = accountOf(undefined)
     assert.equal(account.name, 'Signed in')
     assert.equal(account.picture, null)
+    assert.equal(account.email, null)
     assert.equal(account.id, null)
   })
 })

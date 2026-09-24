@@ -1,6 +1,6 @@
 <template>
   <article>
-    <AppPageHeader :title="document.title" :description="document.description" :badges="editorBadges" :entity="operationsEntity" />
+    <AppPageHeader :title="document.title" :description="document.description" :entity="operationsEntity" />
     <AppProse v-if="!drupal" :document="document" />
     <!-- Keyed so each page gets a fresh AppProse, whose enhance() runs on mount. -->
     <AppProse v-else :key="document.path" :title="document.title">
@@ -14,6 +14,7 @@
 import { seoHead } from '~/utils/seo'
 import { documentDescription } from '~/utils/content'
 import { fetchDrupalPage, sectionOf } from '~/lib/drupal-document'
+import { versionFromQuery } from '~/lib/revisions'
 
 /** Pages docgen writes into the authored sections; they come from its corpus, not Drupal. */
 const GENERATED = ['/how-to/contributing']
@@ -31,6 +32,13 @@ export default {
     const path = route.path.replace(/\/$/, '') || '/'
 
     if ($config.docsSource !== 'markdown' && !GENERATED.includes(path)) {
+      // A shared URL carries the revision and whether its diff is on, so the
+      // page a reader was sent is the page they are sent to.
+      if (store.$auth && store.$auth.loggedIn) {
+        const asked = versionFromQuery(route.query)
+        if (asked) store.commit('setEditorVersion', asked)
+        store.commit('setEditorCompare', Boolean(route.query.diff))
+      }
       const document = await fetchDrupalPage(store, path)
       if (!document) return error({ statusCode: 404, message: 'Document not found' })
       // Drupal matches aliases in any case; one spelling is the page.
@@ -79,20 +87,6 @@ export default {
     operationsEntity() {
       if (!this.drupal || !this.document.uuid) return null
       return { type: this.document.type, id: this.document.uuid, attributes: { title: this.document.title }, state: this.document.moderationState }
-    },
-    /**
-     * A badge when a signed-in editor is viewing something other than the
-     * published page: the latest draft, or a specific revision.
-     */
-    editorBadges() {
-      if (!(this.$auth && this.$auth.loggedIn)) return []
-      const version = this.$store.state.editor.version
-      if (version === 'published') return []
-      if (version === 'working-copy') {
-        const draft = (this.document || {}).moderationState && this.document.moderationState !== 'published'
-        return draft ? [{ text: 'Draft', class: 'badge-warning' }] : []
-      }
-      return [{ text: `Revision ${String(version).replace(/^id:/, '')}`, class: 'badge-warning badge-outline' }]
     },
     /** Re-mounts DruxtEntity when the editor switches revision, so it re-fetches. */
     druxtKey() {

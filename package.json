@@ -51,5 +51,8 @@
     "knip": "2.43.0",
     "markdownlint-cli2": "0.10.0",
     "prettier": "3.3.3"
+  },
+  "dependencies": {
+    "@druxt-contrib/diff": "file:nuxt/vendor/druxt-diff"
   }
 }

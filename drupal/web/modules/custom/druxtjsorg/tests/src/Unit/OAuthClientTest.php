@@ -25,7 +25,7 @@ final class OAuthClientTest extends UnitTestCase {
     self::assertTrue($values['pkce']);
     self::assertTrue($values['automatic_authorization']);
     self::assertSame(['authorization_code', 'refresh_token'], $values['grant_types']);
-    self::assertSame(['authenticated', 'editor', 'contributor'], $values['authorization_code_scopes']);
+    self::assertSame(['authenticated', 'editor', 'contributor', 'administrator'], $values['authorization_code_scopes']);
     self::assertSame([], $values['redirect']);
   }
 
