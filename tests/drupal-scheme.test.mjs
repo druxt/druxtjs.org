@@ -5,8 +5,10 @@
 // when the sign-in is refused. A check placed after it is dead code that
 // still reads like a fix.
 //
-// The scheme imports `~auth/runtime`, a webpack alias with no meaning to Node,
-// so the module is loaded here with that import pointed at a stub.
+// The scheme is druxt-auth's own file, read from the installed package rather
+// than from a copy: the site carried one while the fix for a session it did
+// not open was unreleased. It imports `~auth/runtime`, a webpack alias with no
+// meaning to Node, so it is loaded here with that import pointed at a stub.
 //
 //   node --test "tests/*.test.mjs"
 
@@ -43,7 +45,7 @@ const loadScheme = async () => {
     }`
   )
   const source = readFileSync(
-    new URL('../nuxt/modules/druxt-auth/drupal-scheme.js', import.meta.url),
+    new URL('../nuxt/node_modules/druxt-auth/templates/drupal-scheme.js', import.meta.url),
     'utf8'
   ).replace("from '~auth/runtime'", "from './runtime.mjs'")
   const file = path.join(dir, 'scheme.mjs')
@@ -137,7 +139,7 @@ beforeEach(() => {
 
 describe('signing in with credentials', () => {
   test('a session nobody else holds signs in, then goes to authorize', async () => {
-    scheme = schemeWhere({ logout_token: 'lt-1' })
+    scheme = schemeWhere({ current_user: { uid: '2', name: 'editor' }, logout_token: 'lt-1' })
     await scheme.login({ credentials: { name: 'editor', pass: 'x' } })
 
     assert.equal(scheme.authorizeCalls.length, 1, 'the authorize step runs')
@@ -148,13 +150,16 @@ describe('signing in with credentials', () => {
   // reusing it authorizes whoever left it there. The refusal has to come
   // before the redirect, because there is no after.
   test('a session somebody else left open is refused, and never authorized', async () => {
-    scheme = schemeWhere(OPEN_SESSION)
+    // No backend route to end it, which is Drupal core on its own: its JSON
+    // logout wants the token issued at login and this session never had one.
+    // The flag is asserted, not the wording, which the scheme says is not a
+    // contract precisely so a form can tell this apart without matching text.
+    scheme = schemeWith({ login: OPEN_SESSION, endpoint: null })
 
     await assert.rejects(
       () => scheme.login({ credentials: { name: 'editor', pass: 'x' } }),
       (error) => {
         assert.equal(error.sessionInUse, true, 'the form can tell this apart')
-        assert.match(error.message, /Sign out, then sign in again/)
         return true
       }
     )
@@ -181,8 +186,28 @@ describe('signing in without credentials', () => {
 })
 
 describe('drupalLogin', () => {
+  // Drupal's JSON login answers with the account and a logout token. A 200
+  // from anywhere else, the site's own routes when the proxy is wrong, would
+  // otherwise read as a sign-in these credentials never made.
+  test('an answer that is not Drupal is refused, not taken as a sign-in', async () => {
+    for (const answer of [{}, { current_user: { uid: '2' } }, { logout_token: 'lt' }, null]) {
+      const scheme = schemeWhere(answer)
+      await assert.rejects(
+        () => scheme.drupalLogin({ name: 'editor', pass: 'x' }),
+        /did not answer with a session/,
+        JSON.stringify(answer)
+      )
+    }
+  })
+
   test('says whether it reused a session rather than starting one', async () => {
-    assert.equal(await schemeWhere({ logout_token: 'lt' }).drupalLogin({}), false)
+    assert.equal(
+      await schemeWhere({
+        current_user: { uid: '2', name: 'editor' },
+        logout_token: 'lt',
+      }).drupalLogin({}),
+      false
+    )
     assert.equal(await schemeWhere(OPEN_SESSION).drupalLogin({}), true)
   })
 
@@ -200,7 +225,7 @@ describe('a session this browser started itself', () => {
   test('is ended and signed in again, rather than locking the sign-in out', async () => {
     const scheme = schemeWith({
       token: 'lt-1',
-      login: [OPEN_SESSION, { logout_token: 'lt-2' }],
+      login: [OPEN_SESSION, { current_user: { uid: '2', name: 'editor' }, logout_token: 'lt-2' }],
     })
 
     await scheme.login({ credentials: { name: 'editor', pass: 'x' } })
@@ -211,7 +236,9 @@ describe('a session this browser started itself', () => {
   })
 
   test('a stranger’s is closed rather than borrowed, when the backend can close it', async () => {
-    const scheme = schemeWith({ login: [OPEN_SESSION, { logout_token: 'lt-2' }] })
+    const scheme = schemeWith({
+      login: [OPEN_SESSION, { current_user: { uid: '2', name: 'editor' }, logout_token: 'lt-2' }],
+    })
 
     await scheme.login({ credentials: { name: 'editor', pass: 'x' } })
 
@@ -268,10 +295,18 @@ describe('ending the Drupal session', () => {
     assert.equal(store['drupal.logout_token'], undefined)
   })
 
-  test('falls back to the backend route when there is no token', async () => {
+  test("does nothing without a token: the backend route is login()'s to call", async () => {
     const scheme = schemeWith({ token: null })
-    assert.equal(await scheme.drupalLogout(), true)
+    assert.equal(await scheme.drupalLogout(), false)
+    assert.deepEqual(scheme.calls, [], 'no request is made at all')
+  })
+
+  test('endForeignSession reaches the route, with the header a write needs', async () => {
+    const scheme = schemeWith({ token: null })
+    assert.equal(await scheme.endForeignSession(), true)
     assert.deepEqual(scheme.calls, ['csrf', 'session'])
+    const headers = scheme.sentHeaders[scheme.calls.indexOf('session')]
+    assert.equal(headers['X-CSRF-Token'], 'csrf-1', 'a protected route would refuse without it')
   })
 
   test('does nothing at all when no route is configured either', async () => {
@@ -280,13 +315,8 @@ describe('ending the Drupal session', () => {
     assert.deepEqual(scheme.calls, [])
   })
 
-  test('a route that answers a refusal means the session is already gone', async () => {
-    const scheme = schemeWith({ token: null, sessionLogout: refusal(403, 'Not logged in.') })
-    assert.equal(await scheme.drupalLogout(), true)
-  })
-
-  test('a route that cannot be reached says nothing, so nothing is claimed', async () => {
+  test('a route that cannot be reached is not taken as an ending', async () => {
     const scheme = schemeWith({ token: null, sessionLogout: new Error('Network Error') })
-    assert.equal(await scheme.drupalLogout(), false)
+    assert.equal(await scheme.endForeignSession(), false)
   })
 })

@@ -38,21 +38,38 @@ const CONSUMER_ID = process.env.DRUXT_CONSUMER_ID || 'druxtjs_org'
  * runs on this origin through the proxy, so the Drupal session the login
  * starts is the one the authorize step finds, and nothing of Drupal's is
  * shown. druxt-auth builds the endpoints on the server's base URL, which is
- * an internal service name in production, so the strategy is set here.
+ * an internal service name in production and unreachable from a browser, so
+ * the strategy is set here. The scheme itself is the module's own file: the
+ * site carried a copy while the fix for a session it did not open was
+ * unreleased, and 0.5.0 carries it.
  */
 // Every role scope an editor might hold: a token carries only the roles its
 // scopes name that the account also has, so each person gets exactly their own.
 const OAUTH_CLIENT = { clientId: CONSUMER_ID, scope: ['editor', 'contributor', 'administrator'] }
 const OAUTH_STRATEGY = {
-  scheme: '~/modules/druxt-auth/drupal-scheme.js',
+  // The package's `exports` map does not expose `./templates`, so the file is
+  // reached from the package root the way the module reaches it itself.
+  scheme: require('path').join(
+    require('path').dirname(require.resolve('druxt-auth')),
+    '..',
+    'templates',
+    'drupal-scheme.js',
+  ),
+  // Credentials set the session cookie on this origin, so the authorize step
+  // has to come from here too. Without them the scheme uses `authorization`,
+  // and that is this origin as well, because Drupal's own login form is
+  // proxied and a reader should never leave the site to see it.
+  credentials: true,
   endpoints: {
     authorization: '/oauth/authorize',
+    authorizationSameOrigin: '/oauth/authorize',
     token: '/oauth/token',
     userInfo: '/oauth/userinfo',
     // druxt_docs' own, because core offers no way to end a session that did
     // not log in here: its JSON logout wants the token issued at login. Both
     // this and /session/token are proxied, so the session cookie reaches them.
     sessionLogout: '/druxt-docs/session',
+    sessionLogoutMethod: 'delete',
   },
   ...OAUTH_CLIENT,
   responseType: 'code',

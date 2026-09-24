@@ -10944,15 +10944,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"druxt-auth@npm:0.4.0":
-  version: 0.4.0
-  resolution: "druxt-auth@npm:0.4.0"
+"druxt-auth@npm:0.5.0-dev-20260924072142":
+  version: 0.5.0-dev-20260924072142
+  resolution: "druxt-auth@npm:0.5.0-dev-20260924072142"
   dependencies:
     "@nuxtjs/auth-next": ^5.0.0-1667386184.dfbbb54
   peerDependencies:
     axios: ^0.27.2
     body-parser: ^1.20.2
-  checksum: 1376737c76416d0217da63e6d65b3d3bbd24e541c4fd09911b0f8d7142411692ed6038a77828a1355b047da9afd1c09e4b1fbbc43963fb3d80bdfc752cf98659
+  checksum: 8700eabd3070ccc5b2bce0fedac2b3fbbe2ad9b2d07ace39d1e871feca37ad5a142acd4913a12b51dfa5751903e2370ecc174823a698e0ee6b886e532a267462
   languageName: node
   linkType: hard
 
@@ -11275,7 +11275,7 @@ __metadata:
     daisyui: 1.25.4
     drupal-jsonapi-params: 2.3.2
     druxt: 0.24.0
-    druxt-auth: 0.4.0
+    druxt-auth: 0.5.0-dev-20260924072142
     druxt-blocks: 0.17.3
     druxt-breadcrumb: 0.17.2
     druxt-entity: 0.28.1
