@@ -10944,27 +10944,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"druxt-auth@npm:0.5.0-dev-20260924072142":
-  version: 0.5.0-dev-20260924072142
-  resolution: "druxt-auth@npm:0.5.0-dev-20260924072142"
+"druxt-auth@file:vendor/druxt-auth::locator=druxtjs-org%40workspace%3A.":
+  version: 0.4.0
+  resolution: "druxt-auth@file:vendor/druxt-auth#vendor/druxt-auth::hash=26851a&locator=druxtjs-org%40workspace%3A."
   dependencies:
     "@nuxtjs/auth-next": ^5.0.0-1667386184.dfbbb54
   peerDependencies:
     axios: ^0.27.2
     body-parser: ^1.20.2
-  checksum: 8700eabd3070ccc5b2bce0fedac2b3fbbe2ad9b2d07ace39d1e871feca37ad5a142acd4913a12b51dfa5751903e2370ecc174823a698e0ee6b886e532a267462
-  languageName: node
-  linkType: hard
-
-"druxt-auth@patch:druxt-auth@npm%3A0.5.0-dev-20260924072142#./.yarn/patches/druxt-auth-npm-0.5.0-dev-20260924072142-bfcc2b8dfd.patch::locator=druxtjs-org%40workspace%3A.":
-  version: 0.5.0-dev-20260924072142
-  resolution: "druxt-auth@patch:druxt-auth@npm%3A0.5.0-dev-20260924072142#./.yarn/patches/druxt-auth-npm-0.5.0-dev-20260924072142-bfcc2b8dfd.patch::version=0.5.0-dev-20260924072142&hash=a9255b&locator=druxtjs-org%40workspace%3A."
-  dependencies:
-    "@nuxtjs/auth-next": ^5.0.0-1667386184.dfbbb54
-  peerDependencies:
-    axios: ^0.27.2
-    body-parser: ^1.20.2
-  checksum: bda9836dfc4f45aa69df1b1da9e64db3b0af47153f545bd9dbb3e228bcf83c7b2812a88268395054a32a6b1fbd564d6019fc2ab0232558d399c992d71b5f9edb
+  checksum: 21ca875bc6de135fd05d109504383a6fb40ffebc327b08ff71f5e65c27fa03d6b554793e6d22bf4673143d8050f11bda72d0cfe3c20b454934208b9ebac44a93
   languageName: node
   linkType: hard
 
@@ -11287,7 +11275,7 @@ __metadata:
     daisyui: 1.25.4
     drupal-jsonapi-params: 2.3.2
     druxt: 0.24.0
-    druxt-auth: 0.5.0-dev-20260924072142
+    druxt-auth: "file:vendor/druxt-auth"
     druxt-blocks: 0.17.3
     druxt-breadcrumb: 0.17.2
     druxt-entity: 0.28.1
