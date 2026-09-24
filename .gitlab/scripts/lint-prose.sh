@@ -138,6 +138,15 @@ elif [ -n "${CI_MERGE_REQUEST_IID:-}" ]; then
   exit 2
 fi
 
+# A review bot writes its own summary into the description, and that text is
+# nobody's to answer for here: the checks read what a person wrote. Anything
+# between an auto-generated marker and its end is dropped before linting.
+if [ -f "$inputs/merge-request.md" ]; then
+  awk -f "$(dirname "$0")/strip-generated.awk" "$inputs/merge-request.md" \
+    > "$inputs/merge-request.trimmed" &&
+    mv "$inputs/merge-request.trimmed" "$inputs/merge-request.md"
+fi
+
 generated=()
 for f in "$inputs"/commits/*.md "$inputs/merge-request.md"; do
   [ -f "$f" ] && generated+=("${f#"$inputs"/}")

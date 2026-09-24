@@ -1,0 +1,6 @@
+services:
+  druxtjsorg.editor_hint:
+    class: Drupal\druxtjsorg\EventSubscriber\EditorHintSubscriber
+    arguments: ['@current_user']
+    tags:
+      - { name: event_subscriber }

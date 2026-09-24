@@ -22,6 +22,7 @@ source:
       redirect:
         - 'https://druxtjs.org/callback'
         - 'http://localhost:3000/callback'
+        - 'http://localhost:3939/callback'
   ids:
     id:
       type: string

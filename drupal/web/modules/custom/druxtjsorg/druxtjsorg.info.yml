@@ -1,0 +1,8 @@
+name: druxtjs.org
+type: module
+description: 'Site-specific additions to the druxtjs.org backend, trialled here before any reaches the druxt module.'
+package: DruxtJS
+core_version_requirement: ^11
+dependencies:
+  - drupal:jsonapi
+  - jsonapi_hypermedia:jsonapi_hypermedia

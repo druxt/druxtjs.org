@@ -2,6 +2,7 @@
 // Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
 const { serviceRoute } = require('./server/backend')
+const { AUTH_COOKIE_PREFIX, AUTH_STRATEGY } = require('./lib/auth')
 const { syncDruxtComponents } = require('./lib/sync-druxt-components')
 
 // The id is interpolated into an inline script, so check its shape first.
@@ -26,6 +27,41 @@ const druxtVersion = JSON.parse(
 
 /** The Drupal backend Druxt reads, and proxies onto this origin. */
 const DRUXT_BASE_URL = process.env.DRUXT_BASE_URL || 'http://127.0.0.1:8899'
+
+/** The consumer this site is to Drupal: its decoupled settings and its OAuth client. */
+const CONSUMER_ID = process.env.DRUXT_CONSUMER_ID || 'druxtjs_org'
+
+/**
+ * Editor sign-in: the authorization code grant with PKCE, as a public client,
+ * on druxt-auth's Drupal scheme. The site's own form signs in through
+ * Drupal's JSON login, and every step after it (authorize, token, userinfo)
+ * runs on this origin through the proxy, so the Drupal session the login
+ * starts is the one the authorize step finds, and nothing of Drupal's is
+ * shown. druxt-auth builds the endpoints on the server's base URL, which is
+ * an internal service name in production, so the strategy is set here.
+ */
+const OAUTH_CLIENT = { clientId: CONSUMER_ID, scope: ['editor'] }
+const OAUTH_STRATEGY = {
+  scheme: '~/modules/druxt-auth/drupal-scheme.js',
+  endpoints: {
+    authorization: '/oauth/authorize',
+    token: '/oauth/token',
+    userInfo: '/oauth/userinfo',
+    // druxt_docs' own, because core offers no way to end a session that did
+    // not log in here: its JSON logout wants the token issued at login. Both
+    // this and /session/token are proxied, so the session cookie reaches them.
+    sessionLogout: '/druxt-docs/session',
+  },
+  ...OAUTH_CLIENT,
+  responseType: 'code',
+  grantType: 'authorization_code',
+  codeChallengeMethod: 'S256',
+}
+
+// Drupal's login, its editing screens and their assets, served on this origin
+// so an editor's session is first party. The same test tells the page cache
+// in server/start.js which requests are Drupal's, so none of them is stored.
+const { shouldProxy } = require('./modules/druxt-admin/proxy')
 
 export default {
   // Pages render live from Drupal. In production, server/start.js serves
@@ -80,12 +116,19 @@ export default {
   },
 
   css: ['~/assets/css/app.css', '~/assets/css/code.css'],
+  // Read by server/start.js: a request Drupal answers is never stored.
+  docsPassThrough: (path) => shouldProxy(path),
+
   plugins: [
+    '~/plugins/entity-operations.js',
     '~/plugins/color-mode-theme.client.js',
     '~/plugins/analytics.client.js',
     '~/plugins/chunk-reload.client.js',
     '~/plugins/content-links.client.js',
     '~/plugins/mermaid.client.js',
+    // After the Druxt and auth plugins the modules add: it wraps the client.
+    '~/plugins/working-copy.js',
+    '~/plugins/sign-out.client.js',
   ],
   components: true,
   // Mirrors the SITE_ORIGIN override into the client bundle so hydration
@@ -154,13 +197,15 @@ export default {
     // Every core module, so the playground can render every component. Its
     // layout is only added to a site without one.
     'druxt-site',
+    // Editor sign-in. The strategy it registers is replaced by `auth` below.
+    ['druxt-auth', OAUTH_CLIENT],
     // The consumer's decoupled settings and theme manifest, baked in at build.
     // A copy of the unreleased @druxt-contrib/decoupled-settings module.
     '~/modules/decoupled-settings',
   ],
 
   decoupledSettings: {
-    consumerId: process.env.DRUXT_CONSUMER_ID || 'druxtjs_org',
+    consumerId: CONSUMER_ID,
     // Each page sets its own title and description.
     applyHead: false,
   },
@@ -184,13 +229,50 @@ export default {
     },
   },
 
+  // @nuxtjs/auth-next: a signed-in editor is sent back to the page they
+  // started from, or home; the callback page is the site's own.
+  auth: {
+    redirect: { login: '/login', logout: '/', home: '/', callback: '/callback' },
+    cookie: { prefix: AUTH_COOKIE_PREFIX },
+    strategies: { [AUTH_STRATEGY]: OAUTH_STRATEGY },
+  },
+
   // changeOrigin: false keeps the browser's host, so Drupal's JSON:API links
-  // point at this origin. Registered before Druxt's own proxy entries.
+  // point at this origin. Registered before Druxt's own proxy entries. The
+  // two OAuth endpoints the browser calls are here too: the proxy module
+  // reads this list before druxt-auth adds its own entry.
   proxy: [
-    ...['/jsonapi', '/router/translate-path', '/sites/default/files'].map((context) => [
+    ...[
+      '/jsonapi',
+      '/router/translate-path',
+      '/sites/default/files',
+      '/oauth/authorize',
+      '/oauth/token',
+      '/oauth/userinfo',
+      '/oauth/revoke',
+      '/druxt-docs',
+    ].map((context) => [
       context,
       { target: DRUXT_BASE_URL, changeOrigin: false },
     ]),
+    // Drupal's login and editing screens, for an editor. The Host is kept, so
+    // Drupal builds its links and redirects for this origin, and its session
+    // cookie is made this origin's: no Domain, and Secure only over HTTPS,
+    // where a browser will store it.
+    [
+      (pathname) => shouldProxy(pathname),
+      {
+        target: DRUXT_BASE_URL,
+        changeOrigin: false,
+        cookieDomainRewrite: '',
+        onProxyRes: (proxyRes, req) => {
+          const https = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https' || req.socket.encrypted
+          const cookies = proxyRes.headers['set-cookie']
+          if (https || !cookies) return
+          proxyRes.headers['set-cookie'] = cookies.map((cookie) => cookie.replace(/;\s*secure/gi, ''))
+        },
+      },
+    ],
     // The Umami demo backend, for the live component examples. Proxied so the
     // browser stays on this origin and Umami's CORS allowlist never applies.
     [

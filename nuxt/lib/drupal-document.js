@@ -8,7 +8,7 @@ export const PARAGRAPH_TYPES = ['docs_callout', 'docs_code', 'docs_diagram', 'do
 const INCLUDE = ['field_content', 'field_content.field_media', 'field_content.field_media.field_media_image']
 
 /** What this module reads from the page itself, beyond its display. */
-const PAGE_FIELDS = ['title', 'field_toc']
+const PAGE_FIELDS = ['title', 'field_toc', 'moderation_state', 'drupal_internal__nid']
 
 /** What Layout Paragraphs reads from every paragraph, whatever its display. */
 const PARAGRAPH_FIELDS = ['behavior_settings']
@@ -25,13 +25,21 @@ const displayFields = async (schema, type, mode) => {
  * for the same fields (`druxt.entity.query.schema` in nuxt.config.js), so
  * they find the page's resources complete in the store.
  *
+ * A versioned view (a draft or an older revision) is requested without its
+ * includes: a JSON:API include always returns the default revision, so a
+ * paragraph changed in that revision would come back published. Left out,
+ * each paragraph is fetched on its own at the revision the node names, by the
+ * page's body.
+ *
  * A query object, the form the Druxt store takes, rather than the query
  * builder: the root tests import this file without the app's packages.
  *
  * @param {object} schema - The `$druxtSchema` plugin.
- * @returns {Promise<{ include: string, fields: Object<string, string> }>} The query.
+ * @param {object} [options] - Options.
+ * @param {boolean} [options.versioned] - Whether the page is read at a non-published revision.
+ * @returns {Promise<{ include?: string, fields: Object<string, string> }>} The query.
  */
-export const pageQuery = async (schema) => {
+export const pageQuery = async (schema, { versioned = false } = {}) => {
   const fields = {
     'node--doc_page': [...PAGE_FIELDS, ...(await displayFields(schema, 'node--doc_page', 'full'))].join(','),
     'media--image': ['name', ...(await displayFields(schema, 'media--image', 'default'))].join(','),
@@ -40,7 +48,26 @@ export const pageQuery = async (schema) => {
     const type = `paragraph--${bundle}`
     fields[type] = [...PARAGRAPH_FIELDS, ...(await displayFields(schema, type, 'default'))].join(',')
   }
-  return { include: INCLUDE.join(','), fields }
+  return versioned ? { fields } : { include: INCLUDE.join(','), fields }
+}
+
+/**
+ * Drops a revision selection that belongs to the page being left.
+ *
+ * `id:<vid>` names a revision of one node, and the selection is one value for
+ * the whole app. Carried to the next page it asks for a revision that page does
+ * not have, and the page fails to load. `published` and `working-copy` name a
+ * view every page has, so they are kept. The history goes either way: it is the
+ * previous page's.
+ *
+ * @param {object} store - The Vuex store.
+ * @param {string} uuid - The page being read.
+ */
+const leaveRevisionBehind = (store, uuid) => {
+  const { page, version } = store.state.editor
+  if (!page || page.uuid === uuid) return
+  if (/^id:/.test(String(version))) store.commit('setEditorVersion', 'working-copy')
+  store.commit('setEditorRevisions', [])
 }
 
 /**
@@ -61,10 +88,37 @@ export const fetchDrupalPage = async (store, path) => {
   if (!entity || entity.type !== 'node') return null
 
   const type = `node--${entity.bundle}`
-  const query = await pageQuery(store.$druxtSchema)
-  const resource = await store.dispatch('druxt/getResource', { type, id: entity.uuid, query })
-  const data = resource && (resource.data || resource)
+  // A signed-in editor reads the page at the toolbar's selected version, and
+  // never from the store's cache, so switching version always re-fetches.
+  // See plugins/working-copy.js and the editor store state.
+  const editor = Boolean(store.$auth && store.$auth.loggedIn)
+  if (editor) leaveRevisionBehind(store, entity.uuid)
+  const versioned = editor && store.state.editor.version !== 'published'
+  const read = async (wanted) => {
+    const query = await pageQuery(store.$druxtSchema, { versioned: wanted })
+    const resource = await store.dispatch('druxt/getResource', { type, id: entity.uuid, query, bypassCache: editor })
+    return resource && (resource.data || resource)
+  }
+
+  let data = await read(versioned)
+  // Drupal refuses a revision this account may not read, and the Druxt store
+  // returns that as an empty resource. The published page is the one every
+  // reader may see, so it is shown instead of an error, and the toolbar is put
+  // back to the version being shown.
+  if (versioned && (!data || !data.attributes)) {
+    store.commit('setEditorVersion', 'published')
+    data = await read(false)
+  }
   if (!data || !data.attributes) throw new Error(`Drupal returned no ${type} for ${path}`)
+
+  // What the editor toolbar needs to name and switch this page's revisions.
+  if (editor) {
+    store.commit('setEditorPage', {
+      uuid: entity.uuid,
+      nid: data.attributes.drupal_internal__nid || null,
+      moderationState: data.attributes.moderation_state || null,
+    })
+  }
 
   return {
     path,
@@ -76,5 +130,6 @@ export const fetchDrupalPage = async (store, path) => {
     title: data.attributes.title,
     description: data.attributes.field_description || '',
     toc: data.attributes.field_toc || [],
+    moderationState: data.attributes.moderation_state || null,
   }
 }

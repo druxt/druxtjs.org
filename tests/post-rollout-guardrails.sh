@@ -314,5 +314,25 @@ for table in 'cache' 'cache_*' 'cachetags' 'sessions' 'watchdog'; do
   fi
 done
 
+# --------------------------------------------------------------------------
+# The frontend's consumer is set up after the updates, on every rollout,
+# copied database or installed site alike.
+# --------------------------------------------------------------------------
+
+line_of() { grep -n -F -- "$2" "$1/calls.log" | head -1 | cut -d: -f1; }
+
+for bootstrap in yes no; do
+  app="$(build_app "$bootstrap")"
+  run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
+  step="$( [ "$bootstrap" = yes ] && echo deploy || echo site:install )"
+  client="$(line_of "$app" 'druxtjsorg:oauth-client')"
+  update="$(line_of "$app" "$step")"
+  if [ -n "$client" ] && [ -n "$update" ] && [ "$client" -gt "$update" ]; then
+    ok "sets up the sign-in consumer after ${step}"
+  else
+    no "did not set up the sign-in consumer after ${step} (client line: ${client:-none}, ${step} line: ${update:-none})"
+  fi
+done
+
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]

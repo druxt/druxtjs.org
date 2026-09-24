@@ -22,6 +22,7 @@
         "drupal/environment_indicator": "^4.0",
         "drupal/field_group": "^4.0",
         "drupal/field_tokens": "^2.0",
+        "drupal/jsonapi_hypermedia": "^1.10",
         "drupal/jsonapi_node_preview": "^1.0@beta",
         "drupal/jsonapi_node_preview_tab": "^1.0.2",
         "drupal/jsonapi_resources": "^1.8",
@@ -36,6 +37,7 @@
         "drupal/pathauto": "^1.15",
         "drupal/redirect": "^1.13",
         "drupal/simple_oauth": "^6.1",
+        "drupal/simple_oauth_revoke": "^3.0",
         "drupal/token": "^1.17",
         "drush/drush": "^13",
         "js-cookie/js-cookie": "3.0.5"

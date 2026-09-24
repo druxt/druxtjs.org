@@ -8,12 +8,13 @@
  * stored once it has answered 200.
  */
 const { redirectFor } = require('./redirects')
+const { hasAuthCookie } = require('../lib/auth')
 const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')
 
 /** Paths the frontend serves that are not pages: its assets, its APIs and Drupal's. */
-const NOT_PAGES = /^\/(_nuxt|_content|_decoupled|__webpack_hmr|jsonapi|router|sites)(\/|$)/
+const NOT_PAGES = /^\/(_nuxt|_content|_decoupled|__webpack_hmr|jsonapi|oauth|router|sites)(\/|$)/
 const ASSET = /\.(js|mjs|css|map|json|xml|txt|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|webmanifest|pdf)$/i
 const LINK = /href="(\/[^"#?]*)/g
 
@@ -175,10 +176,11 @@ const crawl = async ({ seeds, store, concurrency = 2, limit = 5000 }) => {
  * @param {object|null} options.cache - The page cache, or null to render every page live.
  * @param {Function} options.live - Nuxt's renderer, `(req, res) => void`.
  * @param {boolean} [options.noindex] - Ask search engines not to index this environment.
+ * @param {Function} [options.passThrough] - True for a path the backend answers, which is never stored.
  * @returns {Function} An HTTP request listener.
  */
 const createHandler =
-  ({ cache, live, noindex = false, artefacts = null }) =>
+  ({ cache, live, noindex = false, artefacts = null, passThrough = null }) =>
   async (req, res) => {
     for (const [name, value] of Object.entries(SECURITY_HEADERS)) res.setHeader(name, value)
     if (String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https') {
@@ -209,12 +211,21 @@ const createHandler =
     // every `.xml` and `.txt` to the static middleware.
     if (artefacts && artefacts.isArtefact(req.method, pathname)) return artefacts.handle(req, res)
 
+    // Drupal's login and editing screens, proxied: an editor's page, never a stored one.
+    if (passThrough && passThrough(pathname)) return live(req, res)
     if (!isPage(req.method, pathname)) return live(req, res)
 
     // Canonical page URLs carry no trailing slash.
     if (pathname !== '/' && pathname.endsWith('/')) {
       res.writeHead(301, { Location: `/${pathname.replace(/^\/+|\/+$/g, '')}${search}` })
       return res.end()
+    }
+    // A signed-in editor may be shown a draft: rendered live, never stored,
+    // and not to be kept by anything between here and the browser.
+    if (hasAuthCookie(req.headers.cookie)) {
+      res.setHeader('X-Docs-Cache', 'BYPASS')
+      res.setHeader('Cache-Control', 'no-store')
+      return live(req, res)
     }
     // Only `live=1` renders past the store: any other query string, a campaign
     // tag say, is the same page and gets the stored copy.

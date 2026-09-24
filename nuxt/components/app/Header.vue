@@ -58,7 +58,9 @@
           <component :is="iconFor(link)" class="w-5 h-5" />
         </a>
 
-        <AppColorModeToggle />
+        <!-- A signed-in editor finds the colour mode in the account menu. -->
+        <AppColorModeToggle v-if="!($auth && $auth.loggedIn)" />
+        <AppAccountMenu />
       </div>
     </div>
   </header>

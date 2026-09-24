@@ -7,8 +7,10 @@ dependencies:
     - filter.format.docs_markdown
     - media.type.image
     - node.type.doc_page
+    - workflows.workflow.editorial
   module:
     - coffee
+    - content_moderation
     - environment_indicator
     - file
     - filter
@@ -17,6 +19,8 @@ dependencies:
     - navigation
     - node
     - paragraphs
+    - path
+    - simple_oauth
     - system
 id: editor
 label: Editor
@@ -35,6 +39,7 @@ permissions:
   - 'administer node published status'
   - 'create doc_page content'
   - 'create image media'
+  - 'create url aliases'
   - 'delete any doc_page content'
   - 'delete any image media'
   - 'delete doc_page revisions'
@@ -43,10 +48,18 @@ permissions:
   - 'edit any image media'
   - 'edit own doc_page content'
   - 'edit own image media'
+  - 'grant simple_oauth codes'
   - 'revert doc_page revisions'
+  - 'use editorial transition archive'
+  - 'use editorial transition archived_draft'
+  - 'use editorial transition archived_published'
+  - 'use editorial transition create_new_draft'
+  - 'use editorial transition publish'
   - 'use text format basic_html'
   - 'use text format docs_markdown'
+  - 'view any unpublished content'
   - 'view doc_page revisions'
+  - 'view latest version'
   - 'view media'
   - 'view own unpublished content'
   - 'view the administration theme'

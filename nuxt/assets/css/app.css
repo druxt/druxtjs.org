@@ -673,3 +673,200 @@ html {
   max-width: 100%;
   overflow-x: auto;
 }
+
+/* The account and page-operation menus: rows of an icon and a label, built
+   outside the prose so none of its list styling reaches them. */
+.account-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  height: 2.125rem;
+  padding: 0 0.625rem;
+  border-radius: 0.45rem;
+  font-size: 0.84375rem;
+  color: hsl(var(--bc));
+  text-align: left;
+}
+.account-item:hover {
+  background: hsl(var(--b2));
+}
+.account-item:hover .account-icon {
+  color: hsl(var(--pf));
+}
+.account-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: hsl(var(--bc) / 0.68);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.account-item.danger,
+.account-item.danger .account-icon {
+  /* daisyUI's error (#ff5724) is 3.2:1 on white; this clears 4.5:1. */
+  color: #c7431b;
+}
+[data-theme='dark'] .account-item.danger,
+[data-theme='dark'] .account-item.danger .account-icon {
+  color: hsl(var(--er));
+}
+
+/* Avatar initials, on a tint of one of the three brand hues. */
+.avatar-hue-0 {
+  background: color-mix(in srgb, #53b0eb 22%, hsl(var(--b1)));
+  color: hsl(var(--pf));
+}
+.avatar-hue-1 {
+  background: color-mix(in srgb, #41b883 24%, hsl(var(--b1)));
+  color: #1e7a54;
+}
+.avatar-hue-2 {
+  background: color-mix(in srgb, #37cdbe 24%, hsl(var(--b1)));
+  color: #17786f;
+}
+[data-theme='dark'] .avatar-hue-1 {
+  color: #68cb9f;
+}
+[data-theme='dark'] .avatar-hue-2 {
+  color: #5ddbcf;
+}
+.avatar-disc img {
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+}
+
+/* The sign-in form. */
+.sign-in-input {
+  height: 2.5rem;
+  width: 100%;
+  padding: 0 0.75rem;
+  border: 1px solid hsl(var(--b3));
+  border-radius: 0.5rem;
+  background: hsl(var(--b1));
+  font-size: 0.875rem;
+}
+.sign-in-input:focus {
+  outline: none !important;
+  border-color: hsl(var(--p));
+  box-shadow: 0 0 0 3px hsl(var(--p) / 0.25) !important;
+}
+.sign-in-invalid,
+.sign-in-invalid:focus {
+  border-color: #c7431b;
+  box-shadow: 0 0 0 3px rgb(199 67 27 / 0.2) !important;
+}
+.sign-in-error {
+  display: flex;
+  gap: 0.375rem;
+  align-items: flex-start;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #c7431b;
+}
+.sign-in-error .account-icon {
+  color: currentColor;
+  width: 0.95rem;
+  height: 0.95rem;
+  margin-top: 0.1rem;
+}
+[data-theme='dark'] .sign-in-error,
+[data-theme='dark'] .sign-in-invalid {
+  color: hsl(var(--er));
+  border-color: hsl(var(--er));
+}
+.sign-in-submit {
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background: hsl(var(--pf));
+  color: hsl(var(--pc));
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.sign-in-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.sign-in-spinner {
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: sign-in-spin 0.8s linear infinite;
+}
+@keyframes sign-in-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 639px) {
+  .sign-in-input,
+  .sign-in-submit {
+    height: 2.75rem;
+  }
+}
+/* iOS zooms into any field set below 16px when it takes focus, and leaves
+   the page zoomed, so the sheet runs off the side. 16px on anything touch. */
+@media (max-width: 639px), (pointer: coarse) {
+  .sign-in-input {
+    font-size: 1rem;
+  }
+}
+
+/* The page's Edit control: hidden until the page header is hovered or holds
+   focus, and always shown where nothing can hover. */
+.page-ops-slot {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.group:hover .page-ops-slot,
+.page-ops-slot:focus-within {
+  opacity: 1;
+}
+@media (hover: none) {
+  .page-ops-slot {
+    opacity: 1;
+  }
+}
+.page-ops-seg {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 100%;
+  color: hsl(var(--bc));
+}
+.page-ops-seg:hover {
+  background: hsl(var(--b2));
+}
+.page-ops-seg:hover .account-icon {
+  color: hsl(var(--pf));
+}
+.page-ops-delete {
+  background: #d64a1f;
+  color: #ffffff;
+}
+[data-theme='dark'] .page-ops-delete {
+  background: hsl(var(--er));
+  color: #1a0c07;
+}
+
+/* The sign-in sheet stays within the visible viewport, keyboard included,
+   and clears the home indicator. */
+.sign-in-sheet {
+  max-height: 100vh;
+  max-height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 640px) {
+  .sign-in-sheet {
+    padding-bottom: 1.5rem;
+  }
+}

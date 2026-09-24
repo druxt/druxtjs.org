@@ -49,6 +49,13 @@
     <AppSiteFooter :version="$config.druxtVersion ? 'v' + $config.druxtVersion : null" />
 
     <AppSearch :open="searchOpen" @close="searchOpen = false" />
+
+    <AppSignInDialog />
+
+    <!-- The editor toolbar renders only for a signed-in editor; the padding
+         keeps the fixed bar off the footer when it is there. -->
+    <AppEditorToolbar />
+    <div v-if="$auth && $auth.loggedIn" class="h-12" aria-hidden="true" />
   </div>
 </template>
 
@@ -64,7 +71,8 @@ export default {
   }),
 
   computed: {
-    isDocs: ({ $route }) => $route.path !== '/',
+    /** Home, sign-in and the OAuth callback are full-bleed; everything else is documentation. */
+    isDocs: ({ $route }) => !['/', '/login', '/callback'].includes($route.path.replace(/(.)\/$/, '$1')),
     /** The playground has no prose to cap and no headings to list. */
     wide: ({ $route }) => $route.path.replace(/\/$/, '') === '/playground',
   },

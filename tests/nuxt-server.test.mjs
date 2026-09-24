@@ -21,6 +21,7 @@ const {
   isPage,
 } = require('../nuxt/server/page-cache.js')
 const {
+  backendOrigin,
   backendReady,
   deployedRevision,
   deploymentReady,
@@ -86,6 +87,7 @@ describe('isPage', () => {
       ...others,
       '/router/translate-path',
       '/sites/default/files/a.png',
+      '/oauth/userinfo',
       '/icon.png',
       '/sitemap.xml',
     ]) {
@@ -238,6 +240,47 @@ describe('createHandler', () => {
     })
   })
 
+  test('renders a signed-in editor live, never from the store and never into it', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'docs-cache-'))
+    let renders = 0
+    const cache = createPageCache({
+      dir,
+      ttl: 60000,
+      render: async () => ({ html: `<p>live ${++renders}</p>` }),
+    })
+    await cache.store('/how-to')
+    const stored = await cache.read('/how-to')
+    const live = (req, res) => res.end('<p>rendered for the request</p>')
+    try {
+      await withServer(createHandler({ cache, live }), async (base) => {
+        const editor = await request(`${base}/how-to`, {
+          headers: {
+            cookie:
+              'auth.strategy=drupal-authorization_code; auth._token.drupal-authorization_code=Bearer%20abc',
+          },
+        })
+        assert.equal(editor.body, '<p>rendered for the request</p>')
+        assert.equal(editor.headers['x-docs-cache'], 'BYPASS')
+        assert.equal(editor.headers['cache-control'], 'no-store')
+        // The store is untouched: the next anonymous reader gets the copy from before.
+        const reader = await request(`${base}/how-to`)
+        assert.equal(reader.headers['x-docs-cache'], 'HIT')
+        assert.equal(reader.body, stored.body.toString())
+        // A cookie that is not the token, or a signed-out one, is an anonymous reader.
+        for (const cookie of [
+          'auth.strategy=drupal-authorization_code',
+          'auth._token.drupal-authorization_code=false',
+        ]) {
+          const other = await request(`${base}/how-to`, { headers: { cookie } })
+          assert.equal(other.headers['x-docs-cache'], 'HIT', cookie)
+        }
+      })
+      assert.equal(renders, 1)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
   test('bypasses the store for live=1 only, not for any query string', async () => {
     const dir = tempDir()
     try {
@@ -256,6 +299,31 @@ describe('createHandler', () => {
         assert.equal(fresh.body, 'live')
         const both = await request(`${base}/page?a=1&live=1`)
         assert.equal(both.body, 'live')
+      })
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  test("hands Drupal's own paths to the live app and never stores them", async () => {
+    const dir = tempDir()
+    try {
+      const cache = createPageCache({
+        dir,
+        ttl: 60000,
+        render: async () => ({ html: '<p>stored</p>' }),
+      })
+      await cache.store('/user/login')
+      await cache.store('/page')
+      const passThrough = (pathname) => pathname.startsWith('/user')
+      await withServer(createHandler({ cache, live: live(), passThrough }), async (base) => {
+        const login = await request(`${base}/user/login`)
+        assert.equal(login.body, 'live')
+        assert.equal(login.headers['x-docs-cache'], undefined)
+        const trailing = await request(`${base}/user/`)
+        assert.equal(trailing.status, 200, 'not redirected to drop the slash')
+        const page = await request(`${base}/page`)
+        assert.equal(page.headers['x-docs-cache'], 'HIT')
       })
     } finally {
       rmSync(dir, { recursive: true, force: true })
@@ -544,6 +612,42 @@ describe('backend', () => {
 
   test('resolveOrigin leaves an environment without routes alone', () => {
     assert.equal(resolveOrigin({}), undefined)
+  })
+
+  test('backendOrigin keeps an explicit public URL, without its trailing slash', () => {
+    assert.equal(
+      backendOrigin({
+        DRUXT_PUBLIC_URL: 'https://cms.example.com/',
+        LAGOON_ROUTES: 'https://cms.druxtjs.org',
+      }),
+      'https://cms.example.com'
+    )
+  })
+
+  test('backendOrigin names the cms route in production, never the internal service', () => {
+    const routes =
+      'https://druxtjs.org,https://nginx.main.druxtjs-org.au2.amazee.io,https://cms.druxtjs.org'
+    assert.equal(
+      backendOrigin({ LAGOON_ROUTES: routes, DRUXT_BASE_URL: 'http://nginx:8080' }),
+      'https://cms.druxtjs.org'
+    )
+  })
+
+  test('backendOrigin uses the nginx route on a preview', () => {
+    const routes =
+      'https://nuxt.feature.druxtjs-org.au2.amazee.io,https://nginx.feature.druxtjs-org.au2.amazee.io'
+    assert.equal(
+      backendOrigin({ LAGOON_ROUTES: routes, DRUXT_BASE_URL: 'http://nginx:8080' }),
+      'https://nginx.feature.druxtjs-org.au2.amazee.io'
+    )
+  })
+
+  test('backendOrigin shares the base URL locally, and has a default', () => {
+    assert.equal(
+      backendOrigin({ DRUXT_BASE_URL: 'http://127.0.0.1:8888' }),
+      'http://127.0.0.1:8888'
+    )
+    assert.equal(backendOrigin({}), 'http://127.0.0.1:8899')
   })
 
   test('is ready once the footer menu has items', async () => {
