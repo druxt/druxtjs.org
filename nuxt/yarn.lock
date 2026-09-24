@@ -10956,6 +10956,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"druxt-auth@patch:druxt-auth@npm%3A0.5.0-dev-20260924072142#./.yarn/patches/druxt-auth-npm-0.5.0-dev-20260924072142-bfcc2b8dfd.patch::locator=druxtjs-org%40workspace%3A.":
+  version: 0.5.0-dev-20260924072142
+  resolution: "druxt-auth@patch:druxt-auth@npm%3A0.5.0-dev-20260924072142#./.yarn/patches/druxt-auth-npm-0.5.0-dev-20260924072142-bfcc2b8dfd.patch::version=0.5.0-dev-20260924072142&hash=a9255b&locator=druxtjs-org%40workspace%3A."
+  dependencies:
+    "@nuxtjs/auth-next": ^5.0.0-1667386184.dfbbb54
+  peerDependencies:
+    axios: ^0.27.2
+    body-parser: ^1.20.2
+  checksum: bda9836dfc4f45aa69df1b1da9e64db3b0af47153f545bd9dbb3e228bcf83c7b2812a88268395054a32a6b1fbd564d6019fc2ab0232558d399c992d71b5f9edb
+  languageName: node
+  linkType: hard
+
 "druxt-blocks@npm:0.17.3, druxt-blocks@npm:^0.17.1, druxt-blocks@npm:^0.17.3":
   version: 0.17.3
   resolution: "druxt-blocks@npm:0.17.3"

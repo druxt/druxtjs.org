@@ -55,6 +55,7 @@ process:
     plugin: default_value
     default_value:
       - authorization_code
+      - password
       - refresh_token
   authorization_code_scopes:
     plugin: default_value

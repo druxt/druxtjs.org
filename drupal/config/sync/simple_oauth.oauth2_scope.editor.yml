@@ -9,6 +9,9 @@ grant_types:
   authorization_code:
     status: true
     description: ''
+  password:
+    status: true
+    description: ''
   refresh_token:
     status: true
     description: ''

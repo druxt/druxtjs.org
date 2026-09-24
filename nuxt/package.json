@@ -53,7 +53,8 @@
   },
   "resolutions": {
     "vue-template-compiler": "2.7.16",
-    "ws": "7.5.11"
+    "ws": "7.5.11",
+    "druxt-auth@0.5.0-dev-20260924072142": "patch:druxt-auth@npm%3A0.5.0-dev-20260924072142#./.yarn/patches/druxt-auth-npm-0.5.0-dev-20260924072142-bfcc2b8dfd.patch"
   },
   "packageManager": "yarn@3.8.7",
   "engines": {
