@@ -1,0 +1,13 @@
+druxtjsorg.settings:
+  type: config_object
+  label: 'druxtjs.org settings'
+  mapping:
+    consumer_resources:
+      type: sequence
+      label: 'Resources a consumer may read, keyed by client id'
+      sequence:
+        type: sequence
+        label: 'Resource type ids'
+        sequence:
+          type: string
+          label: 'Resource type id'
