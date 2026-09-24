@@ -61,11 +61,24 @@ const WRONG = refusal(400, 'Sorry, unrecognized username or password.')
 let store
 let scheme
 
-/** A scheme whose Drupal login answers however the test says. */
-const schemeWhere = (answer) => {
-  store = {}
+/**
+ * A scheme whose Drupal endpoints answer however the test says.
+ *
+ * `login` and `logout` each take one answer, or a list read in turn so a
+ * second attempt can differ from the first. An Error is thrown rather than
+ * returned. `token` seeds a stored logout token, which is what a sign-in this
+ * browser started leaves behind.
+ */
+const schemeWith = ({ login, logout = {}, token } = {}) => {
+  store = token ? { 'drupal.logout_token': token } : {}
+  const queues = { login: [].concat(login), logout: [].concat(logout) }
+  const calls = []
   const $auth = {
-    request: async () => {
+    request: async ({ url }) => {
+      const kind = String(url).includes('login') ? 'login' : 'logout'
+      calls.push(kind)
+      const queue = queues[kind]
+      const answer = queue.length > 1 ? queue.shift() : queue[0]
       if (answer instanceof Error) throw answer
       return { data: answer }
     },
@@ -77,8 +90,13 @@ const schemeWhere = (answer) => {
       removeUniversal: (key) => delete store[key],
     },
   }
-  return new DrupalScheme($auth, { name: 'drupal' })
+  const scheme = new DrupalScheme($auth, { name: 'drupal' })
+  scheme.calls = calls
+  return scheme
 }
+
+/** A scheme whose Drupal login answers however the test says. */
+const schemeWhere = (login) => schemeWith({ login })
 
 beforeEach(() => {
   scheme = null
@@ -137,5 +155,73 @@ describe('drupalLogin', () => {
 
   test('passes on a refusal that is not an open session', async () => {
     await assert.rejects(() => schemeWhere(WRONG).drupalLogin({}), /unrecognized username/)
+  })
+})
+
+// Refusing every open session locked people out of their own: a sign-in that
+// reached Drupal and then abandoned the authorize redirect leaves a session
+// behind, and every later attempt met the refusal with no way to clear it.
+// The logout token tells the two apart, because Drupal issues one only at
+// login, so holding it means this browser started the session.
+describe('a session this browser started itself', () => {
+  test('is ended and signed in again, rather than locking the sign-in out', async () => {
+    const scheme = schemeWith({
+      token: 'lt-1',
+      login: [OPEN_SESSION, { logout_token: 'lt-2' }],
+    })
+
+    await scheme.login({ credentials: { name: 'editor', pass: 'x' } })
+
+    assert.deepEqual(scheme.calls, ['login', 'logout', 'login'], 'ended, then signed in again')
+    assert.equal(scheme.authorizeCalls.length, 1, 'and the authorize step runs')
+    assert.equal(store['drupal.logout_token'], 'lt-2', 'on the new session’s token')
+  })
+
+  test('is told apart from a stranger’s by the token, not by the answer', async () => {
+    const scheme = schemeWith({ login: OPEN_SESSION })
+
+    await assert.rejects(
+      () => scheme.login({ credentials: { name: 'editor', pass: 'x' } }),
+      (error) => error.sessionInUse === true
+    )
+    assert.deepEqual(scheme.calls, ['login'], 'a session that is not ours is never ended')
+    assert.equal(scheme.authorizeCalls.length, 0)
+  })
+
+  test('is refused, not retried forever, when it will not end', async () => {
+    const scheme = schemeWith({ token: 'lt-1', login: OPEN_SESSION })
+
+    await assert.rejects(
+      () => scheme.login({ credentials: { name: 'editor', pass: 'x' } }),
+      (error) => error.sessionInUse === true
+    )
+    assert.equal(scheme.authorizeCalls.length, 0, 'still nobody is authorized')
+  })
+})
+
+// A token thrown away after a failure that never reached Drupal made the
+// session look like a stranger's on the next attempt, which is the lockout
+// again by another route.
+describe('ending the Drupal session', () => {
+  test('keeps the token when nothing answered', async () => {
+    const scheme = schemeWith({ token: 'lt-1', logout: new Error('Network Error') })
+    assert.equal(await scheme.drupalLogout(), false)
+    assert.equal(store['drupal.logout_token'], 'lt-1', 'kept for another attempt')
+  })
+
+  test('drops the token once Drupal has answered, whatever it said', async () => {
+    const ok = schemeWith({ token: 'lt-1' })
+    assert.equal(await ok.drupalLogout(), true)
+    assert.equal(store['drupal.logout_token'], undefined)
+
+    const gone = schemeWith({ token: 'lt-1', logout: refusal(403, 'Not authenticated.') })
+    assert.equal(await gone.drupalLogout(), true, 'an answer means the session is not there')
+    assert.equal(store['drupal.logout_token'], undefined)
+  })
+
+  test('does nothing when there is no token to use', async () => {
+    const scheme = schemeWith({ token: null })
+    assert.equal(await scheme.drupalLogout(), false)
+    assert.deepEqual(scheme.calls, [])
   })
 })
