@@ -172,8 +172,10 @@ export default {
         // Navigates away to the authorize step; nothing after this runs on success.
         await this.$auth.loginWith(AUTH_STRATEGY, { credentials: { name: this.name.trim(), pass: this.pass } })
       } catch (error) {
+        // A session already open is refused by the scheme rather than reused,
+        // so it arrives as an error of its own with nothing from Drupal on it.
         const { status, data } = error.response || {}
-        this.error = signInError(status, (data || {}).message)
+        this.error = error.sessionInUse ? error.message : signInError(status, (data || {}).message)
         this.busy = false
       }
     },
