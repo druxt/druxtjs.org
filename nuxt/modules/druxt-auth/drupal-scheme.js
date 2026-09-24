@@ -44,8 +44,14 @@ export default class DrupalScheme extends Oauth2Scheme {
    * Drupal refuses a JSON login while a session is open, so a browser that
    * still holds one would be authorized as whoever left it there rather than
    * as whoever typed these credentials. The authorize step is a redirect, so
-   * nothing after it runs and there is no later point to check at: the
-   * credentialed sign-in is refused here instead.
+   * nothing after it runs and there is no later point to check at.
+   *
+   * A session this browser started is its own to end: the logout token proves
+   * it, because Drupal issues one only at login. That is the sign-in that
+   * reached Drupal and then abandoned the redirect, and ending it and starting
+   * again is what lets the reader in. Without that, their own leftover session
+   * locks them out of every later attempt. Any other session is a stranger's
+   * and the sign-in is refused.
    *
    * @param {object} [options] - oauth2's login options, plus `credentials`.
    * @param {object} [options.credentials] - `{ name, pass }`.
@@ -56,11 +62,15 @@ export default class DrupalScheme extends Oauth2Scheme {
       return super.login(options)
     }
     if (await this.drupalLogin(credentials)) {
-      const error = new Error(
-        'Somebody else is still signed in on this browser. Sign out, then sign in again.'
-      )
-      error.sessionInUse = true
-      throw error
+      // Ours to end, and gone, or this is somebody else's.
+      const ours = await this.drupalLogout()
+      if (!ours || (await this.drupalLogin(credentials))) {
+        const error = new Error(
+          'Somebody else is still signed in on this browser. Sign out, then sign in again.'
+        )
+        error.sessionInUse = true
+        throw error
+      }
     }
     return super.login(options)
   }
@@ -97,28 +107,48 @@ export default class DrupalScheme extends Oauth2Scheme {
   }
 
   /**
+   * Ends the Drupal session this scheme started, when there is one.
+   *
+   * The token is kept unless Drupal answered, because an answer of any kind
+   * means the session is not there to end, while a request that never arrived
+   * says nothing. Dropping it then would leave the session open with nothing
+   * left to prove it was ours, and the next sign-in would read it as a
+   * stranger's and refuse.
+   *
+   * @returns {Promise<boolean>} True when the session is known to be over.
+   */
+  async drupalLogout () {
+    const token = this.$auth.$storage.getUniversal(this.logoutTokenKey)
+    if (!token) {
+      return false
+    }
+    let ended = true
+    try {
+      await this.$auth.request({
+        method: 'post',
+        baseURL: '',
+        url: this.options.endpoints.drupalLogout,
+        params: { token },
+        // The session is the cookie's. A bearer token, possibly revoked
+        // already, would have Drupal authenticate that instead and refuse.
+        headers: { Authorization: '' },
+        withCredentials: true,
+      })
+    } catch (error) {
+      ended = Boolean(error.response)
+    }
+    if (ended) {
+      this.$auth.$storage.removeUniversal(this.logoutTokenKey)
+    }
+    return ended
+  }
+
+  /**
    * Ends the Drupal session too, when this scheme started one, then signs
    * out the way oauth2 does.
    */
   async logout () {
-    const token = this.$auth.$storage.getUniversal(this.logoutTokenKey)
-    if (token) {
-      try {
-        await this.$auth.request({
-          method: 'post',
-          baseURL: '',
-          url: this.options.endpoints.drupalLogout,
-          params: { token },
-          // The session is the cookie's. A bearer token, possibly revoked
-          // already, would have Drupal authenticate that instead and refuse.
-          headers: { Authorization: '' },
-          withCredentials: true,
-        })
-      } catch (error) {
-        // A session that has already ended is the outcome wanted.
-      }
-      this.$auth.$storage.removeUniversal(this.logoutTokenKey)
-    }
+    await this.drupalLogout()
     return super.logout()
   }
 
