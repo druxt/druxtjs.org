@@ -9,6 +9,9 @@ grant_types:
   authorization_code:
     status: true
     description: 'Everything an administrator may do, for someone who is an administrator.'
+  password:
+    status: true
+    description: 'Everything an administrator may do, for someone who is an administrator.'
   refresh_token:
     status: true
     description: 'Everything an administrator may do, for someone who is an administrator.'
