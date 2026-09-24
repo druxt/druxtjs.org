@@ -1,11 +1,7 @@
 // A copy of druxt-auth's templates/drupal-scheme.js from druxt/druxt-auth#69,
-// until a release carries it. Keep the two identical, apart from the check
-// that the reused Drupal session belongs to whoever typed the credentials,
-// which is owed upstream: see `login()` and `isSignedInAs`.
+// until a release carries it. Keep the two identical.
 
 import { Oauth2Scheme } from '~auth/runtime'
-
-import { isSignedInAs } from '~/lib/account'
 
 /**
  * The authorization code grant, with a sign-in form of the site's own.
@@ -45,28 +41,28 @@ export default class DrupalScheme extends Oauth2Scheme {
    * Signs in to Drupal with credentials when given them, then starts the
    * authorization code flow.
    *
-   * A session already open is reused, because Drupal refuses a JSON login
-   * while one is. That session belongs to whoever left it there, so when it is
-   * reused the account it signed in as is checked against the name that was
-   * typed, and a sign-in that landed on somebody else is undone. Without this,
-   * the next person to use a shared browser is authorized as the last one.
+   * Drupal refuses a JSON login while a session is open, so a browser that
+   * still holds one would be authorized as whoever left it there rather than
+   * as whoever typed these credentials. The authorize step is a redirect, so
+   * nothing after it runs and there is no later point to check at: the
+   * credentialed sign-in is refused here instead.
    *
    * @param {object} [options] - oauth2's login options, plus `credentials`.
    * @param {object} [options.credentials] - `{ name, pass }`.
+   * @throws {Error} When another session is open, with `sessionInUse` set.
    */
   async login ({ credentials, ...options } = {}) {
     if (!credentials) {
       return super.login(options)
     }
-    const reused = await this.drupalLogin(credentials)
-    const result = await super.login(options)
-    if (reused && !isSignedInAs(this.$auth.user, credentials.name)) {
-      await this.logout()
-      throw new Error(
-        'Somebody else is still signed in to this browser. Sign them out, then try again.'
+    if (await this.drupalLogin(credentials)) {
+      const error = new Error(
+        'Somebody else is still signed in on this browser. Sign out, then sign in again.'
       )
+      error.sessionInUse = true
+      throw error
     }
-    return result
+    return super.login(options)
   }
 
   /**
