@@ -24,6 +24,13 @@ const DEFAULTS = {
     drupalLogin: '/user/login?_format=json',
     drupalLogout: '/user/logout?_format=json',
     passwordReset: '/user/password?_format=json',
+    csrfToken: '/session/token',
+    // A backend route that ends whatever session the request carries, taking
+    // the `X-CSRF-Token` header. Drupal issues the logout token only at login,
+    // so without a route like this a session the frontend did not start cannot
+    // be ended at all. Core has none, so there is no default: a site that adds
+    // one names it here.
+    sessionLogout: null,
   },
 }
 
@@ -46,25 +53,24 @@ export default class DrupalScheme extends Oauth2Scheme {
    * as whoever typed these credentials. The authorize step is a redirect, so
    * nothing after it runs and there is no later point to check at.
    *
-   * A session this browser started is its own to end: the logout token proves
-   * it, because Drupal issues one only at login. That is the sign-in that
-   * reached Drupal and then abandoned the redirect, and ending it and starting
-   * again is what lets the reader in. Without that, their own leftover session
-   * locks them out of every later attempt. Any other session is a stranger's
-   * and the sign-in is refused.
+   * So an open session is ended and the credentials tried again, which signs
+   * the reader in as themselves whoever the session belonged to. Their own
+   * leftover session, from a sign-in that went no further than Drupal, stops
+   * locking them out; a stranger's is closed rather than borrowed. Only a
+   * session that cannot be ended is refused, because reusing it would hand
+   * this reader the other one's account.
    *
    * @param {object} [options] - oauth2's login options, plus `credentials`.
    * @param {object} [options.credentials] - `{ name, pass }`.
-   * @throws {Error} When another session is open, with `sessionInUse` set.
+   * @throws {Error} When a session is open and will not end, with `sessionInUse` set.
    */
   async login ({ credentials, ...options } = {}) {
     if (!credentials) {
       return super.login(options)
     }
     if (await this.drupalLogin(credentials)) {
-      // Ours to end, and gone, or this is somebody else's.
-      const ours = await this.drupalLogout()
-      if (!ours || (await this.drupalLogin(credentials))) {
+      const ended = await this.drupalLogout()
+      if (!ended || (await this.drupalLogin(credentials))) {
         const error = new Error(
           'Somebody else is still signed in on this browser. Sign out, then sign in again.'
         )
@@ -120,7 +126,7 @@ export default class DrupalScheme extends Oauth2Scheme {
   async drupalLogout () {
     const token = this.$auth.$storage.getUniversal(this.logoutTokenKey)
     if (!token) {
-      return false
+      return this.endSession()
     }
     let ended = true
     try {
@@ -141,6 +147,44 @@ export default class DrupalScheme extends Oauth2Scheme {
       this.$auth.$storage.removeUniversal(this.logoutTokenKey)
     }
     return ended
+  }
+
+  /**
+   * Ends a session this scheme has no logout token for.
+   *
+   * That is any session it did not start: one left open on a shared browser,
+   * or one from a sign-in that reached Drupal and then went no further. The
+   * `X-CSRF-Token` header proves the caller is a page on this origin holding
+   * the session, which is the same proof core takes for its own writes.
+   *
+   * @returns {Promise<boolean>} True when the session is known to be over.
+   */
+  async endSession () {
+    const { csrfToken, sessionLogout } = this.options.endpoints
+    if (!sessionLogout) {
+      return false
+    }
+    try {
+      const { data } = await this.$auth.request({
+        method: 'get',
+        baseURL: '',
+        url: csrfToken,
+        headers: { Authorization: '' },
+        withCredentials: true,
+      })
+      await this.$auth.request({
+        method: 'delete',
+        baseURL: '',
+        url: sessionLogout,
+        headers: { Authorization: '', 'X-CSRF-Token': String(data).trim() },
+        withCredentials: true,
+      })
+      return true
+    } catch (error) {
+      // Drupal refusing means there is no session of its own left to end. A
+      // request that never arrived says nothing, so it is not treated as one.
+      return Boolean(error.response)
+    }
   }
 
   /**

@@ -25,7 +25,14 @@ const loadScheme = async () => {
     `export class Oauth2Scheme {
       constructor ($auth, options, ...defaults) {
         this.$auth = $auth
-        this.options = Object.assign({}, ...defaults.reverse(), options)
+        // auth-next merges options over defaults deeply, so naming one
+        // endpoint does not drop the rest.
+        const all = [...defaults.reverse(), options]
+        this.options = all.reduce((merged, one) => ({
+          ...merged,
+          ...one,
+          endpoints: { ...(merged.endpoints || {}), ...((one || {}).endpoints || {}) },
+        }), {})
         this.authorizeCalls = []
         this.logoutCalls = 0
       }
@@ -69,14 +76,35 @@ let scheme
  * returned. `token` seeds a stored logout token, which is what a sign-in this
  * browser started leaves behind.
  */
-const schemeWith = ({ login, logout = {}, token } = {}) => {
+const schemeWith = ({
+  login,
+  logout = {},
+  token,
+  sessionLogout = {},
+  csrf = 'csrf-1',
+  endpoint,
+} = {}) => {
   store = token ? { 'drupal.logout_token': token } : {}
-  const queues = { login: [].concat(login), logout: [].concat(logout) }
+  const queues = {
+    login: [].concat(login),
+    logout: [].concat(logout),
+    session: [].concat(sessionLogout),
+    csrf: [].concat(csrf),
+  }
   const calls = []
+  const headers = []
   const $auth = {
-    request: async ({ url }) => {
-      const kind = String(url).includes('login') ? 'login' : 'logout'
+    request: async ({ url, headers: sent }) => {
+      const path = String(url)
+      const kind = path.includes('/session/token')
+        ? 'csrf'
+        : path.includes('druxt-docs/session')
+          ? 'session'
+          : path.includes('login')
+            ? 'login'
+            : 'logout'
       calls.push(kind)
+      headers.push(sent || {})
       const queue = queues[kind]
       const answer = queue.length > 1 ? queue.shift() : queue[0]
       if (answer instanceof Error) throw answer
@@ -90,8 +118,13 @@ const schemeWith = ({ login, logout = {}, token } = {}) => {
       removeUniversal: (key) => delete store[key],
     },
   }
-  const scheme = new DrupalScheme($auth, { name: 'drupal' })
+  const options = { name: 'drupal' }
+  if (endpoint !== null) {
+    options.endpoints = { sessionLogout: endpoint || '/druxt-docs/session' }
+  }
+  const scheme = new DrupalScheme($auth, options)
   scheme.calls = calls
+  scheme.sentHeaders = headers
   return scheme
 }
 
@@ -177,14 +210,30 @@ describe('a session this browser started itself', () => {
     assert.equal(store['drupal.logout_token'], 'lt-2', 'on the new session’s token')
   })
 
-  test('is told apart from a stranger’s by the token, not by the answer', async () => {
-    const scheme = schemeWith({ login: OPEN_SESSION })
+  test('a stranger’s is closed rather than borrowed, when the backend can close it', async () => {
+    const scheme = schemeWith({ login: [OPEN_SESSION, { logout_token: 'lt-2' }] })
+
+    await scheme.login({ credentials: { name: 'editor', pass: 'x' } })
+
+    assert.deepEqual(scheme.calls, ['login', 'csrf', 'session', 'login'])
+    assert.equal(scheme.authorizeCalls.length, 1, 'and this reader signs in as themselves')
+    assert.equal(
+      scheme.sentHeaders[2]['X-CSRF-Token'],
+      'csrf-1',
+      'the header proves the caller holds the session'
+    )
+  })
+
+  // The refusal is what is left when no route can end it. Without this the
+  // reader would be authorized as whoever the session belongs to.
+  test('is refused when the backend offers no way to end a session', async () => {
+    const scheme = schemeWith({ login: OPEN_SESSION, endpoint: null })
 
     await assert.rejects(
       () => scheme.login({ credentials: { name: 'editor', pass: 'x' } }),
       (error) => error.sessionInUse === true
     )
-    assert.deepEqual(scheme.calls, ['login'], 'a session that is not ours is never ended')
+    assert.deepEqual(scheme.calls, ['login'], 'and nothing is attempted')
     assert.equal(scheme.authorizeCalls.length, 0)
   })
 
@@ -219,9 +268,25 @@ describe('ending the Drupal session', () => {
     assert.equal(store['drupal.logout_token'], undefined)
   })
 
-  test('does nothing when there is no token to use', async () => {
+  test('falls back to the backend route when there is no token', async () => {
     const scheme = schemeWith({ token: null })
+    assert.equal(await scheme.drupalLogout(), true)
+    assert.deepEqual(scheme.calls, ['csrf', 'session'])
+  })
+
+  test('does nothing at all when no route is configured either', async () => {
+    const scheme = schemeWith({ token: null, endpoint: null })
     assert.equal(await scheme.drupalLogout(), false)
     assert.deepEqual(scheme.calls, [])
+  })
+
+  test('a route that answers a refusal means the session is already gone', async () => {
+    const scheme = schemeWith({ token: null, sessionLogout: refusal(403, 'Not logged in.') })
+    assert.equal(await scheme.drupalLogout(), true)
+  })
+
+  test('a route that cannot be reached says nothing, so nothing is claimed', async () => {
+    const scheme = schemeWith({ token: null, sessionLogout: new Error('Network Error') })
+    assert.equal(await scheme.drupalLogout(), false)
   })
 })

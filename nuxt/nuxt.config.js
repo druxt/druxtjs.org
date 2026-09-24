@@ -47,6 +47,10 @@ const OAUTH_STRATEGY = {
     authorization: '/oauth/authorize',
     token: '/oauth/token',
     userInfo: '/oauth/userinfo',
+    // druxt_docs' own, because core offers no way to end a session that did
+    // not log in here: its JSON logout wants the token issued at login. Both
+    // this and /session/token are proxied, so the session cookie reaches them.
+    sessionLogout: '/druxt-docs/session',
   },
   ...OAUTH_CLIENT,
   responseType: 'code',
