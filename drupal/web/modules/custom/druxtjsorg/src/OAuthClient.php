@@ -43,7 +43,7 @@ final class OAuthClient {
       'confidential' => FALSE,
       'pkce' => TRUE,
       'automatic_authorization' => TRUE,
-      'grant_types' => ['authorization_code', 'refresh_token'],
+      'grant_types' => ['authorization_code', 'password', 'refresh_token'],
       'authorization_code_scopes' => self::SCOPES,
       'redirect' => array_values(array_unique(array_filter($redirects))),
     ];
