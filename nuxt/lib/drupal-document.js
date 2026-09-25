@@ -122,7 +122,16 @@ export const fetchDrupalPage = async (store, path) => {
   // What the editor toolbar needs to name and switch this page's revisions.
   if (editor) {
     store.commit('setEditorPage', {
+      // The route this page answers. One store value serves every route, so
+      // without it the bar keeps naming the page the reader has left on every
+      // page Drupal does not hold.
+      path,
       uuid: entity.uuid,
+      // The JSON:API resource type, not the router's entity type: the bar
+      // asks Drupal for this page's operations by it.
+      type,
+      // The editor bar names the page, so it carries the title too.
+      title: data.attributes.title || null,
       nid: data.attributes.drupal_internal__nid || null,
       moderationState: data.attributes.moderation_state || null,
     })

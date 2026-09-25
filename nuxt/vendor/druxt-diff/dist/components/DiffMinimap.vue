@@ -39,10 +39,12 @@
 
 <script>
 
-// The package by name, not a relative path: siroc bundles the engine into
-// `dist/index.*` and mkdist transpiles components into `dist/components`, so
-// `../lib/minimap` does not exist once built.
-import { anchorUuid, placeMarks, placeViewport } from '@druxt-contrib/diff'
+// Relative paths, which the package publishes: `exports` maps `./lib/*` and
+// mkdist copies the directory file by file. The package index would bring the
+// Nuxt module with it, and webpack 4 would put a polyfill of Node's `path`
+// into the bundle of every reader served a page with a rail on it.
+import { anchorUuid } from '../lib/diff'
+import { placeMarks, placeViewport } from '../lib/minimap'
 
 /** The changes worth pointing at. A block that did not change is not one. */
 const MARKED = ['changed', 'added', 'removed', 'moved']
@@ -161,7 +163,9 @@ export default {
 
     /** The element the page scrolls, and what it scrolls by. */
     scroller() {
-      return this.container || document.scrollingElement || document.documentElement
+      return (
+        this.container || document.scrollingElement || document.documentElement
+      )
     },
 
     /** Measures every marked block that is on the page, and where the reader is. */
@@ -169,9 +173,15 @@ export default {
       const scroller = this.scroller()
       if (!scroller) return
       const total = scroller.scrollHeight || 0
-      const scrolled = this.container ? this.container.scrollTop : window.scrollY
+      const scrolled = this.container
+        ? this.container.scrollTop
+        : window.scrollY
+      // Where the scrolling content starts, in the coordinates a bounding box
+      // is measured in. For the document that is the viewport's origin; for a
+      // panel it is the panel's own top, and the scroll position is added once
+      // below rather than twice.
       const origin = this.container
-        ? this.container.getBoundingClientRect().top - this.container.scrollTop
+        ? this.container.getBoundingClientRect().top
         : 0
 
       const found = []
@@ -180,7 +190,12 @@ export default {
         const el = this.elementFor(block)
         if (!el) continue
         const box = el.getBoundingClientRect()
-        found.push({ block, el, top: box.top - origin + scrolled, height: box.height })
+        found.push({
+          block,
+          el,
+          top: box.top - origin + scrolled,
+          height: box.height,
+        })
       }
 
       const placed = placeMarks(found, total)
@@ -195,7 +210,9 @@ export default {
         ...placed[index],
       }))
 
-      const shown = this.container ? this.container.clientHeight : window.innerHeight
+      const shown = this.container
+        ? this.container.clientHeight
+        : window.innerHeight
       this.viewport = placeViewport(scrolled, shown, total)
     },
 

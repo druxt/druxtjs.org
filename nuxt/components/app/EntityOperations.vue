@@ -1,12 +1,30 @@
 <template>
-  <!-- Edit, and the rest behind the dots. Shown while the page header is hovered or focused. -->
-  <div class="page-ops flex items-center h-[30px] border border-base-300 rounded-lg bg-base-100 shadow-sm text-[12.5px] font-medium" data-druxt-operations>
-    <a v-if="edit" :href="back(edit.href)" target="_self" class="page-ops-seg px-2.5 rounded-l-lg" :aria-label="`Edit ${label}`">
-      <svg class="account-icon !w-[15px] !h-[15px]" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+  <!-- Edit, and the rest behind the dots. In the bar, or beside a page's title. -->
+  <div
+    class="page-ops flex items-center font-medium"
+    :class="
+      bar
+        ? 'editor-bar-ops h-[28px] text-[12.5px]'
+        : 'h-[30px] border border-base-300 rounded-lg bg-base-100 shadow-sm text-[12.5px]'
+    "
+    data-druxt-operations
+  >
+    <a
+      v-if="edit"
+      :href="editTarget"
+      target="_self"
+      class="page-ops-seg px-2.5 rounded-l-lg"
+      :aria-label="editAria"
+      :title="bar ? editAria : null"
+    >
+      <svg class="account-icon !w-[15px] !h-[15px]" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </svg>
       Edit
     </a>
 
-    <div class="dropdown dropdown-end h-full">
+    <div class="dropdown dropdown-end h-full" :class="{ 'dropdown-top': bar }">
       <button
         type="button"
         tabindex="0"
@@ -14,28 +32,45 @@
         :class="{ 'border-l border-base-300': edit, 'rounded-l-lg': !edit }"
         :aria-label="`More actions for ${label}`"
       >
-        <svg class="account-icon !w-[15px] !h-[15px]" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></svg>
+        <svg class="account-icon !w-[15px] !h-[15px]" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="5" cy="12" r="1" />
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="19" cy="12" r="1" />
+        </svg>
       </button>
 
       <div
         ref="menu"
         tabindex="0"
-        class="ops-menu dropdown-content mt-2 w-[236px] p-1.5 bg-base-100 border border-base-300 rounded-xl shadow-lg z-20"
-        :class="{ drilled: flyout }"
+        class="ops-menu dropdown-content w-[236px] p-1.5 bg-base-100 border border-base-300 rounded-xl shadow-lg z-20"
+        :class="[bar ? 'mb-2' : 'mt-2', { drilled: flyout }]"
         role="menu"
         @keydown="onKey"
       >
         <div class="px-2.5 pt-2 pb-2.5">
           <div class="text-[13px] font-semibold">This page</div>
           <div class="flex items-center gap-1.5 mt-0.5 text-xs text-base-content/70">
-            <span class="w-[7px] h-[7px] rounded-full flex-shrink-0" :class="draft ? 'bg-warning' : 'bg-success'" />
+            <span
+              class="w-[7px] h-[7px] rounded-full flex-shrink-0"
+              :class="draft ? 'bg-warning' : 'bg-success'"
+            />
             {{ draft ? 'Draft pending' : 'Published' }}
           </div>
         </div>
         <div class="h-px bg-base-300 -mx-1.5 my-1.5" />
 
-        <a v-if="edit" :href="back(edit.href)" target="_self" class="account-item" data-menu-item role="menuitem">
-          <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+        <a
+          v-if="edit"
+          :href="back(edit.href)"
+          target="_self"
+          class="account-item"
+          data-menu-item
+          role="menuitem"
+        >
+          <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+          </svg>
           {{ draft ? 'Edit draft' : 'Edit' }}
           <kbd class="kbd kbd-xs ml-auto">E</kbd>
         </a>
@@ -51,59 +86,127 @@
             :aria-expanded="String(flyout)"
             @click="toggleFlyout"
           >
-            <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" /><path d="M12 7v5l3 2" /></svg>
+            <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+              <path d="M3 3v5h5" />
+              <path d="M12 7v5l3 2" />
+            </svg>
             {{ flyout ? 'Back' : 'Revisions' }}
-            <span class="ml-auto flex items-center gap-1 text-[11.5px] text-base-content/50 tabular-nums">
+            <span
+              class="ml-auto flex items-center gap-1 text-[11.5px] text-base-content/50 tabular-nums"
+            >
               <template v-if="revisionCount">{{ revisionCount }}</template>
-              <svg class="account-icon !w-3.5 !h-3.5" viewBox="0 0 24 24" aria-hidden="true"><path :d="flyout ? 'M9 6l6 6-6 6' : 'M15 18l-6-6 6-6'" /></svg>
+              <svg class="account-icon !w-3.5 !h-3.5" viewBox="0 0 24 24" aria-hidden="true">
+                <path :d="flyout ? 'M9 6l6 6-6 6' : 'M15 18l-6-6 6-6'" />
+              </svg>
             </span>
           </button>
           <div class="revisions-flyout" :class="{ open: flyout }">
             <div class="revisions-card" role="menu" aria-label="Recent revisions">
-              <p v-if="!recent.length" class="px-2.5 py-3 text-xs text-base-content/70">Reading the revisions…</p>
-            <div
-              v-for="row of recent"
-              :key="row.revision.vid"
-              class="revision-row"
-              data-testid="revision-row"
-              data-flyout-item
-              role="menuitem"
-              tabindex="-1"
-              :aria-label="`${row.when}, ${row.viewing ? 'the revision you are reading' : row.kind}, by ${row.author.name}`"
-              @keydown.enter.prevent="show(row.revision, false)"
-              @keydown.space.prevent="show(row.revision, false)"
-            >
-              <AppAvatar :account="row.author" :size="24" class="row-span-2" />
-              <span class="text-[13px] font-medium truncate">{{ row.when }}</span>
-              <span class="revision-row-end row-span-2">
-                <span class="revision-tag" :class="row.viewing ? 'viewing' : row.kind">{{ row.viewing ? 'Viewing' : row.kind }}</span>
-                <span v-if="row.actions.length" class="revision-actions">
-                  <button v-if="row.actions.includes('view')" type="button" class="revision-chip" tabindex="-1" @click="show(row.revision, false)">View</button>
-                  <button v-if="row.actions.includes('diff')" type="button" class="revision-chip" data-testid="revision-diff" tabindex="-1" @click="show(row.revision, true)">Diff</button>
+              <p v-if="!recent.length" class="px-2.5 py-3 text-xs text-base-content/70">
+                Reading the revisions…
+              </p>
+              <div
+                v-for="row of recent"
+                :key="row.revision.vid"
+                class="revision-row"
+                data-testid="revision-row"
+                data-flyout-item
+                role="menuitem"
+                tabindex="-1"
+                :aria-label="`${row.when}, ${
+                  row.viewing ? 'the revision you are reading' : row.kind
+                }, by ${row.author.name}`"
+                @keydown.enter.prevent="show(row.revision, false)"
+                @keydown.space.prevent="show(row.revision, false)"
+              >
+                <AppAvatar :account="row.author" :size="24" class="row-span-2" />
+                <span class="text-[13px] font-medium truncate">{{ row.when }}</span>
+                <span class="revision-row-end row-span-2">
+                  <span class="revision-tag" :class="row.viewing ? 'viewing' : row.kind">{{
+                    row.viewing ? 'Viewing' : row.kind
+                  }}</span>
+                  <span v-if="row.actions.length" class="revision-actions">
+                    <button
+                      v-if="row.actions.includes('view')"
+                      type="button"
+                      class="revision-chip"
+                      data-flyout-action
+                      tabindex="-1"
+                      @click="show(row.revision, false)"
+                    >
+                      View
+                    </button>
+                    <button
+                      v-if="row.actions.includes('diff')"
+                      type="button"
+                      class="revision-chip"
+                      data-testid="revision-diff"
+                      data-flyout-action
+                      tabindex="-1"
+                      @click="show(row.revision, true)"
+                    >
+                      Diff
+                    </button>
+                  </span>
                 </span>
-              </span>
-              <span class="text-[11.5px] text-base-content/70 truncate">{{ row.author.name }}</span>
-            </div>
-            <template v-if="revisions">
-              <div class="h-px bg-base-300 -mx-1.5 my-1.5" />
-              <a :href="back(revisions.href)" target="_self" class="account-item" data-flyout-item role="menuitem">
-                <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
-                All revisions
-                <span v-if="revisionCount" class="ml-auto text-[11.5px] text-base-content/50 tabular-nums">{{ revisionCount }}</span>
-              </a>
-            </template>
+                <span class="text-[11.5px] text-base-content/70 truncate">{{
+                  row.author.name
+                }}</span>
+              </div>
+              <template v-if="revisions">
+                <div class="h-px bg-base-300 -mx-1.5 my-1.5" />
+                <a
+                  :href="back(revisions.href)"
+                  target="_self"
+                  class="account-item"
+                  data-flyout-item
+                  role="menuitem"
+                >
+                  <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 6h16M4 12h16M4 18h10" />
+                  </svg>
+                  All revisions
+                  <span
+                    v-if="revisionCount"
+                    class="ml-auto text-[11.5px] text-base-content/50 tabular-nums"
+                    >{{ revisionCount }}</span
+                  >
+                </a>
+              </template>
             </div>
           </div>
         </div>
-        <a v-for="operation of others" :key="operation.key" :href="back(operation.href)" target="_self" class="account-item" data-menu-item role="menuitem">
-          <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" /></svg>
+        <a
+          v-for="operation of others"
+          :key="operation.key"
+          :href="back(operation.href)"
+          target="_self"
+          class="account-item"
+          data-menu-item
+          role="menuitem"
+        >
+          <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+          </svg>
           {{ operation.title }}
         </a>
 
         <template v-if="remove">
           <div class="h-px bg-base-300 -mx-1.5 my-1.5" />
-          <button type="button" class="account-item danger w-full" data-menu-item role="menuitem" @click="confirming = true">
-            <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M6 6l1 14h10l1-14" /></svg>
+          <button
+            type="button"
+            class="account-item danger w-full"
+            data-menu-item
+            role="menuitem"
+            @click="confirming = true"
+          >
+            <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 6h18" />
+              <path d="M8 6V4h8v2" />
+              <path d="M6 6l1 14h10l1-14" />
+            </svg>
             Delete…
           </button>
         </template>
@@ -121,16 +224,34 @@
       @click.self="cancel"
       @keydown.esc.prevent="cancel"
     >
-      <div class="w-full max-w-[400px] bg-base-100 border border-base-300 rounded-2xl shadow-2xl p-5 font-normal text-sm">
-        <h2 id="delete-title" class="text-base font-bold tracking-tight mb-2">Delete “{{ label }}”?</h2>
+      <div
+        class="w-full max-w-[400px] bg-base-100 border border-base-300 rounded-2xl shadow-2xl p-5 font-normal text-sm"
+      >
+        <h2 id="delete-title" class="text-base font-bold tracking-tight mb-2">
+          Delete “{{ label }}”?
+        </h2>
         <p class="text-[13px] text-base-content/70 leading-relaxed mb-5">
-          The page<template v-if="revisionCount"> and its {{ revisionCount }} revisions</template> are removed from Drupal.
-          Links to <code class="text-xs">{{ path }}</code> will return 404. This can't be undone.
+          The page<template v-if="revisionCount"> and its {{ revisionCount }} revisions</template>
+          are removed from Drupal. Links to <code class="text-xs">{{ path }}</code> will return 404.
+          This can't be undone.
         </p>
         <p v-if="error" class="sign-in-error mb-4" role="alert">{{ error }}</p>
         <div class="flex justify-end gap-2">
-          <button ref="cancel" type="button" class="h-9 px-3.5 rounded-lg border border-base-300 font-medium" :disabled="deleting" @click="cancel">Cancel</button>
-          <button type="button" class="page-ops-delete h-9 px-3.5 rounded-lg font-semibold" :disabled="deleting" @click="destroy">
+          <button
+            ref="cancel"
+            type="button"
+            class="h-9 px-3.5 rounded-lg border border-base-300 font-medium"
+            :disabled="deleting"
+            @click="cancel"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="page-ops-delete h-9 px-3.5 rounded-lg font-semibold"
+            :disabled="deleting"
+            @click="destroy"
+          >
             {{ deleting ? 'Deleting…' : 'Delete page' }}
           </button>
         </div>
@@ -163,6 +284,12 @@ export default {
     label: { type: String, default: 'this page' },
     /** The JSON:API resource: `{ type, id }`. */
     resource: { type: Object, default: null },
+    /** `bar` renders for the floating editor bar, which is dark and opens upward. */
+    variant: { type: String, default: 'page' },
+    /** Where Edit goes, when the bar has decided (a block opens the page's form). */
+    editHref: { type: String, default: null },
+    /** What Edit promises, when the bar has decided. */
+    editLabel: { type: String, default: null },
     /** The page's moderation state, when it has one. */
     state: { type: String, default: null },
   },
@@ -170,28 +297,39 @@ export default {
   data: () => ({ confirming: false, deleting: false, error: null, flyout: false }),
 
   computed: {
+    bar: ({ variant }) => variant === 'bar',
+    /** The bar's target when it has one, else Drupal's own link. */
+    editTarget: ({ edit, editHref, back }) => editHref || (edit ? back(edit.href) : null),
+    editAria: ({ editLabel, label }) => editLabel || `Edit ${label}`,
     byKey: ({ operations }) => Object.fromEntries(operations.map((o) => [o.key, o])),
     edit: ({ byKey }) => byKey['edit-form'] || null,
     revisions: ({ byKey }) => byKey['version-history'] || null,
     remove: ({ byKey, resource }) => (resource && byKey['delete-form']) || null,
-    others: ({ operations }) => operations.filter((o) => !['edit-form', 'version-history', 'delete-form'].includes(o.key)),
+    others: ({ operations }) =>
+      operations.filter((o) => !['edit-form', 'version-history', 'delete-form'].includes(o.key)),
     /** A pending draft, from the revisions when they are in, else the page's state. */
-    draft: ({ allRevisions, state }) => (allRevisions.length ? hasDraft(allRevisions) : Boolean(state && state !== 'published')),
-    allRevisions: ({ $store }) => ($store && $store.state.editor && $store.state.editor.revisions) || [],
+    draft: ({ allRevisions, state }) =>
+      allRevisions.length ? hasDraft(allRevisions) : Boolean(state && state !== 'published'),
+    allRevisions: ({ $store }) =>
+      ($store && $store.state.editor && $store.state.editor.revisions) || [],
     revisionCount: ({ allRevisions }) => allRevisions.length,
     /** The latest few, each with who made it and when. */
-    recent: ({ allRevisions, $store }) => allRevisions.slice(0, RECENT).map((revision) => {
-      const actions = actionsFor(revision, allRevisions, $store.state.editor.version)
-      return {
-        revision,
-        kind: kindOf(revision),
-        when: whenOf(revision.date),
-        actions,
-        // The row being read: it has nothing to offer but its own diff.
-        viewing: !actions.includes('view'),
-        author: accountOf({ name: (revision.author || {}).name || 'Unknown', picture: (revision.author || {}).picture }),
-      }
-    }),
+    recent: ({ allRevisions, $store }) =>
+      allRevisions.slice(0, RECENT).map((revision) => {
+        const actions = actionsFor(revision, allRevisions, $store.state.editor.version)
+        return {
+          revision,
+          kind: kindOf(revision),
+          when: whenOf(revision.date),
+          actions,
+          // The row being read: it has nothing to offer but its own diff.
+          viewing: !actions.includes('view'),
+          author: accountOf({
+            name: (revision.author || {}).name || 'Unknown',
+            picture: (revision.author || {}).picture,
+          }),
+        }
+      }),
     path: () => (typeof window === 'undefined' ? '' : window.location.pathname),
   },
 
@@ -232,10 +370,19 @@ export default {
      */
     onKey(event) {
       if (this.confirming || event.defaultPrevented) return
-      if (!this.edit || event.key !== 'e' || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return
+      if (
+        !this.edit ||
+        event.key !== 'e' ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        event.shiftKey
+      )
+        return
       const target = event.target || {}
-      if (target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName || '')) return
-      window.location.href = this.back(this.edit.href)
+      if (target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName || ''))
+        return
+      window.location.href = this.editTarget
     },
 
     /**
@@ -278,7 +425,9 @@ export default {
 
     /**
      * The arrow keys walk the menu, and follow the list to the side it opens
-     * on: left into it, right back out. Escape closes the list, then the menu.
+     * on: left into it, right back out. That holds one level deeper too, so
+     * left on a revision reaches its View and Diff and right returns to it.
+     * Escape closes the list, then the menu.
      */
     onKey(event) {
       const inFlyout = Boolean(event.target.closest('.revisions-flyout'))
@@ -287,8 +436,28 @@ export default {
         event.preventDefault()
         const items = this.items(inFlyout)
         if (!items.length) return
-        const at = items.indexOf(event.target)
+        // From an action, up and down carry on through the rows it sits in.
+        const from = event.target.closest('[data-flyout-item]') || event.target
+        const at = items.indexOf(from)
         items[(at + step + items.length) % items.length].focus()
+        return
+      }
+      // Left goes deeper, right comes back, the same way the flyout itself
+      // opens. A row's own action is View; Diff is only reachable this way,
+      // so without it the keyboard can read a revision and never compare one.
+      const action = event.target.closest('[data-flyout-action]')
+      if (event.key === 'ArrowLeft' && inFlyout && !action) {
+        const actions = [...event.target.querySelectorAll('[data-flyout-action]')]
+        if (actions.length) {
+          event.preventDefault()
+          actions[0].focus()
+          return
+        }
+      }
+      if (event.key === 'ArrowRight' && action) {
+        event.preventDefault()
+        const row = action.closest('[data-flyout-item]')
+        if (row) row.focus()
         return
       }
       if (event.key === 'ArrowLeft' && !inFlyout) {

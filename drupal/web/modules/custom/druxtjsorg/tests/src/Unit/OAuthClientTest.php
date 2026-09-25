@@ -24,7 +24,10 @@ final class OAuthClientTest extends UnitTestCase {
     self::assertFalse($values['confidential']);
     self::assertTrue($values['pkce']);
     self::assertTrue($values['automatic_authorization']);
-    self::assertSame(['authorization_code', 'refresh_token'], $values['grant_types']);
+    // The password grant too: the frontend signs an editor in by exchanging
+    // their credentials for a token, with no browser redirect and no Drupal
+    // session to find. simple_oauth_password_grant provides it.
+    self::assertSame(['authorization_code', 'password', 'refresh_token'], $values['grant_types']);
     self::assertSame(['authenticated', 'editor', 'contributor', 'administrator'], $values['authorization_code_scopes']);
     self::assertSame([], $values['redirect']);
   }

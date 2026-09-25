@@ -32,6 +32,11 @@ Nuxt application.
   holds real content on new code. The importer seeds from the commit pinned
   in `docs-source.json` only when there is no database to start from.
   `DOCS_SKIP_SYNC=1` keeps the database an environment already has.
+- **A maintainer keeps their login through the sanitise.** An address at
+  `DOCS_MAINTAINER_DOMAIN` survives, and `DOCS_MAINTAINER_NAME` gets the
+  password in `DOCS_MAINTAINER_PASSWORD` back, both set as Lagoon variables.
+  A password that reaches a non-production environment this way is not one
+  to reuse anywhere else. [docs/hosting.md](docs/hosting.md) covers it.
 - **The pin is the API reference's version, not the site's content.** docgen
   reads the pinned `druxt.js` to generate the `api/`, `components/` and module
   pages, which have no Drupal representation. The authored pages come from the

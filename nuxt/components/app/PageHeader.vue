@@ -10,11 +10,10 @@
       />
     </div>
 
-    <!-- `group`: hovering the title row reveals an editor's page operations. -->
     <div class="group flex items-start gap-3">
       <h1 v-diff="rootDiff('title')" class="flex-1 min-w-0 text-3xl sm:text-4xl font-bold tracking-tight" v-text="title" />
       <span v-if="draft" class="page-draft" data-diff-ignore>Draft</span>
-      <div v-if="entity" v-druxt-admin="entity" class="page-ops-slot flex-none mt-1.5" />
+      <!-- The controls float now, in AppEditorBar, so they are reachable anywhere. -->
     </div>
 
     <p v-if="description" v-diff="rootDiff('field_description')" class="mt-3 text-lg text-base-content/70" v-text="description" />

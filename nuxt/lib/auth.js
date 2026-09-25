@@ -6,8 +6,22 @@
  * interop lets components import from it too.
  */
 
-/** The @nuxtjs/auth-next strategy druxt-auth registers and this site configures. */
-const AUTH_STRATEGY = 'drupal-authorization_code'
+/**
+ * The @nuxtjs/auth-next strategy this site signs editors in with.
+ *
+ * The password grant, through simple_oauth_password_grant: credentials are
+ * exchanged for a token by the site's own server, so there is no browser
+ * redirect and no Drupal session for the authorize step to find. That removes
+ * the whole class of problems the authorization code flow had here, where a
+ * session left open in the browser decided who the token belonged to.
+ */
+const AUTH_STRATEGY = 'drupal-password'
+
+/**
+ * The scopes a sign-in asks for: one per role an editor might hold. A token
+ * carries only those the account also has, so each person gets their own.
+ */
+const SCOPES = ['authenticated', 'editor', 'contributor', 'administrator']
 
 /** @nuxtjs/auth-next's cookie prefix, set explicitly so the cookie name below cannot drift. */
 const AUTH_COOKIE_PREFIX = 'auth.'
@@ -61,4 +75,4 @@ const authStorageKeys = (strategy) => [
   `${AUTH_COOKIE_PREFIX}strategy`,
 ]
 
-module.exports = { AUTH_COOKIE, AUTH_COOKIE_PREFIX, AUTH_STRATEGY, authStorageKeys, hasAuthCookie }
+module.exports = { AUTH_COOKIE, AUTH_COOKIE_PREFIX, AUTH_STRATEGY, SCOPES, authStorageKeys, hasAuthCookie }

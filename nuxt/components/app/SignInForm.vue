@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import { AUTH_STRATEGY } from '~/lib/auth'
+import { AUTH_STRATEGY, SCOPES } from '~/lib/auth'
 import { signInError } from '~/lib/account'
 
 /**
@@ -169,8 +169,33 @@ export default {
       this.error = null
       try {
         this.$auth.$storage.setUniversal('redirect', this.destination || this.$route.fullPath)
-        // Navigates away to the authorize step; nothing after this runs on success.
-        await this.$auth.loginWith(AUTH_STRATEGY, { credentials: { name: this.name.trim(), pass: this.pass } })
+        // The password grant: the site's own server exchanges these for a
+        // token. No redirect, so this does return, and the reader is sent on
+        // from here rather than by a callback.
+        await this.$auth.loginWith(AUTH_STRATEGY, {
+          data: {
+            grant_type: 'password',
+            username: this.name.trim(),
+            password: this.pass,
+            scope: SCOPES.join(' '),
+          },
+        })
+        // The password grant returns rather than redirecting, so nothing
+        // tears this down for us: the dialog has to be closed and the reader
+        // moved on from here. The redirect flow did both by navigating away.
+        this.$store.commit('setSignIn', false)
+        // The spinner is this component's, and this component survives: the
+        // redirect flow used to take the whole page with it.
+        this.busy = false
+        const to = this.destination || this.$route.fullPath
+        if (to !== this.$route.fullPath) {
+          this.$router.push(to)
+        } else if (this.$nuxt && this.$nuxt.refresh) {
+          // Staying put: the page was read as an anonymous visitor, so it
+          // carries no editor context and the bar would sit idle on a page
+          // Drupal does hold. Reading it again as this account fills it in.
+          this.$nuxt.refresh()
+        }
       } catch (error) {
         // A session already open is refused by the scheme rather than reused,
         // so it arrives as an error of its own with nothing from Drupal on it.

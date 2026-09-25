@@ -37,7 +37,8 @@
 </template>
 
 <script>
-import { anchorUuid, normaliseDiff } from '~/lib/diff'
+import { normaliseDiff } from '~/lib/diff'
+import { anchorsOf } from '~/lib/diff-anchors'
 import { findAnchor } from '~/lib/anchors'
 import { viewing } from '~/lib/revisions'
 
@@ -135,9 +136,9 @@ export default {
 
     /** Resolves once every changed block is rendered with its text, or after a few seconds. */
     rendered(view) {
-      const uuids = (view.blocks || []).filter((b) => b.status === 'changed').map((b) => anchorUuid(b, 'right'))
-      const ready = () => uuids.every((uuid) => {
-        const el = findAnchor(document, { entity: uuid })
+      const changed = (view.blocks || []).filter((b) => b.status === 'changed')
+      const ready = () => changed.every((block) => {
+        const el = anchorsOf(block).map((uuid) => findAnchor(document, { entity: uuid })).find(Boolean)
         return el && el.textContent.trim()
       })
       return new Promise((resolve) => {
@@ -166,7 +167,7 @@ export default {
       // uuid that is actually in the markup.
       for (const block of diff.blocks) {
         if (!MARKED.includes(block.status)) continue
-        const el = findAnchor(document, { entity: anchorUuid(block, 'right') })
+        const el = anchorsOf(block).map((uuid) => findAnchor(document, { entity: uuid })).find(Boolean)
         if (!el) continue
         el.setAttribute('data-diff', block.status)
         this.marked.push(el)
@@ -176,7 +177,8 @@ export default {
       const groups = new Map()
       for (const block of diff.rebuilt ? [] : diff.blocks) {
         if (block.status !== 'removed') continue
-        const anchor = anchorUuid({ placeUuids: block.placeUuids, uuid: block.placeAfter || block.placeBefore }, 'right')
+        const neighbour = { placeUuids: block.placeUuids, uuid: block.placeAfter || block.placeBefore }
+        const anchor = anchorsOf(neighbour).find((uuid) => findAnchor(document, { entity: uuid }))
         if (!anchor) continue
         const side = block.placeAfter ? 'after' : 'before'
         const key = `${side}:${anchor}`
