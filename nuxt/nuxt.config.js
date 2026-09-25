@@ -162,9 +162,13 @@ export default {
   docsPassThrough: (path) => (shouldProxy(path) && !LOGIN_PATH.test(path)) || isProfilePath(path),
 
   plugins: [
-    // A token Drupal revoked is replaced before the reader notices. Ordered
-    // after the modules that create the clients it attaches to.
-    '~/plugins/auth-refresh.client.js',
+    // The site's own token recovery is gone: druxt-auth ships one, and it is
+    // the better of the two. It runs on the server render as well, where this
+    // one never did, and it refuses to replay a request bound for another
+    // host, where this one would have resent the Drupal token. Running both
+    // meant two interceptors retried the same failure, which was measurable:
+    // a foreign 401 was replayed twice with the token attached, and once with
+    // only the module's.
     '~/plugins/entity-operations.js',
     '~/plugins/color-mode-theme.client.js',
     '~/plugins/analytics.client.js',
