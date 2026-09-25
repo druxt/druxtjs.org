@@ -188,7 +188,14 @@ export default {
         // redirect flow used to take the whole page with it.
         this.busy = false
         const to = this.destination || this.$route.fullPath
-        if (to !== this.$route.fullPath) this.$router.push(to)
+        if (to !== this.$route.fullPath) {
+          this.$router.push(to)
+        } else if (this.$nuxt && this.$nuxt.refresh) {
+          // Staying put: the page was read as an anonymous visitor, so it
+          // carries no editor context and the bar would sit idle on a page
+          // Drupal does hold. Reading it again as this account fills it in.
+          this.$nuxt.refresh()
+        }
       } catch (error) {
         // A session already open is refused by the scheme rather than reused,
         // so it arrives as an error of its own with nothing from Drupal on it.
