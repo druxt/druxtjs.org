@@ -131,6 +131,7 @@
                       v-if="row.actions.includes('view')"
                       type="button"
                       class="revision-chip"
+                      data-flyout-action
                       tabindex="-1"
                       @click="show(row.revision, false)"
                     >
@@ -141,6 +142,7 @@
                       type="button"
                       class="revision-chip"
                       data-testid="revision-diff"
+                      data-flyout-action
                       tabindex="-1"
                       @click="show(row.revision, true)"
                     >
@@ -423,7 +425,9 @@ export default {
 
     /**
      * The arrow keys walk the menu, and follow the list to the side it opens
-     * on: left into it, right back out. Escape closes the list, then the menu.
+     * on: left into it, right back out. That holds one level deeper too, so
+     * left on a revision reaches its View and Diff and right returns to it.
+     * Escape closes the list, then the menu.
      */
     onKey(event) {
       const inFlyout = Boolean(event.target.closest('.revisions-flyout'))
@@ -432,8 +436,28 @@ export default {
         event.preventDefault()
         const items = this.items(inFlyout)
         if (!items.length) return
-        const at = items.indexOf(event.target)
+        // From an action, up and down carry on through the rows it sits in.
+        const from = event.target.closest('[data-flyout-item]') || event.target
+        const at = items.indexOf(from)
         items[(at + step + items.length) % items.length].focus()
+        return
+      }
+      // Left goes deeper, right comes back, the same way the flyout itself
+      // opens. A row's own action is View; Diff is only reachable this way,
+      // so without it the keyboard can read a revision and never compare one.
+      const action = event.target.closest('[data-flyout-action]')
+      if (event.key === 'ArrowLeft' && inFlyout && !action) {
+        const actions = [...event.target.querySelectorAll('[data-flyout-action]')]
+        if (actions.length) {
+          event.preventDefault()
+          actions[0].focus()
+          return
+        }
+      }
+      if (event.key === 'ArrowRight' && action) {
+        event.preventDefault()
+        const row = action.closest('[data-flyout-item]')
+        if (row) row.focus()
         return
       }
       if (event.key === 'ArrowLeft' && !inFlyout) {
