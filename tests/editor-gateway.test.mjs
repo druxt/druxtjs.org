@@ -40,7 +40,10 @@ describe('the editor bar on a page Drupal does not hold', () => {
     assert.ok(redirect, 'the repair is offered first')
     assert.equal(links[0].key, 'redirect')
     // The form reads `source`, and reads it url-decoded.
-    assert.equal(redirect.href, '/admin/config/search/redirect/add?source=tutorials%2Fmoved-away')
+    assert.equal(
+      redirect.href,
+      `/admin/config/search/redirect/add?source=${encodeURIComponent('tutorials/moved-away')}`
+    )
   })
 
   // Most of what Drupal does not hold is still a page: the playground, the
@@ -56,7 +59,10 @@ describe('the editor bar on a page Drupal does not hold', () => {
   test('the query is dropped before the path is offered as the source', () => {
     const { links } = gatewayFor('/tutorials/moved-away?draft=1', { missing: true })
     const redirect = links.find((link) => link.key === 'redirect')
-    assert.equal(redirect.href, '/admin/config/search/redirect/add?source=tutorials%2Fmoved-away')
+    assert.equal(
+      redirect.href,
+      `/admin/config/search/redirect/add?source=${encodeURIComponent('tutorials/moved-away')}`
+    )
   })
 
   // The front page is the site's own, and there is nothing to redirect.
