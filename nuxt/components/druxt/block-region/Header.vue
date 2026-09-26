@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center gap-3 min-w-0">
+  <div class="header-region flex items-center gap-3 min-w-0">
     <slot v-for="block in blocks" :name="block.attributes.drupal_internal__id" />
   </div>
 </template>

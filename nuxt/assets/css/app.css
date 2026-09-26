@@ -841,6 +841,10 @@ html {
 .page-ops-seg {
   display: flex;
   align-items: center;
+  /* Centred, because a finger-sized minimum makes the button wider than its
+     contents: the overflow button's dots sat 5px left of centre, with the
+     spare width all landing on one side. */
+  justify-content: center;
   gap: 0.375rem;
   height: 100%;
   color: hsl(var(--bc));
@@ -1264,6 +1268,13 @@ body.has-editor-bar main {
    against the bar, which is what a reader sees it sitting above. */
 .editor-bar-ops .dropdown {
   position: static;
+  /* The wrapper carries `h-full`, which measures the row rather than the
+     button inside it. A finger-sized button is taller than that row, so it
+     hung below the segment beside it. Centring the button on the wrapper puts
+     the two back on one line whatever either of them measures. */
+  display: flex;
+  align-items: center;
+  height: auto;
 }
 .editor-bar-ops .ops-menu {
   top: auto;
@@ -1771,4 +1782,21 @@ del.v-diff-del--trailing {
   border-radius: 0.6rem;
   background: hsl(var(--b2));
   font-size: 0.875rem;
+}
+
+/* Each block in the header region is wrapped in a div of Druxt's making, and
+   that wrapper, not the block inside it, is the flex item. The wrappers
+   shrank below their content, so the site name overflowed its box and ran
+   under the section links beside it. The blocks keep their own width; the row
+   already scrolls nothing, and the navigation collapses to the drawer before
+   the space runs out. */
+.header-region > * {
+  min-width: 0;
+}
+/* The branding is the one that must not shrink: squeezed, its name overflowed
+   its box and ran under the section links. Everything after it keeps the
+   default shrink, so the row gives where there is something to give rather
+   than pushing the version badge beside it. */
+.header-region > *:first-child {
+  flex: none;
 }
