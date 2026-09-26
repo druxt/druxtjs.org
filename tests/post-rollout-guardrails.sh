@@ -111,6 +111,23 @@ else
   ok "production by type alone: nothing was synced"
 fi
 
+# A sync is only one way to lose production's data. The update-only path must
+# not drop, truncate, sanitise or re-key it either, and it must still deploy.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=production LAGOON_ENVIRONMENT=main > /dev/null
+for destructive in "sql:drop" "sql:sanitize" "TRUNCATE TABLE" "state:set system.private_key" "state:delete system.cron_key"; do
+  if called "$app" "$destructive"; then
+    no "production: ran ${destructive}"
+  else
+    ok "production: never ran ${destructive}"
+  fi
+done
+if called "$app" "deploy"; then
+  ok "production: still took the update path"
+else
+  no "production: did not deploy"
+fi
+
 app="$(build_app yes)"
 run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=main > /dev/null
 if called "$app" "sql:sync"; then
