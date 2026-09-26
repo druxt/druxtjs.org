@@ -36,7 +36,7 @@ trap 'rm -rf "$scratch"' EXIT
 #
 # bootstrap=yes|no decides whether `drush status` reports an installed site.
 build_app() {
-  local bootstrap="$1" sessions="${2:-0}"
+  local bootstrap="$1" sessions="${2:-0}" tokens="${3:-0}"
   local app="$scratch/app-$RANDOM"
   mkdir -p "$app/lagoon" "$app/drupal/vendor/bin" "$app/drupal/.devtools"
   cp "$ROLLOUT" "$app/lagoon/post-rollout.sh"
@@ -63,6 +63,7 @@ case "\$*" in
     [ "\${STUB_SYNC_FAILS:-}" = "1" ] && exit 1 ;;
   *"status --field=bootstrap"*) [ "$bootstrap" = "yes" ] && echo "Successful" ;;
   *"SELECT COUNT(*) FROM sessions"*) echo "$sessions" ;;
+  *"SELECT COUNT(*) FROM oauth2_token"*) echo "$tokens" ;;
   *"mail LIKE"*) [ -n "\${STUB_KEPT_ADDRESSES:-}" ] && printf '%b\n' "\${STUB_KEPT_ADDRESSES}" ;;
   *"php:eval"*)
     [ "\${STUB_EVAL_FAILS:-}" = "1" ] && exit 1
@@ -168,6 +169,53 @@ elif printf '%s' "$output" | grep -q "refusing to leave this environment usable"
   ok "sanitisation that left sessions behind: the rollout stopped, and said why"
 else
   no "sanitisation that left sessions behind: stopped without saying why"
+fi
+
+# The same proof for the tokens, because clearing one table and failing the
+# other is exactly what a single check cannot tell from success.
+app="$(build_app yes 0 7)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x)"
+status=$?
+if [ "$status" -eq 0 ]; then
+  no "sanitisation that left OAuth tokens behind: the rollout continued"
+elif printf '%s' "$output" | grep -q "did not clear the oauth2_token table"; then
+  ok "sanitisation that left OAuth tokens behind: the rollout stopped, and named the table"
+else
+  no "sanitisation that left OAuth tokens behind: stopped without naming the table"
+fi
+
+# The control for both: a copy with neither left behind runs to the end.
+app="$(build_app yes 0 0)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
+status=$?
+if [ "$status" -eq 0 ]; then
+  ok "a sanitised copy: the rollout carried on"
+else
+  no "a sanitised copy: the rollout stopped anyway"
+fi
+
+# Production's private key signs its CSRF tokens; a copy that keeps it hands
+# every environment production's signing secret.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
+if called "$app" "state:set system.private_key"; then
+  ok "the private key is replaced, so production's does not survive the copy"
+else
+  no "the private key survived the copy"
+fi
+if called "$app" "state:delete system.cron_key"; then
+  ok "the cron key is dropped with it"
+else
+  no "the cron key survived the copy"
+fi
+
+# Production keeps its own keys: the sanitise never runs there.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=production LAGOON_ENVIRONMENT=main > /dev/null
+if called "$app" "state:set system.private_key"; then
+  no "production: its private key was replaced"
+else
+  ok "production: its private key was left alone"
 fi
 
 # --------------------------------------------------------------------------

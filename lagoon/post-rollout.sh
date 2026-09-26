@@ -198,18 +198,47 @@ sanitise() {
   drush sql:sanitize --yes
 
   for table in sessions oauth2_token oauth2_token__scopes watchdog flood key_value_expire admin_audit_trail; do
-    drush sql:query "TRUNCATE TABLE ${table};" || echo "  no ${table} table to clear."
+    if drush sql:query "TRUNCATE TABLE ${table};"; then
+      continue
+    fi
+    # A table this site does not have is nothing to clear. A table that is
+    # there and would not clear is production data left behind, and the two
+    # must not read the same: `|| echo "no table"` swallowed both.
+    if drush sql:query "SELECT 1 FROM ${table} LIMIT 1;" > /dev/null 2>&1; then
+      echo "Could not clear ${table}, and it exists; refusing to leave this environment usable."
+      exit 1
+    fi
+    echo "  no ${table} table to clear."
   done
 
   drush sql:query "UPDATE consumer_field_data SET secret = CONCAT('sanitised-', client_id);"
 
+  # Production's private key signs its CSRF tokens and its HMACs, and
+  # `sql:sanitize` does not touch it, so a copy carries production's signing
+  # secret into every environment that takes one. The cron key lets anyone
+  # holding it run cron over HTTP. Both are replaced rather than cleared,
+  # because Drupal expects them to exist.
+  # `state:set` rather than `php:eval`: the eval path is how a maintainer's
+  # login is restored below, and its output is read, so a second caller
+  # sharing it makes one of them misread the other's answer.
+  drush state:set system.private_key "$(head -c 55 /dev/urandom | base64 | tr -d '\n')" --yes
+  drush state:delete system.cron_key --yes || :
+
   # Prove it rather than assume it: a sanitiser that silently did nothing
   # would leave production credentials in an environment meant to be safe.
-  remaining=$(drush sql:query "SELECT COUNT(*) FROM sessions;" | tr -cd '0-9')
-  if [ "${remaining:-1}" != "0" ]; then
-    echo "Sanitisation did not clear the sessions table; refusing to leave this environment usable."
-    exit 1
-  fi
+  # Both tables are checked, because clearing one and failing the other is
+  # exactly the case a single check cannot tell from success.
+  for table in sessions oauth2_token; do
+    remaining=$(drush sql:query "SELECT COUNT(*) FROM ${table};" | tr -cd '0-9')
+    if [ -z "$remaining" ]; then
+      echo "Could not count ${table} after sanitising; refusing to leave this environment usable."
+      exit 1
+    fi
+    if [ "$remaining" != "0" ]; then
+      echo "Sanitisation did not clear the ${table} table; refusing to leave this environment usable."
+      exit 1
+    fi
+  done
   # After the check, never before it: a sanitise that did not happen must
   # not be handed an address or a password to put back.
   restore_addresses
