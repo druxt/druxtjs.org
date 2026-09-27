@@ -113,6 +113,10 @@ jobs:
       - run: npm ci --ignore-scripts
 
       # The coverage floor in the script is what fails here.
+      # The scheme test reads druxt-auth's template from nuxt/'s installed copy.
+      - run: yarn install --immutable --mode=skip-build
+        working-directory: nuxt
+
       - run: npm run test:coverage
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
