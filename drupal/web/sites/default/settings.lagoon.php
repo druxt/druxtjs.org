@@ -77,6 +77,14 @@ if ($frontend) {
   $settings['druxt_docs_frontend_url'] = rtrim($frontend, '/');
 }
 
+// The Nuxt server's shared JSON:API cache is cleared when content changes.
+// On Lagoon the Nuxt service is reached by name; elsewhere the frontend URL
+// serves. The secret is the value the Nuxt server holds as druxt.cache.secret.
+$settings['druxt_frontend_cache'] = [
+  'url' => getenv('DRUXT_CACHE_CLEAR_URL') ?: (getenv('LAGOON_ENVIRONMENT') ? 'http://nuxt:3000' : $frontend),
+  'secret' => getenv('DRUXT_CACHE_SECRET') ?: '',
+];
+
 $environment_type = getenv('LAGOON_ENVIRONMENT_TYPE') ?: 'development';
 $config['environment_indicator.indicator'] = [
   'name' => $environment_type === 'production' ? 'Production' : ucfirst($environment_type) . ': ' . getenv('LAGOON_ENVIRONMENT'),

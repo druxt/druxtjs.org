@@ -27,6 +27,7 @@ module:
   diff: 0
   druxt: 0
   druxt_docs: 0
+  druxt_frontend_cache: 0
   dynamic_page_cache: 0
   editor: 0
   entity_reference_revisions: 0
