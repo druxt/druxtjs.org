@@ -1,0 +1,24 @@
+services:
+  logger.channel.druxt_frontend_cache:
+    parent: logger.channel_base
+    arguments: ['druxt_frontend_cache']
+
+  druxt_frontend_cache.notifier:
+    class: Drupal\druxt_frontend_cache\Notifier
+    arguments: ['@http_client', '@settings', '@logger.channel.druxt_frontend_cache']
+  # Hook classes are autowired by class, so the notifier answers to its class too.
+  Drupal\druxt_frontend_cache\Notifier: '@druxt_frontend_cache.notifier'
+
+  # Any cache tag invalidation marks the frontend's cache for clearing.
+  druxt_frontend_cache.invalidator:
+    class: Drupal\druxt_frontend_cache\CacheTagsInvalidator
+    arguments: ['@druxt_frontend_cache.notifier']
+    tags:
+      - { name: cache_tags_invalidator }
+
+  # The clear is sent after the response, so the editor never waits on it.
+  druxt_frontend_cache.terminate:
+    class: Drupal\druxt_frontend_cache\EventSubscriber\TerminateSubscriber
+    arguments: ['@druxt_frontend_cache.notifier']
+    tags:
+      - { name: event_subscriber }
