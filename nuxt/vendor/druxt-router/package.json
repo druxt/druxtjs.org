@@ -1,0 +1,62 @@
+{
+  "name": "druxt-router",
+  "version": "0.31.0",
+  "description": "Drupal router for Nuxt, powered by the Drupal Decoupled Router module.",
+  "keywords": [
+    "cms",
+    "decoupled",
+    "drupal",
+    "druxt",
+    "druxtjs",
+    "headless",
+    "jsonapi",
+    "json:api",
+    "nuxt",
+    "nuxtjs",
+    "module",
+    "router",
+    "vue"
+  ],
+  "homepage": "https://druxtjs.org",
+  "bugs": {
+    "url": "https://github.com/druxt/druxt.js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/druxt/druxt.js",
+    "directory": "packages/router"
+  },
+  "license": "MIT",
+  "author": "Stuart Clark <stuart@druxtjs.org>",
+  "exports": {
+    ".": {
+      "require": "./dist/druxt-router.ssr.js",
+      "import": "./dist/druxt-router.esm.js"
+    },
+    "./components/*": "./dist/components/*",
+    "./nuxt": "./nuxt/index.js"
+  },
+  "main": "dist/druxt-router.ssr.js",
+  "module": "dist/druxt-router.esm.js",
+  "files": [
+    "dist",
+    "nuxt",
+    "templates",
+    "icon.svg",
+    "banner.svg"
+  ],
+  "dependencies": {
+    "druxt": "^0.24.0",
+    "url-parse": "^1.5.10"
+  },
+  "peerDependencies": {
+    "drupal-jsonapi-params": "*"
+  },
+  "optionalDependencies": {
+    "vue": "^2.7.16",
+    "vuex": "^3.6.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
