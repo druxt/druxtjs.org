@@ -39,6 +39,13 @@ $config['simple_oauth.settings']['private_key'] = $app_root . '/' . $site_path .
 // Requests arrive through Lagoon's router, or through the Nuxt server's proxy.
 $settings['reverse_proxy'] = TRUE;
 $settings['reverse_proxy_addresses'] = [$_SERVER['REMOTE_ADDR'] ?? '127.0.0.1'];
+// Only the X-Forwarded headers, which the router sets. Trusting `Forwarded`
+// too means a client that sends its own, as scanners do, makes Symfony refuse
+// the request as conflicting and the page answers 500.
+$settings['reverse_proxy_trusted_headers'] = \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_FOR
+  | \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_HOST
+  | \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_PORT
+  | \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_PROTO;
 
 // This environment's routes, and the service name the Nuxt server calls Drupal by.
 $routes = array_filter(array_map('trim', explode(',', (string) getenv('LAGOON_ROUTES'))));
