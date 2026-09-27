@@ -90,3 +90,4 @@ itok
 Revisionable
 SAMESITE
 SIMPLETEST
+coderabbit
