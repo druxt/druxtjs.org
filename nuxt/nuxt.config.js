@@ -243,8 +243,27 @@ export default {
       filter: ['node--doc_page--.*', 'paragraph--docs_.*', 'media--image--.*'],
       refresh: true,
     },
-    // POST /_druxt/cache/clear with this in X-Druxt-Secret. Unset, it is off.
-    cache: { secret: process.env.DRUXT_CACHE_SECRET },
+    // The JSON:API index and the menus are the same for every anonymous reader,
+    // so they are held between server requests rather than fetched per render.
+    // Drupal's Cache-Control decides how long, which is why system.performance
+    // sets a page max_age: at 0 it answers "no-cache, private" and nothing is
+    // stored. A request carrying an Authorization header or a session cookie
+    // never reads or writes this cache, so an editor's page is never shared.
+    //
+    // The secret turns on POST /_druxt/cache/clear, which Drupal calls when
+    // content changes so a publish does not wait out the max_age. Each Nuxt
+    // process keeps its own cache, so every process has to be told.
+    //
+    // sessionCookie is stated rather than left to the default because the
+    // default fails open: a session cookie whose name it does not match is read
+    // as anonymous, and the response is then cached for everyone. Axios forwards
+    // the visitor's headers on a server render, so whatever cookie the backend
+    // authenticates with arrives here and has to be recognised. If anything in
+    // front of Drupal ever renames it, this pattern is what has to change.
+    cache: {
+      secret: process.env.DRUXT_CACHE_SECRET,
+      sessionCookie: 'S?SESS[0-9a-f]+',
+    },
   },
 
   // @nuxtjs/auth-next: a signed-in editor is sent back to the page they
