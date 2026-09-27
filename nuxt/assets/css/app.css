@@ -864,11 +864,26 @@ html {
   color: #1a0c07;
 }
 
+/* While the sign-in sheet is open the page behind it is pinned where it was
+   scrolled to, so a drag on the backdrop or the keyboard opening moves
+   nothing. SignInDialog sets body's top to the scroll position and puts it
+   back on close. */
+html.sign-in-open,
+html.sign-in-open body {
+  overflow: hidden;
+}
+html.sign-in-open body {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
+}
+
 /* The sign-in sheet stays within the visible viewport, keyboard included,
-   and clears the home indicator. */
+   and clears the home indicator. The overlay is sized to the visual viewport
+   by SignInDialog, so the sheet fits that rather than the layout viewport. */
 .sign-in-sheet {
-  max-height: 100vh;
-  max-height: 100dvh;
+  max-height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
