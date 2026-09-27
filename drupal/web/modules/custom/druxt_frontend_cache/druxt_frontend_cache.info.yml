@@ -1,0 +1,5 @@
+name: Druxt frontend cache
+type: module
+description: 'Tells the Nuxt server to empty its shared JSON:API cache when content changes here.'
+package: DruxtJS
+core_version_requirement: ^11
