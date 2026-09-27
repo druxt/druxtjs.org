@@ -50,6 +50,16 @@ if ($unknown !== []) {
   FAIL('Unknown argument: %s.', implode(', ', $unknown));
 }
 
+// Production's database is the documentation's only copy, and --force would
+// talk this past every later guard, so the environment decides and nothing
+// overrides it. A name is checked as well as the type, because an
+// environment can be typed by hand and a rename should not open this up.
+$environment_type = (string) getenv('LAGOON_ENVIRONMENT_TYPE');
+$environment_name = (string) getenv('LAGOON_ENVIRONMENT');
+if ($environment_type === 'production' || $environment_name === 'main') {
+  FAIL('Refusing to import into production (LAGOON_ENVIRONMENT_TYPE=%s, LAGOON_ENVIRONMENT=%s). Production holds the canonical documentation, and the importer would seed it from the pinned corpus. Import into a non-production environment instead.', $environment_type !== '' ? $environment_type : '(unset)', $environment_name !== '' ? $environment_name : '(unset)');
+}
+
 /**
  * The migrations, in the order their dependencies require.
  */

@@ -22,6 +22,8 @@ const {
 } = require('../nuxt/server/page-cache.js')
 const {
   backendReady,
+  deployedRevision,
+  deploymentReady,
   resolveOrigin,
   serviceRoute,
   waitForBackend,
@@ -564,6 +566,107 @@ describe('backend', () => {
     })
     const closed = await withServer(live(), async (base) => base)
     assert.equal(await backendReady(closed), false)
+  })
+
+  test('reads the revision Drupal reports having deployed', async () => {
+    let answer
+    const drupal = (req, res) => {
+      const [status, body] = req.url === '/druxt-docs/deployment' ? answer : [404, '{}']
+      res.writeHead(status, { 'Content-Type': 'application/json' })
+      res.end(body)
+    }
+    await withServer(drupal, async (base) => {
+      for (const [status, body, expected] of [
+        [200, '{"revision":"abc123"}', 'abc123'],
+        [200, '{"revision":null}', null],
+        [200, '{"revision":""}', null],
+        [404, '{}', undefined],
+        [200, 'not json', undefined],
+        [200, '{"other":"field"}', undefined],
+      ]) {
+        answer = [status, body]
+        assert.equal(await deployedRevision(base), expected, `${status} ${body}`)
+      }
+    })
+  })
+
+  test('is ready once Drupal reports the revision this build is from', async () => {
+    let deployment
+    let footer = [200, '{"data":[{"id":"a"}]}']
+    const drupal = (req, res) => {
+      const [status, body] =
+        req.url === '/druxt-docs/deployment'
+          ? deployment
+          : req.url === '/jsonapi/menu_items/footer'
+            ? footer
+            : [404, '{}']
+      res.writeHead(status, { 'Content-Type': 'application/json' })
+      res.end(body)
+    }
+    await withServer(drupal, async (base) => {
+      // The matching revision is the only thing that makes it ready.
+      deployment = [200, '{"revision":"abc123"}']
+      assert.equal(await deploymentReady(base, { revision: 'abc123' }), true, 'matching revision')
+
+      // An older revision keeps it waiting, even though the footer menu
+      // has items, which is exactly the case the old probe passed.
+      deployment = [200, '{"revision":"older"}']
+      assert.equal(await deploymentReady(base, { revision: 'abc123' }), false, 'older revision')
+
+      // A rollout that has not recorded one yet is not ready either.
+      deployment = [200, '{"revision":null}']
+      assert.equal(
+        await deploymentReady(base, { revision: 'abc123' }),
+        false,
+        'no revision recorded'
+      )
+
+      // No endpoint means a backend deployed before this existed, so the
+      // footer-menu probe decides, in both directions.
+      deployment = [404, '{}']
+      assert.equal(
+        await deploymentReady(base, { revision: 'abc123' }),
+        true,
+        'no endpoint, menu has items'
+      )
+      footer = [200, '{"data":[]}']
+      assert.equal(
+        await deploymentReady(base, { revision: 'abc123' }),
+        false,
+        'no endpoint, menu empty'
+      )
+
+      // Without a revision of its own there is nothing to compare, so the
+      // gate does not apply and the fallback decides.
+      footer = [200, '{"data":[{"id":"a"}]}']
+      deployment = [200, '{"revision":"anything"}']
+      assert.equal(await deploymentReady(base, {}), true, 'no local revision')
+    })
+  })
+
+  test('gives up waiting rather than holding the port forever', async () => {
+    const lines = []
+    const ready = await waitForBackend('http://drupal', {
+      interval: 1,
+      timeout: 5,
+      ready: async () => false,
+      log: (line) => lines.push(line),
+    })
+    assert.equal(ready, false)
+    // The first line is the ordinary "still waiting" one; what matters is
+    // that the run ends by saying plainly that it stopped waiting.
+    const last = lines[lines.length - 1]
+    assert.match(last, /giving up waiting for Drupal/)
+    assert.match(last, /may be against a backend that has not finished deploying/)
+  })
+
+  test('reports that it waited successfully when Drupal becomes ready', async () => {
+    let checks = 0
+    const ready = await waitForBackend('http://drupal', {
+      interval: 1,
+      ready: async () => ++checks === 2,
+    })
+    assert.equal(ready, true)
   })
 
   test('waits until Drupal is ready', async () => {

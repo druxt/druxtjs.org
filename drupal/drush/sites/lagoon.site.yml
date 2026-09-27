@@ -1,0 +1,34 @@
+# Drush aliases for the hosted environments.
+#
+# `drush @lagoon.druxtjs-org-main sql:dump` and the rest run through these
+# rather than through an ad-hoc SSH session, so a database is moved by the
+# tooling Drupal and the platform already provide.
+#
+# The user of each alias is the environment's own namespace, which is how
+# the platform scopes SSH access.
+#
+# Production is here to be read from. Nothing in this repository writes to
+# it: the sync in post-rollout.sh refuses to run unless the environment it
+# is running in is a non-production one.
+
+druxtjs-org-main:
+  host: ssh.amazeeio.cloud
+  user: druxtjs-org-main
+  root: /app/drupal/web
+  options:
+    command-specific:
+      sql-sync:
+        no-ordered-dump: true
+  ssh:
+    options: '-o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 32222'
+
+druxtjs-org-develop:
+  host: ssh.amazeeio.cloud
+  user: druxtjs-org-develop
+  root: /app/drupal/web
+  options:
+    command-specific:
+      sql-sync:
+        no-ordered-dump: true
+  ssh:
+    options: '-o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 32222'

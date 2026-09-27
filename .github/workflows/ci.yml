@@ -1,0 +1,122 @@
+---
+name: CI
+
+# The same lint and test set as .gitlab-ci.yml. This repository is mirrored and
+# review happens on the mirror, so both hosts have to agree. Nothing on this
+# side lints this file: lint:yaml in the GitLab pipeline runs actionlint over it
+# in return.
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # The root tooling, on the Node the frontend builds with.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      # Actions are pinned to commit SHAs, not tags. A tag is a mutable
+      # reference to code that runs with this repository's credentials.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          # The attribution, prose and commit checks read the pull request's
+          # own commits, so its base has to be present.
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # corepack reads package.json's packageManager, so the npm that wrote the
+      # lockfile is the one that installs it.
+      - run: corepack enable && corepack prepare --activate
+
+      # Install scripts are skipped, so the git hook setup never runs in a job
+      # that makes no commits.
+      - run: npm ci --ignore-scripts
+
+      - run: npm run lint:js
+
+      - run: npm run lint:format
+
+      - run: npm run lint:md
+
+      - run: npm run lint:cspell
+
+      - run: npm run lint:knip
+
+      # This repository is public. A host only the author can reach must never
+      # reach a tracked file.
+      - run: npm run lint:private
+
+      # The work is the author's. No commit, pull request description or
+      # tracked file may credit an AI tool as author, co-author or generator.
+      - name: Check for AI attribution
+        env:
+          ATTRIBUTION_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          MERGE_REQUEST_DESCRIPTION: ${{ github.event.pull_request.body }}
+        run: bash .gitlab/scripts/check-attribution.sh
+
+      # Project voice over the markdown a change touches, its commit messages
+      # and the pull request description.
+      - name: Lint prose
+        env:
+          PROSE_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          MERGE_REQUEST_DESCRIPTION: ${{ github.event.pull_request.body }}
+          PROSE_LINT_GLOB: '!nuxt/**'
+        run: |
+          bash .gitlab/scripts/install-vale.sh .vale/bin .vale/styles
+          bash .gitlab/scripts/lint-prose.sh
+
+      # The pull request's own commits. These repositories squash-merge, so a
+      # prose title becomes the commit subject and breaks the target branch.
+      - name: Validate commit messages
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: npm run lint:commit -- --from "$BASE_SHA" --to HEAD --verbose
+
+      # Production dependencies only: a devDependency advisory is worth knowing
+      # about and not worth blocking a merge on. nuxt/'s audit stays report-only
+      # in the GitLab pipeline, as Nuxt 2's frozen tree cannot pass it.
+      - run: npm audit --omit=dev --audit-level=high
+
+  # test:coverage refuses to run below Node 22.8, so it cannot share the lint
+  # job's pin at the Node the frontend builds with.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: corepack enable && corepack prepare --activate
+
+      - run: npm ci --ignore-scripts
+
+      # The coverage floor in the script is what fails here.
+      - run: npm run test:coverage
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: test-results
+          path: reports/junit.xml

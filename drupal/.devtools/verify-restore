@@ -1,0 +1,204 @@
+#!/usr/bin/env bash
+# Prove a database dump restores into a database that holds the content.
+#
+# The documentation lives in the database and nothing exports it back to
+# this repository, so "there is a backup" is not worth claiming until a
+# restore of that backup has been read back. This dumps the local site,
+# loads the dump into a scratch database, and asserts the content arrived.
+#
+#   .devtools/verify-restore                 # dump this site, restore, verify
+#   .devtools/verify-restore path/to/dump.sql
+#
+# Scope, stated plainly: this is the local SQLite simulation. It exercises
+# the procedure and the assertions, not the platform. The gate it stands in
+# for is a real backup restored into a real scratch environment on MariaDB,
+# which has to be done once on the platform before anything that can
+# replace a database is enabled. This script does not substitute for that.
+#
+# It never writes to the database the site is using. `.devtools/provision`
+# writes the database path into the site's settings, so a runtime `DB_FILE`
+# does not move it, and a restore that assumed otherwise would load the
+# dump straight back into the live database. The check below is what stops
+# that, and it is the reason this script exists as a script.
+
+set -uo pipefail
+
+cd "$(dirname "$0")/.."
+
+readonly DRUPAL_ROOT="$PWD"
+readonly DRUSH="$DRUPAL_ROOT/vendor/bin/drush"
+
+pass=0
+fail=0
+
+ok() {
+  printf '[ OK ] %s\n' "$1"
+  pass=$((pass + 1))
+}
+
+no() {
+  printf '[FAIL] %s\n' "$1"
+  fail=$((fail + 1))
+}
+
+# Production is refused on the environment, before anything is read or
+# written. A restore verification has no business running there.
+if [ "${LAGOON_ENVIRONMENT_TYPE:-}" = "production" ] || [ "${LAGOON_ENVIRONMENT:-}" = "main" ]; then
+  printf '[FAIL] Refusing to run in production (LAGOON_ENVIRONMENT_TYPE=%s, LAGOON_ENVIRONMENT=%s).\n' \
+    "${LAGOON_ENVIRONMENT_TYPE:-unset}" "${LAGOON_ENVIRONMENT:-unset}"
+  exit 1
+fi
+
+if [ ! -x "$DRUSH" ]; then
+  printf '[FAIL] vendor/bin/drush is missing. Run .devtools/assemble and .devtools/provision first.\n'
+  exit 1
+fi
+
+# Drupal's SQLite driver registers a NOCASE_UTF8 collation at runtime, and
+# its dumps declare columns that use it. The sqlite3 CLI does not have it,
+# so loading a dump there fails at the first such column and every later
+# INSERT reports a missing table. Restores and queries here go through PDO
+# with the collation registered, which is what Drupal itself does.
+sqlite_php() {
+  php -r '
+    $db = $argv[1];
+    $pdo = new PDO("sqlite:" . $db);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->sqliteCreateCollation("NOCASE_UTF8", "strcasecmp");
+    try {
+      if ($argv[2] === "--file") {
+        $pdo->exec(file_get_contents($argv[3]));
+        echo "OK";
+      }
+      else {
+        echo (string) $pdo->query($argv[3])->fetchColumn();
+      }
+    }
+    catch (Throwable $e) {
+      fwrite(STDERR, $e->getMessage());
+      exit(1);
+    }
+  ' "$@"
+}
+
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+
+# The database the site is actually using, straight from Drupal rather than
+# from an environment variable, because the settings file is what decides.
+live_db="$("$DRUSH" status --field=db-name 2>/dev/null | tr -d '[:space:]')"
+if [ -z "$live_db" ]; then
+  printf '[FAIL] Could not determine which database the site is using.\n'
+  exit 1
+fi
+printf '[TASK] The site is using %s.\n' "$live_db"
+
+# --------------------------------------------------------------------------
+# Obtain a dump: the one named on the command line, or one taken now.
+# --------------------------------------------------------------------------
+
+dump="${1:-}"
+if [ -n "$dump" ]; then
+  if [ ! -s "$dump" ]; then
+    printf '[FAIL] %s is not a dump this can read.\n' "$dump"
+    exit 1
+  fi
+  printf '[TASK] Restoring from %s.\n' "$dump"
+else
+  dump="$work/source.sql"
+  printf '[TASK] Dumping the site to %s.\n' "$dump"
+  if ! "$DRUSH" sql:dump --result-file="$dump" > "$work/dump.log" 2>&1; then
+    no "the dump step failed"
+    sed 's/^/       /' "$work/dump.log"
+    exit 1
+  fi
+  if [ ! -s "$dump" ]; then
+    no "the dump step reported success and wrote nothing"
+    exit 1
+  fi
+  ok "dumped $(wc -c < "$dump") bytes from the running site"
+fi
+
+# --------------------------------------------------------------------------
+# Restore into a scratch database, having first proved it is not the live one.
+# --------------------------------------------------------------------------
+
+restored="$work/restored.sqlite"
+
+if [ "$restored" = "$live_db" ]; then
+  no "the restore target is the database the site is using; refusing to load a dump over a live database"
+  exit 1
+fi
+ok "the restore target is not the database the site is using"
+
+printf '[TASK] Restoring into %s.\n' "$restored"
+if ! sqlite_php "$restored" --file "$dump" > "$work/restore.log" 2>&1; then
+  no "the restore step failed"
+  sed 's/^/       /' "$work/restore.log" | head -20
+  exit 1
+fi
+if [ ! -s "$restored" ]; then
+  no "the restore step reported success and left no database"
+  exit 1
+fi
+ok "restored into a scratch database of $(wc -c < "$restored") bytes"
+
+# --------------------------------------------------------------------------
+# Assert the restored copy holds the content, and that the live one is
+# unchanged by any of the above.
+# --------------------------------------------------------------------------
+
+query() {
+  sqlite_php "$1" --query "$2" 2>/dev/null | tr -cd '0-9'
+}
+
+readonly PAGE_COUNT="SELECT COUNT(*) FROM node_field_data WHERE type = 'doc_page';"
+readonly PARAGRAPH_COUNT="SELECT COUNT(*) FROM paragraphs_item_field_data;"
+
+live_pages="$(query "$live_db" "$PAGE_COUNT")"
+restored_pages="$(query "$restored" "$PAGE_COUNT")"
+
+if [ -n "$restored_pages" ] && [ "$restored_pages" -gt 0 ]; then
+  ok "the restored database holds $restored_pages documentation page(s)"
+else
+  no "the restored database holds no documentation pages"
+fi
+
+if [ "$restored_pages" = "$live_pages" ]; then
+  ok "the restored page count matches the source ($live_pages)"
+else
+  no "the restored database holds $restored_pages page(s), the source holds $live_pages"
+fi
+
+# A page is built from paragraphs. A restore that kept the nodes and lost
+# their paragraphs would still count pages correctly, so count both.
+live_paragraphs="$(query "$live_db" "$PARAGRAPH_COUNT")"
+restored_paragraphs="$(query "$restored" "$PARAGRAPH_COUNT")"
+if [ -n "$restored_paragraphs" ] && [ "$restored_paragraphs" = "$live_paragraphs" ]; then
+  ok "the restored paragraph count matches the source ($live_paragraphs)"
+else
+  no "the restored database holds ${restored_paragraphs:-no} paragraph(s), the source holds $live_paragraphs"
+fi
+
+# The negative control. The same query against an empty database has to come
+# back zero, or the counts above would pass against anything.
+empty="$work/empty.sqlite"
+sqlite_php "$empty" --query "CREATE TABLE node_field_data (type TEXT)" > /dev/null 2>&1
+control="$(query "$empty" "$PAGE_COUNT")"
+if [ "${control:-0}" -eq 0 ]; then
+  ok "negative control: an empty database reports no pages"
+else
+  no "negative control: an empty database reported $control pages, so the count proves nothing"
+fi
+
+# The live database must be exactly as it was. This script has loaded a dump
+# before; the guard above exists because of it.
+live_pages_after="$(query "$live_db" "$PAGE_COUNT")"
+if [ "$live_pages_after" = "$live_pages" ]; then
+  ok "the live database is unchanged ($live_pages_after page(s))"
+else
+  no "the live database changed during this run: $live_pages before, $live_pages_after after"
+fi
+
+printf '\n%d passed, %d failed\n' "$pass" "$fail"
+[ "$fail" -eq 0 ]

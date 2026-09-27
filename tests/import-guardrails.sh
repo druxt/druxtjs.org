@@ -105,6 +105,35 @@ assert_refusal() {
 }
 
 # --------------------------------------------------------------------------
+# Production is refused on the environment alone, before the pin is read,
+# and --force does not talk it past. The last case is the negative control:
+# the same run without the production markers has to get past this guard,
+# or a refusal here would prove nothing.
+# --------------------------------------------------------------------------
+
+repo="$(fresh_copy)"
+output="$(run_import "$repo" LAGOON_ENVIRONMENT_TYPE=production)"
+assert_refusal "production by environment type" "$output" $? "Refusing to import into production"
+
+repo="$(fresh_copy)"
+output="$(run_import "$repo" LAGOON_ENVIRONMENT=main)"
+assert_refusal "production by environment name" "$output" $? "Refusing to import into production"
+
+repo="$(fresh_copy)"
+output="$(cd "$repo/drupal" && env LAGOON_ENVIRONMENT_TYPE=production timeout 120 "$IMPORT" --force 2>&1)"
+assert_refusal "production with --force" "$output" $? "Refusing to import into production"
+
+repo="$(fresh_copy)"
+rm "$repo/docs-source.json"
+output="$(run_import "$repo" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x)"
+if printf '%s' "$output" | grep -q "Refusing to import into production"; then
+  no "negative control: a non-production environment was refused as production"
+  printf '%s\n' "$output" | sed 's/^/       /'
+else
+  ok "negative control: a non-production environment passes the production guard"
+fi
+
+# --------------------------------------------------------------------------
 # The pin has to exist and name exactly one commit.
 # --------------------------------------------------------------------------
 
