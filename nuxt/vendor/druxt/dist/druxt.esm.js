@@ -13,7 +13,7 @@ const scopes = globalThis[SCOPES] || (globalThis[SCOPES] = new Map());
 const GENERATION = Symbol.for("druxt.processCacheGeneration");
 const generation = globalThis[GENERATION] || (globalThis[GENERATION] = { value: 0 });
 const credentialed = new WeakSet();
-const watched = new WeakSet();
+const watched = new WeakMap();
 const runtime = { isServer: () => typeof window === "undefined" };
 const DRUPAL_SESSION_COOKIE = "S?SESS[0-9a-f]+";
 const consumerId = (axios) => {
@@ -51,12 +51,22 @@ const hasCredentials = (axios, sessionCookie = DRUPAL_SESSION_COOKIE) => {
 };
 const watchCredentials = (axios, sessionCookie = DRUPAL_SESSION_COOKIE) => {
   const interceptors = ((axios || {}).interceptors || {}).response;
-  if (!interceptors || typeof interceptors.use !== "function" || watched.has(axios))
+  if (!interceptors || typeof interceptors.use !== "function")
     return;
-  watched.add(axios);
+  const registered = watched.get(axios);
+  if (registered) {
+    registered.add(sessionCookie);
+    return;
+  }
+  const patterns = new Set([sessionCookie]);
+  watched.set(axios, patterns);
   const mark = (config) => {
-    if (configHasCredentials(config, sessionCookie))
-      credentialed.add(axios);
+    for (const pattern of patterns) {
+      if (configHasCredentials(config, pattern)) {
+        credentialed.add(axios);
+        return;
+      }
+    }
   };
   interceptors.use((response) => {
     mark((response || {}).config);

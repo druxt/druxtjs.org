@@ -10853,7 +10853,7 @@ __metadata:
 
 "druxt-blocks@file:vendor/druxt-blocks::locator=druxtjs-org%40workspace%3A.":
   version: 0.17.3
-  resolution: "druxt-blocks@file:vendor/druxt-blocks#vendor/druxt-blocks::hash=62b604&locator=druxtjs-org%40workspace%3A."
+  resolution: "druxt-blocks@file:vendor/druxt-blocks#vendor/druxt-blocks::hash=359a5d&locator=druxtjs-org%40workspace%3A."
   dependencies:
     axios: 0.33.0
     drupal-jsonapi-params: ^2.3.2
@@ -10865,13 +10865,13 @@ __metadata:
       optional: true
     vuex:
       optional: true
-  checksum: 0351d30c12c6bfdb5dcd48c10f6f0af3e7a92b89c43c7451f15f5bd12a09898cefda495a23edf98e97c595fe73f42433ad2786d3d7e36927c7efc48c9f76e02f
+  checksum: 6fe65ba0b34275aa85337054f6d778ae37674c9c75cc096eae858577117f09440975f2e72f5750a874fb449d9891601db983bc3c597dc770528de53d67343778
   languageName: node
   linkType: hard
 
 "druxt-breadcrumb@file:vendor/druxt-breadcrumb::locator=druxtjs-org%40workspace%3A.":
   version: 0.17.2
-  resolution: "druxt-breadcrumb@file:vendor/druxt-breadcrumb#vendor/druxt-breadcrumb::hash=e9954f&locator=druxtjs-org%40workspace%3A."
+  resolution: "druxt-breadcrumb@file:vendor/druxt-breadcrumb#vendor/druxt-breadcrumb::hash=e942b3&locator=druxtjs-org%40workspace%3A."
   dependencies:
     druxt: ^0.24.0
     druxt-blocks: ^0.17.1
@@ -10883,20 +10883,20 @@ __metadata:
       optional: true
     vuex:
       optional: true
-  checksum: d8f9a36120998aca9b81bcdbd7e79dec9cdb29a2a4bc2108e1864d4966461d17bd36861122c2227acd2d242ec319d2f51bb59117f968113199c1c7de1ca4bf8e
+  checksum: 2966f3ed4eb5a603a75943c637c439cd95d4e8d1a502824eb0554a1d7392e5d261f40df5a3f11f378aa939942b56d23eb2504aebb44fcf17003ff7b063db56bc
   languageName: node
   linkType: hard
 
 "druxt-entity@file:vendor/druxt-entity::locator=druxtjs-org%40workspace%3A.":
   version: 0.28.1
-  resolution: "druxt-entity@file:vendor/druxt-entity#vendor/druxt-entity::hash=4e160d&locator=druxtjs-org%40workspace%3A."
+  resolution: "druxt-entity@file:vendor/druxt-entity#vendor/druxt-entity::hash=832dd5&locator=druxtjs-org%40workspace%3A."
   dependencies:
     deepmerge: ^4.3.1
     drupal-jsonapi-params: ^2.3.2
     druxt: ^0.24.0
     druxt-router: ^0.31.0
     druxt-schema: ^0.11.2
-  checksum: b36fb70ffdbcf98aaac32a70ac3b723c7d1f300e7d3470337fc47cd8b025e0de43eb4dfc907a7f69b265648b747e9235bbb5a5e6fb1e581f40dc74ac17b7856f
+  checksum: d2d1c673efafd26a4792cf84a0214101e14237bea63dbf7095a63af766edb198dae03b1b44937f0c3eaaf99ce1996830c99977bd6a9d2437f755d5d488c8ad56
   languageName: node
   linkType: hard
 
@@ -10909,7 +10909,7 @@ __metadata:
 
 "druxt-menu@file:vendor/druxt-menu::locator=druxtjs-org%40workspace%3A.":
   version: 0.21.0
-  resolution: "druxt-menu@file:vendor/druxt-menu#vendor/druxt-menu::hash=7b8f24&locator=druxtjs-org%40workspace%3A."
+  resolution: "druxt-menu@file:vendor/druxt-menu#vendor/druxt-menu::hash=9b0aa5&locator=druxtjs-org%40workspace%3A."
   dependencies:
     deepmerge: ^4.3.1
     drupal-jsonapi-params: ^2.3.2
@@ -10922,13 +10922,13 @@ __metadata:
       optional: true
     vuex:
       optional: true
-  checksum: 6aff0ff032ea38afc3d2d5167dee1d24aafe5df5f81ea83272a96f2efc832d1ffbd86ae11afd3a623651ddde6abca8b0de2e30d1b422f74488159557e2ecdca8
+  checksum: d427671487bf65e2eed9b91c358370ee7e7884efd463f5b795dabee2a786580f3850e0b74208441054845a088c1f93b8f24f6663becbe9f2bc576cb5a4fd918d
   languageName: node
   linkType: hard
 
 "druxt-router@file:vendor/druxt-router::locator=druxtjs-org%40workspace%3A.":
   version: 0.31.0
-  resolution: "druxt-router@file:vendor/druxt-router#vendor/druxt-router::hash=42a2b5&locator=druxtjs-org%40workspace%3A."
+  resolution: "druxt-router@file:vendor/druxt-router#vendor/druxt-router::hash=468202&locator=druxtjs-org%40workspace%3A."
   dependencies:
     druxt: ^0.24.0
     url-parse: ^1.5.10
@@ -10941,13 +10941,13 @@ __metadata:
       optional: true
     vuex:
       optional: true
-  checksum: b99a2caf44ec0edab82ed11a668648294310bda606cc666083ffd2f9de18b727f2fa38cfd6eb438968145bdc4434df94edcac528ef276717e2dec5653b5d4c0f
+  checksum: 55fe5d81b3d8a649c43b095590951279e7624f1a31cd864f5e2dc51c25d239c59d18bdb835bd4df1aa4342f88fd50d7db821a41e4ccdfb79ee41db379e8eefa8
   languageName: node
   linkType: hard
 
 "druxt-schema@file:vendor/druxt-schema::locator=druxtjs-org%40workspace%3A.":
   version: 0.11.3
-  resolution: "druxt-schema@file:vendor/druxt-schema#vendor/druxt-schema::hash=9dec24&locator=druxtjs-org%40workspace%3A."
+  resolution: "druxt-schema@file:vendor/druxt-schema#vendor/druxt-schema::hash=78e026&locator=druxtjs-org%40workspace%3A."
   dependencies:
     consola: ^2.15.3
     drupal-jsonapi-params: ^2.3.2
@@ -10959,13 +10959,13 @@ __metadata:
       optional: true
     vuex:
       optional: true
-  checksum: f038995d5cf44e9a7875db5d045d55fb199271c26347777aea12dd47b6f5bb77825dbff1fce0c329b3c547e248f7fe66dd21b06d26db6c6fdf6cfa26e1e7a4a3
+  checksum: 8e74a2577e26f68c2a50625c2e091163fe1c1185863da328d8bf7e550fa72f62e2b0eb42c91bb0ab3e6e2a694dcce2881757c48cb2da86defdafb55c58c5311c
   languageName: node
   linkType: hard
 
 "druxt-site@file:vendor/druxt-site::locator=druxtjs-org%40workspace%3A.":
   version: 0.14.3
-  resolution: "druxt-site@file:vendor/druxt-site#vendor/druxt-site::hash=55e572&locator=druxtjs-org%40workspace%3A."
+  resolution: "druxt-site@file:vendor/druxt-site#vendor/druxt-site::hash=b6eed7&locator=druxtjs-org%40workspace%3A."
   dependencies:
     drupal-jsonapi-params: ^2.3.2
     druxt: ^0.24.0
@@ -10983,13 +10983,13 @@ __metadata:
       optional: true
     vuex:
       optional: true
-  checksum: 0ec27b59b65e94d6e14ee5bf3cc468bb7be989f62cd92fdc8618c136e3308ee870da5d1d8e2899266047bfe24c7f6f5a6d505dfba0683ddc3d38b9acb11d9c17
+  checksum: 68173a9258f94610a6f9a4f7eb3e9b04f31949b96259bd05401a0f030bfef77919e5d4b1adfea5b95e95398d75e652ee6eb3f9c1561b22034c63c11f9991e3ab
   languageName: node
   linkType: hard
 
 "druxt-views@file:vendor/druxt-views::locator=druxtjs-org%40workspace%3A.":
   version: 0.22.2
-  resolution: "druxt-views@file:vendor/druxt-views#vendor/druxt-views::hash=be4001&locator=druxtjs-org%40workspace%3A."
+  resolution: "druxt-views@file:vendor/druxt-views#vendor/druxt-views::hash=9f4c15&locator=druxtjs-org%40workspace%3A."
   dependencies:
     axios: 0.33.0
     deepmerge: ^4.3.1
@@ -11006,13 +11006,13 @@ __metadata:
       optional: true
     vuex:
       optional: true
-  checksum: 3905631ae7ac95360485928778bd1465b81d84d449e5d52b8db343dac363c3a7160ac22365f3da19e3d7f08464b44c6b9264997c79c407abf7695ff8290a0233
+  checksum: 7711a5607b632667cd21f94ba1ccdaad3eee1ff8b14eaf85d2add4d29aebe2c1822fd21acc216cc6017122663ed5457ea422e27f377489690de348da4fd920c9
   languageName: node
   linkType: hard
 
 "druxt@file:vendor/druxt::locator=druxtjs-org%40workspace%3A.":
   version: 0.24.0
-  resolution: "druxt@file:vendor/druxt#vendor/druxt::hash=f2d9db&locator=druxtjs-org%40workspace%3A."
+  resolution: "druxt@file:vendor/druxt#vendor/druxt::hash=070d26&locator=druxtjs-org%40workspace%3A."
   dependencies:
     "@nuxtjs/axios": ^5.13.6
     "@nuxtjs/proxy": ^2.1.0
@@ -11038,7 +11038,7 @@ __metadata:
       optional: true
     vuex:
       optional: true
-  checksum: f43f88c89edee7661fda3cab899da9295f62f11ec600e08ce5050f3526bfa43b3feaf9ba0d9155ffac96687cdb25f3f6da193db3e162fafc01e4156038630e58
+  checksum: 94d9ffd01066ff548d151d528def5f6399ae7f27f8fe9a7ed92375171541d60dd1decdf26ba3ce67b7aba8088b41b3bb10ad1519f6cc6d950b492f4bbca0ef6f
   languageName: node
   linkType: hard
 
