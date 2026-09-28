@@ -50,7 +50,8 @@ Nuxt application.
   A core patch is the exception: it is vendored into `drupal/patches/` with
   the merge request and commit in its name, because the upstream branch moves
   and a core change needs review before it changes under the site.
-  `docs/frontend-cache.md` records what each one is for.
+  `docs/frontend-cache.md` records what each one is for, and
+  `lagoon/cli.dockerfile` copies `drupal/patches` in before `composer install`.
 - **Adding or changing a patch needs `composer patches-relock` and
   `composer patches-repatch`.** `composer install` applies nothing to a
   package it already has. Grep the patched file for something the patch adds
