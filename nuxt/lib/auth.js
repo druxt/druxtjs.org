@@ -58,6 +58,9 @@ const authStorageKeys = (strategy) => [
   `${AUTH_COOKIE_PREFIX}_refresh_token_expiration.${strategy}`,
   `${AUTH_COOKIE_PREFIX}${strategy}.pkce_state`,
   `${AUTH_COOKIE_PREFIX}${strategy}.pkce_code_verifier`,
+  // The scheme's own key: Drupal's logout token, removed by the scheme only
+  // when Drupal answered the sign-out.
+  `${AUTH_COOKIE_PREFIX}${strategy}.logout_token`,
   `${AUTH_COOKIE_PREFIX}strategy`,
 ]
 

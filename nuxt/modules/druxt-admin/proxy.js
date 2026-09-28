@@ -231,10 +231,14 @@ export function createProxy(options = {}) {
   const onError =
     options.onError ||
     ((error, req, res) => {
+      // Once the status and headers are on the wire there is no 502 to send;
+      // the client gets a cut-off body, which is the truth of what happened.
+      if (res.headersSent) return res.destroy()
       res.statusCode = 502
       res.setHeader('content-type', 'text/plain; charset=utf-8')
       res.end(`The backend could not be reached: ${error.message}\n`)
     })
+  const timeout = Number(options.timeout) > 0 ? Number(options.timeout) : 30000
 
   return function druxtAdminProxy(req, res, next) {
     // A site with no backend configured has nothing to proxy to. Falling
@@ -276,6 +280,12 @@ export function createProxy(options = {}) {
     )
 
     upstream.on('error', (error) => onError(error, req, res))
+    // A backend that answers nothing holds the socket and the reader with it.
+    upstream.setTimeout(timeout, () => upstream.destroy(new Error(`no answer within ${timeout} ms`)))
+    // A reader who leaves takes the upstream request with them.
+    res.on('close', () => {
+      if (!res.writableEnded) upstream.destroy()
+    })
     req.pipe(upstream)
   }
 }
