@@ -1,0 +1,10 @@
+--- a/core/modules/jsonapi/jsonapi.services.yml
++++ b/core/modules/jsonapi/jsonapi.services.yml
+@@ -43,6 +43,7 @@
+       - { name: jsonapi_normalizer }
+   serializer.normalizer.data.jsonapi:
+     class: Drupal\jsonapi\Normalizer\DataNormalizer
++    arguments: ['@jsonapi.normalization_cacher']
+     tags:
+       - { name: jsonapi_normalizer }
+   serializer.normalizer.resource_object.jsonapi:
