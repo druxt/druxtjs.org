@@ -137,7 +137,7 @@ restore_addresses() {
     case "$uid" in '' | *[!0-9]*) continue ;; esac
     case "$mail" in '' | *"'"* | *'\'*) continue ;; esac
     drush sql:query "UPDATE users_field_data SET mail = '${mail}', init = '${mail}' WHERE uid = ${uid};"
-    echo "  kept ${mail}."
+    echo "  kept the address of uid ${uid}."
   done < "$kept_addresses"
 }
 
@@ -171,11 +171,16 @@ restore_maintainer_login() {
     $account->activate();
     $account->save();
     print "login-restored";
-  ' 2>/dev/null || :)
+  ' 2>&1 || :)
   case "$restored" in
     *login-restored*) echo "  ${DOCS_MAINTAINER_NAME} can sign in again." ;;
     *no-account*) echo "  no ${DOCS_MAINTAINER_NAME} account in this copy; nothing to restore." ;;
-    *) echo "  could not restore ${DOCS_MAINTAINER_NAME}'s login; the account stays sanitised." ;;
+    *)
+      # A copy nobody can sign in to is not a usable environment, and the
+      # reason is in what drush said, so it is shown rather than dropped.
+      echo "  could not restore ${DOCS_MAINTAINER_NAME}'s login; refusing to leave this environment usable."
+      printf '%s\n' "$restored" | sed 's/^/    /'
+      exit 1 ;;
   esac
 }
 
@@ -242,6 +247,8 @@ sanitise() {
   # After the check, never before it: a sanitise that did not happen must
   # not be handed an address or a password to put back.
   restore_addresses
+  # The kept addresses are production's; nothing needs them after this.
+  rm -f "$kept_addresses"
   restore_maintainer_login
   echo "Sanitised."
 }
