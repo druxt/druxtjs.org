@@ -88,3 +88,6 @@ Revisionable
 SAMESITE
 SIMPLETEST
 coderabbit
+coretags
+httpbundled
+lateruntime

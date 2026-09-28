@@ -1,0 +1,26 @@
+uuid: 436b7eec-50c6-4522-ae6f-b3dc8cbfbb93
+langcode: en
+status: true
+dependencies: {  }
+label: null
+id: 705a5122da
+name: 'Druxt server cache'
+invalidationtype: tag
+hostname: nuxt
+port: 3000
+path: /_druxt/cache/clear
+request_method: POST
+scheme: http
+verify: true
+headers:
+  -
+    field: X-Druxt-Secret
+    value: ''
+body: ''
+body_content_type: text/plain
+runtime_measurement: true
+timeout: 3.0
+connect_timeout: 1.0
+cooldown_time: 0.0
+max_requests: 100
+http_errors: true
