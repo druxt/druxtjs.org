@@ -70,3 +70,26 @@ describe('operationsOf', () => {
     assert.deepEqual(operationsOf({}), [])
   })
 })
+
+describe('EntityOperations.vue', () => {
+  // A second method with the same name replaces the first without a warning:
+  // the E shortcut was registered on the document under a name the menu's
+  // navigation handler then took over, so every arrow key on the page went
+  // to the menu. The two are named for where they listen.
+  it('registers the document shortcut and the menu handler under different names', async () => {
+    const { readFile } = await import('node:fs/promises')
+    const source = await readFile(
+      new URL('../nuxt/components/app/EntityOperations.vue', import.meta.url),
+      'utf8'
+    )
+    const script = source.slice(source.indexOf('<script>'), source.indexOf('</script>'))
+    const methods = script.slice(script.indexOf('  methods: {'))
+    const names = [...methods.matchAll(/^ {4}(?:async )?([a-zA-Z]+)\(/gm)].map((m) => m[1])
+    const duplicates = names.filter((name, i) => names.indexOf(name) !== i)
+    assert.deepEqual(duplicates, [], 'a method name defined twice')
+    assert.ok(source.includes("document.addEventListener('keydown', this.onDocumentKey)"))
+    assert.ok(source.includes("document.removeEventListener('keydown', this.onDocumentKey)"))
+    assert.ok(source.includes('@keydown="onMenuKey"'))
+    assert.ok(!source.includes('@keydown="onKey"'))
+  })
+})
