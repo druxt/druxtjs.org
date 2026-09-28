@@ -68,23 +68,23 @@ included is 18 to 46 objects; the collection behind `sitemap.xml` and
 [3626255](https://www.drupal.org/project/drupal/issues/3626255) reads them
 in one query per response level instead. Measured on this site with page
 caches bypassed, the collection goes from 1301 queries to 77 and the largest
-page from 107 to 63; the responses are byte-identical. Over a network
+page from 107 to 63. The responses are byte-identical. Over a network
 database the collection answered in 97 ms instead of 154.
 
-The site carries it as two patches in `drupal/patches/`:
+The site applies it as two patches in `drupal/patches/`:
 
-| Patch                                                         | What it is                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `drupal-core-3626255-prefetch-normalizations-mr17265-a9227f7b.patch` | The merge request's diff, verbatim, at the commit in the name. Vendored rather than fetched from the merge request URL because the branch moves and a core change is reviewed here before it changes.                                                                                                                                                                                                                                              |
-| `jsonapi-3626255-data-normalizer-argument.patch`              | One line in `jsonapi.services.yml`. The merge request targets Drupal's `main` branch, where the JSON:API services get their arguments by type; on 11.x they do not, so without this line every JSON:API request fails with a circular service reference. Reported on the issue.                                                                                                                                                                                              |
+| Patch                                                                | What it is                                                                                                                                                                                                                                                                      |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `drupal-core-3626255-prefetch-normalizations-mr17265-a9227f7b.patch` | The merge request's diff, verbatim, at the commit in the name. Vendored rather than fetched from the merge request URL because the branch moves and a core change is reviewed here before it changes.                                                                           |
+| `jsonapi-3626255-data-normalizer-argument.patch`                     | One line in `jsonapi.services.yml`. The merge request targets Drupal's `main` branch, where the JSON:API services get their arguments by type. On 11.x they do not, so without this line every JSON:API request fails with a circular service reference. Reported on the issue. |
 
 To take a newer revision of the merge request: download its `.diff`, save it
 under a name with the new commit, point `drupal/composer.json` at it, run
 `composer patches-relock` and `composer patches-repatch`, and confirm
 `ResourceObjectNormalizationCacher.php` has `prefetch()` before committing.
 `composer install` alone applies nothing to a package it already has. Drop
-the argument patch when the merge request carries the argument or lands on
-11.x, and both when the site's core includes the fix.
+the argument patch when the merge request includes the argument or is merged
+into 11.x, and both when the site's core includes the fix.
 
 ## A cache between Drupal and Nuxt
 
