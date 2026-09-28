@@ -294,8 +294,10 @@ test:unit:
     - !reference [default, before_script]
     - apk add --no-cache git > /dev/null
   script:
-    # The page cache test reads druxt-auth through nuxt/'s installed copy.
+    # The tests read the vendored diff engine through the root manifest.
     - corepack enable && corepack prepare --activate
+    - npm ci --cache .npm --prefer-offline --ignore-scripts
+    # The page cache test reads druxt-auth through nuxt/'s installed copy.
     - section_start "nuxt-deps" "Installing nuxt/'s dependencies"
     - (cd nuxt && yarn install --immutable --mode=skip-build)
     - section_end "nuxt-deps"
