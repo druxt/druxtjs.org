@@ -20,6 +20,8 @@ const AUTH_STRATEGY = 'drupal-password'
 /**
  * The scopes a sign-in asks for: one per role an editor might hold. A token
  * carries only those the account also has, so each person gets their own.
+ * The consumer's list is `OAuthClient::SCOPES` in the druxtjsorg module, and
+ * the authorization code strategy's is `OAUTH_CLIENT.scope` in nuxt.config.js.
  */
 const SCOPES = ['authenticated', 'editor', 'contributor', 'administrator']
 

@@ -32,19 +32,24 @@ const DRUXT_BASE_URL = process.env.DRUXT_BASE_URL || 'http://127.0.0.1:8899'
 const CONSUMER_ID = process.env.DRUXT_CONSUMER_ID || 'druxtjs_org'
 
 /**
- * Editor sign-in: the authorization code grant with PKCE, as a public client,
- * on druxt-auth's Drupal scheme. The site's own form signs in through
- * Drupal's JSON login, and every step after it (authorize, token, userinfo)
- * runs on this origin through the proxy, so the Drupal session the login
- * starts is the one the authorize step finds, and nothing of Drupal's is
- * shown. druxt-auth builds the endpoints on the server's base URL, which is
- * an internal service name in production and unreachable from a browser, so
- * the strategy is set here. The scheme itself is the module's own file: the
- * site carried a copy while the fix for a session it did not open was
- * unreleased, and 0.5.0 carries it.
+ * Editor sign-in is the password grant (`lib/auth.js`): the site's own form
+ * sends the credentials to this server, which exchanges them for a token
+ * through simple_oauth_password_grant, with no browser redirect and no
+ * Drupal session for an authorize step to find.
+ *
+ * What follows is the authorization code strategy druxt-auth registers by
+ * default, kept configured but unused: it is what `/login` fell back to
+ * before the password grant, and it is the shape a public client would need.
+ * druxt-auth builds the endpoints on the server's base URL, which is an
+ * internal service name in production and unreachable from a browser, so the
+ * strategy is set here with this origin's proxied endpoints. The scheme
+ * itself is the module's own file since 0.5.0.
  */
-// Every role scope an editor might hold: a token carries only the roles its
-// scopes name that the account also has, so each person gets exactly their own.
+// The role scopes a sign-in asks for. Three lists have to agree: this one,
+// `SCOPES` in `lib/auth.js` (what the password grant asks for), and
+// `OAuthClient::SCOPES` in the druxtjsorg module (what the consumer allows).
+// A token carries only the roles its scopes name that the account also has,
+// so each person gets exactly their own.
 // `druxt.proxy.api` below is what turns the module's own proxy entries on: it
 // takes `/user/login`, `/user/logout` and `/user/password` for POST alone, and
 // `/oauth/authorize` and `/oauth/userinfo` whole, so the site lists none of
