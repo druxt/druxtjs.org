@@ -1,12 +1,12 @@
 {
-    "_hash": "009116c73551388b097ff3145a67fe89170ee61a40086d93b3f184a499902695",
+    "_hash": "4b98f5763e7dd61a2c6e46f6095b02966578cab2d3a010398aa4a295b1f9a6c5",
     "patches": {
         "drupal/core": [
             {
                 "package": "drupal/core",
-                "description": "Issue #3626255: prefetch JSON:API resource object normalizations (MR 17265)",
-                "url": "https://git.drupalcode.org/project/drupal/-/merge_requests/17265.diff",
-                "sha256": "c40d86a4a88bcabce7cb7a53b7e5aa0c893a19a1b922d5c5f4c926b96ef2a59d",
+                "description": "Issue #3626255: prefetch JSON:API resource object normalizations (MR 17265 at a9227f7b, vendored)",
+                "url": "patches/drupal-core-3626255-prefetch-normalizations-mr17265-a9227f7b.patch",
+                "sha256": "a9b87aff390c5ab00c16a0bf421e31c17e4642a1de2cf6f268ba28411c8147a8",
                 "depth": 2,
                 "extra": {
                     "provenance": "root"

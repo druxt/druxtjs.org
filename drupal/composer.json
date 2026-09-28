@@ -147,7 +147,7 @@
         },
         "patches": {
             "drupal/core": {
-                "Issue #3626255: prefetch JSON:API resource object normalizations (MR 17265)": "https://git.drupalcode.org/project/drupal/-/merge_requests/17265.diff",
+                "Issue #3626255: prefetch JSON:API resource object normalizations (MR 17265 at a9227f7b, vendored)": "patches/drupal-core-3626255-prefetch-normalizations-mr17265-a9227f7b.patch",
                 "Issue #3626255: inject the normalization cacher, which 11.x does not autowire": "patches/jsonapi-3626255-data-normalizer-argument.patch"
             },
             "drupal/decoupled_settings": {
