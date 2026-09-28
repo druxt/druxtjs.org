@@ -133,12 +133,16 @@ export default {
       }
     },
 
-    /** Resolves once every changed block is rendered with its text, or after a few seconds. */
+    /**
+     * Resolves once every changed block is rendered, or after a few seconds.
+     * Rendered means the anchor is in the document with content in it: text,
+     * or an element, because an image block never has any text.
+     */
     rendered(view) {
       const uuids = (view.blocks || []).filter((b) => b.status === 'changed').map((b) => anchorUuid(b, 'right'))
       const ready = () => uuids.every((uuid) => {
         const el = findAnchor(document, { entity: uuid })
-        return el && el.textContent.trim()
+        return el && (el.textContent.trim() || el.children.length > 0)
       })
       return new Promise((resolve) => {
         const started = Date.now()
@@ -172,21 +176,32 @@ export default {
         this.marked.push(el)
       }
 
-      // Removed blocks, grouped by the surviving block they sat beside.
+      // Removed blocks, grouped by the surviving block they sat beside. A
+      // block whose field lost every sibling has no neighbour; it is shown
+      // after the last block still on the page, or at the article when
+      // nothing is, rather than not at all.
       const groups = new Map()
+      const lastOnPage = () => {
+        const els = diff.blocks
+          .filter((b) => b.status !== 'removed')
+          .map((b) => findAnchor(document, { entity: anchorUuid(b, 'right') }))
+          .filter(Boolean)
+        return els[els.length - 1] || document.querySelector('article') || null
+      }
       for (const block of diff.rebuilt ? [] : diff.blocks) {
         if (block.status !== 'removed') continue
-        const anchor = anchorUuid({ placeUuids: block.placeUuids, uuid: block.placeAfter || block.placeBefore }, 'right')
-        if (!anchor) continue
-        const side = block.placeAfter ? 'after' : 'before'
-        const key = `${side}:${anchor}`
-        if (!groups.has(key)) groups.set(key, { key, anchor, side, blocks: [] })
+        const neighbour = block.placeAfter || block.placeBefore
+        const anchor = neighbour ? anchorUuid({ placeUuids: block.placeUuids, uuid: neighbour }, 'right') : null
+        const el = anchor ? findAnchor(document, { entity: anchor }) : lastOnPage()
+        if (!el) continue
+        const side = block.placeBefore && anchor ? 'before' : 'after'
+        const key = anchor ? `${side}:${anchor}` : `after:${block.field || 'page'}`
+        if (!groups.has(key)) groups.set(key, { key, el, side, blocks: [] })
         groups.get(key).blocks.push(block)
       }
       const removed = []
       for (const group of groups.values()) {
-        const el = findAnchor(document, { entity: group.anchor })
-        if (!el) continue
+        const el = group.el
         const r = el.getBoundingClientRect()
         removed.push({
           key: group.key,
