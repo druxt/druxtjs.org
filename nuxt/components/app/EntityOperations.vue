@@ -23,7 +23,7 @@
         class="ops-menu dropdown-content mt-2 w-[236px] p-1.5 bg-base-100 border border-base-300 rounded-xl shadow-lg z-20"
         :class="{ drilled: flyout }"
         role="menu"
-        @keydown="onKey"
+        @keydown="onMenuKey"
       >
         <div class="px-2.5 pt-2 pb-2.5">
           <div class="text-[13px] font-semibold">This page</div>
@@ -202,11 +202,11 @@ export default {
   },
 
   mounted() {
-    document.addEventListener('keydown', this.onKey)
+    document.addEventListener('keydown', this.onDocumentKey)
   },
 
   beforeDestroy() {
-    document.removeEventListener('keydown', this.onKey)
+    document.removeEventListener('keydown', this.onDocumentKey)
   },
 
   methods: {
@@ -230,7 +230,7 @@ export default {
      * focus on its Cancel button, which is not a text field, so without this
      * an E while it is open navigates away and the dialog vanishes unanswered.
      */
-    onKey(event) {
+    onDocumentKey(event) {
       if (this.confirming || event.defaultPrevented) return
       if (!this.edit || event.key !== 'e' || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return
       const target = event.target || {}
@@ -280,7 +280,10 @@ export default {
      * The arrow keys walk the menu, and follow the list to the side it opens
      * on: left into it, right back out. Escape closes the list, then the menu.
      */
-    onKey(event) {
+    onMenuKey(event) {
+      // Only keys from inside the menu: it is bound on the menu, and a
+      // document-level listener must never swallow the page's arrow keys.
+      if (!event.target || !event.target.closest || !event.target.closest('.ops-menu')) return
       const inFlyout = Boolean(event.target.closest('.revisions-flyout'))
       const step = { ArrowDown: 1, ArrowUp: -1 }[event.key]
       if (step) {
