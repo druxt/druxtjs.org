@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/). Versions
 count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
 Druxt 1.0.0.
 
+## [Unreleased]
+
+### Added
+
+- The Nuxt server keeps the JSON:API index and the menus between server
+  renders for as long as Drupal's page `max_age` allows, now set to 300
+  seconds. A warm render of a documentation page asks Drupal for one thing,
+  the path lookup, instead of six or seven; a crawl of the site goes from 168
+  backend calls to 27. A request with an Authorization header or a session
+  cookie never reads or writes that cache.
+- Purge clears that cache when content changes: `purge_queuer_coretags`
+  queues the tags a save invalidates, the bundled HTTP purger sends one
+  `POST /_druxt/cache/clear` per batch with the shared secret, and the
+  late-runtime processor sends it after the response. The purger is exported
+  with an empty secret and Lagoon's service address; `settings.lagoon.php`
+  completes both from the environment.
+
+### Changed
+
+- `druxt`, `druxt-blocks`, `druxt-breadcrumb`, `druxt-entity`, `druxt-menu`,
+  `druxt-router`, `druxt-schema`, `druxt-site` and `druxt-views` are vendored
+  from the 0.25.0 candidate under `nuxt/vendor/`, so the site runs it on
+  Lagoon before it is released. Each carries a `VENDORED.md` naming the
+  commit.
+
 ## [0.10.0] - 2026-09-27
 
 ### Changed
