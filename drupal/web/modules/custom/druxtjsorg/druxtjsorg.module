@@ -40,7 +40,11 @@ function druxtjsorg_druxt_resources_alter(array &$resources): void {
     return;
   }
 
+  // A token can outlive the consumer it was issued to.
   $consumer = $account->getConsumer();
+  if (!$consumer) {
+    return;
+  }
   $scoped = \Drupal::config('druxtjsorg.settings')->get('consumer_resources') ?? [];
   $extra = $scoped[$consumer->getClientId()] ?? [];
   if (!$extra) {
