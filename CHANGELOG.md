@@ -23,9 +23,9 @@ Druxt 1.0.0.
   completes both from the environment.
 - Drupal reads the cached normalizations of a JSON:API response in one query
   instead of one per resource, the change proposed in Drupal core issue
-  3626255, carried as a composer patch with the one-line service argument
-  Drupal 11 needs for it. The collection behind the sitemap and `llms.txt`
-  drops from 1301 queries to 77.
+  3626255, carried as a vendored copy of its merge request plus the one-line
+  service argument Drupal 11 needs for it. The collection behind the sitemap
+  and `llms.txt` drops from 1301 queries to 77.
 
 ### Changed
 
