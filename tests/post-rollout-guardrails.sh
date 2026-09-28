@@ -486,6 +486,22 @@ if printf '%s' "$output" | grep -q "could not restore"; then
 else
   no "a drush that fails another way: the failure was reported as a missing account"
 fi
+if printf '%s' "$output" | grep -q "refusing to leave this environment usable"; then
+  ok "a drush that fails another way: the rollout refuses to hand over the environment"
+else
+  no "a drush that fails another way: the rollout was reported green"
+fi
+
+# Production addresses are read to be put back, and nothing needs the file
+# after that: it must not outlive the rollout.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_DOMAIN=example.com STUB_KEPT_ADDRESSES='2\tsomeone@example.com' > /dev/null
+if [ -e /tmp/kept-addresses.tsv ]; then
+  no "the kept addresses file outlived the rollout"
+else
+  ok "the kept addresses file does not outlive the rollout"
+fi
 
 # The domain decides a SQL predicate, so a value that is not a hostname is
 # refused rather than interpolated.
