@@ -16,6 +16,15 @@ const credentialed = new WeakSet();
 const watched = new WeakSet();
 const runtime = { isServer: () => typeof window === "undefined" };
 const DRUPAL_SESSION_COOKIE = "S?SESS[0-9a-f]+";
+const consumerId = (axios) => {
+  const headers = ((axios || {}).defaults || {}).headers || {};
+  for (const set of [headers, headers.common, headers.get]) {
+    const match = Object.entries(set || {}).find(([name]) => name.toLowerCase() === "x-consumer-id");
+    if (match && match[1])
+      return String(match[1]);
+  }
+  return "";
+};
 const headersHaveCredentials = (headers, sessionCookie) => {
   const session = new RegExp(`(?:^|;\\s*)(?:${sessionCookie})=`, "i");
   return Object.entries(headers || {}).some(([name, value]) => {
@@ -58,29 +67,35 @@ const watchCredentials = (axios, sessionCookie = DRUPAL_SESSION_COOKIE) => {
   });
 };
 const parseCacheLifetime = (headers) => {
-  const header = (name) => {
-    const key = Object.keys(headers || {}).find((k) => k.toLowerCase() === name);
-    return key ? String(headers[key]) : "";
-  };
+  const header = (name) => Object.entries(headers || {}).filter(([key]) => key.toLowerCase() === name).map(([, value]) => String(value)).join(", ");
   const directives = header("cache-control").toLowerCase().split(",").map((d) => d.trim());
   if (directives.some((d) => ["private", "no-store", "no-cache"].includes(d)))
     return 0;
+  const vary = header("vary").toLowerCase().split(",").map((v) => v.trim()).filter(Boolean);
+  if (vary.some((v) => !["cookie", "x-consumer-id", "accept-encoding"].includes(v)))
+    return 0;
   const seconds = (name) => {
     const directive = directives.find((d) => d.startsWith(`${name}=`));
-    return directive ? parseInt(directive.split("=")[1], 10) : NaN;
+    const value = directive ? directive.slice(name.length + 1) : "";
+    return /^\d+$/.test(value) ? Number(value) : NaN;
   };
-  const lifetime = Number.isNaN(seconds("s-maxage")) ? seconds("max-age") : seconds("s-maxage");
+  const lifetime = directives.some((d) => d.startsWith("s-maxage=")) ? seconds("s-maxage") : seconds("max-age");
   if (Number.isNaN(lifetime))
     return 0;
-  return Math.max(0, lifetime - (parseInt(header("age"), 10) || 0));
+  const age = parseInt(header("age"), 10) || 0;
+  return Math.max(0, lifetime - age);
 };
 const processCache = (scope, { axios, ttl, sessionCookie } = {}) => {
   if (!runtime.isServer() || hasCredentials(axios, sessionCookie))
     return null;
   if (!scopes.has(scope))
     scopes.set(scope, new Map());
-  const entries = scopes.get(scope);
-  const cap = (seconds) => ttl > 0 ? Math.min(seconds, ttl) : seconds;
+  const consumers = scopes.get(scope);
+  const consumer = consumerId(axios);
+  if (!consumers.has(consumer))
+    consumers.set(consumer, new Map());
+  const entries = consumers.get(consumer);
+  const cap = (seconds) => typeof ttl === "number" ? Math.min(seconds, ttl) : seconds;
   const taken = generation.value;
   return {
     generation: taken,
@@ -97,6 +112,8 @@ const processCache = (scope, { axios, ttl, sessionCookie } = {}) => {
         return value;
       if (cap(seconds) > 0)
         entries.set(key, { value, seconds: cap(seconds), created: Date.now() });
+      else
+        entries.delete(key);
       return value;
     }
   };
@@ -148,8 +165,9 @@ class DruxtClient {
     const indexKey = JSON.stringify([baseUrl, this.options.endpoint, this.options.jsonapiResourceConfig]);
     this.indexKey = indexKey;
     if (!indexCache.has(this.axios))
-      indexCache.set(this.axios, { index: {}, requests: {} });
+      indexCache.set(this.axios, { index: {}, requests: {}, generation: 0 });
     const cache = indexCache.get(this.axios);
+    this.indexCache = cache;
     this.indexRequests = cache.requests;
     this.index = cache.index[indexKey] || (cache.index[indexKey] = {});
     this.cacheGeneration = 0;
@@ -157,6 +175,9 @@ class DruxtClient {
   clearCache() {
     for (const prefix of Object.keys(this.index))
       delete this.index[prefix];
+    for (const key of Object.keys(this.indexRequests))
+      delete this.indexRequests[key];
+    this.indexCache.generation += 1;
     resetProcessCache();
     this.cacheGeneration += 1;
   }
@@ -167,7 +188,10 @@ class DruxtClient {
     return processCache(scope, { axios: this.axios, ttl, sessionCookie });
   }
   cacheLifetime(document) {
-    return document && typeof document === "object" && lifetimes.get(document) || 0;
+    const record = document && typeof document === "object" && lifetimes.get(document);
+    if (!record)
+      return 0;
+    return Math.max(0, record.seconds - Math.floor((Date.now() - record.at) / 1e3));
   }
   addHeaders(headers) {
     if (typeof headers === "undefined") {
@@ -263,7 +287,7 @@ class DruxtClient {
     try {
       const res = await this.axios.get(url, options);
       if (res && res.data && typeof res.data === "object")
-        lifetimes.set(res.data, parseCacheLifetime(res.headers));
+        lifetimes.set(res.data, { seconds: parseCacheLifetime(res.headers), at: Date.now() });
       return res;
     } catch (err) {
       this.error(err, { url });
@@ -301,17 +325,22 @@ class DruxtClient {
       const key = [this.indexKey, prefix || ""].join(":");
       const before = this.processCache("index");
       const since = before ? before.generation : void 0;
+      const started = this.indexCache.generation;
       const request = this.indexRequests[key] || (this.indexRequests[key] = this.fetchIndex(prefix));
-      let lifetime;
+      let fetched;
       try {
-        lifetime = await request;
+        fetched = await request;
       } finally {
         if (this.indexRequests[key] === request)
           delete this.indexRequests[key];
       }
+      if (started !== this.indexCache.generation) {
+        return resource ? fetched.index[resource] || false : fetched.index;
+      }
+      this.index[prefix] = fetched.index;
       const shared = this.processCache("index");
-      if (shared && this.index[prefix])
-        shared.set(key, this.index[prefix], lifetime, since);
+      if (shared)
+        shared.set(key, fetched.index, fetched.lifetime, since);
     }
     return resource ? this.index[prefix][resource] || false : this.index[prefix];
   }
@@ -328,10 +357,13 @@ class DruxtClient {
       value.href = value.href.replace(baseUrl, "");
       return [key, value];
     }));
+    const documents = [data];
     if (index[this.options.jsonapiResourceConfig]) {
       let resources = [];
       try {
-        resources = (await this.get(index[this.options.jsonapiResourceConfig].href)).data.data;
+        const config = (await this.get(index[this.options.jsonapiResourceConfig].href)).data;
+        resources = config.data;
+        documents.push(config);
       } catch (err) {
         this.log.warn(err.message);
       }
@@ -351,8 +383,7 @@ class DruxtClient {
         };
       }
     }
-    this.index[prefix] = index;
-    return this.cacheLifetime(data);
+    return { index, lifetime: Math.min(...documents.map((document) => this.cacheLifetime(document))) };
   }
   async getRelated(type, id, related, query, prefix = "") {
     if (!id || !type || !related) {
@@ -398,10 +429,10 @@ class DruxtClient {
   }
 }
 
-const safeEqual = (a, b) => {
-  let diff = a.length ^ b.length;
-  for (let i = 0; i < Math.max(a.length, b.length); i++) {
-    diff |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
+const safeEqual = (input, secret) => {
+  let diff = input.length ^ secret.length;
+  for (let i = 0; i < input.length; i++) {
+    diff |= input.charCodeAt(i) ^ secret.charCodeAt(i % secret.length);
   }
   return diff === 0;
 };
@@ -673,12 +704,12 @@ const flush = (tree, key, keys, leaf) => {
   const byKey = tree[key];
   if (!byKey)
     return;
-  if (!keys.length && !leaf)
+  if (!keys.length && leaf === void 0)
     return Vue.delete(tree, key);
   for (const k of keys.length ? keys : Object.keys(byKey)) {
     if (!byKey[k])
       continue;
-    if (leaf)
+    if (leaf !== void 0)
       Vue.delete(byKey[k], leaf);
     else
       Vue.delete(byKey, k);
@@ -690,10 +721,18 @@ const DruxtStore = ({ store }) => {
   }
   const namespace = "druxt";
   const inFlight = new Map();
+  const generation = { value: 0 };
+  const flushInFlight = () => {
+    inFlight.clear();
+    generation.value += 1;
+  };
   const share = (key, request) => {
     if (!inFlight.has(key)) {
-      const clear = () => inFlight.delete(key);
       const promise = request();
+      const clear = () => {
+        if (inFlight.get(key) === promise)
+          inFlight.delete(key);
+      };
       inFlight.set(key, promise);
       promise.then(clear, clear);
     }
@@ -749,15 +788,17 @@ const DruxtStore = ({ store }) => {
         Vue.set(state.resources[type][id], prefix, resource);
       },
       flushCollection(state, { type, hash, query, prefix } = {}) {
+        flushInFlight();
         if (!type)
           return Vue.set(state, "collections", {});
-        const key = hash || (query ? collectionHash(query) : void 0);
-        flush(state.collections, type, key ? [key] : [], prefix);
+        const key = hash !== void 0 ? hash : query !== void 0 ? collectionHash(query) : void 0;
+        flush(state.collections, type, key !== void 0 ? [key] : [], prefix);
       },
       flushResource(state, { type, id, prefix } = {}) {
+        flushInFlight();
         if (!type)
           return Vue.set(state, "resources", {});
-        flush(state.resources, type, id ? [id] : [], prefix);
+        flush(state.resources, type, id !== void 0 ? [id] : [], prefix);
       }
     },
     actions: {
@@ -788,8 +829,10 @@ const DruxtStore = ({ store }) => {
         }
         const key = JSON.stringify(["collection", prefix, type, hash, getDrupalJsonApiParams(query).getQueryObject()]);
         return share(key, async () => {
+          const since = generation.value;
           const collection = await this.$druxt.getCollection(type, query, prefix);
-          commit("addCollection", { collection: { ...collection }, type, hash, prefix });
+          if (since === generation.value)
+            commit("addCollection", { collection: { ...collection }, type, hash, prefix });
           return collection;
         });
       },
@@ -838,18 +881,22 @@ const DruxtStore = ({ store }) => {
           queryObject.fields[type] = (missingFields || []).join(",") || void 0;
         }
         let resource;
+        const since = generation.value;
         if (bypassCache || !storedResource || fields) {
           try {
             const key = JSON.stringify(["resource", prefix, type, id, queryObject]);
             resource = await share(key, async () => {
+              const started = generation.value;
               const response = await this.$druxt.getResource(type, id, getDrupalJsonApiParams(queryObject), prefix);
-              commit("addResource", { prefix, resource: { ...response } });
+              if (started === generation.value)
+                commit("addResource", { prefix, resource: { ...response } });
               return response;
             });
           } catch (e) {
           }
         }
-        const result = { ...((state.resources[type] || {})[id] || {})[prefix] };
+        const stored = ((state.resources[type] || {})[id] || {})[prefix];
+        const result = { ...since === generation.value && stored ? stored : resource || stored };
         if (queryObject.include && ((resource || {}).included || (storedResource || {}).included)) {
           included = [
             ...(resource || {}).included || [],

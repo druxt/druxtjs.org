@@ -91,24 +91,6 @@ class DruxtMenu {
     }
     return query;
   }
-  buildMenuLinkContentQuery(menuName, settings) {
-    const requiredFields = ["bundle", "link", "menu_name", "parent", "title", "weight"];
-    return this.buildQuery("menu_link_content--menu_link_content", menuName, requiredFields, settings);
-  }
-  buildJsonApiMenuItemsQuery(menuName, settings) {
-    const requiredFields = ["menu_name", "parent", "title", "url", "weight"];
-    const query = this.buildQuery("menu_link_content--menu_link_content", menuName, requiredFields, settings);
-    if ((settings || {}).max_depth) {
-      query.addFilter("max_depth", parseInt(settings.max_depth));
-    }
-    if ((settings || {}).min_depth) {
-      query.addFilter("min_depth", parseInt(settings.min_depth));
-    }
-    if ((settings || {}).parent) {
-      query.addFilter("parent", settings.parent);
-    }
-    return query;
-  }
   async get(menuName, settings, prefix) {
     if (!menuCache.has(this.druxt))
       menuCache.set(this.druxt, new Map());
@@ -119,8 +101,7 @@ class DruxtMenu {
       cache.generation = generation;
     }
     const jsonApiMenuItems = !!this.options.menu.jsonApiMenuItems;
-    const query = jsonApiMenuItems ? this.buildJsonApiMenuItemsQuery(menuName, settings) : this.buildMenuLinkContentQuery(menuName, settings);
-    const cacheKey = JSON.stringify([prefix || "", menuName, jsonApiMenuItems, query.getQueryString()]);
+    const cacheKey = JSON.stringify([prefix || "", menuName, settings || {}, jsonApiMenuItems]);
     if (!cache.has(cacheKey)) {
       const processCache = (scope) => typeof this.druxt.processCache === "function" ? this.druxt.processCache(scope) : null;
       const sharedKey = JSON.stringify([this.druxt.indexKey, cacheKey]);
@@ -129,8 +110,8 @@ class DruxtMenu {
       const since = shared ? shared.generation : void 0;
       const request = stored ? Promise.resolve(stored) : (jsonApiMenuItems ? this.getJsonApiMenuItems(menuName, settings, prefix) : this.getMenuLinkContent(menuName, settings, prefix)).then((result) => {
         const after = processCache("menu");
-        if (after)
-          after.set(sharedKey, result, lifetimes.get(result) || 0, since);
+        if (after && lifetimes.has(result))
+          after.set(sharedKey, result, lifetimes.get(result), since);
         return result;
       });
       cache.set(cacheKey, request);
@@ -152,7 +133,8 @@ class DruxtMenu {
   }
   async getMenuLinkContent(menuName, settings, prefix) {
     const resource = "menu_link_content--menu_link_content";
-    const query = this.buildMenuLinkContentQuery(menuName, settings);
+    const requiredFields = ["bundle", "link", "menu_name", "parent", "title", "weight"];
+    const query = this.buildQuery(resource, menuName, requiredFields, settings);
     const entities = [];
     const collections = await this.druxt.getCollectionAll(resource, query, prefix);
     for (const collection of collections) {
@@ -164,11 +146,22 @@ class DruxtMenu {
   }
   async getJsonApiMenuItems(menuName, settings, prefix) {
     const menuItemsResource = `menu_items--${menuName}`;
+    const resource = "menu_link_content--menu_link_content";
+    const requiredFields = ["menu_name", "parent", "title", "url", "weight"];
     await this.druxt.getIndex(void 0, prefix);
     if (!(this.druxt.index[prefix][menuItemsResource] || {}).href) {
       this.druxt.index[prefix][menuItemsResource] = { href: `${prefix || ""}${this.druxt.options.endpoint}/menu_items/${menuName}` };
     }
-    const query = this.buildJsonApiMenuItemsQuery(menuName, settings);
+    const query = this.buildQuery(resource, menuName, requiredFields, settings);
+    if ((settings || {}).max_depth) {
+      query.addFilter("max_depth", parseInt(settings.max_depth));
+    }
+    if ((settings || {}).min_depth) {
+      query.addFilter("min_depth", parseInt(settings.min_depth));
+    }
+    if ((settings || {}).parent) {
+      query.addFilter("parent", settings.parent);
+    }
     const entities = [];
     let collections = [];
     try {

@@ -8,8 +8,8 @@ removed.
 | | |
 | --- | --- |
 | Package | `druxt-views` |
-| Commit | `0b01869c` |
-| Source | the druxt.js cache stack (gh#848, gh#880, gh#881) and the two commits above it, on `perf/menu-key-by-query` |
+| Commit | `6b730bd2` |
+| Source | the druxt.js cache stack: gh#848, gh#880, gh#881 and gh#885 (`feat/druxt-clear-cache`) |
 
 Replace `file:vendor/druxt-views` in `package.json` with the published 0.25.0
 version once it is on npm, and delete this directory.
