@@ -1,8 +1,9 @@
 # The frontend's cache, and clearing it
 
 Druxt holds the JSON:API index and the menus between server renders, so a
-warm render of a documentation page asks Drupal for one thing, the path
-lookup, instead of six. Drupal decides how long: the page `max_age` in
+warm render of a documentation page no longer asks Drupal for the index and
+the three menus. The path lookup, the page and its blocks are still fetched
+per render. Drupal decides how long: the page `max_age` in
 `system.performance` becomes the `Cache-Control` on every anonymous JSON:API
 answer, and Druxt keeps each answer for exactly that long. At 0 Drupal says
 `no-cache, private` and nothing is kept.
@@ -26,8 +27,11 @@ lands, the same purger gains a body.
 
 The purger is configuration (`purge_purger_http.settings.705a5122da`) and is
 exported with an empty secret and Lagoon's service address. Each environment
-completes it in `settings.php`; `settings.lagoon.php` does this from the
-environment:
+completes it from its settings. `settings.lagoon.php` reads the secret from
+`DRUXT_CACHE_SECRET`, and takes the address from `DRUXT_CACHE_CLEAR_HOST` and
+`DRUXT_CACHE_CLEAR_PORT` when they are set, from the `nuxt` service on Lagoon
+otherwise, and from `DRUXT_FRONTEND_URL` off Lagoon. Reduced to the Lagoon
+case:
 
 ```php
 $purger = 'purge_purger_http.settings.705a5122da';

@@ -13,10 +13,10 @@ Druxt 1.0.0.
 
 - The Nuxt server keeps the JSON:API index and the menus between server
   renders for as long as Drupal's page `max_age` allows, now set to 300
-  seconds. A warm render of a documentation page asks Drupal for one thing,
-  the path lookup, instead of six or seven; a crawl of the site goes from 168
-  backend calls to 27. A request with an Authorization header or a session
-  cookie never reads or writes that cache.
+  seconds. A warm render of a documentation page no longer asks Drupal for
+  the index and the three menus, four of its backend calls. The path lookup,
+  the page and its blocks are still fetched per render. A request with an
+  Authorization header or a session cookie never reads or writes that cache.
 - Purge clears that cache when content changes: `purge_queuer_coretags`
   queues the tags a save invalidates, the bundled HTTP purger sends one
   `POST /_druxt/cache/clear` per batch with the shared secret, and the
