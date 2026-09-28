@@ -47,6 +47,14 @@ Nuxt application.
   files the dist archive leaves out still applies. Commit
   `drupal/patches.lock.json` with it. composer-patches prints every patch
   description during `composer install`, so a description is public text too.
+  A core patch is the exception: it is vendored into `drupal/patches/` with
+  the merge request and commit in its name, because the upstream branch moves
+  and a core change needs review before it changes under the site.
+  `docs/frontend-cache.md` records what each one is for.
+- **Adding or changing a patch needs `composer patches-relock` and
+  `composer patches-repatch`.** `composer install` applies nothing to a
+  package it already has. Grep the patched file for something the patch adds
+  before committing.
 - **The coverage floor goes up, never down.** `npm run test:coverage` fails
   below 88% of lines, 87% of branches and 87% of functions in `scripts/`. It
   needs Node 22.8 or later, so CI runs it. `npm test` is the same suite on
