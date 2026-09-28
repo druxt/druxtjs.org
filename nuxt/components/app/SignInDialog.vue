@@ -84,7 +84,8 @@ export default {
       }
       document.documentElement.classList.remove('sign-in-open')
       document.body.style.top = ''
-      window.scrollTo(0, this.scrollY)
+      // Instant: the page has scroll-behavior smooth, and a restore is not a scroll.
+      window.scrollTo({ top: this.scrollY, behavior: 'instant' })
     },
 
     fitViewport() {
