@@ -36,6 +36,8 @@ Druxt 1.0.0.
 - The site no longer registers Druxt's components as synchronous imports
   itself. The modules register them that way now, so the hook that worked
   around the first-load refetch is gone.
+- Drupal core 11.4.8, the security release. The two JSON:API patches apply
+  to it unchanged.
 - `druxt`, `druxt-blocks`, `druxt-breadcrumb`, `druxt-entity`, `druxt-menu`,
   `druxt-router`, `druxt-schema`, `druxt-site` and `druxt-views` are vendored
   from the 0.25.0 candidate under `nuxt/vendor/`, so the site runs it on
