@@ -1,7 +1,9 @@
 FROM uselagoon/php-8.3-cli-drupal:26.8.1
 
 # drupal/ is the composer project; the importer reads the files beside it.
+# The vendored patches must be present before the install applies them.
 COPY drupal/composer.json drupal/composer.lock drupal/patches.lock.json /app/drupal/
+COPY drupal/patches /app/drupal/patches
 RUN composer install --working-dir=/app/drupal --no-dev --no-interaction --no-progress
 COPY drupal /app/drupal
 COPY docs-source.json package.json package-lock.json /app/
