@@ -16,7 +16,7 @@ import http from 'http'
 import https from 'https'
 import { URL } from 'url'
 
-import { ADMIN_PATHS, isAdminPath } from './lib/admin'
+import { ADMIN_PATHS, isAdminPath } from './lib/admin.js'
 
 /**
  * Drupal's own paths, beyond the administration screens themselves.
@@ -92,9 +92,17 @@ const HOP_BY_HOP = [
 ]
 
 /** Whether a request is Drupal's to answer. */
+/**
+ * A dot segment, an encoded separator or a backslash: Drupal's server would
+ * normalise it, this proxy sends the path as it came, so a path the allowlist
+ * excludes could reach Drupal under an allowed prefix.
+ */
+const UNSAFE_PATH = /(^|\/)\.\.?(\/|$)|%2e|%2f|%5c|\\/i
+
 export function shouldProxy(path, options = {}) {
   const subject = String(path || '').split('?')[0]
   if (!subject) return false
+  if (UNSAFE_PATH.test(subject)) return false
   if (isAdminPath(subject, options.paths || ADMIN_PATHS)) return true
   if (EDIT_PATH.test(subject)) return true
   if (FILES_PATH.test(subject)) return true
