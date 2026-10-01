@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/). Versions
 count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
 Druxt 1.0.0.
 
+## [Unreleased]
+
+### Added
+
+- Every response names the llms.txt that describes it, the way llmstxt.org
+  v2 discovers one: a `Link` header with `rel="describedby"`, and the same
+  link in each page's head.
+
 ## [0.10.0] - 2026-09-27
 
 ### Changed
