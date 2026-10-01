@@ -52,6 +52,9 @@ Druxt 1.0.0.
   are counted and kept in the address, so Edit returns to the same list.
   Drupal's own overview of a workspace lists pages rather than every
   paragraph.
+- Every response names the llms.txt that describes it, the way llmstxt.org
+  v2 discovers one: a `Link` header with `rel="describedby"`, and the same
+  link in each page's head.
 
 ### Changed
 
