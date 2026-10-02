@@ -14,6 +14,7 @@ import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
 const {
+  LLMS_LINK,
   SECURITY_HEADERS,
   createHandler,
   createPageCache,
@@ -330,6 +331,16 @@ describe('createHandler', () => {
       const tls = await request(`${base}/`, { headers: { 'X-Forwarded-Proto': 'https,http' } })
       assert.equal(tls.headers['strict-transport-security'], 'max-age=31536000')
     })
+  })
+
+  test('points every response at llms.txt with a describedby link', async () => {
+    await withServer(createHandler({ cache: null, live: live() }), async (base) => {
+      for (const target of [`${base}/`, `${base}/how-to/proxy`, `${base}/jsonapi/x`]) {
+        const res = await request(target)
+        assert.equal(res.headers.link, LLMS_LINK, `Link on ${target}`)
+      }
+    })
+    assert.equal(LLMS_LINK, '</llms.txt>; rel="describedby"; type="text/markdown"')
   })
 
   test('never stores a page that did not answer 200', async () => {
