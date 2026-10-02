@@ -22,6 +22,7 @@ dependencies:
     - path
     - simple_oauth
     - system
+    - workspaces
 id: editor
 label: Editor
 weight: 3
@@ -37,15 +38,19 @@ permissions:
   - 'access media overview'
   - 'access navigation'
   - 'administer node published status'
+  - 'administer workspaces'
   - 'create doc_page content'
   - 'create image media'
   - 'create url aliases'
+  - 'create workspace'
   - 'delete any doc_page content'
   - 'delete any image media'
   - 'delete doc_page revisions'
   - 'delete own doc_page content'
+  - 'delete own workspace'
   - 'edit any doc_page content'
   - 'edit any image media'
+  - 'edit any workspace'
   - 'edit own doc_page content'
   - 'edit own image media'
   - 'grant simple_oauth codes'
@@ -58,6 +63,7 @@ permissions:
   - 'use text format basic_html'
   - 'use text format docs_markdown'
   - 'view any unpublished content'
+  - 'view any workspace'
   - 'view doc_page revisions'
   - 'view latest version'
   - 'view media'
