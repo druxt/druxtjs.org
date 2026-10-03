@@ -294,6 +294,9 @@ test:unit:
     - !reference [default, before_script]
     - apk add --no-cache git > /dev/null
   script:
+    # The tests read the vendored diff engine through the root manifest.
+    - corepack enable && corepack prepare --activate
+    - npm ci --cache .npm --prefer-offline --ignore-scripts
     - section_start "node-test" "Running the node tests with the coverage floor"
     - npm run test:coverage
     - section_end "node-test"

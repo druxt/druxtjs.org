@@ -25,8 +25,8 @@ const displayFields = async (schema, type, mode) => {
  * for the same fields (`druxt.entity.query.schema` in nuxt.config.js), so
  * they find the page's resources complete in the store.
  *
- * A versioned view (a draft or an older revision) is requested without its
- * includes: a JSON:API include always returns the default revision, so a
+ * A versioned view (a draft or an older revision) is requested whole, and
+ * without its includes: a JSON:API include always returns the default revision, so a
  * paragraph changed in that revision would come back published. Left out,
  * each paragraph is fetched on its own at the revision the node names, by the
  * page's body.
@@ -41,8 +41,16 @@ const displayFields = async (schema, type, mode) => {
  */
 export const pageQuery = async (schema, { versioned = false } = {}) => {
   const fields = {
-    'node--doc_page': [...PAGE_FIELDS, ...(await displayFields(schema, 'node--doc_page', 'full'))].join(','),
     'media--image': ['name', ...(await displayFields(schema, 'media--image', 'default'))].join(','),
+  }
+  // A versioned view asks for the whole page rather than the fields it
+  // renders. The Druxt store answers a sparse request from the copy it holds
+  // and asks Drupal only for the fields it is missing, which for a page it
+  // already has is none: it then sends `fields[node--doc_page]=undefined`,
+  // Drupal answers 400, the store swallows it and returns the copy it had,
+  // which is the revision the reader just left.
+  if (!versioned) {
+    fields['node--doc_page'] = [...PAGE_FIELDS, ...(await displayFields(schema, 'node--doc_page', 'full'))].join(',')
   }
   for (const bundle of PARAGRAPH_TYPES) {
     const type = `paragraph--${bundle}`
