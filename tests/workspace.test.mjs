@@ -59,7 +59,7 @@ describe('the header', () => {
       '/user/login',
       'https://api.umami.demo.druxtjs.org/jsonapi',
       '/umami/jsonapi',
-      '/jsonapikey',
+      '/jsonapi-other',
     ]) {
       assert.deepEqual(editor(url), {}, url)
     }
