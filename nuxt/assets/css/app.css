@@ -1484,11 +1484,35 @@ a.editor-bar-choice {
     right: auto;
     width: 2.75rem;
   }
+  .editor-bar.idle.with-workspace {
+    width: auto;
+  }
   .editor-bar-subject {
     flex: 1;
     max-width: none;
   }
   .editor-bar-kind {
+    display: none;
+  }
+  /* Everything on one screen's width: the words go, their icons and counts
+     stay, and each control keeps its name for a screen reader. */
+  .editor-bar:not(.idle) {
+    gap: 0.375rem;
+    padding: 0 0.375rem 0 0.5rem;
+  }
+  .editor-bar-workspace {
+    max-width: 5.5rem;
+  }
+  /* A chosen block's name needs the room more than the page's draft chip. */
+  .editor-bar.locked .editor-bar-draft {
+    display: none;
+  }
+  .editor-bar-subject {
+    min-width: 3.5rem;
+  }
+  .editor-bar-word,
+  .editor-bar-ops .page-ops-word,
+  .editor-bar-sep {
     display: none;
   }
 }

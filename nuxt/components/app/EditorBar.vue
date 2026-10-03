@@ -97,10 +97,11 @@
         class="editor-bar-btn ghost"
         :aria-expanded="String(choosing)"
         aria-haspopup="menu"
+        :aria-label="`${choices.length} editable on this page`"
         data-testid="editor-bar-choose"
         @click="choosing = !choosing"
       >
-        {{ choices.length }} editable
+        {{ choices.length }}<span class="editor-bar-word">&nbsp;editable</span>
         <svg class="editor-bar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 15l-6-6-6 6" /></svg>
       </button>
 
