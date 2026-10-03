@@ -1157,8 +1157,6 @@ body.has-editor-bar main {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 22rem;
-  direction: rtl;
-  text-align: left;
 }
 .editor-bar-draft {
   font: 600 9.5px ui-monospace, SFMono-Regular, Menlo, monospace;
