@@ -195,8 +195,9 @@ sanitise() {
   echo "Sanitising the copy."
 
   # Read before sanitising: `sql:sanitize` overwrites every address, and
-  # what it replaced is not recoverable afterwards.
-  rm -f "$kept_addresses"
+  # what it replaced is not recoverable afterwards. Emptied, not removed: the
+  # file mktemp made is private, and one the redirect created would not be.
+  : > "$kept_addresses"
   if is_hostname "$maintainer_domain"; then
     drush sql:query "SELECT uid, mail FROM users_field_data WHERE mail LIKE '%@${maintainer_domain}';" > "$kept_addresses" 2>/dev/null || :
   else
