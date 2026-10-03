@@ -164,7 +164,8 @@ final readonly class TreeBuilder {
    * @param \Drupal\Core\Cache\CacheableMetadata $collector
    *   The root's cacheability, which collects the whole tree.
    * @param bool $is_root
-   *   TRUE for the root entity, whose cacheability is the collector itself.
+   *   TRUE for the root entity. Every diff, root or not, takes the collector
+   *   as its cacheability.
    * @param \Drupal\Core\Session\AccountInterface|null $account
    *   The account every access decision is taken for.
    */
@@ -226,7 +227,11 @@ final readonly class TreeBuilder {
       $fields,
       $summary,
       $children,
-      $is_root ? $collector : $cacheability,
+      // Every diff carries the whole tree's cacheability. A child is included
+      // as a resource of its own, and JSON:API caches its normalization by
+      // type, id and language: with only its entities' cacheability, one
+      // account's field access decisions would be served to another.
+      $collector,
       $right instanceof ContentEntityInterface && $right->uuid() !== $entity->uuid() ? (string) $right->uuid() : NULL,
     );
   }
