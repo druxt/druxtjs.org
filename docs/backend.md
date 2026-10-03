@@ -108,13 +108,24 @@ workspace. Core refuses to publish a workspace that holds a draft. A page
 created in a workspace exists on live only as an unpublished placeholder,
 which readers cannot see by id, path or collection.
 
-A signed-in editor chooses a workspace under **Read the site in** in the
+A signed-in editor chooses a workspace under **Workspaces** in the
 editor bar's Drupal menu. The choice is kept in the `druxt-workspace` cookie,
 the bar names it on every page, and the frontend adds the header to the
 editor's content requests on the server render and in the browser. A
 request without the editor's token never carries it, and the stored-page
 cache is bypassed for a signed-in editor as before. The page diff compares
 the workspace's revision with live.
+
+Drupal reads the same cookie for a signed-in editor, below the header, so its
+own screens open in the workspace the frontend shows. Switching in Drupal's
+toolbar writes the cookie back, and switching to live clears it.
+
+A block's Edit opens the page's form with `?paragraph=<uuid>`, and the
+`druxtjsorg` module opens that block's dialog in the Layout Paragraphs
+builder. The change is saved with the page, so moderation, revisions and the
+workspace all apply. Paragraphs Edit offers a paragraph form of its own, but
+it saves the page from its default revision in its current moderation state,
+which would publish a live page straight away and drop any draft.
 
 ### The local loop
 

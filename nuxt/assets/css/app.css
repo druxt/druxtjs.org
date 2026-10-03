@@ -1142,9 +1142,30 @@ body.has-editor-bar main {
   height: 100%;
   background: transparent;
 }
+.editor-bar.idle.with-workspace {
+  /* Wide enough for the workspace's name beside the orb. */
+  width: auto;
+  padding: 0 0.875rem 0 0.25rem;
+  gap: 0.5rem;
+  justify-content: flex-start;
+}
+.editor-bar.idle.with-workspace .editor-bar-orb {
+  width: 2.25rem;
+  height: 2.25rem;
+}
 .editor-bar.idle .editor-bar-orb-icon {
   width: 19px;
   height: 19px;
+}
+/* Stepping between blocks. */
+.editor-bar-step {
+  display: inline-flex;
+  gap: 0.125rem;
+  flex: none;
+}
+.editor-bar-step button:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 /* Letting a chosen block go. */
 .editor-bar-unlock {

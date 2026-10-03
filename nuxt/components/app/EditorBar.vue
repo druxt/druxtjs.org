@@ -3,7 +3,7 @@
   <div
     v-if="show"
     class="editor-bar"
-    :class="{ idle, docked: Boolean(dock), locked }"
+    :class="{ idle, docked: Boolean(dock), locked, 'with-workspace': Boolean(workspace) }"
     :style="dockStyle"
     role="region"
     aria-label="Editing controls"
@@ -37,7 +37,7 @@
     <span
       v-if="workspace"
       class="editor-bar-workspace"
-      :title="`Reading the site in the ${workspaceLabel} workspace`"
+      :title="`Workspace: ${workspaceLabel}`"
       data-testid="editor-bar-workspace"
     >{{ workspaceLabel }}</span>
 
@@ -51,6 +51,31 @@
         <span v-if="draft" class="editor-bar-draft">Draft</span>
         <!-- Locked on a block, so the bar stays on it while the pointer goes
              anywhere else. Letting go is one press, and so is Escape. -->
+        <!-- One block to the next, without hunting for it. -->
+        <span v-if="active && blocks.length > 1" class="editor-bar-step">
+          <button
+            type="button"
+            class="editor-bar-unlock"
+            aria-label="Previous block"
+            title="Previous block"
+            data-testid="editor-bar-previous"
+            :disabled="position <= 0"
+            @click="step(-1)"
+          >
+            <svg class="editor-bar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 15l-6-6-6 6" /></svg>
+          </button>
+          <button
+            type="button"
+            class="editor-bar-unlock"
+            aria-label="Next block"
+            title="Next block"
+            data-testid="editor-bar-next"
+            :disabled="position < 0 || position >= blocks.length - 1"
+            @click="step(1)"
+          >
+            <svg class="editor-bar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+          </button>
+        </span>
         <button
           v-if="locked"
           type="button"
@@ -123,9 +148,9 @@
       >
         <span class="truncate">{{ link.label }}</span>
       </a>
-      <!-- Which version of the site to read: live, or a workspace's. -->
+      <!-- Workspaces: read the site as live, or as a workspace has it. -->
       <template v-if="workspaces.length">
-        <p class="editor-bar-choices-title">Read the site in</p>
+        <p class="editor-bar-choices-title">Workspaces</p>
         <button
           v-for="choice of [{ id: null, label: 'Live' }, ...workspaces]"
           :key="choice.id || 'live'"
@@ -155,6 +180,9 @@ import { workspaceCookie } from '~/lib/workspace'
 
 /** How long a subject survives the pointer leaving it, in milliseconds. */
 const LINGER = 260
+
+/** How long the pointer must rest on another block before the bar moves to it. */
+const SWITCH_DELAY = 220
 
 /** The gap the bar keeps from the block it is docked to, in pixels. */
 const DOCK_GAP = 10
@@ -223,6 +251,9 @@ export default {
     editor: ({ $store }) => $store.state.editor,
     signedIn: ({ $auth }) => Boolean($auth && $auth.loggedIn),
     workspace: ({ editor }) => editor.workspace,
+    /** The page's blocks, in reading order, for stepping between them. */
+    blocks: ({ choices, page }) => choices.filter(({ uuid }) => !page || uuid !== page.uuid),
+    position: ({ blocks, active }) => blocks.findIndex(({ uuid }) => uuid === (active || {}).uuid),
     /** The workspace's label once the list is in, its id until then. */
     workspaceLabel: ({ workspace, workspaces }) => (workspaces.find(({ id }) => id === workspace) || {}).label || workspace,
     /**
@@ -394,6 +425,7 @@ export default {
     window.removeEventListener('scroll', this.onViewport)
     window.removeEventListener('resize', this.onViewport)
     clearTimeout(this.linger)
+    clearTimeout(this.switching)
     clearInterval(this.hintPoll)
     if (this.frame) cancelAnimationFrame(this.frame)
     this.mark(null)
@@ -508,14 +540,18 @@ export default {
       // not a reason to take it away again.
       if (this.locked) return
       clearTimeout(this.linger)
+      clearTimeout(this.switching)
+      // Moving from one block to another waits a moment, and gives way if the
+      // pointer reaches the bar: crossing a neighbour on the way to the bar's
+      // controls used to move the bar out from under the pointer.
+      if (subject && this.active && subject.uuid !== this.active.uuid) {
+        this.switching = setTimeout(() => {
+          if (!this.hovering && !this.locked) this.take(subject)
+        }, SWITCH_DELAY)
+        return
+      }
       if (subject) {
-        this.choosing = false
-        // Frozen, and without the element: Vue would otherwise walk a DOM
-        // node making it reactive, and the assignment never takes.
-        const { el, ...rest } = subject
-        this.active = Object.freeze(rest)
-        this.mark(el)
-        this.$nextTick(this.place)
+        this.take(subject)
         return
       }
       if (this.hovering) return
@@ -524,6 +560,17 @@ export default {
         this.dock = null
         this.mark(null)
       }, LINGER)
+    },
+
+    /** Binds the bar to a subject now. */
+    take(subject) {
+      this.choosing = false
+      // Frozen, and without the element: Vue would otherwise walk a DOM
+      // node making it reactive, and the assignment never takes.
+      const { el, ...rest } = subject
+      this.active = Object.freeze(rest)
+      this.mark(el)
+      this.$nextTick(this.place)
     },
 
     /**
@@ -567,15 +614,29 @@ export default {
      * @param {Event} event - The click.
      */
     lockOn(event) {
-      if (this.locked || !this.active || !event.target) return
+      if (!event.target) return
       if (this.$el && this.$el.contains(event.target)) return
       if (event.target.closest && event.target.closest(INTERACTIVE)) return
       const selection = typeof window !== 'undefined' && window.getSelection ? window.getSelection() : null
       if (selection && String(selection).length) return
       const subject = subjectFromElement(event.target)
-      if (!subject || subject.uuid !== this.active.uuid) return
+      if (!subject) return
+      // Clicking another block moves the lock to it.
+      clearTimeout(this.switching)
+      if (!this.active || subject.uuid !== this.active.uuid) this.take(subject)
       this.locked = true
       this.dock = null
+    },
+
+    /**
+     * Moves to the block before or after this one, in reading order.
+     *
+     * @param {number} step - -1 for the previous block, 1 for the next.
+     */
+    step(step) {
+      const at = this.blocks.findIndex(({ uuid }) => uuid === (this.active || {}).uuid)
+      const next = this.blocks[at + step]
+      if (next) this.choose(next)
     },
 
     /** Lets a chosen block go, and the bar falls back to the page. */

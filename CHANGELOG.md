@@ -37,7 +37,11 @@ Druxt 1.0.0.
   request that may view it. A reader's header is ignored, and a write naming
   a workspace it cannot have is refused rather than saved to live.
 - The editor bar reads the site in a chosen workspace, names it on every
-  page, and the page diff compares it with live.
+  page, and the page diff compares it with live. Drupal's own screens follow
+  the same choice, and switching in Drupal's toolbar is shared back.
+- A block's Edit opens that block's own dialog in the page's form. The bar
+  names each block by its heading or opening words, steps to the previous or
+  next block, and moves to another block on a click.
 - `author-page.mjs` writes into a workspace with `--workspace <id>`, and sends
   nothing without `--workspace` or `--live`. It checks the whole page against
   the content model first and reports every problem at its place.
