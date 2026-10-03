@@ -28,6 +28,11 @@ describe('auth cookie', () => {
     assert.equal(hasAuthCookie(`auth.strategy=x; ${AUTH_COOKIE}=Bearer abc; other=1`), true)
   })
 
+  test('is found for a session started with the authorization code strategy too', () => {
+    assert.equal(hasAuthCookie('auth._token.drupal-authorization_code=Bearer%20abc'), true)
+    assert.equal(hasAuthCookie('auth._token.drupal-authorization_code=false'), false)
+  })
+
   test('is not found when absent, empty, signed out, or only similarly named', () => {
     for (const header of [
       undefined,

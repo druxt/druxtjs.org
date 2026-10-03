@@ -32,8 +32,15 @@ const AUTH_COOKIE_PREFIX = 'auth.'
 const AUTH_COOKIE = `${AUTH_COOKIE_PREFIX}_token.${AUTH_STRATEGY}`
 
 /**
- * Whether a Cookie header carries a token. Signing out leaves the cookie as
- * `false` until it expires, which is not a token.
+ * Every strategy whose token cookie means a signed-in editor. The site still
+ * registers the authorization code strategy, and a session started with it
+ * before the switch to the password grant still carries its own cookie.
+ */
+const TOKEN_COOKIES = [AUTH_COOKIE, `${AUTH_COOKIE_PREFIX}_token.drupal-authorization_code`]
+
+/**
+ * Whether a Cookie header carries a token, from any strategy above. Signing
+ * out leaves the cookie as `false` until it expires, which is not a token.
  *
  * The name is read before the value is decoded, and the decode cannot throw: a
  * client sends any bytes it likes, `%` alone is not valid percent-encoding, and
@@ -47,7 +54,7 @@ const hasAuthCookie = (header) =>
     .split(';')
     .some((pair) => {
       const [name, ...rest] = pair.split('=')
-      if (name.trim() !== AUTH_COOKIE) return false
+      if (!TOKEN_COOKIES.includes(name.trim())) return false
       const raw = rest.join('=').trim()
       let value
       try {
@@ -80,4 +87,4 @@ const authStorageKeys = (strategy) => [
   `${AUTH_COOKIE_PREFIX}strategy`,
 ]
 
-module.exports = { AUTH_COOKIE, AUTH_COOKIE_PREFIX, AUTH_STRATEGY, SCOPES, authStorageKeys, hasAuthCookie }
+module.exports = { AUTH_COOKIE, AUTH_COOKIE_PREFIX, AUTH_STRATEGY, SCOPES, TOKEN_COOKIES, authStorageKeys, hasAuthCookie }
