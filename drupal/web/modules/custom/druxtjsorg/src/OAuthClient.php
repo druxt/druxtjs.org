@@ -42,7 +42,11 @@ final class OAuthClient {
     return [
       'confidential' => FALSE,
       'pkce' => TRUE,
-      'automatic_authorization' => TRUE,
+      // The site signs editors in with the password grant, which never shows
+      // the authorize screen. Only the authoring script uses it, through a
+      // localhost callback, so a person approves each grant there: an
+      // automatic one would hand any local listener an administrator's token.
+      'automatic_authorization' => FALSE,
       'grant_types' => ['authorization_code', 'password', 'refresh_token'],
       'authorization_code_scopes' => self::SCOPES,
       'redirect' => array_values(array_unique(array_filter($redirects))),
