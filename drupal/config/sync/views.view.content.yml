@@ -623,7 +623,7 @@ display:
               empty_column: false
               responsive: ''
           override: true
-          sticky: true
+          sticky: false
           summary: ''
           empty_table: true
           caption: ''
