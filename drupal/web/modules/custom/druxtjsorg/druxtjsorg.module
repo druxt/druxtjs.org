@@ -7,6 +7,10 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\simple_oauth\Authentication\TokenAuthUserInterface;
 
 /**
@@ -52,4 +56,31 @@ function druxtjsorg_druxt_resources_alter(array &$resources): void {
   }
 
   $resources = array_values(array_unique(array_merge($resources, $extra)));
+}
+
+/**
+ * Implements hook_entity_access().
+ *
+ * Keeps a consumer-scoped resource's access from being cached.
+ *
+ * Druxt grants a listed resource and caches the answer, varied by nothing
+ * that names the consumer, so an answer reached for one consumer would be
+ * served to another. For a resource some consumer is scoped to, this gives
+ * the same answer as Druxt with no lifetime, and access results merge their
+ * cacheability, so the combined answer is never stored.
+ */
+function druxtjsorg_entity_access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResultInterface {
+  $config = \Drupal::config('druxtjsorg.settings');
+  $neutral = AccessResult::neutral()->addCacheableDependency($config);
+  if ($operation !== 'view') {
+    return $neutral;
+  }
+  $type = $entity->getEntityTypeId() . '--' . $entity->bundle();
+  $scoped = array_merge([], ...array_values($config->get('consumer_resources') ?? []));
+  if (!in_array($type, $scoped, TRUE)) {
+    return $neutral;
+  }
+  return AccessResult::allowedIf(druxt_access_check($account))
+    ->addCacheableDependency($config)
+    ->setCacheMaxAge(0);
 }
