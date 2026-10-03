@@ -19,6 +19,7 @@ const {
   assertDocument,
   parseArgs,
   pkcePair,
+  tokenFrom,
   sectionResource,
   sectionTerm,
 } = await import('../nuxt/scripts/author-page.mjs')
@@ -446,4 +447,17 @@ describe('assertDocument', () => {
       assert.throws(() => assertDocument(value), /must be a JSON object/, String(value))
     }
   })
+})
+
+test('a token answer without an access token stops sign-in', () => {
+  assert.equal(tokenFrom({ data: { access_token: 'abc', token_type: 'Bearer' } }), 'abc')
+  for (const response of [
+    undefined,
+    {},
+    { data: {} },
+    { data: { access_token: '' } },
+    { data: { access_token: 7 } },
+  ]) {
+    assert.throws(() => tokenFrom(response), /without an access token/, JSON.stringify(response))
+  }
 })
