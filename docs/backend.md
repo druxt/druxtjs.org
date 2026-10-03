@@ -85,10 +85,12 @@ node nuxt/scripts/author-page.mjs --document <ir.json> --uuid <page-uuid>
 node nuxt/scripts/author-page.mjs --document <ir.json>
 ```
 
-The script signs in the same way the site does: it opens the authorize page
-in a browser and catches the redirect on a local listener at
-`http://localhost:3939/callback`, a URI registered on the consumer. It holds
-no secret. `DRUXT_TOKEN` supplies a token instead, for an unattended run.
+The script opens the authorize page in a browser, where the editor approves
+the grant, and catches the redirect on a local listener at
+`http://localhost:3939/callback`, a URI registered on the consumer. The
+consumer approves no grant by itself, so a process listening on that port
+cannot collect a token unasked. The script doesn't hold a secret.
+`DRUXT_TOKEN` supplies a token instead, for an unattended run.
 
 It creates each paragraph with `DruxtClient.createResource`, then the page
 with `createResource` (or `updateResource` for `--uuid`), referencing the
