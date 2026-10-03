@@ -9,6 +9,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\simple_oauth\Authentication\TokenAuthUserInterface;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
+use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -127,5 +128,25 @@ final class ConsumerScopedResourcesTest extends KernelTestBase {
     \Drupal::currentUser()->setAccount($this->tokenUser($this->consumer('somebody_else')));
     self::assertNotContains(self::SCOPED, druxt_resources());
   }
+
+  /**
+   * Access to a scoped resource is never cached, whatever the answer.
+   *
+   * Druxt's answer varies by nothing that names the consumer, so a stored
+   * one would carry one consumer's grant to another.
+   */
+  public function testAccessToAScopedResourceIsNeverCached(): void {
+    $this->config('druxtjsorg.settings')
+      ->set('consumer_resources', ['druxtjs_org' => [self::SCOPED, 'user_role--user_role']])
+      ->save();
+    $role = Role::load('authenticated');
+    $account = $this->tokenUser($this->consumer());
+
+    self::assertSame(0, druxtjsorg_entity_access($role, 'view', $account)->getCacheMaxAge());
+
+    $this->config('druxtjsorg.settings')->set('consumer_resources', ['druxtjs_org' => [self::SCOPED]])->save();
+    self::assertNotSame(0, druxtjsorg_entity_access($role, 'view', $account)->getCacheMaxAge(), 'an unscoped resource keeps its lifetime');
+  }
+
 
 }
