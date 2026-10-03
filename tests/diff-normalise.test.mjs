@@ -11,7 +11,7 @@ import assert from 'node:assert/strict'
 const { normaliseDiff, wordDiff, groupRuns, condenseRuns, anchorUuid } = await import(
   '@druxt-contrib/diff'
 )
-const { blockFor, anchorsOf } = await import('../nuxt/lib/diff-anchors.js')
+const { blockFor, anchorsOf } = await import('../nuxt/lib/diff-anchors.mjs')
 
 /** A jsonapi_diff document: a node whose field_content children are listed. */
 const doc = (children) => ({
