@@ -6,6 +6,7 @@ namespace Drupal\druxtjsorg\EventSubscriber;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\druxtjsorg\Negotiator\CookieWorkspaceNegotiator;
 use Drupal\druxtjsorg\Negotiator\HeaderWorkspaceNegotiator;
 use Drupal\workspaces\WorkspaceInterface;
 use Drupal\workspaces\WorkspaceManagerInterface;
@@ -16,6 +17,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Activates the workspace a request names, once the request is authenticated.
+ *
+ * The request names it in the header, or the editor's cookie does.
  *
  * The negotiator alone is not enough: Simple OAuth's authentication provider
  * resolves the path, the alias lookup asks for the active workspace while the
@@ -37,6 +40,7 @@ final class WorkspaceHeaderSubscriber implements EventSubscriberInterface {
     private readonly EntityTypeManagerInterface $entityTypeManager,
     private readonly WorkspaceManagerInterface $workspaceManager,
     private readonly HeaderWorkspaceNegotiator $negotiator,
+    private readonly ?CookieWorkspaceNegotiator $cookieNegotiator = NULL,
   ) {}
 
   /**
@@ -58,13 +62,23 @@ final class WorkspaceHeaderSubscriber implements EventSubscriberInterface {
    */
   public function activate(RequestEvent $event): void {
     $request = $event->getRequest();
-    if (!$event->isMainRequest() || !$this->negotiator->applies($request)) {
+    if (!$event->isMainRequest()) {
+      return;
+    }
+    // The header, or else the editor's cookie; the header always wins.
+    if ($this->negotiator->applies($request)) {
+      $id = $this->negotiator->getActiveWorkspaceId($request);
+    }
+    elseif ($this->cookieNegotiator?->applies($request) && $request->cookies->has(CookieWorkspaceNegotiator::COOKIE)) {
+      $id = $this->cookieNegotiator->getActiveWorkspaceId($request);
+    }
+    else {
       return;
     }
 
-    $workspace = $this->workspace($this->negotiator->getActiveWorkspaceId($request));
+    $workspace = $this->workspace($id);
     if ($workspace !== NULL) {
-      // Not persisted: the header lasts this request and leaves the session.
+      // Not persisted: this request only, and the session is left alone.
       $this->workspaceManager->setActiveWorkspace($workspace, FALSE);
       $request->attributes->set(self::ATTRIBUTE, $workspace->id());
       return;

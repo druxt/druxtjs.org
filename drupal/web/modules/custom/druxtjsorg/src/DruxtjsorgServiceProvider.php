@@ -9,6 +9,7 @@ use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\druxtjsorg\Controller\WorkspaceEntityResource;
 use Drupal\druxtjsorg\EventSubscriber\WorkspaceHeaderSubscriber;
+use Drupal\druxtjsorg\Negotiator\CookieWorkspaceNegotiator;
 use Drupal\druxtjsorg\Negotiator\HeaderWorkspaceNegotiator;
 use Drupal\druxtjsorg\Revisions\LiveWorkingCopy;
 use Drupal\druxtjsorg\Revisions\WorkspaceVersionNegotiator;
@@ -39,12 +40,18 @@ final class DruxtjsorgServiceProvider extends ServiceProviderBase {
       ->addArgument(new Reference(AccountInterface::class))
       // Above core's query parameter (100) and session (50) negotiators.
       ->addTag('workspace_negotiator', ['priority' => 150]);
+    $container->register('druxtjsorg.workspace_negotiator.cookie', CookieWorkspaceNegotiator::class)
+      ->addArgument(new Reference(AccountInterface::class))
+      // Below the header, above core's query parameter and session.
+      ->addTag('workspace_negotiator', ['priority' => 140])
+      ->addTag('event_subscriber');
     $container->register('druxtjsorg.workspace_header_subscriber', WorkspaceHeaderSubscriber::class)
       ->setArguments([
         new Reference(AccountInterface::class),
         new Reference('entity_type.manager'),
         new Reference('workspaces.manager'),
         new Reference('druxtjsorg.workspace_negotiator.header'),
+        new Reference('druxtjsorg.workspace_negotiator.cookie'),
       ])
       ->addTag('event_subscriber');
     $container->register('druxtjsorg.live_working_copy', LiveWorkingCopy::class)
