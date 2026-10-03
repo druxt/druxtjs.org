@@ -287,6 +287,34 @@ describe('createHandler', () => {
     }
   })
 
+  test('renders an editor reading a workspace live, and gives a reader with the cookie the stored page', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'docs-cache-'))
+    const cache = createPageCache({
+      dir,
+      ttl: 60000,
+      render: async () => ({ html: '<p>live</p>' }),
+    })
+    await cache.store('/how-to')
+    const live = (req, res) => res.end('<p>rendered in the workspace</p>')
+    try {
+      await withServer(createHandler({ cache, live }), async (base) => {
+        const editor = await request(`${base}/how-to`, {
+          headers: { cookie: 'druxt-workspace=stage; auth._token.drupal-password=Bearer%20abc' },
+        })
+        assert.equal(editor.headers['x-docs-cache'], 'BYPASS')
+        assert.equal(editor.headers['cache-control'], 'no-store')
+        // The choice alone is not a sign-in: Drupal answers that reader from live.
+        const reader = await request(`${base}/how-to`, {
+          headers: { cookie: 'druxt-workspace=stage' },
+        })
+        assert.equal(reader.headers['x-docs-cache'], 'HIT')
+        assert.equal(reader.body, '<p>live</p>')
+      })
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
   test('bypasses the store for live=1 only, not for any query string', async () => {
     const dir = tempDir()
     try {

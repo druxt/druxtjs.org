@@ -1187,6 +1187,21 @@ body.has-editor-bar main {
   padding: 1px 5px;
   flex: none;
 }
+/* The workspace being read, beside the orb on every page. */
+.editor-bar-workspace {
+  font: 600 9.5px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7cc4ff;
+  border: 1px solid rgb(124 196 255 / 0.5);
+  border-radius: 4px;
+  padding: 1px 5px;
+  max-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: none;
+}
 .editor-bar-sep {
   width: 1px;
   height: 18px;

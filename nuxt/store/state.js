@@ -96,6 +96,9 @@ export default () => ({
     // jsonapi_diff through @druxt-contrib/diff's normaliseDiff().
     compare: false,
     diff: null,
+    // The Drupal workspace the editor reads the site in, or null for live.
+    // Kept in a cookie by plugins/workspace.js.
+    workspace: null,
   },
 
   // The sign-in dialog, opened from the header and by the auth middleware.

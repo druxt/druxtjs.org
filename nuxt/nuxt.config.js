@@ -159,6 +159,8 @@ export default {
     '~/plugins/mermaid.client.js',
     // After the Druxt and auth plugins the modules add: it wraps the client.
     '~/plugins/working-copy.js',
+    // Also after the Druxt and auth plugins: it adds to the client they share.
+    '~/plugins/workspace.js',
   ],
   components: true,
   // Mirrors the SITE_ORIGIN override into the client bundle so hydration
@@ -347,6 +349,7 @@ export default {
         onProxyReq: (proxyReq) => {
           proxyReq.removeHeader('cookie')
           proxyReq.removeHeader('authorization')
+          proxyReq.removeHeader('x-druxt-workspace')
         },
       },
     ],

@@ -52,6 +52,11 @@ export default {
     state.editor = { ...state.editor, compare: Boolean(on) }
   },
 
+  /** The workspace the editor reads the site in, or null for live. */
+  setEditorWorkspace(state, workspace) {
+    state.editor = { ...state.editor, workspace: workspace || null }
+  },
+
   /** The page's normalised diff, or null. */
   setEditorDiff(state, diff) {
     state.editor = { ...state.editor, diff: diff || null }

@@ -32,6 +32,15 @@
       </svg>
     </button>
 
+    <!-- The workspace the site is being read in, on every page, so an editor
+         never mistakes it for live. -->
+    <span
+      v-if="workspace"
+      class="editor-bar-workspace"
+      :title="`Reading the site in the ${workspaceLabel} workspace`"
+      data-testid="editor-bar-workspace"
+    >{{ workspaceLabel }}</span>
+
     <template v-if="!idle">
       <!-- The revision being read takes the bar over, and the controls stay put. -->
       <AppRevisionPill v-if="viewingRevision" bare />
@@ -114,6 +123,24 @@
       >
         <span class="truncate">{{ link.label }}</span>
       </a>
+      <!-- Which version of the site to read: live, or a workspace's. -->
+      <template v-if="workspaces.length">
+        <p class="editor-bar-choices-title">Read the site in</p>
+        <button
+          v-for="choice of [{ id: null, label: 'Live' }, ...workspaces]"
+          :key="choice.id || 'live'"
+          type="button"
+          class="editor-bar-choice"
+          :class="{ on: choice.id === workspace }"
+          role="menuitemradio"
+          :aria-checked="String(choice.id === workspace)"
+          :data-testid="`editor-bar-workspace-${choice.id || 'live'}`"
+          @click="chooseWorkspace(choice.id)"
+        >
+          <span class="truncate">{{ choice.label }}</span>
+          <span v-if="choice.id === workspace" class="editor-bar-choice-kind">Current</span>
+        </button>
+      </template>
     </div>
   </div>
 </template>
@@ -124,6 +151,7 @@ import { hasEditorHint, operationsUrl, operationsOf } from '~/lib/entity-operati
 import { gatewayFor } from '~/lib/editor-gateway'
 import { editHref, editLabel, pageSubject, subjectFromElement, subjectsOn } from '~/lib/editor-subject'
 import { hasDraft, viewing } from '~/lib/revisions'
+import { workspaceCookie } from '~/lib/workspace'
 
 /** How long a subject survives the pointer leaving it, in milliseconds. */
 const LINGER = 260
@@ -182,6 +210,8 @@ export default {
     choices: [],
     choosing: false,
     gateway: false,
+    /** The workspaces this editor may read the site in, once asked for. */
+    workspaces: [],
     hovering: false,
     /** Whether this browser has been told the account may edit. */
     hinted: false,
@@ -192,6 +222,9 @@ export default {
   computed: {
     editor: ({ $store }) => $store.state.editor,
     signedIn: ({ $auth }) => Boolean($auth && $auth.loggedIn),
+    workspace: ({ editor }) => editor.workspace,
+    /** The workspace's label once the list is in, its id until then. */
+    workspaceLabel: ({ workspace, workspaces }) => (workspaces.find(({ id }) => id === workspace) || {}).label || workspace,
     /**
      * The store's page, but only where it is this route's page.
      *
@@ -243,6 +276,17 @@ export default {
   },
 
   watch: {
+    // Asked for when first wanted: the menu opening, or a workspace to name.
+    gateway(open) {
+      if (open) this.loadWorkspaces()
+    },
+    show: {
+      handler(on) {
+        if (on && this.workspace) this.loadWorkspaces()
+      },
+      immediate: true,
+    },
+
     // The hint arrives with the login, which is after this mounted, so the
     // cookie is read again whenever the account changes rather than once.
     //
@@ -396,6 +440,37 @@ export default {
       } catch (error) {
         // An editor's convenience, never a reason for the page to break.
       }
+    },
+
+    /** The workspaces this editor may read the site in, by machine name and label. */
+    async loadWorkspaces() {
+      if (this.workspaces.length) return
+      try {
+        const { data } = await this.$druxt.axios.get('/jsonapi/workspace/workspace', {
+          params: { 'fields[workspace--workspace]': 'drupal_internal__id,label', sort: 'label' },
+        })
+        this.workspaces = ((data && data.data) || []).map(({ attributes }) => ({
+          id: attributes.drupal_internal__id,
+          label: attributes.label,
+        }))
+      } catch (error) {
+        // Without the list there is no choice to offer, and live still reads.
+      }
+    },
+
+    /**
+     * Reads the site in a workspace, or live for null.
+     *
+     * A reload, not a refetch: the store already holds pages read in the old
+     * workspace, and only a fresh render is sure to hold none of them.
+     *
+     * @param {string|null} id - The workspace's machine name.
+     */
+    chooseWorkspace(id) {
+      this.gateway = false
+      if (id === this.workspace) return
+      document.cookie = workspaceCookie(id, window.location.protocol === 'https:')
+      window.location.reload()
     },
 
     /** The page's revisions, for the submenu and for the draft dot. */
