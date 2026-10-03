@@ -495,9 +495,13 @@ fi
 # Production addresses are read to be put back, and nothing needs the file
 # after that: it must not outlive the rollout.
 app="$(build_app yes)"
+mkdir -p "$app/tmp"
 run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
-  DOCS_MAINTAINER_DOMAIN=example.com STUB_KEPT_ADDRESSES='2\tsomeone@example.com' > /dev/null
-if [ -e /tmp/kept-addresses.tsv ]; then
+  DOCS_MAINTAINER_DOMAIN=example.com STUB_KEPT_ADDRESSES='2\tsomeone@example.com' TMPDIR="$app/tmp" > /dev/null
+# The address was read and put back, so the file existed; now it must be gone.
+if ! called "$app" "someone@example.com"; then
+  no "the kept address was never restored, so the file check proves nothing"
+elif [ -n "$(ls -A "$app/tmp")" ]; then
   no "the kept addresses file outlived the rollout"
 else
   ok "the kept addresses file does not outlive the rollout"
