@@ -1,5 +1,15 @@
 /* Global accessibility baseline. Registered in nuxt.config.js `css`. */
 
+/* Motion, shared by every transition on the site and by Tailwind's
+   `transition` and `duration-*` utilities. Fast is for colour, opacity and
+   hover; base is for things that move. Reduced motion is honoured below. */
+:root {
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-ease-out: cubic-bezier(0, 0, 0.2, 1);
+}
+
 /* daisyUI's button and link resets drop the UA focus ring in places; a single
    visible focus indicator, keyboard-only, covers every interactive element. */
 :focus-visible {
@@ -182,7 +192,7 @@ html {
   background: linear-gradient(to right, hsl(var(--b1) / 0), hsl(var(--b1)));
   pointer-events: none;
   opacity: 0;
-  transition: opacity 150ms;
+  transition: opacity var(--motion-fast) var(--motion-ease);
 }
 .docs-diagram .docs-diagram-frame[data-overflow]::after {
   opacity: 1;
@@ -444,7 +454,7 @@ html {
   background: linear-gradient(to right, hsl(var(--b1) / 0), hsl(var(--b1)));
   pointer-events: none;
   opacity: 0;
-  transition: opacity 150ms;
+  transition: opacity var(--motion-fast) var(--motion-ease);
 }
 .prose .docs-table[data-overflow]::after {
   opacity: 1;
@@ -827,7 +837,7 @@ html {
    focus, and always shown where nothing can hover. */
 .page-ops-slot {
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--motion-fast) var(--motion-ease);
 }
 .group:hover .page-ops-slot,
 .page-ops-slot:focus-within {
@@ -1090,6 +1100,16 @@ body.has-editor-bar main {
 .editor-bar.docked {
   bottom: auto;
   transform: none;
+  /* Glides from block to block, and arrives with a short rise. */
+  transition: top var(--motion-base) var(--motion-ease-out), left var(--motion-base) var(--motion-ease-out),
+    width var(--motion-base) var(--motion-ease-out);
+  animation: editor-bar-arrive var(--motion-base) var(--motion-ease-out);
+}
+@keyframes editor-bar-arrive {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
 }
 /* Chosen outright, so the bar holds this block while the pointer goes
    anywhere else. The ring is the same one the block itself wears. */
@@ -1442,6 +1462,14 @@ a.editor-bar-choice {
   outline: 2px solid hsl(var(--p));
   outline-offset: 6px;
   border-radius: 4px;
+  animation: editing-ring var(--motion-base) var(--motion-ease-out);
+}
+/* The ring closes in on the block it now belongs to. */
+@keyframes editing-ring {
+  from {
+    outline-color: transparent;
+    outline-offset: 12px;
+  }
 }
 @media (max-width: 639px) {
   .editor-bar {
@@ -1598,7 +1626,7 @@ del.v-diff-del--trailing {
 }
 .diff-minimap__mark {
   opacity: 0.85;
-  transition: opacity 120ms ease;
+  transition: opacity var(--motion-fast) var(--motion-ease);
 }
 .diff-minimap__mark:hover,
 .diff-minimap__mark:focus-visible {

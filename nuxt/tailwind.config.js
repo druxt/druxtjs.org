@@ -86,6 +86,17 @@ module.exports = {
 
   theme: {
     extend: {
+      // Motion comes from the tokens in assets/css/app.css, so a `transition`
+      // utility and a hand-written rule move at the same speed and curve.
+      transitionDuration: {
+        DEFAULT: 'var(--motion-fast)',
+        150: 'var(--motion-fast)',
+        200: 'var(--motion-base)',
+      },
+      transitionTimingFunction: {
+        DEFAULT: 'var(--motion-ease)',
+        out: 'var(--motion-ease-out)',
+      },
       fontFamily: {
         sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Helvetica Neue', 'sans-serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
