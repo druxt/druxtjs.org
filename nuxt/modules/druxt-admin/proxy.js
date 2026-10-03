@@ -91,7 +91,6 @@ const HOP_BY_HOP = [
   'upgrade',
 ]
 
-/** Whether a request is Drupal's to answer. */
 /**
  * A dot segment, an encoded separator or a backslash: Drupal's server would
  * normalise it, this proxy sends the path as it came, so a path the allowlist
@@ -99,6 +98,7 @@ const HOP_BY_HOP = [
  */
 const UNSAFE_PATH = /(^|\/)\.\.?(\/|$)|%2e|%2f|%5c|\\/i
 
+/** Whether a request is Drupal's to answer. */
 export function shouldProxy(path, options = {}) {
   const subject = String(path || '').split('?')[0]
   if (!subject) return false
