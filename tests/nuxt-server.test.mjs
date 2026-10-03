@@ -326,6 +326,7 @@ describe('createHandler', () => {
         const login = await request(`${base}/user/login`)
         assert.equal(login.body, 'live')
         assert.equal(login.headers['x-docs-cache'], undefined)
+        assert.equal(login.headers['cache-control'], 'no-store')
         const trailing = await request(`${base}/user/`)
         assert.equal(trailing.status, 200, 'not redirected to drop the slash')
         const page = await request(`${base}/page`)
