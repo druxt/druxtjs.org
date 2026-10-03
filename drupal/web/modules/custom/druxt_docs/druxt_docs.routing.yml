@@ -11,3 +11,31 @@ druxt_docs.deployment:
     _access: 'TRUE'
   options:
     no_cache: 'TRUE'
+
+druxt_docs.revisions:
+  path: '/druxt-docs/doc-page/{uuid}/revisions'
+  defaults:
+    _controller: '\Drupal\druxt_docs\Controller\RevisionsController::list'
+  requirements:
+    _permission: 'view doc_page revisions'
+    uuid: '[0-9a-f-]{36}'
+  options:
+    _auth: ['oauth2', 'cookie']
+    no_cache: 'TRUE'
+
+druxt_docs.session_end:
+  path: '/druxt-docs/session'
+  defaults:
+    _controller: '\Drupal\druxt_docs\Controller\SessionController::end'
+  methods: [DELETE]
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    # The header token `/session/token` issues, which is core's own protection
+    # for a write it cannot hand a route token to. The login-issued logout
+    # token is no use here: only the session that logged in ever has it.
+    _csrf_request_header_token: 'TRUE'
+  options:
+    # The cookie only: a bearer token names an account, not the browser session
+    # this ends, and it would end whichever session happened to be attached.
+    _auth: ['cookie']
+    no_cache: 'TRUE'

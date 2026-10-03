@@ -129,6 +129,7 @@ const main = async () => {
     cache,
     live: app.render,
     noindex: env.LAGOON_ENVIRONMENT_TYPE !== 'production',
+    passThrough: app.options.docsPassThrough,
     artefacts,
   })
   log(`serving ${env.SITE_ORIGIN || `http://${host}:${port}`}`)

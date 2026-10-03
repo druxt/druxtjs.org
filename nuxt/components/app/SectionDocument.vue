@@ -1,10 +1,10 @@
 <template>
   <article>
-    <AppPageHeader :title="document.title" :description="document.description" />
+    <AppPageHeader :title="document.title" :description="document.description" :badges="editorBadges" :entity="operationsEntity" />
     <AppProse v-if="!drupal" :document="document" />
     <!-- Keyed so each page gets a fresh AppProse, whose enhance() runs on mount. -->
     <AppProse v-else :key="document.path" :title="document.title">
-      <DruxtEntity :type="document.type" :uuid="document.uuid" mode="full" />
+      <DruxtEntity :key="druxtKey" :type="document.type" :uuid="document.uuid" mode="full" />
     </AppProse>
     <AppDocFooter :prev="prev" :next="next" />
   </article>
@@ -75,6 +75,30 @@ export default {
     })
   },
   computed: {
+    /** The page's Drupal node, for an editor's operations; none for markdown. */
+    operationsEntity() {
+      if (!this.drupal || !this.document.uuid) return null
+      return { type: this.document.type, id: this.document.uuid, attributes: { title: this.document.title }, state: this.document.moderationState }
+    },
+    /**
+     * A badge when a signed-in editor is viewing something other than the
+     * published page: the latest draft, or a specific revision.
+     */
+    editorBadges() {
+      if (!(this.$auth && this.$auth.loggedIn)) return []
+      const version = this.$store.state.editor.version
+      if (version === 'published') return []
+      if (version === 'working-copy') {
+        const draft = (this.document || {}).moderationState && this.document.moderationState !== 'published'
+        return draft ? [{ text: 'Draft', class: 'badge-warning' }] : []
+      }
+      return [{ text: `Revision ${String(version).replace(/^id:/, '')}`, class: 'badge-warning badge-outline' }]
+    },
+    /** Re-mounts DruxtEntity when the editor switches revision, so it re-fetches. */
+    druxtKey() {
+      const version = this.$auth && this.$auth.loggedIn ? this.$store.state.editor.version : 'published'
+      return `${(this.document || {}).uuid}@${version}`
+    },
     position: ({ siblings, current }) => siblings.findIndex((o) => o.to === current),
     prev: ({ siblings, position }) => (position > 0 ? siblings[position - 1] : null),
     next: ({ siblings, position }) => (position > -1 && position < siblings.length - 1 ? siblings[position + 1] : null),
