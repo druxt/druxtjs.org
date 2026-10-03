@@ -37,6 +37,7 @@
         "drupal/pathauto": "^1.15",
         "drupal/redirect": "^1.13",
         "drupal/simple_oauth": "^6.1",
+        "drupal/simple_oauth_password_grant": "^2.1",
         "drupal/simple_oauth_revoke": "^3.0",
         "drupal/token": "^1.17",
         "drush/drush": "^13",
@@ -147,6 +148,9 @@
             },
             "drupal/jsonapi_node_preview": {
                 "Issue #3367724: resolve includes from the previewed entity": "https://git.drupalcode.org/project/jsonapi_node_preview/-/merge_requests/4.diff"
+            },
+            "drupal/druxt": {
+                "Stand aside for a path the wildcard resolver cannot rebuild, so the entity resolver answers it": "patches/druxt-wildcard-stands-aside.patch"
             }
         }
     }

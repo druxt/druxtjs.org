@@ -211,8 +211,13 @@ const createHandler =
     // every `.xml` and `.txt` to the static middleware.
     if (artefacts && artefacts.isArtefact(req.method, pathname)) return artefacts.handle(req, res)
 
-    // Drupal's login and editing screens, proxied: an editor's page, never a stored one.
-    if (passThrough && passThrough(pathname)) return live(req, res)
+    // Drupal's login and editing screens, proxied: an editor's page, never a
+    // stored one, and never one a cache between here and the browser keeps.
+    // Drupal's own Cache-Control, where it sends one, replaces this.
+    if (passThrough && passThrough(pathname)) {
+      res.setHeader('Cache-Control', 'no-store')
+      return live(req, res)
+    }
     if (!isPage(req.method, pathname)) return live(req, res)
 
     // Canonical page URLs carry no trailing slash.

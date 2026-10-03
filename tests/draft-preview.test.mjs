@@ -19,7 +19,7 @@ const { WORKING_COPY, applyVersion, resourceVersionFor } = require('../nuxt/lib/
 
 describe('auth cookie', () => {
   test('is named as @nuxtjs/auth-next names a token cookie: prefix, _token., strategy', () => {
-    assert.equal(AUTH_COOKIE, 'auth._token.drupal-authorization_code')
+    assert.equal(AUTH_COOKIE, 'auth._token.drupal-password')
     assert.equal(AUTH_COOKIE, `${AUTH_COOKIE_PREFIX}_token.${AUTH_STRATEGY}`)
   })
 
@@ -28,11 +28,16 @@ describe('auth cookie', () => {
     assert.equal(hasAuthCookie(`auth.strategy=x; ${AUTH_COOKIE}=Bearer abc; other=1`), true)
   })
 
+  test('is found for a session started with the authorization code strategy too', () => {
+    assert.equal(hasAuthCookie('auth._token.drupal-authorization_code=Bearer%20abc'), true)
+    assert.equal(hasAuthCookie('auth._token.drupal-authorization_code=false'), false)
+  })
+
   test('is not found when absent, empty, signed out, or only similarly named', () => {
     for (const header of [
       undefined,
       '',
-      'auth.strategy=drupal-authorization_code',
+      'auth.strategy=drupal-password',
       `${AUTH_COOKIE}=`,
       `${AUTH_COOKIE}=false`,
       `x${AUTH_COOKIE}=Bearer abc`,

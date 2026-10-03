@@ -1,0 +1,86 @@
+<?php
+
+/**
+ * @file
+ * Hooks for the druxtjs.org frontend's integration with Drupal.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\simple_oauth\Authentication\TokenAuthUserInterface;
+
+/**
+ * Implements hook_druxt_resources_alter().
+ *
+ * Adds the resources a consumer may read beyond the ones everybody may.
+ *
+ * `druxt.settings` has one audience: everything it lists is readable by
+ * whoever holds `access druxt resources`, which here is anonymous. That is
+ * right for the theme, the menus and the workflow, and wrong for anything
+ * describing who may do what. This gives the list a second axis, so a
+ * resource can be readable by a named consumer without being readable by the
+ * world.
+ *
+ * The consumer is taken from the OAuth token and from nowhere else. The
+ * consumers negotiator reads an `X-Consumer-ID` header and a `consumerId`
+ * query parameter, both of which any caller may set, so it names a consumer
+ * without proving one. A token's `client` was issued by Drupal.
+ *
+ * This is a proof of concept for druxt issue 15, which designs the same axis
+ * as a `content_resources` key with per-consumer overrides. The hook runs
+ * after `druxt_resources()` has rechecked the stored list, which is where the
+ * module documents that a module may expose what configuration may not.
+ *
+ * @param string[] $resources
+ *   The resource type ids, altered in place.
+ */
+function druxtjsorg_druxt_resources_alter(array &$resources): void {
+  $account = \Drupal::currentUser()->getAccount();
+  if (!$account instanceof TokenAuthUserInterface) {
+    return;
+  }
+
+  // A token can outlive the consumer it was issued to.
+  $consumer = $account->getConsumer();
+  if (!$consumer) {
+    return;
+  }
+  $scoped = \Drupal::config('druxtjsorg.settings')->get('consumer_resources') ?? [];
+  $extra = $scoped[$consumer->getClientId()] ?? [];
+  if (!$extra) {
+    return;
+  }
+
+  $resources = array_values(array_unique(array_merge($resources, $extra)));
+}
+
+/**
+ * Implements hook_entity_access().
+ *
+ * Keeps a consumer-scoped resource's access from being cached.
+ *
+ * Druxt grants a listed resource and caches the answer, varied by nothing
+ * that names the consumer, so an answer reached for one consumer would be
+ * served to another. For a resource some consumer is scoped to, this gives
+ * the same answer as Druxt with no lifetime, and access results merge their
+ * cacheability, so the combined answer is never stored.
+ */
+function druxtjsorg_entity_access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResultInterface {
+  $config = \Drupal::config('druxtjsorg.settings');
+  $neutral = AccessResult::neutral()->addCacheableDependency($config);
+  if ($operation !== 'view') {
+    return $neutral;
+  }
+  $type = $entity->getEntityTypeId() . '--' . $entity->bundle();
+  $scoped = array_merge([], ...array_values($config->get('consumer_resources') ?? []));
+  if (!in_array($type, $scoped, TRUE)) {
+    return $neutral;
+  }
+  return AccessResult::allowedIf(druxt_access_check($account))
+    ->addCacheableDependency($config)
+    ->setCacheMaxAge(0);
+}

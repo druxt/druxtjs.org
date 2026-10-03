@@ -148,6 +148,18 @@ describe('fetchDrupalPage, signed in, moving between pages', () => {
     await fetchDrupalPage(editorStore('u-1', editor), '/tutorials/getting-started')
     assert.equal(editor.version, 'working-copy')
   })
+
+  // One store value serves every route, and only a Drupal page writes it, so
+  // without the path on it the editor bar went on naming, and offering
+  // operations on, the page the reader had left.
+  test('the page carries the route it answers', async () => {
+    const editor = { version: 'published', revisions: [], page: null }
+    await fetchDrupalPage(editorStore('u-1', editor), '/tutorials/getting-started')
+    assert.equal(editor.page.path, '/tutorials/getting-started')
+
+    await fetchDrupalPage(editorStore('u-2', editor), '/how-to/other')
+    assert.equal(editor.page.path, '/how-to/other', 'and it moves with the reader')
+  })
 })
 
 // A contributor may read only their own unpublished work, so Drupal refuses

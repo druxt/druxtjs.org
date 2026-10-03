@@ -15,6 +15,7 @@
   "dependencies": {
     "@druxt-contrib/anchors": "file:vendor/druxt-anchors",
     "@druxt-contrib/diff": "file:vendor/druxt-diff",
+    "@druxt-contrib/user": "file:vendor/druxt-user",
     "@nuxt/content": "1.15.1",
     "@nuxtjs/proxy": "2.1.0",
     "@tailwindcss/typography": "0.4.1",
@@ -24,7 +25,7 @@
     "daisyui": "1.25.4",
     "drupal-jsonapi-params": "2.3.2",
     "druxt": "0.24.0",
-    "druxt-auth": "0.4.0",
+    "druxt-auth": "0.5.0-dev-20260925083534",
     "druxt-blocks": "0.17.3",
     "druxt-breadcrumb": "0.17.2",
     "druxt-entity": "0.28.1",
