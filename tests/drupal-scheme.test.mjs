@@ -47,15 +47,17 @@ const loadScheme = async () => {
   // The scheme's session handling lives in a sibling module, so that comes
   // too: the package splits it to share one copy with the password scheme.
   const templates = new URL('../nuxt/node_modules/druxt-auth/templates/', import.meta.url)
+  // As .mjs: the folder has no package.json saying "module", so Node 16
+  // would read a .js copy as CommonJS and find none of its exports.
   writeFileSync(
-    path.join(dir, 'drupal-session.js'),
+    path.join(dir, 'drupal-session.mjs'),
     readFileSync(new URL('drupal-session.js', templates), 'utf8')
   )
   const source = readFileSync(new URL('drupal-scheme.js', templates), 'utf8')
     .replace("from '~auth/runtime'", "from './runtime.mjs'")
     // Node resolves no extension for us; webpack does, which is why the
     // package can import its sibling without one.
-    .replace("from './drupal-session'", "from './drupal-session.js'")
+    .replace("from './drupal-session'", "from './drupal-session.mjs'")
   const file = path.join(dir, 'scheme.mjs')
   writeFileSync(file, source)
   const mod = await import(pathToFileURL(file).href)
