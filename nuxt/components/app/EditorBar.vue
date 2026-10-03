@@ -389,13 +389,17 @@ export default {
 
     /** The page's revisions, for the submenu and for the draft dot. */
     async loadRevisions(uuid) {
+      let revisions = []
       try {
         const { data } = await this.$druxt.axios.get(`/druxt-docs/doc-page/${uuid}/revisions`)
-        this.$store.commit('setEditorRevisions', (data && data.data) || [])
+        revisions = (data && data.data) || []
       } catch (error) {
         // Without the list there is no submenu, and the page still reads.
-        this.$store.commit('setEditorRevisions', [])
       }
+      // The reader can have moved on while Drupal answered, and a slower
+      // answer for the page they left must not replace this page's list.
+      if ((this.current || {}).uuid !== uuid) return
+      this.$store.commit('setEditorRevisions', revisions)
     },
 
     /** What the page has anchored, for the chooser. */
