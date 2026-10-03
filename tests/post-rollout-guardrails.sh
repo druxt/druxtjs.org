@@ -64,7 +64,11 @@ case "\$*" in
   *"status --field=bootstrap"*) [ "$bootstrap" = "yes" ] && echo "Successful" ;;
   *"SELECT COUNT(*) FROM sessions"*) echo "$sessions" ;;
   *"SELECT COUNT(*) FROM oauth2_token"*) echo "$tokens" ;;
-  *"mail LIKE"*) [ -n "\${STUB_KEPT_ADDRESSES:-}" ] && printf '%b\n' "\${STUB_KEPT_ADDRESSES}" ;;
+  *"mail LIKE"*)
+    # The file the addresses are written into, as the shell opened it: this
+    # process's own stdout, not that of the substitution below.
+    echo "kept file mode \$(stat -L -c %a /proc/\$\$/fd/1 2>/dev/null)" >> "$app/calls.log"
+    [ -n "\${STUB_KEPT_ADDRESSES:-}" ] && printf '%b\n' "\${STUB_KEPT_ADDRESSES}" ;;
   *"php:eval"*)
     [ "\${STUB_EVAL_FAILS:-}" = "1" ] && exit 1
     if [ "\${STUB_NO_SUCH_USER:-}" = "1" ]; then printf 'no-account'; else printf 'login-restored'; fi ;;
@@ -496,8 +500,9 @@ fi
 # after that: it must not outlive the rollout.
 app="$(build_app yes)"
 mkdir -p "$app/tmp"
-run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
-  DOCS_MAINTAINER_DOMAIN=example.com STUB_KEPT_ADDRESSES='2\tsomeone@example.com' TMPDIR="$app/tmp" > /dev/null
+# Under the usual umask, where a file the shell creates is readable by all.
+(umask 022 && run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_DOMAIN=example.com STUB_KEPT_ADDRESSES='2\tsomeone@example.com' TMPDIR="$app/tmp") > /dev/null
 # The address was read and put back, so the file existed; now it must be gone.
 if ! called "$app" "someone@example.com"; then
   no "the kept address was never restored, so the file check proves nothing"
@@ -505,6 +510,13 @@ elif [ -n "$(ls -A "$app/tmp")" ]; then
   no "the kept addresses file outlived the rollout"
 else
   ok "the kept addresses file does not outlive the rollout"
+fi
+# Written while the file still holds production's addresses, so only the
+# rollout's own user may read it.
+if called "$app" "kept file mode 600"; then
+  ok "the kept addresses file is private while it holds addresses"
+else
+  no "the kept addresses file was readable beyond the rollout's user ($(grep 'kept file mode' "$app/calls.log"))"
 fi
 
 # The domain decides a SQL predicate, so a value that is not a hostname is
