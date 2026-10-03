@@ -92,9 +92,12 @@ carry a draft while its published revision stays live. A signed-in editor
 (the `editor` or `contributor` role, over `druxt-auth` PKCE against the
 `druxtjs_org` consumer) sees the draft on the page's own URL. JSON:API writes
 are enabled (`jsonapi.settings` `read_only: false`), so a signed-in client can
-write a page and its paragraphs as a draft. The site is a JSON:API client and
-doesn't carry a writer of its own. Content goes through a Druxt client.
-[docs/backend.md](docs/backend.md#draft-authoring-and-preview) covers it. The
+write a page and its paragraphs as a draft on live or into a workspace. The
+site is a JSON:API client and doesn't carry a writer of its own. Content goes
+through a Druxt client. Workspaces stage a set of changes off live, chosen per
+request with the `X-Druxt-Workspace` header, which `druxtjsorg` honours only
+for a signed-in account.
+[docs/backend.md](docs/backend.md#staging-in-a-workspace) covers both. The
 importer still seeds every page published.
 
 ## Layout

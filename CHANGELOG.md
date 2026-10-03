@@ -30,6 +30,17 @@ Druxt 1.0.0.
   3626255, carried as a vendored copy of its merge request plus the one-line
   service argument Drupal 11 needs for it. The collection behind the sitemap
   and `llms.txt` drops from 1301 queries to 77.
+- Core Workspaces on the backend. A workspace holds changes to pages, their
+  paragraphs, media, menu links and paths off live, and publishing it moves
+  the whole set live at once, which is how a release or embargoed content
+  waits. An `X-Druxt-Workspace` header chooses the workspace for a signed-in
+  request that may view it. A reader's header is ignored, and a write naming
+  a workspace it cannot have is refused rather than saved to live.
+- The editor bar reads the site in a chosen workspace, names it on every
+  page, and the page diff compares it with live.
+- `author-page.mjs` writes into a workspace with `--workspace <id>`, and sends
+  nothing without `--workspace` or `--live`. It checks the whole page against
+  the content model first and reports every problem at its place.
 
 ### Changed
 
@@ -42,6 +53,12 @@ Druxt 1.0.0.
   around the first-load refetch is gone.
 - Drupal core 11.4.8, the security release. The two JSON:API patches apply
   to it unchanged.
+
+### Fixed
+
+- Inside a workspace, JSON:API answered from live for a bearer token, served
+  cached normalizations across workspaces, refused a second write to the same
+  page, and on live showed editors a workspace's revision as the page's draft.
 
 ## [0.10.0] - 2026-09-27
 
