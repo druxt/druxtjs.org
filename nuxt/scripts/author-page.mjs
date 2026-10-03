@@ -327,6 +327,22 @@ export const awaitCode = (port, state) =>
  * @param {string} [options.token] - A token to use as is.
  * @returns {Promise<void>} Resolves once the client carries a token.
  */
+/**
+ * The access token in a token endpoint's answer.
+ *
+ * An answer without one stops sign-in here, before any write goes out as
+ * `Bearer undefined`.
+ *
+ * @param {object} response - The axios response to the token request.
+ * @returns {string} The access token.
+ * @throws {Error} When the answer holds no token.
+ */
+export const tokenFrom = (response) => {
+  const token = ((response || {}).data || {}).access_token
+  if (typeof token !== 'string' || !token) throw new Error('Drupal answered the token request without an access token.')
+  return token
+}
+
 export const signIn = async (client, { backend, clientId, scope, port, log = () => {}, token }) => {
   if (!token) {
     const { verifier, challenge } = pkcePair()
@@ -342,7 +358,7 @@ export const signIn = async (client, { backend, clientId, scope, port, log = () 
       new URLSearchParams({ grant_type: 'authorization_code', client_id: clientId, redirect_uri: redirectUri, code, code_verifier: verifier }).toString(),
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
     )
-    token = response.data.access_token
+    token = tokenFrom(response)
   }
   client.addHeaders({ Authorization: `Bearer ${token}` })
 }
