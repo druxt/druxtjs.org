@@ -4,6 +4,16 @@
  */
 
 @media (max-width: 47.99em) {
+  /* A little zoomed out on a phone: Gin sizes in rem, so this scales the
+     whole admin evenly, and form fields stay 16px or more where they hold
+     text, so a phone does not zoom in on focus. */
+  :root {
+    font-size: 87.5%;
+  }
+  :is(#extra-specificity-hack, [data-drupal-admin-styles]) :is(input:not([type="checkbox"], [type="radio"]), select, textarea) {
+    font-size: max(1rem, 16px);
+  }
+
   /* The top bar's three columns left the title none at all on a phone, and
      laid Save over it. One column: the breadcrumb, the title and its state,
      then the actions. Raised the way Gin raises its own rules. */
