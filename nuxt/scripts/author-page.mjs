@@ -179,7 +179,10 @@ const describe = (cause) => {
 
 /** The written resource's identity. Nodes name their revision `vid`; paragraphs `revision_id`. */
 const identity = (response) => {
-  const { type, id, attributes } = response.data.data
+  // DruxtClient answers false, not an error, when it cannot find the endpoint.
+  const resource = response && response.data && response.data.data
+  if (!resource) throw new Error('Drupal returned no resource.')
+  const { type, id, attributes } = resource
   return { type, id, revision: attributes.drupal_internal__revision_id ?? attributes.drupal_internal__vid }
 }
 
@@ -204,13 +207,12 @@ export const authorPage = async (client, document, { uuid } = {}) => {
 
   const created = []
   const write = async (resource) => {
-    let response
+    let made
     try {
-      response = await client.createResource(resource)
+      made = identity(await client.createResource(resource))
     } catch (cause) {
       throw new AuthoringError(`Could not create ${resource.type}: ${describe(cause)}`, created, cause)
     }
-    const made = identity(response)
     created.push(made)
     return made
   }
@@ -225,13 +227,13 @@ export const authorPage = async (client, document, { uuid } = {}) => {
   }
 
   const resource = pageResource(document, references, term, uuid)
-  let response
+  let page
   try {
-    response = uuid ? await client.updateResource(resource) : await client.createResource(resource)
+    page = identity(uuid ? await client.updateResource(resource) : await client.createResource(resource))
   } catch (cause) {
     throw new AuthoringError(`Could not ${uuid ? 'update' : 'create'} the page: ${describe(cause)}`, created, cause)
   }
-  return { page: identity(response), created }
+  return { page, created }
 }
 
 /**

@@ -335,6 +335,26 @@ describe('authorPage', () => {
     )
   })
 
+  test('a write the client answers with false fails as a write, naming what was created', async () => {
+    const client = fakeClient()
+    const create = client.createResource
+    // DruxtClient answers false, rather than throwing, when it has no endpoint.
+    client.createResource = async (resource) =>
+      resource.type === 'paragraph--docs_code' ? false : create(resource)
+    await assert.rejects(
+      () => authorPage(client, document),
+      (error) => {
+        assert.ok(error instanceof AuthoringError)
+        assert.match(
+          error.message,
+          /Could not create paragraph--docs_code: Drupal returned no resource/
+        )
+        assert.equal(error.created.length, 2)
+        return true
+      }
+    )
+  })
+
   test('a block it cannot write is refused before the first write', async () => {
     const client = fakeClient()
     await assert.rejects(
