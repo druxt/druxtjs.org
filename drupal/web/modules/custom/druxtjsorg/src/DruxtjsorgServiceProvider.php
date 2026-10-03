@@ -10,6 +10,8 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\druxtjsorg\Controller\WorkspaceEntityResource;
 use Drupal\druxtjsorg\EventSubscriber\WorkspaceHeaderSubscriber;
 use Drupal\druxtjsorg\Negotiator\HeaderWorkspaceNegotiator;
+use Drupal\druxtjsorg\Revisions\LiveWorkingCopy;
+use Drupal\druxtjsorg\Revisions\WorkspaceVersionNegotiator;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -45,6 +47,13 @@ final class DruxtjsorgServiceProvider extends ServiceProviderBase {
         new Reference('druxtjsorg.workspace_negotiator.header'),
       ])
       ->addTag('event_subscriber');
+    $container->register('druxtjsorg.live_working_copy', LiveWorkingCopy::class)
+      ->setArguments([
+        new Reference('entity_type.manager'),
+        new Reference('workspaces.manager'),
+        new Reference('workspaces.information'),
+      ])
+      ->setPublic(TRUE);
   }
 
   /**
@@ -53,6 +62,7 @@ final class DruxtjsorgServiceProvider extends ServiceProviderBase {
   public function alter(ContainerBuilder $container): void {
     if ($container->hasDefinition('druxtjsorg.workspace_negotiator.header') && $container->hasDefinition('jsonapi.entity_resource')) {
       $container->getDefinition('jsonapi.entity_resource')->setClass(WorkspaceEntityResource::class);
+      $container->getDefinition('jsonapi.version_negotiator')->setClass(WorkspaceVersionNegotiator::class);
     }
     if (!$container->hasParameter('simple_oauth.openid.claims')) {
       return;

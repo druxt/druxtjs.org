@@ -9,6 +9,8 @@ use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\druxtjsorg\Controller\WorkspaceEntityResource;
 use Drupal\druxtjsorg\EventSubscriber\WorkspaceHeaderSubscriber;
 use Drupal\druxtjsorg\Hook\WorkspaceCacheHooks;
+use Drupal\druxtjsorg\Revisions\LiveWorkingCopy;
+use Drupal\druxtjsorg\Revisions\WorkspaceVersionNegotiator;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -31,6 +33,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 #[CoversClass(WorkspaceHeaderSubscriber::class)]
 #[CoversClass(WorkspaceEntityResource::class)]
 #[CoversClass(WorkspaceCacheHooks::class)]
+#[CoversClass(LiveWorkingCopy::class)]
+#[CoversClass(WorkspaceVersionNegotiator::class)]
 #[Group('druxtjsorg')]
 #[RunTestsInSeparateProcesses]
 final class WorkspaceJsonapiTest extends KernelTestBase {
@@ -123,6 +127,16 @@ final class WorkspaceJsonapiTest extends KernelTestBase {
   }
 
   /**
+   * On live the working copy is live's own, never the workspace's revision.
+   */
+  public function testTheLiveWorkingCopyLeavesTheWorkspaceOut(): void {
+    $this->patch('Staged title', 'stage');
+
+    self::assertSame('Live title', $this->title($this->editor, NULL, 'rel:working-copy'));
+    self::assertSame('Staged title', $this->title($this->editor, 'stage', 'rel:working-copy'));
+  }
+
+  /**
    * A write naming a workspace the account cannot have is refused whole.
    */
   public function testAWriteToAnUnavailableWorkspaceIsRefused(): void {
@@ -208,8 +222,9 @@ final class WorkspaceJsonapiTest extends KernelTestBase {
   /**
    * The page's title as an account reads it, optionally in a workspace.
    */
-  private function title(?UserInterface $account, ?string $workspace = NULL): string {
-    $response = $this->send(Request::create('/jsonapi/node/page/' . $this->page->uuid()), $account, $workspace);
+  private function title(?UserInterface $account, ?string $workspace = NULL, ?string $version = NULL): string {
+    $query = $version === NULL ? [] : ['resourceVersion' => $version];
+    $response = $this->send(Request::create('/jsonapi/node/page/' . $this->page->uuid(), 'GET', $query), $account, $workspace);
     self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
     return Json::decode((string) $response->getContent())['data']['attributes']['title'];
   }

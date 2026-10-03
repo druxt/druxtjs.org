@@ -46,7 +46,9 @@ final class RevisionsController extends ControllerBase {
       ->sort('vid', 'DESC')
       ->accessCheck(FALSE)
       ->execute();
-    $latest = (int) $storage->getLatestRevisionId($node->id());
+    // On live, a workspace's revision is not live's draft.
+    $live = \Drupal::hasService('druxtjsorg.live_working_copy') ? \Drupal::service('druxtjsorg.live_working_copy')->revisionId($node) : NULL;
+    $latest = (int) ($live ?? $storage->getLatestRevisionId($node->id()));
 
     $revisions = [];
     foreach (array_keys($vids) as $vid) {
