@@ -90,7 +90,7 @@ load_from_production() {
   # Each step is allowed to fail: `set -e` would otherwise abandon the trap
   # on the status a killed child returns, and leave the marker behind with
   # the site refusing every request.
-  trap 'kill "$heartbeat" 2>/dev/null || :; wait "$heartbeat" 2>/dev/null || :; rm -f "$replacing"' EXIT
+  trap 'kill "$heartbeat" 2>/dev/null || :; wait "$heartbeat" 2>/dev/null || :; rm -f "$replacing" "$kept_addresses"' EXIT
 
   dump="/tmp/production.sql.gz"
   rm -f "$dump" "${dump%.gz}"
@@ -112,7 +112,10 @@ load_from_production() {
 # someone editing a non-production environment is the person they are in
 # production. Every other address is scrubbed.
 maintainer_domain="${DOCS_MAINTAINER_DOMAIN:-druxtjs.org}"
-kept_addresses="/tmp/kept-addresses.tsv"
+# Production's addresses, briefly. mktemp makes the file private to this user
+# and unguessable, and the exit trap removes it however the rollout ends.
+kept_addresses="$(mktemp)"
+trap 'rm -f "$kept_addresses"' EXIT
 
 # The domain goes into the query that decides which addresses survive, so
 # only a hostname is accepted. A value carrying a quote would rewrite that
