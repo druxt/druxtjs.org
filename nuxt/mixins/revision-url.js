@@ -19,7 +19,7 @@ export default {
      * @returns {Promise<void>} When the URL is the one the store describes.
      */
     async carryRevisionInUrl() {
-      const editor = (this.$store || {}).state.editor
+      const editor = ((this.$store || {}).state || {}).editor
       if (!editor || !(this.$auth && this.$auth.loggedIn)) return
       const { revision, diff, ...rest } = this.$route.query
       const next = { ...rest, ...queryFor(editor.version, editor.compare) }
