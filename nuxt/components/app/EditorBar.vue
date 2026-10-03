@@ -77,7 +77,7 @@
         variant="bar"
         :operations="operations"
         :resource="resource"
-        :label="subject.label"
+        :label="(page || subject).label"
         :edit-href="editUrl"
         :edit-label="editTitle"
         :state="state"
