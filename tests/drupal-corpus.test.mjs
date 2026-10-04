@@ -77,6 +77,14 @@ describe('paragraphMarkdown', () => {
     assert.equal(markdown, '```sh\nnpm i druxt-site\n```')
   })
 
+  test('fences code that shows a fence with a longer one, so it stays one block', () => {
+    const markdown = paragraphMarkdown({
+      type: 'paragraph--docs_code',
+      attributes: { field_code: '# Setup\n\n```sh\nnpm i\n```', field_language: 'md' },
+    })
+    assert.equal(markdown, '````md\n# Setup\n\n```sh\nnpm i\n```\n````')
+  })
+
   test('keeps a callout as the blockquote it was authored as', () => {
     const markdown = paragraphMarkdown({
       type: 'paragraph--docs_callout',
