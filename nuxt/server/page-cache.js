@@ -8,7 +8,7 @@
  * stored once it has answered 200.
  */
 const { redirectFor } = require('./redirects')
-const { hasAuthCookie } = require('../lib/auth')
+const { hasAuthCookie } = require('druxt-auth')
 const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')

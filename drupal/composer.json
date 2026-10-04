@@ -28,6 +28,7 @@
         "drupal/jsonapi_resources": "^1.8",
         "drupal/layout_paragraphs": "^2.1",
         "drupal/linkit": "^7.0",
+        "drupal/logout_token": "^2.0.1",
         "drupal/markdown_easy": "^2.0",
         "drupal/maxlength": "^3.2",
         "drupal/migrate_plus": "^6.0",

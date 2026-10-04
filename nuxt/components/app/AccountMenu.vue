@@ -63,7 +63,7 @@
 
         <div class="h-px bg-base-300 -mx-1.5 my-1.5" />
 
-        <button type="button" class="account-item w-full" data-testid="account-sign-out" @click="$signOut()">
+        <button type="button" class="account-item w-full" data-testid="account-sign-out" @click="signOut">
           <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
           Sign out
         </button>
@@ -96,6 +96,17 @@ export default {
 
   computed: {
     account: ({ $auth }) => accountOf($auth && $auth.user),
+  },
+
+  methods: {
+    /** druxt-auth ends the session and spends the tokens; the full load empties the DruxtStore. */
+    async signOut() {
+      try {
+        await this.$auth.logout()
+      } finally {
+        window.location.assign('/')
+      }
+    },
   },
 }
 </script>

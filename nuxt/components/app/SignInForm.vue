@@ -116,8 +116,10 @@
 </template>
 
 <script>
-import { AUTH_STRATEGY } from '~/lib/auth'
 import { signInError } from '~/lib/account'
+
+/** The druxt-auth strategy this form signs in with. */
+const STRATEGY = 'drupal-authorization_code'
 
 /**
  * The site's own sign-in form.
@@ -161,7 +163,7 @@ export default {
     },
 
     strategy() {
-      return this.$auth.strategies[AUTH_STRATEGY]
+      return this.$auth.strategies[STRATEGY]
     },
 
     async signIn() {
@@ -170,7 +172,7 @@ export default {
       try {
         this.$auth.$storage.setUniversal('redirect', this.destination || this.$route.fullPath)
         // Navigates away to the authorize step; nothing after this runs on success.
-        await this.$auth.loginWith(AUTH_STRATEGY, { credentials: { name: this.name.trim(), pass: this.pass } })
+        await this.$auth.loginWith(STRATEGY, { credentials: { name: this.name.trim(), pass: this.pass } })
       } catch (error) {
         // A session already open is refused by the scheme rather than reused,
         // so it arrives as an error of its own with nothing from Drupal on it.
