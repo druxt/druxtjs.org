@@ -7,7 +7,7 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
 
-const { buildLlmsFullTxt, toAbsoluteUrls, isChangelog } = await import(
+const { buildLlmsFullTxt, outlineProblems, toAbsoluteUrls, isChangelog } = await import(
   '../nuxt/lib/llms-full-txt.js'
 )
 
@@ -135,6 +135,57 @@ describe('buildLlmsFullTxt', () => {
     const out = buildLlmsFullTxt([doc({ title: 'Empty', content: '   ' })], options)
 
     assert.ok(!out.includes('## Empty'))
+  })
+})
+
+describe('outlineProblems', () => {
+  const shell = '```sh\n# .env\nBASE_URL=https://cms.example.com\n# NUXT_TARGET=static\n```'
+  const problems = (docs) => outlineProblems(docs, buildLlmsFullTxt(docs, options))
+  const outline = (content) => problems([doc({ content })])
+
+  test('accepts the title and section headings, with shell comments inside fences', () => {
+    assert.deepEqual(outline(shell), [])
+  })
+
+  test('accepts every section heading the builder can emit', () => {
+    const sections = ['tutorials', 'how-to', 'explanation', 'modules', 'api']
+    const docs = sections.map((section) => doc({ route: '/' + section + '/page', section }))
+
+    assert.deepEqual(problems(docs), [])
+  })
+
+  test('reports a fence that never closes, which hides the rest of the file', () => {
+    const found = outline('```sh\n# .env\nBASE_URL=x')
+
+    assert.equal(found.length, 2)
+    assert.match(found[0], /^\/how-to\/theming line 1: code fence never closes/)
+    assert.match(found[1], /code fence never closes/)
+  })
+
+  test('names the page whose fence the next page closes, which the file alone hides', () => {
+    const found = problems([
+      doc({ route: '/how-to/a', weight: 1, content: '```sh\n# .env' }),
+      doc({ route: '/how-to/b', weight: 2, content: '```sh\nls\n```' }),
+    ])
+
+    assert.deepEqual(found, ['/how-to/a line 1: code fence never closes'])
+  })
+
+  test('reports a heading in a body, which claims the sections after it', () => {
+    const found = outline('# NUXT_TARGET=static')
+
+    assert.equal(found.length, 1)
+    assert.match(found[0], /unexpected top-level heading "# NUXT_TARGET=static"/)
+  })
+
+  test('closes a fence only on a matching marker at least as long', () => {
+    assert.deepEqual(outline('````md\n```js\n# inner\n```\n````'), [])
+    assert.deepEqual(outline('~~~\n```\n# inner\n~~~'), [])
+    assert.match(outline('````\n# inner\n```')[0], /code fence never closes/)
+  })
+
+  test('treats inline code at the start of a line as text, not a fence', () => {
+    assert.deepEqual(outline('```inline``` then prose'), [])
   })
 })
 

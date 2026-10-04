@@ -122,4 +122,61 @@ const buildLlmsFullTxt = (docs, options) => {
   return lines.join('\n')
 }
 
-module.exports = { buildLlmsFullTxt, toAbsoluteUrls, isChangelog, SECTION_ORDER }
+/**
+ * Walk markdown the way a CommonMark reader does, tracking code fences.
+ *
+ * @param {string} markdown - Text to scan.
+ * @returns {{ headings: Array<{ line: number, text: string }>, open: ?number }}
+ *   Top-level headings outside fences, and the line of a fence left open.
+ */
+const scanFences = (markdown) => {
+  const headings = []
+  let fence = null
+
+  markdown.split('\n').forEach((text, index) => {
+    const marker = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(text)
+    if (fence) {
+      if (marker && marker[1][0] === fence.char && marker[1].length >= fence.length && !marker[2].trim()) fence = null
+    } else if (marker && !(marker[1][0] === '`' && marker[2].includes('`'))) {
+      fence = { char: marker[1][0], length: marker[1].length, line: index + 1 }
+    } else if (/^ {0,3}#(\s|$)/.test(text)) {
+      headings.push({ line: index + 1, text })
+    }
+  })
+
+  return { headings, open: fence && fence.line }
+}
+
+/**
+ * Problems with the outline a reader of `/llms-full.txt` would parse.
+ *
+ * Bodies pass through untouched, so `# .env` inside a shell fence stays a
+ * comment. That holds only while every fence closes: one left open swallows
+ * what follows, and an H1 in a body claims the sections after it. Either
+ * mis-attributes pages for anything splitting the file by heading. Each body is
+ * checked on its own as well, because a fence left open mid-file pairs with the
+ * next one and can leave the file as a whole looking balanced.
+ *
+ * @param {Array<object>} docs - Documents the file was built from.
+ * @param {string} text - The rendered file.
+ * @returns {Array<string>} Problems found, empty when the outline is sound.
+ */
+const outlineProblems = (docs, text) => {
+  const expected = ['# ' + SITE_NAME, ...SECTION_ORDER.map((section) => '# ' + SECTIONS[section].label)]
+  const problems = []
+
+  docs.forEach((doc) => {
+    const open = scanFences(doc.content || '').open
+    if (open) problems.push(doc.route + ' line ' + open + ': code fence never closes')
+  })
+
+  const file = scanFences(text)
+  file.headings
+    .filter((heading) => !expected.includes(heading.text))
+    .forEach((heading) => problems.push('line ' + heading.line + ': unexpected top-level heading "' + heading.text + '"'))
+  if (file.open) problems.push('line ' + file.open + ': code fence never closes')
+
+  return problems
+}
+
+module.exports = { buildLlmsFullTxt, outlineProblems, toAbsoluteUrls, isChangelog, SECTION_ORDER }
