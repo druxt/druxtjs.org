@@ -294,6 +294,11 @@ test:unit:
     - !reference [default, before_script]
     - apk add --no-cache git > /dev/null
   script:
+    # The page cache test reads druxt-auth through nuxt/'s installed copy.
+    - corepack enable && corepack prepare --activate
+    - section_start "nuxt-deps" "Installing nuxt/'s dependencies"
+    - (cd nuxt && yarn install --immutable --mode=skip-build)
+    - section_end "nuxt-deps"
     - section_start "node-test" "Running the node tests with the coverage floor"
     - npm run test:coverage
     - section_end "node-test"
