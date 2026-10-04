@@ -283,6 +283,20 @@ describe('artefacts', () => {
     })
   })
 
+  test('logs a page that breaks the outline of llms-full.txt, and still serves it', async () => {
+    const lines = []
+    const broken = corpusOf(['/how-to/proxy']).map((doc) => ({ ...doc, content: '```sh\n# .env' }))
+    const artefacts = serve({ fetchDocs: async () => broken, log: (line) => lines.push(line) })
+    await withServer(createHandler({ cache: null, artefacts, live: () => {} }), async (base) => {
+      assert.equal((await get(`${base}/llms-full.txt`)).status, 200)
+    })
+    assert.ok(
+      lines.some((line) =>
+        /llms-full\.txt outline broken: \/how-to\/proxy line 1: code fence never closes/.test(line)
+      )
+    )
+  })
+
   test('holds a built index for its time to live, then rebuilds', async () => {
     let reads = 0
     const artefacts = serve({
