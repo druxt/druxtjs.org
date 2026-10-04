@@ -116,6 +116,17 @@ request without the editor's token never carries it, and the stored-page
 cache is bypassed for a signed-in editor as before. The page diff compares
 the workspace's revision with live.
 
+**Review changes** in the same menu opens `/workspace`, which lists the
+pages the workspace has changed, newest first, each linking to the page with
+its diff against live on. It reads JSON:API alone: with the workspace
+active, pages filtered on `workspace`, the workspace their revision was made
+in, are the ones it changed. The list links on to Drupal's own overview of
+the workspace, where it is published.
+
+Core lists every paragraph of a changed page in that overview as a row of
+its own, which buries the pages. The `druxtjsorg` module keeps only the
+entities that stand on their own, and marks the columns a phone can drop.
+
 Drupal reads the same cookie for a signed-in editor, below the header, so its
 own screens open in the workspace the frontend shows. Switching in Drupal's
 toolbar writes the cookie back, and switching to live clears it.

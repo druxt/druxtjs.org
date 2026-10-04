@@ -166,6 +166,16 @@
           <span class="truncate">{{ choice.label }}</span>
           <span v-if="choice.id === workspace" class="editor-bar-choice-kind">Current</span>
         </button>
+        <NuxtLink
+          v-if="workspace"
+          to="/workspace"
+          class="editor-bar-choice"
+          role="menuitem"
+          data-testid="editor-bar-workspace-review"
+          @click.native="gateway = false"
+        >
+          <span class="truncate">Review changes in {{ workspaceLabel }}</span>
+        </NuxtLink>
       </template>
     </div>
   </div>
