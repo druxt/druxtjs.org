@@ -179,4 +179,4 @@ const outlineProblems = (docs, text) => {
   return problems
 }
 
-module.exports = { buildLlmsFullTxt, outlineProblems, toAbsoluteUrls, isChangelog, SECTION_ORDER }
+module.exports = { buildLlmsFullTxt, outlineProblems, scanFences, toAbsoluteUrls, isChangelog, SECTION_ORDER }

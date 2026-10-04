@@ -7,7 +7,7 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
 
-const { buildLlmsFullTxt, outlineProblems, toAbsoluteUrls, isChangelog } = await import(
+const { buildLlmsFullTxt, outlineProblems, scanFences, toAbsoluteUrls, isChangelog } = await import(
   '../nuxt/lib/llms-full-txt.js'
 )
 
@@ -186,6 +186,18 @@ describe('outlineProblems', () => {
 
   test('treats inline code at the start of a line as text, not a fence', () => {
     assert.deepEqual(outline('```inline``` then prose'), [])
+  })
+})
+
+describe('scanFences', () => {
+  test('lists headings outside fences by line, which is what a parity split reads', () => {
+    assert.deepEqual(scanFences('# Guide\n\n```sh\n# .env\n```\n# Next'), {
+      headings: [
+        { line: 1, text: '# Guide' },
+        { line: 6, text: '# Next' },
+      ],
+      open: null,
+    })
   })
 })
 
