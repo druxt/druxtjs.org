@@ -10921,14 +10921,14 @@ __metadata:
 
 "druxt-auth@patch:druxt-auth@npm%3A0.5.0#./patches/druxt-auth-0.5.0.patch::locator=druxtjs-org%40workspace%3A.":
   version: 0.5.0
-  resolution: "druxt-auth@patch:druxt-auth@npm%3A0.5.0#./patches/druxt-auth-0.5.0.patch::version=0.5.0&hash=9b1fa8&locator=druxtjs-org%40workspace%3A."
+  resolution: "druxt-auth@patch:druxt-auth@npm%3A0.5.0#./patches/druxt-auth-0.5.0.patch::version=0.5.0&hash=1af4ea&locator=druxtjs-org%40workspace%3A."
   dependencies:
     "@nuxtjs/auth-next": ^5.0.0-1667386184.dfbbb54
     http-proxy-middleware: ^1.0.6
   peerDependencies:
     axios: ^0.27.2
     body-parser: ^1.20.2
-  checksum: c8ebf9f4d9e264bad74ae86017dd5de6e3402c210e37d640d773c83bd5725143f2346823c3a87ed4917e565113bb479d0c93393a36a81e8032c9fe513d031f29
+  checksum: 13b59537c3448b556bd6b51c8b8ba3ba79aba775ee38ebd534a104c28c1bfeeea5125079c7d22147044a456a85184ede787efa9d815823c92f59805cc5533ef2
   languageName: node
   linkType: hard
 

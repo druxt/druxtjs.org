@@ -1,5 +1,5 @@
 diff --git a/dist/index.esm.js b/dist/index.esm.js
-index 7c8880c..540574c 100644
+index 7c8880c..349b7a8 100644
 --- a/dist/index.esm.js
 +++ b/dist/index.esm.js
 @@ -3,6 +3,24 @@ import axios from 'axios';
@@ -27,18 +27,19 @@ index 7c8880c..540574c 100644
  const proxyEntries = (baseUrl) => [
    ["/oauth/userinfo", { target: baseUrl }],
    ...["/user/login", "/user/logout", "/user/password"].map((path) => [
-@@ -11,7 +29,9 @@ const proxyEntries = (baseUrl) => [
+@@ -11,7 +29,10 @@ const proxyEntries = (baseUrl) => [
    ]),
    ["/oauth/authorize", { target: baseUrl }],
    ["/oauth/token", { target: baseUrl }],
 -  ["/session/token", { target: baseUrl }]
 +  ["/oauth/revoke", { target: baseUrl }],
 +  ["/session/token", { target: baseUrl }],
-+  ["/session/logout/token", { target: baseUrl }]
++  ["/session/logout/token", { target: baseUrl }],
++  ["/user/login_status", { target: baseUrl }]
  ];
  
  const isPlainObject = (value) => !!value && typeof value === "object" && !Array.isArray(value);
-@@ -80,7 +100,8 @@ const NuxtModule = function(moduleOptions = {}) {
+@@ -80,7 +101,8 @@ const NuxtModule = function(moduleOptions = {}) {
            authorizationBackend: baseUrl + "/oauth/authorize",
            ...proxy ? { authorizationSameOrigin: "/oauth/authorize" } : {},
            token: (!proxy ? baseUrl : "") + "/oauth/token",
@@ -48,7 +49,7 @@ index 7c8880c..540574c 100644
          },
          clientId: (options.auth || {}).clientId || process.env.DRUXT_AUTH_CLIENT_ID,
          responseType: "code",
-@@ -109,6 +130,7 @@ const NuxtModule = function(moduleOptions = {}) {
+@@ -109,6 +131,7 @@ const NuxtModule = function(moduleOptions = {}) {
              url: "/_auth/drupal-password/token"
            },
            logout: false,
@@ -56,7 +57,7 @@ index 7c8880c..540574c 100644
            refresh: {
              baseURL: "",
              url: "/_auth/drupal-password/token"
-@@ -126,6 +148,37 @@ const NuxtModule = function(moduleOptions = {}) {
+@@ -126,6 +149,37 @@ const NuxtModule = function(moduleOptions = {}) {
      }
    };
    this.options.auth.strategies = extendStrategies(this.options.auth.strategies, siteStrategies);
@@ -94,7 +95,7 @@ index 7c8880c..540574c 100644
    this.options.serverMiddleware.unshift({
      path: "/_auth/drupal-password/token",
      handler: async (req, res, next) => {
-@@ -215,5 +268,7 @@ const NuxtModule = function(moduleOptions = {}) {
+@@ -215,5 +269,7 @@ const NuxtModule = function(moduleOptions = {}) {
      });
    }
  };
@@ -103,7 +104,7 @@ index 7c8880c..540574c 100644
  
  export { NuxtModule as default };
 diff --git a/dist/index.ssr.js b/dist/index.ssr.js
-index 2193363..1211045 100644
+index 2193363..c8029fd 100644
 --- a/dist/index.ssr.js
 +++ b/dist/index.ssr.js
 @@ -10,6 +10,24 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
@@ -131,18 +132,19 @@ index 2193363..1211045 100644
  const proxyEntries = (baseUrl) => [
    ["/oauth/userinfo", { target: baseUrl }],
    ...["/user/login", "/user/logout", "/user/password"].map((path) => [
-@@ -18,7 +36,9 @@ const proxyEntries = (baseUrl) => [
+@@ -18,7 +36,10 @@ const proxyEntries = (baseUrl) => [
    ]),
    ["/oauth/authorize", { target: baseUrl }],
    ["/oauth/token", { target: baseUrl }],
 -  ["/session/token", { target: baseUrl }]
 +  ["/oauth/revoke", { target: baseUrl }],
 +  ["/session/token", { target: baseUrl }],
-+  ["/session/logout/token", { target: baseUrl }]
++  ["/session/logout/token", { target: baseUrl }],
++  ["/user/login_status", { target: baseUrl }]
  ];
  
  const isPlainObject = (value) => !!value && typeof value === "object" && !Array.isArray(value);
-@@ -87,7 +107,8 @@ const NuxtModule = function(moduleOptions = {}) {
+@@ -87,7 +108,8 @@ const NuxtModule = function(moduleOptions = {}) {
            authorizationBackend: baseUrl + "/oauth/authorize",
            ...proxy ? { authorizationSameOrigin: "/oauth/authorize" } : {},
            token: (!proxy ? baseUrl : "") + "/oauth/token",
@@ -152,7 +154,7 @@ index 2193363..1211045 100644
          },
          clientId: (options.auth || {}).clientId || process.env.DRUXT_AUTH_CLIENT_ID,
          responseType: "code",
-@@ -116,6 +137,7 @@ const NuxtModule = function(moduleOptions = {}) {
+@@ -116,6 +138,7 @@ const NuxtModule = function(moduleOptions = {}) {
              url: "/_auth/drupal-password/token"
            },
            logout: false,
@@ -160,7 +162,7 @@ index 2193363..1211045 100644
            refresh: {
              baseURL: "",
              url: "/_auth/drupal-password/token"
-@@ -133,6 +155,37 @@ const NuxtModule = function(moduleOptions = {}) {
+@@ -133,6 +156,37 @@ const NuxtModule = function(moduleOptions = {}) {
      }
    };
    this.options.auth.strategies = extendStrategies(this.options.auth.strategies, siteStrategies);
@@ -198,7 +200,7 @@ index 2193363..1211045 100644
    this.options.serverMiddleware.unshift({
      path: "/_auth/drupal-password/token",
      handler: async (req, res, next) => {
-@@ -222,5 +275,7 @@ const NuxtModule = function(moduleOptions = {}) {
+@@ -222,5 +276,7 @@ const NuxtModule = function(moduleOptions = {}) {
      });
    }
  };
@@ -207,7 +209,7 @@ index 2193363..1211045 100644
  
  module.exports = NuxtModule;
 diff --git a/templates/drupal-password-scheme.js b/templates/drupal-password-scheme.js
-index fc974f1..ceab873 100644
+index fc974f1..4944f4c 100644
 --- a/templates/drupal-password-scheme.js
 +++ b/templates/drupal-password-scheme.js
 @@ -88,11 +88,14 @@ export default class DrupalPasswordScheme extends withDrupalSession(
@@ -224,13 +226,13 @@ index fc974f1..ceab873 100644
 -    await this.drupalLogout()
 -    return super.logout(...args)
 +    return this.signOutWith(async () => {
-+      await this.drupalLogout()
++      await this.endSession()
 +      return super.logout(...args)
 +    })
    }
  }
 diff --git a/templates/drupal-scheme.js b/templates/drupal-scheme.js
-index aa973f3..bc286f0 100644
+index aa973f3..db55908 100644
 --- a/templates/drupal-scheme.js
 +++ b/templates/drupal-scheme.js
 @@ -56,9 +56,11 @@ export default class DrupalScheme extends withDrupalSession(Oauth2Scheme) {
@@ -244,16 +246,16 @@ index aa973f3..bc286f0 100644
 +    return this.signOutWith(async () => {
 +      // Signing out locally happens either way. A Drupal session this could
 +      // not reach is not a reason to strand the visitor signed in here.
-+      await this.drupalLogout()
++      await this.endSession()
 +      return super.logout()
 +    })
    }
  }
 diff --git a/templates/drupal-session.js b/templates/drupal-session.js
-index 83468a1..136d343 100644
+index 83468a1..7d50380 100644
 --- a/templates/drupal-session.js
 +++ b/templates/drupal-session.js
-@@ -18,8 +18,13 @@ export const SESSION_ENDPOINTS = {
+@@ -18,8 +18,16 @@ export const SESSION_ENDPOINTS = {
    drupalLogin: '/user/login?_format=json',
    drupalLogout: '/user/logout?_format=json',
    passwordReset: '/user/password?_format=json',
@@ -261,6 +263,9 @@ index 83468a1..136d343 100644
 +  // drupal/logout_token can, at `/session/logout/token`. Set, the token is
 +  // fetched there and the session ended through `drupalLogout`.
 +  logoutToken: null,
++  // Core's, answering 1 or 0. Asked when a logout is refused, because Drupal
++  // refuses both a session that has ended and a token that is not its own.
++  loginStatus: '/user/login_status?_format=json',
    // Unset: Drupal core has no route that ends a session it did not issue a
 -  // logout token for. A site that adds one points this at it.
 +  // logout token for. A site that adds one points this at it. Tried only
@@ -268,7 +273,86 @@ index 83468a1..136d343 100644
    sessionLogout: null,
    // The verb that route answers on. POST because more routes accept it.
    sessionLogoutMethod: 'post',
-@@ -193,14 +198,39 @@ export const withDrupalSession = (Base) =>
+@@ -68,7 +76,7 @@ export const withDrupalSession = (Base) =>
+       // logout with no cookie, Drupal answers 403 for the anonymous request, and
+       // drupalLogout reads that 403 as the session already gone and drops the
+       // token while the browser session lives on.
+-      if (process.client) this.drupalLogout().catch(() => {})
++      if (process.client) this.endSession().catch(() => {})
+       return super.reset(...args)
+     }
+ 
+@@ -176,31 +184,103 @@ export const withDrupalSession = (Base) =>
+           withCredentials: true,
+         })
+       } catch (error) {
+-        // 403 is Drupal saying the session has already ended, which is the
+-        // outcome wanted. Anything else leaves it possibly alive.
++        // Anything but a 403 leaves the session possibly alive, and the token
++        // is the only way back to it.
+         if (((error || {}).response || {}).status !== 403) return false
++
++        // Drupal answers 403 both when the session has already ended and when
++        // the token is not this session's: one left by an earlier sign-in, or
++        // by an older release. The token is no use either way; the login
++        // status says whether the session is still open.
++        this.discardLogoutToken(token)
++        return !(await this.drupalSignedIn())
+       }
+ 
+-      // Remove only the token that was sent. reset() ends a session without
+-      // awaiting, so a concurrent sign-in may have stored a newer one, and
+-      // clearing that would strand the new session with no token to end it.
++      this.discardLogoutToken(token)
++      return true
++    }
++
++    /**
++     * Ends the Drupal session this scheme opened, even when its stored token
++     * no longer matches: a session still open after the logout is refused is
++     * ended the way a session the scheme did not open is.
++     *
++     * @returns {boolean} Whether the session is now ended.
++     */
++    async endSession () {
++      const held = !!this.$auth.$storage.getUniversal(this.logoutTokenKey)
++      if (await this.drupalLogout()) return true
++      return held ? this.endForeignSession() : false
++    }
++
++    /**
++     * Removes the logout token, if it is still the one given. reset() ends a
++     * session without awaiting, so a concurrent sign-in may have stored a
++     * newer one, and clearing that would strand the new session.
++     */
++    discardLogoutToken (token) {
+       if (this.$auth.$storage.getUniversal(this.logoutTokenKey) === token) {
+         this.$auth.$storage.removeUniversal(this.logoutTokenKey)
+       }
+-      return true
++    }
++
++    /**
++     * Whether Drupal still has this browser signed in. A failed check counts
++     * as signed in: carrying on as though a session ended when it may not
++     * have is the mistake this guards against.
++     *
++     * @returns {boolean} True unless Drupal answers that nobody is signed in.
++     */
++    async drupalSignedIn () {
++      try {
++        const { data } = await this.$auth.request({
++          method: 'get',
++          baseURL: '',
++          url: this.endpointOf('loginStatus'),
++          withCredentials: true,
++        })
++        return Number(data) !== 0
++      } catch (error) {
++        return true
++      }
+     }
+ 
      /**
       * Ends a Drupal session this scheme did not open.
       *
@@ -311,7 +395,7 @@ index 83468a1..136d343 100644
        if (!sessionLogout) return false
  
        try {
-@@ -229,6 +259,95 @@ export const withDrupalSession = (Base) =>
+@@ -229,6 +309,95 @@ export const withDrupalSession = (Base) =>
        }
      }
  
