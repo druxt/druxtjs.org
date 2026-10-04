@@ -63,10 +63,16 @@ On the Drupal side, contrib modules provide the rest:
 | `simple_oauth_revoke` | `POST /oauth/revoke`        | Revoking the access and refresh tokens when an editor signs out   |
 | `logout_token`        | `GET /session/logout/token` | Ending a Drupal session left open in the browser before a sign-in |
 
-`nuxt/patches/druxt-auth-0.5.0.patch` carries three `druxt-auth` changes that
-are not released yet: revoking at sign-out, ending a session through
-`logout_token`, and the `hasAuthCookie` check the page cache uses. Delete it,
-and pin the release, once a `druxt-auth` release includes them.
+`nuxt/patches/druxt-auth-0.5.0.patch` carries `druxt-auth` changes that are
+not released yet:
+
+- Revoking both tokens at sign-out.
+- Ending a session through `logout_token`.
+- Checking `/user/login_status` when Drupal refuses a logout, so a session
+  whose stored logout token has gone stale is still ended.
+- The `hasAuthCookie` check the page cache uses.
+
+Delete it, and pin the release, once a `druxt-auth` release includes them.
 
 A signed-in editor's requests send their bearer token on the server render
 and in the browser, because Druxt's client and `@nuxtjs/auth-next` share one
