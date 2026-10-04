@@ -126,8 +126,8 @@ const buildLlmsFullTxt = (docs, options) => {
  * Walk markdown the way a CommonMark reader does, tracking code fences.
  *
  * @param {string} markdown - Text to scan.
- * @returns {{ headings: Array<{ line: number, text: string }>, open: ?number }}
- *   Top-level headings outside fences, and the line of a fence left open.
+ * @returns {{ headings: Array<{ line: number, level: number, text: string }>, open: ?number }}
+ *   Headings outside fences, at every level, and the line of a fence left open.
  */
 const scanFences = (markdown) => {
   const headings = []
@@ -139,8 +139,9 @@ const scanFences = (markdown) => {
       if (marker && marker[1][0] === fence.char && marker[1].length >= fence.length && !marker[2].trim()) fence = null
     } else if (marker && !(marker[1][0] === '`' && marker[2].includes('`'))) {
       fence = { char: marker[1][0], length: marker[1].length, line: index + 1 }
-    } else if (/^ {0,3}#(\s|$)/.test(text)) {
-      headings.push({ line: index + 1, text })
+    } else {
+      const heading = /^ {0,3}(#{1,6})(\s|$)/.exec(text)
+      if (heading) headings.push({ line: index + 1, level: heading[1].length, text })
     }
   })
 
@@ -172,6 +173,7 @@ const outlineProblems = (docs, text) => {
 
   const file = scanFences(text)
   file.headings
+    .filter((heading) => heading.level === 1)
     .filter((heading) => !expected.includes(heading.text))
     .forEach((heading) => problems.push('line ' + heading.line + ': unexpected top-level heading "' + heading.text + '"'))
   if (file.open) problems.push('line ' + file.open + ': code fence never closes')

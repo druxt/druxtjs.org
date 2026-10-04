@@ -190,11 +190,11 @@ describe('outlineProblems', () => {
 })
 
 describe('scanFences', () => {
-  test('lists headings outside fences by line, which is what a parity split reads', () => {
-    assert.deepEqual(scanFences('# Guide\n\n```sh\n# .env\n```\n# Next'), {
+  test('lists headings outside fences by line and level, which is what a parity split reads', () => {
+    assert.deepEqual(scanFences('# Guide\n\n```md\n# .env\n## Example\n```\n## Page\n#hashtag'), {
       headings: [
-        { line: 1, text: '# Guide' },
-        { line: 6, text: '# Next' },
+        { line: 1, level: 1, text: '# Guide' },
+        { line: 7, level: 2, text: '## Page' },
       ],
       open: null,
     })
