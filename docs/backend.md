@@ -50,18 +50,21 @@ step needs, and `create url aliases`, which a new page's path needs.
 ### Signing in
 
 The frontend signs an editor in against the `druxtjs_org` consumer with the
-authorization code grant and PKCE, no client secret, requesting the `editor`
-scope. `druxt-auth` provides the strategy, the callback route, the store and
-`@nuxtjs/auth-next`. With `druxt.proxy.api` on, it serves every step a browser
-makes on the frontend's own origin, so Drupal does not need CORS to sign an
-editor in. The site configures one endpoint: `logoutToken`.
+password grant, through `druxt-auth`'s `drupal-password` strategy. The site's
+own form sends the credentials to the frontend's server, which exchanges them
+for a token, so there is no browser redirect. The same credentials open a
+Drupal session first (`passwordSession`), because the editing screens are
+Drupal's own forms proxied onto this origin. A sign-in asks for every role
+scope, and Drupal grants only the roles the account holds. The site
+configures one endpoint: `logoutToken`.
 
 On the Drupal side, contrib modules provide the rest:
 
-| Module                | Route                       | Used for                                                          |
-| --------------------- | --------------------------- | ----------------------------------------------------------------- |
-| `simple_oauth_revoke` | `POST /oauth/revoke`        | Revoking the access and refresh tokens when an editor signs out   |
-| `logout_token`        | `GET /session/logout/token` | Ending a Drupal session left open in the browser before a sign-in |
+| Module                        | Route                       | Used for                                                          |
+| ----------------------------- | --------------------------- | ----------------------------------------------------------------- |
+| `simple_oauth_password_grant` | `POST /oauth/token`         | The password grant itself                                         |
+| `simple_oauth_revoke`         | `POST /oauth/revoke`        | Revoking the access and refresh tokens when an editor signs out   |
+| `logout_token`                | `GET /session/logout/token` | Ending a Drupal session left open in the browser before a sign-in |
 
 `nuxt/patches/druxt-auth-0.5.0.patch` carries `druxt-auth` changes that are
 not released yet:
