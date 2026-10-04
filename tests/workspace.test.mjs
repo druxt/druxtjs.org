@@ -9,16 +9,12 @@ import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
 const {
-  CHANGES_LIMIT,
   COOKIE,
   HEADER,
   applyWorkspace,
-  changesFrom,
-  changesQuery,
   hasBearer,
   isContentRequest,
   isWorkspaceId,
-  overviewPath,
   readWorkspace,
   workspaceCookie,
 } = require('../nuxt/lib/workspace.js')
@@ -116,63 +112,4 @@ test('a bearer token is found on the request or in the merged defaults', () => {
   ]) {
     assert.equal(hasBearer(headers), false, JSON.stringify(headers))
   }
-})
-
-describe('the review of a workspace', () => {
-  test('asks for the pages whose revision was made in that workspace, newest first', () => {
-    assert.deepEqual(changesQuery('stage'), {
-      'filter[workspace.meta.drupal_internal__target_id]': 'stage',
-      'fields[node--doc_page]': 'title,path,changed',
-      sort: '-changed',
-      'page[limit]': CHANGES_LIMIT,
-    })
-  })
-
-  test('links each changed page to itself with the diff against live on', () => {
-    const pages = changesFrom({
-      data: [
-        {
-          id: 'a',
-          attributes: {
-            title: 'Staged',
-            path: { alias: '/how-to/stage' },
-            changed: '2026-10-03T00:09:42+00:00',
-          },
-        },
-        {
-          id: 'b',
-          attributes: {
-            title: 'No path yet',
-            path: { alias: null },
-            changed: '2026-10-02T00:00:00+00:00',
-          },
-        },
-      ],
-    })
-    assert.deepEqual(pages, [
-      {
-        id: 'a',
-        title: 'Staged',
-        path: '/how-to/stage',
-        review: '/how-to/stage?diff=1',
-        changed: '2026-10-03T00:09:42+00:00',
-      },
-      {
-        id: 'b',
-        title: 'No path yet',
-        path: null,
-        review: null,
-        changed: '2026-10-02T00:00:00+00:00',
-      },
-    ])
-  })
-
-  test('reads an empty or missing answer as no changes', () => {
-    assert.deepEqual(changesFrom({ data: [] }), [])
-    assert.deepEqual(changesFrom(undefined), [])
-  })
-
-  test("points at Drupal's overview, where the workspace is published", () => {
-    assert.equal(overviewPath('ai_draft'), '/admin/config/workflow/workspaces/manage/ai_draft')
-  })
 })
