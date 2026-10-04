@@ -47,6 +47,16 @@ export const BACKEND_PATHS = [
   '/toolbar',
   '/entity_reference_autocomplete',
   '/update.php',
+  // The requests an edit form makes while it is open: a Layout Paragraphs
+  // block's dialog, CKEditor's uploads and previews, the media library, link
+  // suggestions, the text format tips and the token browser. Missing, each
+  // answers 404 from this site and the control quietly does nothing.
+  '/layout-paragraphs-builder',
+  '/ckeditor5',
+  '/media-library',
+  '/linkit',
+  '/filter',
+  '/token',
   // The whole of /user, because a login form that posts to the backend on
   // another origin sets its cookie there, which is the problem the proxy
   // exists to solve.

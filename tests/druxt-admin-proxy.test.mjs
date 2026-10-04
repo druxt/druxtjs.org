@@ -29,6 +29,22 @@ describe('shouldProxy', () => {
     }
   })
 
+  // An edit form's own requests, which failed with a 404 from this site and
+  // left a Layout Paragraphs block's Edit doing nothing.
+  it('proxies the requests an edit form makes while it is open', () => {
+    for (const path of [
+      '/layout-paragraphs-builder/0039a826/edit/71184142-1e00-43ad-aa6a-6bbf4c6b6fba',
+      '/layout-paragraphs-builder/0039a826/reorder',
+      '/ckeditor5/upload-image/basic_html',
+      '/media-library',
+      '/linkit/autocomplete/default',
+      '/filter/tips',
+      '/token/tree',
+    ]) {
+      assert.equal(shouldProxy(path), true, path)
+    }
+  })
+
   it('ignores the query when deciding', () => {
     assert.equal(shouldProxy('/core/misc/drupal.js?v=1'), true)
     assert.equal(shouldProxy('/node/1?path=/core/x'), false)
