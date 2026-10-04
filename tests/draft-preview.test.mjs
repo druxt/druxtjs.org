@@ -1,5 +1,5 @@
-// Unit tests for the draft preview's pure parts: the auth cookie the page
-// cache keys on, and the working-copy rule the client applies when signed in.
+// Unit tests for the draft preview's pure part: the working-copy rule the
+// client applies when signed in.
 //
 //   node --test "tests/*.test.mjs"
 
@@ -8,54 +8,7 @@ import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
-const {
-  AUTH_COOKIE,
-  AUTH_COOKIE_PREFIX,
-  AUTH_STRATEGY,
-  authStorageKeys,
-  hasAuthCookie,
-} = require('../nuxt/lib/auth.js')
 const { WORKING_COPY, applyVersion, resourceVersionFor } = require('../nuxt/lib/working-copy.js')
-
-describe('auth cookie', () => {
-  test('is named as @nuxtjs/auth-next names a token cookie: prefix, _token., strategy', () => {
-    assert.equal(AUTH_COOKIE, 'auth._token.drupal-authorization_code')
-    assert.equal(AUTH_COOKIE, `${AUTH_COOKIE_PREFIX}_token.${AUTH_STRATEGY}`)
-  })
-
-  test('is found in a Cookie header with a token, however it is encoded', () => {
-    assert.equal(hasAuthCookie(`${AUTH_COOKIE}=Bearer%20abc.def`), true)
-    assert.equal(hasAuthCookie(`auth.strategy=x; ${AUTH_COOKIE}=Bearer abc; other=1`), true)
-  })
-
-  test('is not found when absent, empty, signed out, or only similarly named', () => {
-    for (const header of [
-      undefined,
-      '',
-      'auth.strategy=drupal-authorization_code',
-      `${AUTH_COOKIE}=`,
-      `${AUTH_COOKIE}=false`,
-      `x${AUTH_COOKIE}=Bearer abc`,
-      `${AUTH_COOKIE}x=Bearer abc`,
-    ]) {
-      assert.equal(hasAuthCookie(header), false, String(header))
-    }
-  })
-
-  // A client sends whatever it likes in a Cookie header, and `%` on its own is
-  // not valid percent-encoding. Decoding every value before reading its name
-  // threw URIError out of the page cache's async handler, where nothing caught
-  // it: one request with `Cookie: x=%` ended the process.
-  test('a value no decoder accepts is not a token, and is not an exception', () => {
-    for (const header of ['x=%', 'x=%E0%A4%A', `${AUTH_COOKIE}=ok; junk=%`, 'x=%; y=%%%']) {
-      assert.doesNotThrow(() => hasAuthCookie(header), String(header))
-    }
-    assert.equal(hasAuthCookie('x=%'), false)
-    assert.equal(hasAuthCookie(`${AUTH_COOKIE}=Bearer abc; junk=%`), true)
-    // The token's own value, undecodable: not a usable token, and not a throw.
-    assert.equal(hasAuthCookie(`${AUTH_COOKIE}=%`), false)
-  })
-})
 
 // cspell:ignore Bnode Btitle
 describe('applyVersion', () => {
@@ -109,17 +62,5 @@ describe('resourceVersionFor', () => {
     assert.equal(resourceVersionFor('published'), null)
     assert.equal(resourceVersionFor('id:x'), null)
     assert.equal(resourceVersionFor(undefined), null)
-  })
-})
-
-describe('authStorageKeys', () => {
-  test('names every key @nuxtjs/auth-next leaves as "false" on reset, for the strategy', () => {
-    const keys = authStorageKeys(AUTH_STRATEGY)
-    assert.ok(keys.includes(AUTH_COOKIE))
-    assert.ok(keys.includes(`${AUTH_COOKIE_PREFIX}strategy`))
-    assert.ok(keys.includes(`${AUTH_COOKIE_PREFIX}${AUTH_STRATEGY}.pkce_code_verifier`))
-    // Prefix on every key, and no duplicates.
-    assert.ok(keys.every((k) => k.startsWith(AUTH_COOKIE_PREFIX)))
-    assert.equal(new Set(keys).size, keys.length)
   })
 })

@@ -2,7 +2,6 @@
 // Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
 const { serviceRoute } = require('./server/backend')
-const { AUTH_COOKIE_PREFIX, AUTH_STRATEGY } = require('./lib/auth')
 
 // The id is interpolated into an inline script, so check its shape first.
 if (!/^G-[A-Z0-9]+$/.test(GA_MEASUREMENT_ID)) {
@@ -47,31 +46,14 @@ const DRUXT_BASE_URL = process.env.DRUXT_BASE_URL || 'http://127.0.0.1:8899'
 const CONSUMER_ID = process.env.DRUXT_CONSUMER_ID || 'druxtjs_org'
 
 /**
- * Editor sign-in: the authorization code grant with PKCE, as a public client,
- * on druxt-auth's Drupal scheme. The site's own form signs in through
- * Drupal's JSON login, and every step after it (authorize, token, userinfo)
- * runs on this origin through the proxy, so the Drupal session the login
- * starts is the one the authorize step finds, and nothing of Drupal's is
- * shown. druxt-auth builds the endpoints on the server's base URL, which is
- * an internal service name in production, so the strategy is set here.
+ * Editor sign-in: druxt-auth's authorization code strategy, as a public
+ * client. The site's own form signs in through Drupal's JSON login, and with
+ * `druxt.proxy.api` on, every step after it runs on this origin, so the
+ * session the login starts is the one the authorize step finds. A session
+ * left open in the browser is ended through drupal/logout_token's route.
  */
 const OAUTH_CLIENT = { clientId: CONSUMER_ID, scope: ['editor'] }
-const OAUTH_STRATEGY = {
-  scheme: '~/modules/druxt-auth/drupal-scheme.js',
-  endpoints: {
-    authorization: '/oauth/authorize',
-    token: '/oauth/token',
-    userInfo: '/oauth/userinfo',
-    // druxt_docs' own, because core offers no way to end a session that did
-    // not log in here: its JSON logout wants the token issued at login. Both
-    // this and /session/token are proxied, so the session cookie reaches them.
-    sessionLogout: '/druxt-docs/session',
-  },
-  ...OAUTH_CLIENT,
-  responseType: 'code',
-  grantType: 'authorization_code',
-  codeChallengeMethod: 'S256',
-}
+const OAUTH_STRATEGY = { endpoints: { logoutToken: '/session/logout/token' } }
 
 // Drupal's login, its editing screens and their assets, served on this origin
 // so an editor's session is first party. The same test tells the page cache
@@ -153,7 +135,6 @@ export default {
     '~/plugins/mermaid.client.js',
     // After the Druxt and auth plugins the modules add: it wraps the client.
     '~/plugins/working-copy.js',
-    '~/plugins/sign-out.client.js',
   ],
   components: true,
   // Mirrors the SITE_ORIGIN override into the client bundle so hydration
@@ -222,7 +203,7 @@ export default {
     // Every core module, so the playground can render every component. Its
     // layout is only added to a site without one.
     'druxt-site',
-    // Editor sign-in. The strategy it registers is replaced by `auth` below.
+    // Editor sign-in.
     ['druxt-auth', OAUTH_CLIENT],
     // The consumer's decoupled settings and theme manifest, baked in at build.
     // A copy of the unreleased @druxt-contrib/decoupled-settings module.
@@ -280,8 +261,7 @@ export default {
   // started from, or home; the callback page is the site's own.
   auth: {
     redirect: { login: '/login', logout: '/', home: '/', callback: '/callback' },
-    cookie: { prefix: AUTH_COOKIE_PREFIX },
-    strategies: { [AUTH_STRATEGY]: OAUTH_STRATEGY },
+    strategies: { 'drupal-authorization_code': OAUTH_STRATEGY },
   },
 
   // changeOrigin: false keeps the browser's host, so Drupal's JSON:API links
