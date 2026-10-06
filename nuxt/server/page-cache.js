@@ -9,6 +9,7 @@
  */
 const { redirectFor } = require('./redirects')
 const { hasAuthCookie } = require('druxt-auth')
+const { hasEditorHint } = require('../lib/entity-operations')
 const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')
@@ -221,8 +222,9 @@ const createHandler =
       return res.end()
     }
     // A signed-in editor may be shown a draft: rendered live, never stored,
-    // and not to be kept by anything between here and the browser.
-    if (hasAuthCookie(req.headers.cookie)) {
+    // and not to be kept by anything between here and the browser. Drupal's
+    // editor hint counts too, for a Drupal session without the site's token.
+    if (hasAuthCookie(req.headers.cookie) || hasEditorHint(req.headers.cookie)) {
       res.setHeader('X-Docs-Cache', 'BYPASS')
       res.setHeader('Cache-Control', 'no-store')
       return live(req, res)

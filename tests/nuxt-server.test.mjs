@@ -30,6 +30,7 @@ const {
   waitForBackend,
 } = require('../nuxt/server/backend.js')
 const { PAGE, createStartingHandler } = require('../nuxt/server/starting.js')
+const { HINT } = require('../nuxt/lib/entity-operations.js')
 
 // Serve a request listener on a free port for the length of one callback.
 const withServer = async (listener, callback) => {
@@ -264,6 +265,10 @@ describe('createHandler', () => {
         assert.equal(editor.body, '<p>rendered for the request</p>')
         assert.equal(editor.headers['x-docs-cache'], 'BYPASS')
         assert.equal(editor.headers['cache-control'], 'no-store')
+        // A Drupal session alone, which Drupal marks with its editor hint.
+        const drupalOnly = await request(`${base}/how-to`, { headers: { cookie: `${HINT}=1` } })
+        assert.equal(drupalOnly.body, '<p>rendered for the request</p>')
+        assert.equal(drupalOnly.headers['x-docs-cache'], 'BYPASS')
         // The store is untouched: the next anonymous reader gets the copy from before.
         const reader = await request(`${base}/how-to`)
         assert.equal(reader.headers['x-docs-cache'], 'HIT')
