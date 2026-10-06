@@ -23,8 +23,6 @@
     "*.svg",
     "*.png",
     "drupal/config/",
-    "drupal/content/",
-    "drupal/files/",
     "drupal/patches.lock.json",
     "drupal/vendor/",
     "drupal/web/core/",
