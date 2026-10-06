@@ -1,0 +1,60 @@
+{
+  "name": "druxt-blocks",
+  "version": "0.17.3",
+  "description": "Drupal Block and Block Region Druxt components.",
+  "keywords": [
+    "block",
+    "blocks",
+    "cms",
+    "decoupled",
+    "drupal",
+    "druxt",
+    "druxtjs",
+    "headless",
+    "jsonapi",
+    "json:api",
+    "nuxt",
+    "nuxtjs",
+    "module",
+    "storybook",
+    "vue"
+  ],
+  "homepage": "https://druxtjs.org",
+  "bugs": {
+    "url": "https://github.com/druxt/druxt.js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/druxt/druxt.js",
+    "directory": "packages/blocks"
+  },
+  "license": "MIT",
+  "author": "Stuart Clark <stuart@druxtjs.org>",
+  "exports": {
+    ".": {
+      "require": "./dist/druxt-blocks.ssr.js",
+      "import": "./dist/druxt-blocks.esm.js"
+    },
+    "./components/*": "./dist/components/*"
+  },
+  "main": "dist/druxt-blocks.ssr.js",
+  "module": "dist/druxt-blocks.esm.js",
+  "files": [
+    "dist",
+    "templates",
+    "icon.svg",
+    "banner.svg"
+  ],
+  "dependencies": {
+    "axios": "0.33.0",
+    "drupal-jsonapi-params": "^2.3.2",
+    "druxt": "^0.24.0"
+  },
+  "optionalDependencies": {
+    "vue": "^2.7.16",
+    "vuex": "^3.6.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "name": "druxt-breadcrumb",
+  "version": "0.17.2",
+  "description": "Decoupled Router based Breadcrumb Druxt component.",
+  "keywords": [
+    "breadcrumb",
+    "breadcrumbs",
+    "cms",
+    "decoupled",
+    "drupal",
+    "druxt",
+    "druxtjs",
+    "headless",
+    "jsonapi",
+    "json:api",
+    "nuxt",
+    "nuxtjs",
+    "module",
+    "storybook",
+    "vue"
+  ],
+  "homepage": "https://druxtjs.org",
+  "bugs": {
+    "url": "https://github.com/druxt/druxt.js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/druxt/druxt.js",
+    "directory": "packages/breadcrumb"
+  },
+  "license": "MIT",
+  "author": "Stuart Clark <stuart@druxtjs.org>",
+  "exports": {
+    ".": {
+      "require": "./dist/druxt-breadcrumb.ssr.js",
+      "import": "./dist/druxt-breadcrumb.esm.js"
+    },
+    "./components/*": "./dist/components/*"
+  },
+  "main": "dist/druxt-breadcrumb.ssr.js",
+  "module": "dist/druxt-breadcrumb.esm.js",
+  "files": [
+    "dist",
+    "templates",
+    "icon.svg",
+    "banner.svg"
+  ],
+  "dependencies": {
+    "druxt": "^0.24.0",
+    "druxt-blocks": "^0.17.1",
+    "druxt-router": "^0.31.0"
+  },
+  "optionalDependencies": {
+    "vue": "^2.7.16",
+    "vuex": "^3.6.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
