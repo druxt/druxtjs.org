@@ -14,6 +14,8 @@ const { deploymentReady, resolveOrigin, waitForBackend } = require('./backend')
 const { createHandler, createPageCache, crawl, LLMS_LINK } = require('./page-cache')
 const { createArtefacts } = require('./artefacts')
 const { createStartingHandler } = require('./starting')
+const { watchPurges } = require('./live')
+const { attachSockets } = require('@druxt-contrib/sockets/server')
 
 const rootDir = path.join(__dirname, '..')
 const env = process.env
@@ -31,7 +33,29 @@ const setPhase = (phase) => {
 
 // The describedby link from the first response: the starting page is one too.
 let handler = createStartingHandler(state, { headers: { Link: LLMS_LINK } })
-const server = http.createServer((req, res) => handler(req, res))
+// Each purge druxt accepts: open pages hear it now, stored pages once the app runs.
+let onPurge = () => {}
+const watch = watchPurges((tags) => onPurge(tags))
+const server = http.createServer((req, res) => {
+  watch(req, res)
+  handler(req, res)
+})
+
+// Open pages refresh what a purge touches, over a WebSocket on this server.
+// Only from a page on this host.
+const live = attachSockets(server, {
+  path: '/_live',
+  drupalUrl: baseUrl,
+  origins: (origin, req) => {
+    try {
+      return new URL(origin).host === req.headers.host
+    } catch (e) {
+      return false
+    }
+  },
+  log,
+})
+onPurge = (tags) => live.contentChanged(tags)
 
 const nuxt = (args, extraEnv) =>
   new Promise((resolve, reject) => {
@@ -126,6 +150,10 @@ const main = async () => {
           render: (route) => app.server.renderRoute(route),
           log,
         })
+  onPurge = (tags) => {
+    if (cache) cache.invalidate()
+    live.contentChanged(tags)
+  }
   handler = createHandler({
     cache,
     live: app.render,
@@ -149,6 +177,8 @@ const main = async () => {
 
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, () => {
+    // Open sockets would hold the server open until the fallback below.
+    live.close()
     server.close(() => process.exit(0))
     setTimeout(() => process.exit(0), 10000).unref()
   })

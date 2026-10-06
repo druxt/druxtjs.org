@@ -118,6 +118,23 @@ describe('createPageCache', () => {
     }
   })
 
+  test('reads every page stored before a purge as stale, and a page stored after it fresh', async () => {
+    const dir = tempDir()
+    try {
+      const cache = createPageCache({ dir, ttl: 60000, render: async () => ({ html: '<p>a</p>' }) })
+      await cache.store('/a')
+      assert.equal((await cache.read('/a')).stale, false)
+      await new Promise((resolve) => setTimeout(resolve, 5))
+      cache.invalidate()
+      assert.equal((await cache.read('/a')).stale, true)
+      await new Promise((resolve) => setTimeout(resolve, 5))
+      await cache.store('/a')
+      assert.equal((await cache.read('/a')).stale, false)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
   test('keeps brotli and gzip copies, and reads the one the client accepts', async () => {
     const dir = tempDir()
     try {

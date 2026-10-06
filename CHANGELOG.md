@@ -9,6 +9,11 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+- Open pages follow Drupal. Purge now sends the tags it invalidates, and the
+  Nuxt server passes them over a WebSocket on `/_live` to every page open on
+  the site, which fetches again the entities, views and menus they name. A purge
+  also marks every stored page stale. `@druxt-contrib/sockets` is vendored
+  for it, live refresh only.
 - Tab moves from the username field to the password field on the sign-in
   form. The "Forgot password?" link follows the password field in the page
   so a keyboard reaches it after the field it belongs to.

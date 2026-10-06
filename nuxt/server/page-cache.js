@@ -71,11 +71,13 @@ const isPage = (method, pathname) =>
  * @param {number} options.ttl - Milliseconds before a stored page renders again.
  * @param {Function} options.render - Renders a path to `{ html, error, redirected }`.
  * @param {Function} [options.log] - Logs a line.
- * @returns {{ read: Function, store: Function, fileFor: Function }} The cache.
+ * @returns {{ read: Function, store: Function, fileFor: Function, invalidate: Function }} The cache.
  */
 const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
   const root = path.resolve(dir)
   const pending = new Map()
+  // Pages stored before Drupal's last purge are stale, whatever their age.
+  let purgedAt = 0
 
   const fileFor = (pathname) => {
     const file = path.resolve(root, `.${pathname}`, 'index.html')
@@ -105,7 +107,7 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
         // Floored: a file written this millisecond carries a fractional time
         // that would otherwise read as newer than the clock.
         const age = Date.now() - Math.floor(stats.mtimeMs)
-        return { body, encoding, modified: stats.mtime, stale: age >= ttl }
+        return { body, encoding, modified: stats.mtime, stale: age >= ttl || Math.floor(stats.mtimeMs) < purgedAt }
       } catch (e) {
         // This copy is missing: try the next.
       }
@@ -140,7 +142,12 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
     return job
   }
 
-  return { read, store, fileFor }
+  /** Marks every stored page stale, as a purge cannot say which pages it touched. */
+  const invalidate = () => {
+    purgedAt = Date.now()
+  }
+
+  return { read, store, fileFor, invalidate }
 }
 
 /**

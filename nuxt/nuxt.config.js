@@ -253,10 +253,16 @@ export default {
     // A Drupal user, by uuid, by the number a path carries, or whoever is
     // signed in. The profile pages use it.
     '@druxt-contrib/user',
+    // Open pages refetch what a Drupal purge touches, over a WebSocket.
+    '@druxt-contrib/sockets',
     // The consumer's decoupled settings and theme manifest, baked in at build.
     // A copy of the unreleased @druxt-contrib/decoupled-settings module.
     '~/modules/decoupled-settings',
   ],
+
+  // The browser half only: server/start.js attaches the socket to its own
+  // server, which Nuxt never listens on.
+  sockets: { path: '/_live', server: false },
 
   decoupledSettings: {
     consumerId: CONSUMER_ID,
