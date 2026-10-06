@@ -30,7 +30,7 @@ exported with an empty secret and Lagoon's service address. Each environment
 completes it from its settings. `settings.lagoon.php` reads the secret from
 `DRUXT_CACHE_SECRET`, and takes the address from `DRUXT_CACHE_CLEAR_HOST` and
 `DRUXT_CACHE_CLEAR_PORT` when they are set, from the `nuxt` service on Lagoon
-otherwise, and from `DRUXT_FRONTEND_URL` off Lagoon. Reduced to the Lagoon
+otherwise, and, off Lagoon, from `DRUXT_FRONTEND_URL`, scheme and port included, so a clear sent to an `https` frontend travels over TLS. `DRUXT_CACHE_CLEAR_SCHEME` overrides the scheme. Reduced to the Lagoon
 case:
 
 ```php
