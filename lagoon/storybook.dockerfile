@@ -16,13 +16,12 @@ ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 COPY --from=manifests /manifests /app
 RUN corepack enable && yarn install --immutable
 
-FROM deps AS app
-COPY nuxt /app
-RUN mkdir -p /app/content
-
-# Owned by Lagoon's runtime user, as in nuxt.dockerfile.
+# Dependencies first, then the app, owned by Lagoon's runtime user, as in
+# nuxt.dockerfile.
 FROM amazeeio/node:16@sha256:11f2d4ce2e741dbdc87cf4929e3a30f0d06ece1e137b33073aa291154d067316
-COPY --from=app --chown=10000:0 /app /app
+COPY --from=deps --chown=10000:0 /app /app
+COPY --chown=10000:0 nuxt /app
+RUN mkdir -p /app/content && chown 10000:0 /app/content
 ENV HOST=0.0.0.0 PORT=3000 DRUXT_BASE_URL=http://nginx:8080
 EXPOSE 3000
 CMD ["node", "server/storybook.js"]

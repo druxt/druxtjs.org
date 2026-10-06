@@ -23,14 +23,12 @@ ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 COPY --from=manifests /manifests /app
 RUN corepack enable && yarn install --immutable
 
-# The app over its dependencies. It builds when it starts, once Drupal answers.
-FROM deps AS app
-COPY nuxt /app
-COPY --from=docs /src/docs/nuxt/content /app/content
-
-# Owned by Lagoon's runtime user, so the build at start can write to /app.
+# Dependencies first, as a layer of their own that a code change leaves as it
+# was. Owned by Lagoon's runtime user, so the build at start can write to /app.
 FROM amazeeio/node:16@sha256:11f2d4ce2e741dbdc87cf4929e3a30f0d06ece1e137b33073aa291154d067316
-COPY --from=app --chown=10000:0 /app /app
+COPY --from=deps --chown=10000:0 /app /app
+COPY --chown=10000:0 nuxt /app
+COPY --from=docs --chown=10000:0 /src/docs/nuxt/content /app/content
 ENV HOST=0.0.0.0 PORT=3000 DRUXT_BASE_URL=http://nginx:8080
 EXPOSE 3000
 CMD ["node", "server/start.js"]
