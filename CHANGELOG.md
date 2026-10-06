@@ -11,6 +11,10 @@ Druxt 1.0.0.
 
 ### Changed
 
+- The Druxt packages follow npm's `dev` tag, the development release the
+  druxt.js README describes, so the 0.25.0 work runs here before it is
+  released. The footer badge names the version the documentation describes,
+  `druxt` at the pinned commit, so a development release never shows there.
 - The site no longer registers Druxt's components as synchronous imports
   itself. The modules register them that way now, so the hook that worked
   around the first-load refetch is gone.

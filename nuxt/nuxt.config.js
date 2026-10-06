@@ -18,10 +18,26 @@ const failedRoutes = []
 import { SITE_NAME, SITE_DESCRIPTION, SITE_ORIGIN, docTypeExpression } from './lib/site'
 import { isTrackableHostname } from './lib/analytics'
 
-/** The installed `druxt` version, shown in the header badge. Read from disk: its `exports` hides package.json. */
-const druxtVersion = JSON.parse(
-  require('fs').readFileSync(require('path').join(__dirname, 'node_modules', 'druxt', 'package.json'), 'utf8'),
-).version
+/**
+ * The version the badge names: `druxt` at the documentation's pinned commit,
+ * from the checkout locally and from the file the image copies out of it.
+ * The installed packages may be a development release, which the badge never
+ * says. Hidden when neither is here.
+ */
+const druxtVersion = ['.pinned-druxt.json', '../.docs-source/packages/druxt/package.json'].reduce(
+  (found, file) => {
+    if (found) return found
+    try {
+      return (
+        JSON.parse(require('fs').readFileSync(require('path').join(__dirname, file), 'utf8'))
+          .version || null
+      )
+    } catch (e) {
+      return null
+    }
+  },
+  null
+)
 
 /** The Drupal backend Druxt reads, and proxies onto this origin. */
 const DRUXT_BASE_URL = process.env.DRUXT_BASE_URL || 'http://127.0.0.1:8899'
@@ -36,7 +52,10 @@ export default {
     // "markdown" reads the authored pages from content/ instead of Drupal.
     docsSource: process.env.DOCS_SOURCE || 'drupal',
     // The environment's Storybook, when it has one: linked from the footer and the playground.
-    storybookUrl: serviceRoute(process.env.LAGOON_ROUTES, 'storybook') || process.env.STORYBOOK_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3030'),
+    storybookUrl:
+      serviceRoute(process.env.LAGOON_ROUTES, 'storybook') ||
+      process.env.STORYBOOK_URL ||
+      (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3030'),
   },
 
   head: {
@@ -57,20 +76,27 @@ export default {
       // plugins/color-mode-theme.client.js keeps it in sync after that.
       {
         hid: 'druxt-theme-init',
-        innerHTML: "(function(){try{var k='druxt-color-mode';var p=localStorage.getItem(k)||'system';var v=p==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;document.documentElement.setAttribute('data-theme',v)}catch(e){}})()",
+        innerHTML:
+          "(function(){try{var k='druxt-color-mode';var p=localStorage.getItem(k)||'system';var v=p==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;document.documentElement.setAttribute('data-theme',v)}catch(e){}})()",
         pbody: true,
       },
       // vue-meta re-runs this script on every client-side navigation, so each
       // page re-fires gtag('config'); adding a page_view plugin double-counts.
       // The hostname gate keeps Lagoon's own routes out of the property: they
       // pass the environment check, but they are not the site.
-      ...(isProduction ? [
-        { hid: 'ga-src', src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`, async: true },
-        {
-          hid: 'ga-init',
-          innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());if((${isTrackableHostname})(location.hostname)){gtag('config','${GA_MEASUREMENT_ID}',{doc_type:${docTypeExpression()}});}`,
-        },
-      ] : []),
+      ...(isProduction
+        ? [
+            {
+              hid: 'ga-src',
+              src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`,
+              async: true,
+            },
+            {
+              hid: 'ga-init',
+              innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());if((${isTrackableHostname})(location.hostname)){gtag('config','${GA_MEASUREMENT_ID}',{doc_type:${docTypeExpression()}});}`,
+            },
+          ]
+        : []),
     ],
     __dangerouslyDisableSanitizersByTagID: {
       'druxt-theme-init': ['innerHTML'],
@@ -257,7 +283,10 @@ export default {
       const failed = [...new Set([...failedRoutes, ...handled])]
       if (failed.length) {
         throw new Error(
-          'Refusing to ship ' + failed.length + ' route(s) that failed to generate: ' + failed.join(', '),
+          'Refusing to ship ' +
+            failed.length +
+            ' route(s) that failed to generate: ' +
+            failed.join(', ')
         )
       }
 
@@ -278,14 +307,26 @@ export default {
 
       // A child process, not a require: satori and resvg crash under the esm
       // config loader's patched module system.
-      const cards = execFileSync(process.execPath, [
-        path.join(srcDir, 'scripts', 'og-render.js'),
-        path.join(srcDir, 'content'),
-        path.join(srcDir, 'assets', 'fonts'),
-        path.join(generate.dir, 'og'),
-      ], { stdio: ['ignore', 'pipe', 'inherit'] }).toString().trim()
+      const cards = execFileSync(
+        process.execPath,
+        [
+          path.join(srcDir, 'scripts', 'og-render.js'),
+          path.join(srcDir, 'content'),
+          path.join(srcDir, 'assets', 'fonts'),
+          path.join(generate.dir, 'og'),
+        ],
+        { stdio: ['ignore', 'pipe', 'inherit'] }
+      )
+        .toString()
+        .trim()
 
-      console.log('SEO: wrote llms.txt, llms-full.txt, sitemap.xml and ' + cards + ' share cards for ' + docs.length + ' documents')
+      console.log(
+        'SEO: wrote llms.txt, llms-full.txt, sitemap.xml and ' +
+          cards +
+          ' share cards for ' +
+          docs.length +
+          ' documents'
+      )
     },
   },
 
