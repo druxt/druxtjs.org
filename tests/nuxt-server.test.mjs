@@ -85,6 +85,8 @@ describe('isPage', () => {
     for (const pathname of [
       ...others,
       '/router/translate-path',
+      // Druxt's schema refresh answers JSON at a path with no extension.
+      '/_druxt/schema/node--doc_page--default--view',
       '/sites/default/files/a.png',
       '/icon.png',
       '/sitemap.xml',
