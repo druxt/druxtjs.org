@@ -199,7 +199,11 @@ sanitise() {
   # file mktemp made is private, and one the redirect created would not be.
   : > "$kept_addresses"
   if is_hostname "$maintainer_domain"; then
-    drush sql:query "SELECT uid, mail FROM users_field_data WHERE mail LIKE '%@${maintainer_domain}';" > "$kept_addresses" 2>/dev/null || :
+    # A failed read would let the sanitise take the addresses it was meant to keep.
+    if ! drush sql:query "SELECT uid, mail FROM users_field_data WHERE mail LIKE '%@${maintainer_domain}';" > "$kept_addresses" 2>/dev/null; then
+      echo "Could not read the maintainers' addresses; refusing to sanitise them away."
+      exit 1
+    fi
   else
     echo "  DOCS_MAINTAINER_DOMAIN is not a hostname, so no address is kept."
   fi

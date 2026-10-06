@@ -68,6 +68,7 @@ case "\$*" in
     # The file the addresses are written into, as the shell opened it: this
     # process's own stdout, not that of the substitution below.
     echo "kept file mode \$(stat -L -c %a /proc/\$\$/fd/1 2>/dev/null)" >> "$app/calls.log"
+    [ "\${STUB_MAIL_FAILS:-}" = "1" ] && exit 1
     [ -n "\${STUB_KEPT_ADDRESSES:-}" ] && printf '%b\n' "\${STUB_KEPT_ADDRESSES}" ;;
   *"php:eval"*)
     [ "\${STUB_EVAL_FAILS:-}" = "1" ] && exit 1
@@ -485,15 +486,27 @@ app="$(build_app yes)"
 output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
   DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
   STUB_EVAL_FAILS=1)"
-if printf '%s' "$output" | grep -q "could not restore"; then
-  ok "a drush that fails another way: the rollout says the login was not restored"
+status=$?
+if printf '%s' "$output" | grep -q "could not restore" && [ "$status" -ne 0 ]; then
+  ok "a drush that fails another way: the rollout says the login was not restored, and fails"
 else
-  no "a drush that fails another way: the failure was reported as a missing account"
+  no "a drush that fails another way: reported as a missing account, or the rollout succeeded (exit $status)"
 fi
 if printf '%s' "$output" | grep -q "refusing to leave this environment usable"; then
   ok "a drush that fails another way: the rollout refuses to hand over the environment"
 else
   no "a drush that fails another way: the rollout was reported green"
+fi
+
+# A failed read of the maintainers' addresses stops the rollout before the
+# sanitise can take them.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x STUB_MAIL_FAILS=1)"
+status=$?
+if [ "$status" -ne 0 ] && printf '%s' "$output" | grep -q "Could not read the maintainers' addresses" && ! called "$app" "sql:sanitize"; then
+  ok "a failed address read: the rollout stops before sanitising"
+else
+  no "a failed address read: the rollout went on (exit $status)"
 fi
 
 # Production addresses are read to be put back, and nothing needs the file
