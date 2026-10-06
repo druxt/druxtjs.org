@@ -304,7 +304,11 @@ export default {
     // The pointer and the keyboard both choose a subject, and a touch reader
     // uses the list, so all three end at the same place.
     this.onPointer = (event) => this.bind(subjectFromElement(event.target))
-    this.onFocus = (event) => this.bind(subjectFromElement(event.target))
+    // Focus moving into the bar itself keeps the subject it is on.
+    this.onFocus = (event) => {
+      if (this.$el && this.$el.contains(event.target)) return
+      this.bind(subjectFromElement(event.target))
+    }
     this.onClick = (event) => this.lockOn(event)
     this.onKey = (event) => {
       if (event.key !== 'Escape') return
