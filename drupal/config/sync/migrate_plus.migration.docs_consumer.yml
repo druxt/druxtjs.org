@@ -18,7 +18,7 @@ source:
     -
       id: druxtjs_org
       label: druxtjs.org
-      description: 'The documentation site. A public client: the password grant for editors, and authorization code with PKCE, approved by a person, for the authoring script.'
+      description: 'The documentation site. A public client: the password grant for editors, and authorization code with PKCE, approved by a person, for a client outside the site.'
       redirect:
         - 'https://druxtjs.org/callback'
         - 'http://localhost:3000/callback'

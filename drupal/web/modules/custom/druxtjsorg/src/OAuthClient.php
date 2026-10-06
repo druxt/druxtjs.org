@@ -43,8 +43,8 @@ final class OAuthClient {
       'confidential' => FALSE,
       'pkce' => TRUE,
       // The site signs editors in with the password grant, which never shows
-      // the authorize screen. Only the authoring script uses it, through a
-      // localhost callback, so a person approves each grant there: an
+      // the authorize screen. Only a client outside the site uses it, through
+      // a localhost callback, so a person approves each grant there: an
       // automatic one would hand any local listener an administrator's token.
       'automatic_authorization' => FALSE,
       'grant_types' => ['authorization_code', 'password', 'refresh_token'],
