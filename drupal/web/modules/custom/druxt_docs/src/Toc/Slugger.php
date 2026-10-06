@@ -7,8 +7,8 @@ namespace Drupal\druxt_docs\Toc;
 /**
  * A port of github-slugger 1.5.0, which gives headings their ids.
  *
- * The IR builder slugs with github-slugger, as did the site the
- * documentation came from, so any anchor ever linked to is one of its slugs.
+ * The site the documentation came from slugged with github-slugger, so any
+ * anchor ever linked to is one of its slugs.
  * This reproduces it exactly: lowercase as JavaScript does, remove what its
  * regex.js removes, turn spaces into hyphens, and number repeats -1, -2 and
  * so on. JsTables holds what JavaScript and regex.js do to each code point,
