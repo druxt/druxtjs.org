@@ -7,10 +7,10 @@ namespace Drupal\druxtjsorg;
 /**
  * What the frontend's OAuth consumer must be for its sign-in to work.
  *
- * The importer creates the consumer with these values, but only on a site it
- * seeds. An environment that copies production's database has whatever
- * production has, and its own frontend's callback is in no list, so every
- * rollout applies this.
+ * A fresh site has no consumer, so it is created with the initial values. An
+ * environment that copies production's database has whatever production has,
+ * and its own frontend's callback is in no list, so every rollout applies
+ * these.
  */
 final class OAuthClient {
 
@@ -23,6 +23,22 @@ final class OAuthClient {
    * The scopes an editor's sign-in may ask for.
    */
   public const SCOPES = ['authenticated', 'editor', 'contributor', 'administrator'];
+
+  /**
+   * The values a new consumer starts with, before the ones it needs.
+   *
+   * @return array<string, mixed>
+   *   Field values, keyed by field name.
+   */
+  public static function initial(): array {
+    return [
+      'client_id' => self::CLIENT_ID,
+      'label' => 'druxtjs.org',
+      'description' => 'The documentation site. A public client: the password grant for editors, and authorization code with PKCE, approved by a person, for a client outside the site.',
+      'decoupled_settings_theme' => 'druxtjs',
+      'redirect' => ['https://druxtjs.org/callback', 'http://localhost:3000/callback'],
+    ];
+  }
 
   /**
    * The field values the consumer needs.

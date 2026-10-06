@@ -43,4 +43,14 @@ final class OAuthClientTest extends UnitTestCase {
     self::assertSame($values['redirect'], $again['redirect']);
   }
 
+  /**
+   * A new consumer is the frontend's, themed, with the production callbacks.
+   */
+  public function testNewConsumer(): void {
+    $initial = OAuthClient::initial();
+    self::assertSame(OAuthClient::CLIENT_ID, $initial['client_id']);
+    self::assertSame('druxtjs', $initial['decoupled_settings_theme']);
+    self::assertSame(['https://druxtjs.org/callback', 'http://localhost:3000/callback'], $initial['redirect']);
+  }
+
 }
