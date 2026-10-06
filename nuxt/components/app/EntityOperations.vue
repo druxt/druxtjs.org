@@ -168,7 +168,9 @@ export default {
       this.deleting = true
       this.error = null
       try {
-        const token = await (await fetch('/session/token', { credentials: 'same-origin' })).text()
+        const tokenResponse = await fetch('/session/token', { credentials: 'same-origin' })
+        if (!tokenResponse.ok) throw new Error(String(tokenResponse.status))
+        const token = await tokenResponse.text()
         const { type, id } = this.resource
         const response = await fetch(`/jsonapi/${type.replace('--', '/')}/${id}`, {
           method: 'DELETE',
