@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/). Versions
 count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
 Druxt 1.0.0.
 
+## [Unreleased]
+
+### Changed
+
+- The site no longer registers Druxt's components as synchronous imports
+  itself. The modules register them that way now, so the hook that worked
+  around the first-load refetch is gone.
+
 ## [0.10.0] - 2026-09-27
 
 ### Changed

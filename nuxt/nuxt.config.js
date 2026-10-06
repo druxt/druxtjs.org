@@ -2,7 +2,6 @@
 // Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
 const { serviceRoute } = require('./server/backend')
-const { syncDruxtComponents } = require('./lib/sync-druxt-components')
 
 // The id is interpolated into an inline script, so check its shape first.
 if (!/^G-[A-Z0-9]+$/.test(GA_MEASUREMENT_ID)) {
@@ -233,9 +232,6 @@ export default {
   },
 
   hooks: {
-    // Druxt's own components load with the page: see lib/sync-druxt-components.js.
-    'components:extend': (components) => syncDruxtComponents(components),
-
     /**
      * Collects routes whose generation failed, so the build can refuse to ship them.
      *
