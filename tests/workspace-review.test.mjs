@@ -86,7 +86,7 @@ describe('a row', () => {
     assert.equal(pathless.nid, 40)
   })
 
-  test('marks a revision the authoring script wrote as AI, whichever account saved it', () => {
+  test('marks a revision whose log says it was written with AI, whichever account saved it', () => {
     assert.equal(staged.ai, true)
     assert.equal(staged.initials, 'AI')
     assert.equal(concepts.ai, false)

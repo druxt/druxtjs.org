@@ -42,9 +42,12 @@ Druxt 1.0.0.
 - A block's Edit opens that block's own dialog in the page's form. The bar
   names each block by its heading or opening words, steps to the previous or
   next block, and moves to another block on a click.
-- `author-page.mjs` writes into a workspace with `--workspace <id>`, and sends
-  nothing without `--workspace` or `--live`. It checks the whole page against
-  the content model first and reports every problem at its place.
+- `/workspace` reviews the active workspace: a row per changed page, marked
+  new or changed, with who changed it and when, and its diff against live or
+  its form a click away. Search, status, section, author and order filters
+  are counted and kept in the address, so Edit returns to the same list.
+  Drupal's own overview of a workspace lists pages rather than every
+  paragraph.
 
 ### Changed
 
