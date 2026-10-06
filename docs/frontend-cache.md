@@ -62,6 +62,17 @@ succeeds sends it too.
 A clear that fails leaves the old content served until the `max_age` runs
 out. Nothing breaks, it is slow to update.
 
+## Displays follow a clear
+
+Druxt generates each display's schema when the app builds, so a change made
+on a Manage display screen used to wait for a redeploy. With
+`druxt.schema.refresh` on, the Nuxt server regenerates a schema the first
+time a page needs it after a cache clear, and holds it until the next one. The
+Purge batch that clears the content clears the displays with it. The browser
+asks the server for a schema at `/_druxt/schema/<id>`, which the page cache
+leaves to Nuxt rather than storing as a page. When regeneration fails, the
+schema from the build is used.
+
 ## Drupal's side: one query for a response's cached normalizations
 
 JSON:API keeps each resource object's normalization in the

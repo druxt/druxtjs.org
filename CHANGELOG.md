@@ -15,6 +15,10 @@ Druxt 1.0.0.
   the index and the three menus, four of its backend calls. The path lookup,
   the page and its blocks are still fetched per render. A request with an
   Authorization header or a session cookie never reads or writes that cache.
+- A change to a display in Drupal shows without a rebuild. After a cache
+  clear the Nuxt server regenerates a schema the first time a page needs it
+  (`druxt.schema.refresh`), and the page cache leaves Druxt's own `/_druxt/`
+  routes to Nuxt instead of storing them as pages.
 - Purge clears that cache when content changes: `purge_queuer_coretags`
   queues the tags a save invalidates, the bundled HTTP purger sends one
   `POST /_druxt/cache/clear` per batch with the shared secret, and the
