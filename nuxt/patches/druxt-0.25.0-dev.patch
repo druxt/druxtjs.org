@@ -1,0 +1,26 @@
+diff --git a/dist/druxt.esm.js b/dist/druxt.esm.js
+index ae97541558711a0b193412fe47df34519b1b916d..8265eda3a7cd11fedbb2a587b436b7487f7d89c0 100644
+--- a/dist/druxt.esm.js
++++ b/dist/druxt.esm.js
+@@ -819,7 +819,7 @@ const DruxtStore = ({ store }) => {
+           this.$druxt.clearCache();
+         commit("flushCollection", {});
+         commit("flushResource", {});
+-        for (const mutation of ["druxt/views/flushResults", "druxtMenu/flushEntities", "druxtRouter/flushRoutes"]) {
++        for (const mutation of ["druxt/views/flushResults", "druxtMenu/flushEntities", "druxtRouter/flushRoutes", "druxtSchema/flushSchemas"]) {
+           if (this._mutations[mutation])
+             commit(mutation, {}, { root: true });
+         }
+diff --git a/dist/druxt.ssr.js b/dist/druxt.ssr.js
+index 4c1b8f249b79a63c86d54ec6d2a32ab4dcc5efe2..a0b59f6d3fdd0fc4f2a0f043cdaf9af5344a418b 100644
+--- a/dist/druxt.ssr.js
++++ b/dist/druxt.ssr.js
+@@ -832,7 +832,7 @@ const DruxtStore = ({ store }) => {
+           this.$druxt.clearCache();
+         commit("flushCollection", {});
+         commit("flushResource", {});
+-        for (const mutation of ["druxt/views/flushResults", "druxtMenu/flushEntities", "druxtRouter/flushRoutes"]) {
++        for (const mutation of ["druxt/views/flushResults", "druxtMenu/flushEntities", "druxtRouter/flushRoutes", "druxtSchema/flushSchemas"]) {
+           if (this._mutations[mutation])
+             commit(mutation, {}, { root: true });
+         }

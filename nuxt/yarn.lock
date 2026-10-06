@@ -11051,6 +11051,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"druxt-schema@patch:druxt-schema@npm%3A0.12.0-dev.20261006094246#./patches/druxt-schema-0.12.0-dev.patch::locator=druxtjs-org%40workspace%3A.":
+  version: 0.12.0-dev.20261006094246
+  resolution: "druxt-schema@patch:druxt-schema@npm%3A0.12.0-dev.20261006094246#./patches/druxt-schema-0.12.0-dev.patch::version=0.12.0-dev.20261006094246&hash=99860e&locator=druxtjs-org%40workspace%3A."
+  dependencies:
+    consola: ^2.15.3
+    drupal-jsonapi-params: ^2.3.2
+    druxt: 0.25.0-dev.20261006094246
+  peerDependencies:
+    vue: ^2.7.14
+    vuex: ^3.6.2
+  checksum: 3086880566f0a6d808534894fcf366dea5136b44ec2f40db6503628cc96fde059b4d9ed4a08e23a5b01429edd3fc1529fe115efa18b29f356da78313a7593f54
+  languageName: node
+  linkType: hard
+
 "druxt-site@npm:0.15.0-dev.20261006094246":
   version: 0.15.0-dev.20261006094246
   resolution: "druxt-site@npm:0.15.0-dev.20261006094246"
@@ -11118,6 +11132,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+"druxt@patch:druxt@npm%3A0.25.0-dev.20261006094246#./patches/druxt-0.25.0-dev.patch::locator=druxtjs-org%40workspace%3A.":
+  version: 0.25.0-dev.20261006094246
+  resolution: "druxt@patch:druxt@npm%3A0.25.0-dev.20261006094246#./patches/druxt-0.25.0-dev.patch::version=0.25.0-dev.20261006094246&hash=166b69&locator=druxtjs-org%40workspace%3A."
+  dependencies:
+    "@nuxtjs/axios": ^5.13.6
+    "@nuxtjs/proxy": ^2.1.0
+    "@vue/devtools-api": ^6.6.4
+    chalk: ^4.1.2
+    core-js: ^3.50.0
+    deepmerge: ^4.3.1
+    drupal-jsonapi-params: ^2.3.2
+    express-rate-limit: ^7.5.1
+    launch-editor: ^2.14.1
+    md5: ^2.3.0
+    querystring: ^0.2.1
+    scule: ^0.3.2
+  peerDependencies:
+    axios: 0.28.0
+    consola: "*"
+    vue: ^2.7.14
+    vuex: ^3.6.2
+  dependenciesMeta:
+    core-js:
+      optional: true
+  checksum: f216fb3ba8707ddda9d5853da74ed3925da5cfac353191c4b90e99706f5f1f6c8600d7a86c25ffbda5a5d48ad5306244c0a7f4f2a7fa7fd484a440f1133d38ba
+  languageName: node
+  linkType: hard
+
 "druxtjs-org@workspace:.":
   version: 0.0.0-use.local
   resolution: "druxtjs-org@workspace:."
@@ -11140,7 +11182,7 @@ __metadata:
     core-js: 3.50.0
     daisyui: 1.25.4
     drupal-jsonapi-params: 2.3.2
-    druxt: 0.25.0-dev.20261006094246
+    druxt: "patch:druxt@npm%3A0.25.0-dev.20261006094246#./patches/druxt-0.25.0-dev.patch"
     druxt-auth: "patch:druxt-auth@npm%3A0.5.0#./patches/druxt-auth-0.5.0.patch"
     druxt-blocks: 0.18.0-dev.20261006094246
     druxt-breadcrumb: 0.18.0-dev.20261006094246
@@ -11148,7 +11190,7 @@ __metadata:
     druxt-layout-paragraphs: 0.4.1
     druxt-menu: 0.22.0-dev.20261006094246
     druxt-router: 0.32.0-dev.20261006094246
-    druxt-schema: 0.12.0-dev.20261006094246
+    druxt-schema: "patch:druxt-schema@npm%3A0.12.0-dev.20261006094246#./patches/druxt-schema-0.12.0-dev.patch"
     druxt-site: 0.15.0-dev.20261006094246
     druxt-views: 0.23.0-dev.20261006094246
     github-slugger: 1.5.0

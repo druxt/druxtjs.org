@@ -1,0 +1,606 @@
+diff --git a/README.md b/README.md
+index cb0d5bff64631f13dfbc9f65294c530f8c4ccc57..e8dd3624ebb1e91d366ea09f2f77876358a4116c 100644
+--- a/README.md
++++ b/README.md
+@@ -80,6 +80,48 @@ export default {
+ };
+ ```
+ 
++### Refresh schemas without a rebuild
++
++Schemas are generated at build time, so a change to a display in Drupal needs a new build to show. Set `druxt.schema.refresh` to regenerate them on the Nuxt server instead:
++
++```js
++export default {
++  modules: ['druxt-schema'],
++  druxt: {
++    cache: { secret: process.env.DRUXT_CACHE_SECRET },
++    schema: { refresh: true },
++  },
++};
++```
++
++- The server regenerates a schema the first time a page needs it, and holds it until the next cache clear, `POST /_druxt/cache/clear` or `druxt/clearCache`. Have Drupal call the clear when configuration changes, as for content.
++- The browser asks the server for a schema at `/_druxt/schema/<id>` and never reads Drupal's configuration itself. The server generates with the same access the build uses.
++- Regeneration only covers schemas the build could generate. When it fails, the schema from the build is used.
++- The hold is per server process, so a site with several instances needs each one cleared.
++- Under `nuxt dev` there is no cache to clear, so each request regenerates the schemas it uses.
++- A static site (`nuxt generate`) has no server and keeps the schemas from its build.
++
++#### On your own server
++
++A static site served by its own Node server can offer the same refresh. Serve the route the browser asks, and clear the held schemas where the server handles Drupal's purge:
++
++```js
++const { createSchemaRefresh } = require('druxt-schema');
++
++const schemas = createSchemaRefresh('https://example.com');
++
++// In the request handler.
++if (pathname.startsWith('/_druxt/schema/')) {
++  req.url = pathname.slice('/_druxt/schema'.length);
++  return schemas.handler(req, res);
++}
++
++// Where the server handles Drupal's purge.
++schemas.clear();
++```
++
++Create the refresh once and keep it. A `DruxtSchema` instance keeps the configuration it has read for as long as it lives, so one held by your own code never shows a renamed field. The refresh starts a new instance on each clear.
++
+ ---
+ 
+ ## API
+@@ -105,9 +147,10 @@ These options are available to all Druxt modules.
+ 
+ These options are specific to this module.
+ 
+-| Option          | Type    | Required | Default | Description                                                    |
+-| --------------- | ------- | -------- | ------- | -------------------------------------------------------------- |
+-| `schema.filter` | `array` | No       | `[]`    | Array of regular expression rules to filter generated schemas. |
++| Option           | Type      | Required | Default | Description                                                                  |
++| ---------------- | --------- | -------- | ------- | ---------------------------------------------------------------------------- |
++| `schema.filter`  | `array`   | No       | `[]`    | Array of regular expression rules to filter generated schemas.               |
++| `schema.refresh` | `boolean` | No       | `false` | Regenerate schemas on the Nuxt server after each cache clear, with no build. |
+ 
+ ## Links
+ 
+diff --git a/dist/druxt-schema.esm.js b/dist/druxt-schema.esm.js
+index 57f6bdb2dd9f1ba8945e8079f5854060bb81b6be..0f98ef7bb1663edd7c8a280aa008cf194cd1e1e6 100644
+--- a/dist/druxt-schema.esm.js
++++ b/dist/druxt-schema.esm.js
+@@ -3,6 +3,7 @@ import { resolve } from 'path';
+ import { DrupalJsonApiParams } from 'drupal-jsonapi-params';
+ import { DruxtClient } from 'druxt';
+ import { mapActions } from 'vuex';
++import Vue from 'vue';
+ 
+ const resourceCache = new WeakMap();
+ class Schema {
+@@ -65,7 +66,7 @@ class Schema {
+   }
+   async form() {
+     const entityFormDisplay = await this.getResources("entity_form_display--entity_form_display", { "filter[drupal_internal__id]": this.displayId }).then((res) => Array.isArray(res.data) ? res.data[0] : res);
+-    if (!entityFormDisplay)
++    if (!entityFormDisplay || (entityFormDisplay.attributes || {}).status === false)
+       return false;
+     const fieldConfig = await this.getResources("field_config--field_config", { "filter[entity_type]": this.config.entityType, "filter[bundle]": this.config.bundle });
+     if (!fieldConfig)
+@@ -131,7 +132,7 @@ class Schema {
+   }
+   async view() {
+     const entityViewDisplay = await this.getResources("entity_view_display--entity_view_display", { "filter[drupal_internal__id]": this.displayId }).then((res) => Array.isArray(res.data) ? res.data[0] : res);
+-    if (!entityViewDisplay)
++    if (!entityViewDisplay || (entityViewDisplay.attributes || {}).status === false)
+       return false;
+     const fieldConfig = await this.getResources("field_config--field_config", { "filter[entity_type]": this.config.entityType, "filter[bundle]": this.config.bundle });
+     if (!fieldConfig)
+@@ -186,6 +187,49 @@ class Schema {
+   }
+ }
+ 
++const GENERATION = Symbol.for("druxt.processCacheGeneration");
++const clears = () => (globalThis[GENERATION] || { value: 0 }).value;
++const parseSchemaId = (id) => {
++  const match = /^([a-z0-9_]+)--([a-z0-9_]+)--([a-z0-9_]+)--(view|form)$/.exec(String(id));
++  if (!match)
++    return false;
++  const [, entityType, bundle, mode, schemaType] = match;
++  return { entityType, bundle, mode, schemaType };
++};
++const createHold = (createDruxtSchema) => {
++  const hold = { generation: void 0, generator: null, schemas: new Map(), pending: new Map() };
++  const clear = () => {
++    hold.schemas.clear();
++    hold.pending.clear();
++    hold.generator = null;
++    hold.generation = void 0;
++  };
++  const get = (id) => {
++    const now = clears();
++    if (hold.generation !== now) {
++      clear();
++      hold.generation = now;
++    }
++    if (hold.schemas.has(id))
++      return Promise.resolve(hold.schemas.get(id));
++    if (!hold.pending.has(id)) {
++      if (!hold.generator)
++        hold.generator = createDruxtSchema();
++      const request = hold.generator.getSchemaById(id).then((schema) => {
++        if (schema && hold.generation === now && clears() === now)
++          hold.schemas.set(id, schema);
++        return schema;
++      }).finally(() => {
++        if (hold.pending.get(id) === request)
++          hold.pending.delete(id);
++      });
++      hold.pending.set(id, request);
++    }
++    return hold.pending.get(id);
++  };
++  return { get, clear };
++};
++
+ class DruxtSchema {
+   constructor(baseUrl, options = {}) {
+     if (!baseUrl)
+@@ -226,6 +270,33 @@ class DruxtSchema {
+     const schemas = Object.fromEntries((await Promise.all(displays.map((config) => this.getSchema(config)))).filter((o) => o).map((schema) => [schema.id, schema.schema]));
+     return { index, schemas };
+   }
++  getDisplayIds() {
++    if (!this.displayIds) {
++      this.displayIds = Promise.all(["view", "form"].map(async (schemaType) => {
++        const resourceType = `entity_${schemaType}_display--entity_${schemaType}_display`;
++        const query = new DrupalJsonApiParams().addSort("drupal_internal__id");
++        const result = await this.druxt.getCollectionAll(resourceType, query);
++        return result.flatMap((collection) => (collection.data || []).filter((data) => !!data.attributes.status).map((data) => [data.attributes.targetEntityType, data.attributes.bundle, data.attributes.mode, schemaType].join("--")));
++      })).then((ids) => new Set(ids.flat()));
++      this.displayIds.catch(() => {
++        this.displayIds = null;
++      });
++    }
++    return this.displayIds;
++  }
++  async getSchemaById(id) {
++    const parts = parseSchemaId(id);
++    if (!parts)
++      return false;
++    const index = await this.druxt.getIndex();
++    const resource = index[[parts.entityType, parts.bundle].join("--")];
++    if (!resource)
++      return false;
++    if (!(await this.getDisplayIds()).has(id))
++      return false;
++    const schema = await this.getSchema({ ...parts, filter: this.options.schema.filter, ...resource });
++    return schema && schema.schema || false;
++  }
+   async getSchema(config, options = {}) {
+     const schema = new Schema(config, { druxtSchema: this, ...options });
+     if (!schema.isValid) {
+@@ -236,6 +307,50 @@ class DruxtSchema {
+   }
+ }
+ 
++const schemaHandler = (getSchema) => async (req, res) => {
++  res.setHeader("Cache-Control", "no-store");
++  if (req.method !== "GET") {
++    res.statusCode = 405;
++    res.setHeader("Allow", "GET");
++    return res.end();
++  }
++  let id;
++  try {
++    id = decodeURIComponent(String(req.url || "").split("?")[0].replace(/^\/+/, ""));
++  } catch (err) {
++    id = "";
++  }
++  if (!parseSchemaId(id)) {
++    res.statusCode = 404;
++    return res.end();
++  }
++  let schema;
++  try {
++    schema = await getSchema(id);
++  } catch (err) {
++    res.statusCode = 502;
++    return res.end();
++  }
++  if (!schema) {
++    res.statusCode = 404;
++    res.setHeader("X-Druxt-Schema", "missing");
++    return res.end();
++  }
++  res.statusCode = 200;
++  res.setHeader("Content-Type", "application/json");
++  res.end(JSON.stringify(schema));
++};
++
++const createSchemaRefresh = (baseUrl, options = {}, { hold = true } = {}) => {
++  const createDruxtSchema = () => new DruxtSchema(baseUrl, {
++    ...options,
++    proxy: { ...options.proxy || {}, api: false }
++  });
++  const held = createHold(createDruxtSchema);
++  const getSchema = hold ? held.get : (id) => createDruxtSchema().getSchemaById(id);
++  return { getSchema, handler: schemaHandler(getSchema), clear: held.clear };
++};
++
+ const DruxtSchemaNuxtModule = function(moduleOptions = {}) {
+   const options = {
+     baseUrl: moduleOptions.baseUrl,
+@@ -256,6 +371,12 @@ const DruxtSchemaNuxtModule = function(moduleOptions = {}) {
+     fileName: "store/druxt-schema.js",
+     options
+   });
++  if (options.schema.refresh) {
++    const { getSchema, handler } = createSchemaRefresh(options.baseUrl, options, { hold: !this.options.dev });
++    this.addServerMiddleware({ path: "/_druxt/schema", handler });
++    const refreshes = process[Symbol.for("druxt.schemaRefresh")] || (process[Symbol.for("druxt.schemaRefresh")] = new Map());
++    refreshes.set(options.baseUrl, (id) => parseSchemaId(id) ? getSchema(id) : Promise.resolve(null));
++  }
+   this.nuxt.hook("builder:prepared", async () => {
+     const druxtSchema = new DruxtSchema(options.baseUrl, {
+       ...options,
+@@ -317,6 +438,7 @@ const DruxtSchemaStore = ({ store }) => {
+     throw new TypeError("Vuex store not found.");
+   }
+   const namespace = "druxtSchema";
++  const generation = { value: 0 };
+   const module = {
+     namespaced: true,
+     state: () => ({
+@@ -324,7 +446,11 @@ const DruxtSchemaStore = ({ store }) => {
+     }),
+     mutations: {
+       addSchema(state, { id, schema }) {
+-        state.schemas[id] = schema;
++        Vue.set(state.schemas, id, schema);
++      },
++      flushSchemas(state) {
++        generation.value += 1;
++        Vue.set(state, "schemas", {});
+       }
+     },
+     actions: {
+@@ -347,11 +473,18 @@ const DruxtSchemaStore = ({ store }) => {
+         if (!resource.id) {
+           return false;
+         }
+-        if (!state.schemas[resource.id]) {
+-          const schema = await this.$druxtSchema.import(resource.id);
+-          commit("addSchema", { id: resource.id, schema });
++        if (state.schemas[resource.id])
++          return state.schemas[resource.id];
++        let schema;
++        for (let attempt = 0; attempt < 3; attempt += 1) {
++          const since = generation.value;
++          schema = await this.$druxtSchema.import(resource.id);
++          if (since === generation.value) {
++            commit("addSchema", { id: resource.id, schema });
++            return state.schemas[resource.id];
++          }
+         }
+-        return state.schemas[resource.id];
++        return schema;
+       }
+     }
+   };
+@@ -360,4 +493,4 @@ const DruxtSchemaStore = ({ store }) => {
+   });
+ };
+ 
+-export { DruxtSchema, DruxtSchemaMixin, DruxtSchemaStore, DruxtSchemaNuxtModule as default };
++export { DruxtSchema, DruxtSchemaMixin, DruxtSchemaStore, createSchemaRefresh, DruxtSchemaNuxtModule as default };
+diff --git a/dist/druxt-schema.ssr.js b/dist/druxt-schema.ssr.js
+index d13aafdea4891bd5b664b958cff9e58d65fc12fa..3bafe517e025041f9a9e7914554a6bbfb849bb85 100644
+--- a/dist/druxt-schema.ssr.js
++++ b/dist/druxt-schema.ssr.js
+@@ -7,10 +7,12 @@ const path = require('path');
+ const drupalJsonapiParams = require('drupal-jsonapi-params');
+ const druxt = require('druxt');
+ const vuex = require('vuex');
++const Vue = require('vue');
+ 
+ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+ 
+ const consola__default = /*#__PURE__*/_interopDefaultLegacy(consola);
++const Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
+ 
+ const resourceCache = new WeakMap();
+ class Schema {
+@@ -73,7 +75,7 @@ class Schema {
+   }
+   async form() {
+     const entityFormDisplay = await this.getResources("entity_form_display--entity_form_display", { "filter[drupal_internal__id]": this.displayId }).then((res) => Array.isArray(res.data) ? res.data[0] : res);
+-    if (!entityFormDisplay)
++    if (!entityFormDisplay || (entityFormDisplay.attributes || {}).status === false)
+       return false;
+     const fieldConfig = await this.getResources("field_config--field_config", { "filter[entity_type]": this.config.entityType, "filter[bundle]": this.config.bundle });
+     if (!fieldConfig)
+@@ -139,7 +141,7 @@ class Schema {
+   }
+   async view() {
+     const entityViewDisplay = await this.getResources("entity_view_display--entity_view_display", { "filter[drupal_internal__id]": this.displayId }).then((res) => Array.isArray(res.data) ? res.data[0] : res);
+-    if (!entityViewDisplay)
++    if (!entityViewDisplay || (entityViewDisplay.attributes || {}).status === false)
+       return false;
+     const fieldConfig = await this.getResources("field_config--field_config", { "filter[entity_type]": this.config.entityType, "filter[bundle]": this.config.bundle });
+     if (!fieldConfig)
+@@ -194,6 +196,49 @@ class Schema {
+   }
+ }
+ 
++const GENERATION = Symbol.for("druxt.processCacheGeneration");
++const clears = () => (globalThis[GENERATION] || { value: 0 }).value;
++const parseSchemaId = (id) => {
++  const match = /^([a-z0-9_]+)--([a-z0-9_]+)--([a-z0-9_]+)--(view|form)$/.exec(String(id));
++  if (!match)
++    return false;
++  const [, entityType, bundle, mode, schemaType] = match;
++  return { entityType, bundle, mode, schemaType };
++};
++const createHold = (createDruxtSchema) => {
++  const hold = { generation: void 0, generator: null, schemas: new Map(), pending: new Map() };
++  const clear = () => {
++    hold.schemas.clear();
++    hold.pending.clear();
++    hold.generator = null;
++    hold.generation = void 0;
++  };
++  const get = (id) => {
++    const now = clears();
++    if (hold.generation !== now) {
++      clear();
++      hold.generation = now;
++    }
++    if (hold.schemas.has(id))
++      return Promise.resolve(hold.schemas.get(id));
++    if (!hold.pending.has(id)) {
++      if (!hold.generator)
++        hold.generator = createDruxtSchema();
++      const request = hold.generator.getSchemaById(id).then((schema) => {
++        if (schema && hold.generation === now && clears() === now)
++          hold.schemas.set(id, schema);
++        return schema;
++      }).finally(() => {
++        if (hold.pending.get(id) === request)
++          hold.pending.delete(id);
++      });
++      hold.pending.set(id, request);
++    }
++    return hold.pending.get(id);
++  };
++  return { get, clear };
++};
++
+ class DruxtSchema {
+   constructor(baseUrl, options = {}) {
+     if (!baseUrl)
+@@ -234,6 +279,33 @@ class DruxtSchema {
+     const schemas = Object.fromEntries((await Promise.all(displays.map((config) => this.getSchema(config)))).filter((o) => o).map((schema) => [schema.id, schema.schema]));
+     return { index, schemas };
+   }
++  getDisplayIds() {
++    if (!this.displayIds) {
++      this.displayIds = Promise.all(["view", "form"].map(async (schemaType) => {
++        const resourceType = `entity_${schemaType}_display--entity_${schemaType}_display`;
++        const query = new drupalJsonapiParams.DrupalJsonApiParams().addSort("drupal_internal__id");
++        const result = await this.druxt.getCollectionAll(resourceType, query);
++        return result.flatMap((collection) => (collection.data || []).filter((data) => !!data.attributes.status).map((data) => [data.attributes.targetEntityType, data.attributes.bundle, data.attributes.mode, schemaType].join("--")));
++      })).then((ids) => new Set(ids.flat()));
++      this.displayIds.catch(() => {
++        this.displayIds = null;
++      });
++    }
++    return this.displayIds;
++  }
++  async getSchemaById(id) {
++    const parts = parseSchemaId(id);
++    if (!parts)
++      return false;
++    const index = await this.druxt.getIndex();
++    const resource = index[[parts.entityType, parts.bundle].join("--")];
++    if (!resource)
++      return false;
++    if (!(await this.getDisplayIds()).has(id))
++      return false;
++    const schema = await this.getSchema({ ...parts, filter: this.options.schema.filter, ...resource });
++    return schema && schema.schema || false;
++  }
+   async getSchema(config, options = {}) {
+     const schema = new Schema(config, { druxtSchema: this, ...options });
+     if (!schema.isValid) {
+@@ -244,6 +316,50 @@ class DruxtSchema {
+   }
+ }
+ 
++const schemaHandler = (getSchema) => async (req, res) => {
++  res.setHeader("Cache-Control", "no-store");
++  if (req.method !== "GET") {
++    res.statusCode = 405;
++    res.setHeader("Allow", "GET");
++    return res.end();
++  }
++  let id;
++  try {
++    id = decodeURIComponent(String(req.url || "").split("?")[0].replace(/^\/+/, ""));
++  } catch (err) {
++    id = "";
++  }
++  if (!parseSchemaId(id)) {
++    res.statusCode = 404;
++    return res.end();
++  }
++  let schema;
++  try {
++    schema = await getSchema(id);
++  } catch (err) {
++    res.statusCode = 502;
++    return res.end();
++  }
++  if (!schema) {
++    res.statusCode = 404;
++    res.setHeader("X-Druxt-Schema", "missing");
++    return res.end();
++  }
++  res.statusCode = 200;
++  res.setHeader("Content-Type", "application/json");
++  res.end(JSON.stringify(schema));
++};
++
++const createSchemaRefresh = (baseUrl, options = {}, { hold = true } = {}) => {
++  const createDruxtSchema = () => new DruxtSchema(baseUrl, {
++    ...options,
++    proxy: { ...options.proxy || {}, api: false }
++  });
++  const held = createHold(createDruxtSchema);
++  const getSchema = hold ? held.get : (id) => createDruxtSchema().getSchemaById(id);
++  return { getSchema, handler: schemaHandler(getSchema), clear: held.clear };
++};
++
+ const DruxtSchemaNuxtModule = function(moduleOptions = {}) {
+   const options = {
+     baseUrl: moduleOptions.baseUrl,
+@@ -264,6 +380,12 @@ const DruxtSchemaNuxtModule = function(moduleOptions = {}) {
+     fileName: "store/druxt-schema.js",
+     options
+   });
++  if (options.schema.refresh) {
++    const { getSchema, handler } = createSchemaRefresh(options.baseUrl, options, { hold: !this.options.dev });
++    this.addServerMiddleware({ path: "/_druxt/schema", handler });
++    const refreshes = process[Symbol.for("druxt.schemaRefresh")] || (process[Symbol.for("druxt.schemaRefresh")] = new Map());
++    refreshes.set(options.baseUrl, (id) => parseSchemaId(id) ? getSchema(id) : Promise.resolve(null));
++  }
+   this.nuxt.hook("builder:prepared", async () => {
+     const druxtSchema = new DruxtSchema(options.baseUrl, {
+       ...options,
+@@ -325,6 +447,7 @@ const DruxtSchemaStore = ({ store }) => {
+     throw new TypeError("Vuex store not found.");
+   }
+   const namespace = "druxtSchema";
++  const generation = { value: 0 };
+   const module = {
+     namespaced: true,
+     state: () => ({
+@@ -332,7 +455,11 @@ const DruxtSchemaStore = ({ store }) => {
+     }),
+     mutations: {
+       addSchema(state, { id, schema }) {
+-        state.schemas[id] = schema;
++        Vue__default["default"].set(state.schemas, id, schema);
++      },
++      flushSchemas(state) {
++        generation.value += 1;
++        Vue__default["default"].set(state, "schemas", {});
+       }
+     },
+     actions: {
+@@ -355,11 +482,18 @@ const DruxtSchemaStore = ({ store }) => {
+         if (!resource.id) {
+           return false;
+         }
+-        if (!state.schemas[resource.id]) {
+-          const schema = await this.$druxtSchema.import(resource.id);
+-          commit("addSchema", { id: resource.id, schema });
++        if (state.schemas[resource.id])
++          return state.schemas[resource.id];
++        let schema;
++        for (let attempt = 0; attempt < 3; attempt += 1) {
++          const since = generation.value;
++          schema = await this.$druxtSchema.import(resource.id);
++          if (since === generation.value) {
++            commit("addSchema", { id: resource.id, schema });
++            return state.schemas[resource.id];
++          }
+         }
+-        return state.schemas[resource.id];
++        return schema;
+       }
+     }
+   };
+@@ -371,4 +505,5 @@ const DruxtSchemaStore = ({ store }) => {
+ exports.DruxtSchema = DruxtSchema;
+ exports.DruxtSchemaMixin = DruxtSchemaMixin;
+ exports.DruxtSchemaStore = DruxtSchemaStore;
++exports.createSchemaRefresh = createSchemaRefresh;
+ exports["default"] = DruxtSchemaNuxtModule;
+diff --git a/templates/plugin.js b/templates/plugin.js
+index 2b7f6f5c5ab88a7a324ffa2ae740bebbde7cd7db..0a3c467bdb0d2d9d7a1a0cf4e4c71d14d8c605f3 100644
+--- a/templates/plugin.js
++++ b/templates/plugin.js
+@@ -1,3 +1,47 @@
++// The router base, which prefixes server middleware paths.
++let base = '/'
++
++// Drupal has no such schema, so the built one is out of date too.
++const MISSING = {}
++
++/**
++ * A schema regenerated since the last cache clear, MISSING when Drupal has none,
++ * or null to use the built file.
++ *
++ * @param {string} id - The Druxt.js Schema ID.
++ * @returns {Promise<object|null>}
++ */
++<% if ((options.schema || {}).refresh) { %>
++const refreshed = async (id) => {
++  try {
++    if (process.server) {
++      const refresh = (process[Symbol.for('druxt.schemaRefresh')] || new Map()).get(<%= JSON.stringify(options.baseUrl) %>)
++      const schema = refresh ? await refresh(id) : null
++      return schema === false ? MISSING : schema || null
++    }
++    const res = await fetch(`${base}_druxt/schema/${encodeURIComponent(id)}`)
++    if (res.ok) return await res.json()
++    return res.headers.get('X-Druxt-Schema') === 'missing' ? MISSING : null
++  } catch (err) {
++    return null
++  }
++}
++<% } else { %>
++const refreshed = async () => null
++<% } %>
++
++/**
++ * A schema, regenerated where available, else as built.
++ *
++ * @param {string} id - The Druxt.js Schema ID.
++ * @returns {Promise<object>}
++ */
++const load = async (id) => {
++  const schema = await refreshed(id)
++  if (schema === MISSING) throw new Error(`No Druxt schema ${id} in Drupal.`)
++  return schema || import(`./schemas/${id}.json`).then(m => m.default || m)
++}
++
+ /**
+  * Nuxt.js plugin for Druxt.js Schema.
+  */
+@@ -12,8 +56,7 @@ const DruxtSchemaPlugin = {
+    * const schema = await this.$druxtSchema.import('node--page--default--view')
+    */
+   import: async id => {
+-    return import(`./schemas/${id}.json`)
+-      .then(m => m.default || m)
++    return load(id)
+       .catch(async (err) => {
+         const parts = id.split('--')
+ 
+@@ -22,12 +65,14 @@ const DruxtSchemaPlugin = {
+ 
+         // Fallback to the default view mode.
+         parts[parts.length - 2] = 'default'
+-        return import(`./schemas/${parts.join('--')}.json`).then(m => m.default || m)
++        return load(parts.join('--'))
+       })
+   }
+ }
+ 
+ export default (context, inject) => {
++  base = (((context.app || {}).router || {}).options || {}).base || '/'
++  if (!base.endsWith('/')) base += '/'
+   inject('druxtSchema', DruxtSchemaPlugin)
+ }
+ 

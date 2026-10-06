@@ -96,6 +96,26 @@ The draft renders for the signed-in editor on the page's URL. An editor
 publishes it from Drupal's content administration, and the anonymous site
 then serves it.
 
+## Schemas after a cache clear
+
+The frontend runs on the Druxt development snapshot, with `druxt.schema.refresh`
+on. The Nuxt server regenerates a display's schema the first time a page needs
+it and holds it until `POST /_druxt/cache/clear`, so a change to a display in
+Drupal shows without a rebuild. The clear needs the `DRUXT_CACHE_SECRET`
+environment variable in an `X-Druxt-Secret` header:
+
+```sh
+curl -X POST -H "X-Druxt-Secret: $DRUXT_CACHE_SECRET" https://example.com/_druxt/cache/clear
+```
+
+Stored pages still expire on their own time to live, `DOCS_CACHE_TTL`.
+
+`nuxt/patches/druxt-0.25.0-dev.patch` and
+`nuxt/patches/druxt-schema-0.12.0-dev.patch` carry the refresh from
+[druxt/druxt.js#903](https://github.com/druxt/druxt.js/pull/903), built
+against the snapshot. Delete them, and take the next snapshot, once it
+includes the change.
+
 ## Export configuration after changing it
 
 A change made through the admin UI or `drush` stays in the database until

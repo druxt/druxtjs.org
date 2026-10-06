@@ -238,10 +238,13 @@ export default {
     // asked for the fields its display renders, from the generated schema.
     entity: { components: { fields: false }, query: { schema: true } },
     // Display schemas, view and form, for what this site renders. Generated
-    // from Drupal's display configuration when the app builds.
+    // when the app builds, then again on the server after each cache clear.
     schema: {
       filter: ['node--doc_page--.*', 'paragraph--docs_.*', 'media--image--.*'],
+      refresh: true,
     },
+    // POST /_druxt/cache/clear with this in X-Druxt-Secret. Unset, it is off.
+    cache: { secret: process.env.DRUXT_CACHE_SECRET },
   },
 
   // @nuxtjs/auth-next: a signed-in editor is sent back to the page they
