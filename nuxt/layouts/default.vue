@@ -56,6 +56,9 @@
     <!-- For a signed-in editor: the revision pill and the diff drawn on the page. -->
     <AppEditorBar />
     <AppPageDiff />
+
+    <!-- When Drupal changes the open page: an offer to show it. -->
+    <AppLiveUpdate />
   </div>
 </template>
 

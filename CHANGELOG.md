@@ -9,6 +9,11 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+- Open pages hear about Drupal's changes. Purge now sends the tags it
+  invalidates, and the Nuxt server passes them over a WebSocket on `/_live` to
+  every page open on the site. A page they touch shows a small notice, and
+  **Show the update** loads the change. A purge also marks every stored page
+  stale. `@druxt-contrib/sockets` is vendored for it, without presence.
 - Open pages follow Drupal. Purge now sends the tags it invalidates, and the
   Nuxt server passes them over a WebSocket on `/_live` to every page open on
   the site, which fetches again the entities, views and menus they name. A purge

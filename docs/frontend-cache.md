@@ -32,10 +32,17 @@ things with them:
   purge cannot say which pages it touched.
 - It sends them, as `content:changed`, to every page open on the site, over a
   WebSocket on `/_live` from `@druxt-contrib/sockets` (vendored in
-  `nuxt/vendor/druxt-sockets`). Each page flushes the resources and lists
-  those tags name from its store and fetches again the entities, views and menus
-  it shows. A batch of sign-in bookkeeping (`oauth2_token`, `consumer`,
-  `session`) is not a content change and reaches no page.
+  `nuxt/vendor/druxt-sockets`). A batch of sign-in bookkeeping
+  (`oauth2_token`, `consumer`, `session`) is not a content change and reaches
+  no page.
+
+A page whose content changed tells its reader rather than changing under
+them. `plugins/live-updates.client.js` decides whether the tags touch the page:
+an entity it loaded, a menu, or a purge that lists no tags. A list
+tag alone, such as the `node_list` every save purges, does not count.
+`AppLiveUpdate` then shows a small notice with **Show the update**, which
+clears Druxt's stores and runs the page's data again, so the header, the body
+and the menus all follow. The module's own refetch is off (`refresh: false`).
 
 The socket opens only from a page on the same host, and the module runs here
 without presence or channels. Each Nuxt process has its own sockets, as it has

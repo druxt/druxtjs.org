@@ -174,6 +174,8 @@ export default {
     '~/plugins/chunk-reload.client.js',
     '~/plugins/content-links.client.js',
     '~/plugins/mermaid.client.js',
+    // Offers the reader a change Drupal made to the open page.
+    '~/plugins/live-updates.client.js',
     // After the Druxt and auth plugins the modules add: it wraps the client.
     '~/plugins/working-copy.js',
     // Also after the Druxt and auth plugins: it adds to the client they share.
@@ -261,8 +263,9 @@ export default {
   ],
 
   // The browser half only: server/start.js attaches the socket to its own
-  // server, which Nuxt never listens on.
-  sockets: { path: '/_live', server: false },
+  // server, which Nuxt never listens on. Pages are not refetched behind the
+  // reader's back: plugins/live-updates offers the change instead.
+  sockets: { path: '/_live', server: false, refresh: false },
 
   decoupledSettings: {
     consumerId: CONSUMER_ID,
