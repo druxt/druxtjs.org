@@ -55,8 +55,10 @@ export default {
       this.broken = false
       this.gravatar = null
       if (this.account.picture || !this.account.email) return
-      const hash = await emailHash(this.account.email)
-      if (hash) this.gravatar = gravatarUrl(hash, this.size * 2)
+      const email = this.account.email
+      const hash = await emailHash(email)
+      // The account may have changed while the hash was computed.
+      if (hash && email === this.account.email) this.gravatar = gravatarUrl(hash, this.size * 2)
     },
   },
 }
