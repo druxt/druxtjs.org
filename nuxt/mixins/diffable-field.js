@@ -15,7 +15,8 @@ export default {
     editorDiffBlock() {
       const editor = this.$store && this.$store.state.editor
       if (!editor || !editor.compare || !editor.diff || !this.entity) return null
-      return blockFor(editor.diff.blocks, this.entity.id, 'changed')
+      // A block that moved may have changed too, and carries its field diffs.
+      return blockFor(editor.diff.blocks, this.entity.id, 'changed') || blockFor(editor.diff.blocks, this.entity.id, 'moved')
     },
   },
   methods: {
