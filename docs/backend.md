@@ -78,34 +78,6 @@ A signed-in editor's requests send their bearer token on the server render
 and in the browser, because Druxt's client and `@nuxtjs/auth-next` share one
 axios instance. A "Sign in" control sits in the site header.
 
-### Seeing the draft
-
-The frontend asks JSON:API for the working copy of each page and paragraph
-for a signed-in editor, so the page's own URL shows the latest draft. Anonymous requests never ask for the working copy, and Drupal refuses
-a working-copy request from anyone without permission, so a draft is never
-shown to the public. The stored-page cache is bypassed for a request that
-presents the auth cookie, and that response is never written to the store, so
-a draft cannot leak into a cached page.
-
-### Authoring a page over JSON:API
-
-The site is a JSON:API client and doesn't carry a writer of its own. A signed-in
-client writes a page the way the importer's content model expects:
-
-1. Create each paragraph, in reading order.
-2. Create the page, or update it by uuid, referencing the paragraphs by
-   revision (`meta.target_revision_id`) and setting `moderation_state` to
-   `draft`.
-
-JSON:API has no transaction, so a writer that stops part way has to report
-what it created, leaving a list to clean up rather than a search.
-
-The writes need `jsonapi.settings` set to `read_only: false`, and a hook in
-`druxt_docs` that allows a page's authors to create its paragraph bundles,
-which Paragraphs otherwise permits only inside an entity form. Creation is
-still gated by role and by the bearer token, so an anonymous request cannot
-write.
-
 ### The local loop
 
 The whole loop runs on one machine, with Drupal and the frontend on
@@ -114,8 +86,7 @@ different origins, as in production:
 ```sh
 npm run setup                 # assemble, provision, import, start Drupal
 npm run dev                   # the frontend, on another origin
-# create an editor account, sign in through the header, then edit a page
-# in Drupal or write a draft over JSON:API
+# create an editor account, sign in through the header, then edit a page in Drupal
 ```
 
 The draft renders for the signed-in editor on the page's URL. An editor
