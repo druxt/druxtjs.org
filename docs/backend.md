@@ -89,38 +89,22 @@ a draft cannot leak into a cached page.
 
 ### Authoring a page over JSON:API
 
-`nuxt/scripts/author-page.mjs` writes a page and its paragraphs as a draft,
-through Druxt's client. It takes one page of the intermediate representation:
+The site is a JSON:API client and doesn't carry a writer of its own. A signed-in
+client writes a page the way the importer's content model expects:
 
-```sh
-# A new draft revision of an existing page:
-node nuxt/scripts/author-page.mjs --document <ir.json> --uuid <page-uuid>
+1. Create each paragraph, in reading order.
+2. Create the page, or update it by uuid, referencing the paragraphs by
+   revision (`meta.target_revision_id`) and setting `moderation_state` to
+   `draft`.
 
-# A new page:
-node nuxt/scripts/author-page.mjs --document <ir.json>
-```
-
-The script signs in the same way the site does: it opens the authorize page
-in a browser and catches the redirect on a local listener at
-`http://localhost:3939/callback`, a URI registered on the consumer. It holds
-no secret. `DRUXT_TOKEN` supplies a token instead, for an unattended run.
-
-It creates each paragraph with `DruxtClient.createResource`, then the page
-with `createResource` (or `updateResource` for `--uuid`), referencing the
-paragraphs by revision and setting `moderation_state` to `draft`. JSON:API
-has no transaction, so on any failed write the script stops, exits non-zero
-and prints every entity it created, leaving a list to clean up rather than a
-search.
+JSON:API has no transaction, so a writer that stops part way has to report
+what it created, leaving a list to clean up rather than a search.
 
 The writes need `jsonapi.settings` set to `read_only: false`, and a hook in
-`druxt_docs` that allows a page's authors to
-create its paragraph bundles, which Paragraphs otherwise permits only inside
-an entity form. Creation is still gated by role and by the bearer token, so
-an anonymous request cannot write.
-
-The script does not upload media yet, so it refuses a page with an image
-block before writing anything. A page whose only images are ones the seeded
-site already holds can be authored once its markdown drops the image block.
+`druxt_docs` that allows a page's authors to create its paragraph bundles,
+which Paragraphs otherwise permits only inside an entity form. Creation is
+still gated by role and by the bearer token, so an anonymous request cannot
+write.
 
 ### The local loop
 
@@ -130,8 +114,8 @@ different origins, as in production:
 ```sh
 npm run setup                 # assemble, provision, import, start Drupal
 npm run dev                   # the frontend, on another origin
-# create an editor account, sign in through the header, then:
-node nuxt/scripts/author-page.mjs --document <ir.json> --uuid <page-uuid>
+# create an editor account, sign in through the header, then edit a page
+# in Drupal or write a draft over JSON:API
 ```
 
 The draft renders for the signed-in editor on the page's URL. An editor
