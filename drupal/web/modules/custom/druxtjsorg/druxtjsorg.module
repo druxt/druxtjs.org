@@ -11,6 +11,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\simple_oauth\Authentication\TokenAuthUserInterface;
 
 /**
@@ -61,13 +62,14 @@ function druxtjsorg_druxt_resources_alter(array &$resources): void {
 /**
  * Implements hook_entity_access().
  *
- * Keeps a consumer-scoped resource's access from being cached.
+ * Grants a consumer-scoped resource to its consumer only, and never caches it.
  *
- * Druxt grants a listed resource and caches the answer, varied by nothing
- * that names the consumer, so an answer reached for one consumer would be
- * served to another. For a resource some consumer is scoped to, this gives
- * the same answer as Druxt with no lifetime, and access results merge their
- * cacheability, so the combined answer is never stored.
+ * Druxt decides by the route's resource type, so a read of a public resource
+ * can include a scoped one, and its answer varies by nothing that names the
+ * consumer. For a resource some consumer is scoped to, this allows only a
+ * token naming that consumer, as Druxt would, with no lifetime: an allowed
+ * result merges its cacheability into the combined answer, which is then
+ * never stored. Anyone else gets a neutral answer, also never stored.
  */
 function druxtjsorg_entity_access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResultInterface {
   $config = \Drupal::config('druxtjsorg.settings');
@@ -76,11 +78,13 @@ function druxtjsorg_entity_access(EntityInterface $entity, string $operation, Ac
     return $neutral;
   }
   $type = $entity->getEntityTypeId() . '--' . $entity->bundle();
-  $scoped = array_merge([], ...array_values($config->get('consumer_resources') ?? []));
-  if (!in_array($type, $scoped, TRUE)) {
+  $scoped = $config->get('consumer_resources') ?? [];
+  if (!in_array($type, array_merge([], ...array_values($scoped)), TRUE)) {
     return $neutral;
   }
-  return AccessResult::allowedIf(druxt_access_check($account))
-    ->addCacheableDependency($config)
-    ->setCacheMaxAge(0);
+  $token = $account instanceof AccountProxyInterface ? $account->getAccount() : $account;
+  $consumer = $token instanceof TokenAuthUserInterface ? $token->getConsumer() : NULL;
+  $mine = $consumer && in_array($type, $scoped[$consumer->getClientId()] ?? [], TRUE);
+  $result = $mine ? AccessResult::allowedIf(druxt_access_check($account)) : AccessResult::neutral();
+  return $result->addCacheableDependency($config)->setCacheMaxAge(0);
 }

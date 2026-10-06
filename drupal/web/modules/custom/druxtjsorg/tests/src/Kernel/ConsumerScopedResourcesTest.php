@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\druxtjsorg\Kernel;
 
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\consumers\Entity\Consumer;
+use Drupal\jsonapi\Routing\Routes;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\simple_oauth\Authentication\TokenAuthUserInterface;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use Drupal\user\Entity\Role;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Route;
 
 /**
  * Resources a named consumer may read, beyond the ones everybody may.
@@ -79,12 +83,13 @@ final class ConsumerScopedResourcesTest extends KernelTestBase {
   /**
    * An account authenticated by a token naming that consumer.
    */
-  private function tokenUser(Consumer $consumer): TokenAuthUserInterface {
+  private function tokenUser(Consumer $consumer, bool $druxt = FALSE): TokenAuthUserInterface {
     $account = $this->createUser();
     $token = $this->createMock(TokenAuthUserInterface::class);
     $token->method('getConsumer')->willReturn($consumer);
     $token->method('id')->willReturn($account->id());
     $token->method('isAuthenticated')->willReturn(TRUE);
+    $token->method('hasPermission')->willReturnCallback(fn (string $permission): bool => $druxt && $permission === 'access druxt resources');
     return $token;
   }
 
@@ -148,5 +153,35 @@ final class ConsumerScopedResourcesTest extends KernelTestBase {
     self::assertNotSame(0, druxtjsorg_entity_access($role, 'view', $account)->getCacheMaxAge(), 'an unscoped resource keeps its lifetime');
   }
 
+  /**
+   * Only the consumer a resource is scoped to is granted it.
+   *
+   * Druxt decides by the route, so a JSON:API read of a public resource,
+   * which can include a scoped one, passes its check for anyone with the
+   * Druxt permission. Anonymous and other consumers must not be granted the
+   * scoped entity that way.
+   */
+  public function testOnlyTheScopedConsumerIsGrantedIt(): void {
+    $this->config('druxtjsorg.settings')
+      ->set('consumer_resources', ['druxtjs_org' => ['user_role--user_role']])
+      ->save();
+    $route = new Route('/jsonapi/menu/menu', [
+      RouteObjectInterface::CONTROLLER_NAME => Routes::CONTROLLER_SERVICE_NAME . ':getCollection',
+      'resource_type' => 'menu--menu',
+    ], [], [], '', [], ['GET']);
+    $request = Request::create('/jsonapi/menu/menu');
+    $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, $route);
+    $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'jsonapi.menu--menu.collection');
+    $request->setSession($this->container->get('request_stack')->getCurrentRequest()->getSession());
+    $this->container->get('request_stack')->push($request);
+    $this->container->get('current_route_match')->resetRouteMatch();
+    user_role_grant_permissions('anonymous', ['access druxt resources']);
+    $role = Role::load('authenticated');
+
+    self::assertTrue(druxt_access_check(\Drupal::currentUser()), 'the route passes Druxt for anonymous');
+    self::assertFalse(druxtjsorg_entity_access($role, 'view', \Drupal::currentUser())->isAllowed(), 'anonymous');
+    self::assertFalse(druxtjsorg_entity_access($role, 'view', $this->tokenUser($this->consumer('somebody_else'), TRUE))->isAllowed(), 'another consumer');
+    self::assertTrue(druxtjsorg_entity_access($role, 'view', $this->tokenUser($this->consumer(), TRUE))->isAllowed(), 'its consumer');
+  }
 
 }
