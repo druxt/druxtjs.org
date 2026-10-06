@@ -9,16 +9,16 @@
     "node": ">=16.20.1"
   },
   "scripts": {
-    "setup": "npm run assemble && npm run provision && npm run import && sh scripts/link-content.sh && npm run start",
+    "setup": "npm run assemble && npm run provision && npm run docs:fetch && sh scripts/link-content.sh && npm run start",
     "assemble": "cd drupal && .devtools/assemble",
     "provision": "cd drupal && .devtools/provision",
-    "import": "cd drupal && .devtools/import",
     "start": "cd drupal && .devtools/start",
     "stop": "cd drupal && .devtools/stop",
     "info": "cd drupal && .devtools/info",
     "login": "sh scripts/login.sh",
     "dev": "sh scripts/dev.sh",
     "storybook": "cd nuxt && yarn storybook --port 3030",
+    "docs:fetch": "sh scripts/docs-fetch.sh",
     "docs:generate": "sh scripts/docs-generate.sh",
     "hooks:install": "git config core.hooksPath .githooks",
     "lint": "npm run lint:js && npm run lint:format && npm run lint:md && npm run lint:cspell && npm run lint:private && npm run lint:attribution && npm run lint:knip",
@@ -36,10 +36,8 @@
     "lint:prose": "PROSE_LINT_GLOB='!nuxt/**' bash .gitlab/scripts/lint-prose.sh --all",
     "lint:prose:install": "bash .gitlab/scripts/install-vale.sh .vale/bin .vale/styles",
     "prepare": "node scripts/prepare.mjs",
-    "survey:content": "node scripts/survey-content.mjs --source .docs-source --json scripts/content-baseline.json",
     "test": "node --test tests/*.test.mjs",
-    "test:coverage": "node -e \"const[a,b]=process.versions.node.split('.').map(Number);if(a<22||(a===22&&b<8)){console.error('test:coverage needs Node >= 22.8 for --experimental-test-coverage; use npm test on the Node 16 floor.');process.exit(1)}\" && mkdir -p reports && node --test --experimental-test-coverage --test-coverage-include=\"scripts/**\" --test-coverage-lines=88 --test-coverage-branches=87 --test-coverage-functions=87 --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=reports/junit.xml tests/*.test.mjs",
-    "validate:content": "node scripts/validate-content.mjs"
+    "test:coverage": "node -e \"const[a,b]=process.versions.node.split('.').map(Number);if(a<22||(a===22&&b<8)){console.error('test:coverage needs Node >= 22.8 for --experimental-test-coverage; use npm test on the Node 16 floor.');process.exit(1)}\" && mkdir -p reports && node --test --experimental-test-coverage --test-coverage-include=\"scripts/**\" --test-coverage-lines=88 --test-coverage-branches=87 --test-coverage-functions=87 --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=reports/junit.xml tests/*.test.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "17.8.1",

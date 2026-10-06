@@ -2,17 +2,16 @@
 
 Thanks for helping. This repository is the [druxtjs.org](https://druxtjs.org)
 documentation site, with a Drupal backend and a Nuxt frontend. The backend
-holds the content model, the importer that seeds it, and the site's
-configuration.
+holds the content model and the site's configuration.
 
 ## Repositories
 
-| Change                                                                                            | Where it goes                                                                                                                                                |
-| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| The text of a documentation page                                                                  | Drupal, where editors change it. The database is the source of truth, and page text is not taken as a pull request yet, so report a mistake as an issue here |
-| A Druxt Nuxt module                                                                               | [druxt/druxt.js](https://github.com/druxt/druxt.js)                                                                                                          |
-| The Druxt Drupal module                                                                           | [drupal.org/project/druxt](https://www.drupal.org/project/druxt)                                                                                             |
-| The frontend, the content model, the importer, the editing experience or the site's configuration | This repository. Open an issue or a pull request on [druxt/druxtjs.org](https://github.com/druxt/druxtjs.org)                                                |
+| Change                                                                              | Where it goes                                                                                                                                                |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The text of a documentation page                                                    | Drupal, where editors change it. The database is the source of truth, and page text is not taken as a pull request yet, so report a mistake as an issue here |
+| A Druxt Nuxt module                                                                 | [druxt/druxt.js](https://github.com/druxt/druxt.js)                                                                                                          |
+| The Druxt Drupal module                                                             | [drupal.org/project/druxt](https://www.drupal.org/project/druxt)                                                                                             |
+| The frontend, the content model, the editing experience or the site's configuration | This repository. Open an issue or a pull request on [druxt/druxtjs.org](https://github.com/druxt/druxtjs.org)                                                |
 
 ## Getting set up
 
@@ -28,8 +27,7 @@ npm run dev
 `npm install` also enables the git hooks. If you skipped install scripts, run
 `npm run hooks:install`, or the hooks stay on disk doing nothing.
 
-[docs/backend.md](docs/backend.md) covers the importer, page history and
-previews.
+[docs/backend.md](docs/backend.md) covers page history and previews.
 
 ## Before you push
 
@@ -41,7 +39,7 @@ npm run lint:prose     # Vale, after `npm run lint:prose:install` once
 
 The pre-commit hook runs the first two. The pipeline also runs the guardrail
 tests in `tests/`, PHPUnit in `drupal/`, commit message and YAML lint, a
-secret scan, and a provision and import from the pinned documentation. To run
+secret scan, and a provision from the committed configuration. To run
 PHPUnit yourself, run `vendor/bin/phpunit` in `drupal/` after
 `.devtools/assemble`.
 

@@ -70,7 +70,7 @@ npm run dev
 | Command         | What it does                                                                                                      |
 | --------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `npm install`   | Installs the root tooling and enables the git hooks                                                               |
-| `npm run setup` | Installs Drupal on a throwaway SQLite database and imports the documentation from druxt.js. Then it starts Drupal |
+| `npm run setup` | Installs Drupal on a throwaway SQLite database, fetches the pinned druxt.js for the API pages, then starts Drupal |
 | `npm run dev`   | Starts the Nuxt dev server against that Drupal. The first run installs the frontend's packages                    |
 | `npm run login` | Prints a one-time login link for Drupal                                                                           |
 
@@ -114,9 +114,8 @@ checkout. It installs and builds druxt.js first, so the first run is slow.
 | The frontend                                         | A pull request with the change in `nuxt/`                                                                              |
 | The text of a page                                   | Drupal, where editors change it. The database is the source of truth, and page text is not taken as a pull request yet |
 
-The site's content is stored in its database, and `npm run setup` seeds that
-database from a pinned commit of druxt.js. Edits in your local Drupal stay
-local.
+The site's content is stored in production's database. A local Drupal starts
+with no pages, and edits in it stay local.
 
 ## Druxt in the frontend
 
@@ -145,7 +144,7 @@ covers what a deployment does.
 
 | Command                  | What it does                                          |
 | ------------------------ | ----------------------------------------------------- |
-| `npm run setup`          | Install and import the backend, then start it         |
+| `npm run setup`          | Install the backend, then start it                    |
 | `npm run dev`            | Nuxt dev server against the backend                   |
 | `npm run storybook`      | Storybook on port 3030, against the backend           |
 | `npm run start` / `stop` | Start or stop Drupal                                  |
@@ -161,7 +160,7 @@ covers what a deployment does.
 See [CONTRIBUTING.md](CONTRIBUTING.md) for commit messages, checks and what
 never goes in a file. Open issues and pull requests on
 [druxt/druxtjs.org](https://github.com/druxt/druxtjs.org).
-[docs/backend.md](docs/backend.md) covers the importer and page history.
+[docs/backend.md](docs/backend.md) covers page history and previews.
 
 ## License
 

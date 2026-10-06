@@ -16,7 +16,6 @@
     "**/node_modules/**",
     ".npm/**",
     ".vale/**",
-    ".docs-ir/**",
     ".docs-source/**",
     "drupal/vendor/**",
     "drupal/web/core/**",

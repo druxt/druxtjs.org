@@ -64,9 +64,9 @@ subdomains, are set in `.lagoon.yml`.
    environment nobody can sign in to. Both are restored after the check that
    the sanitise happened, and never on production. Either
    way it then runs `drush deploy`, or installs from `drupal/config/sync`
-   when there is no database at all. It seeds from the pinned commit only
-   in that last case. It also creates
-   Simple OAuth's keys, once, on the files volume, and records the
+   when there is no database at all, which leaves the site empty. It
+   creates the frontend's OAuth consumer when there is none, and Simple
+   OAuth's keys, once, on the files volume, and records the
    revision it deployed.
 4. Once Drupal reports that revision, `nuxt` builds the app against it and
    starts serving. It then renders every page it can reach into its page
@@ -84,7 +84,7 @@ bar of three segments under it.
 
 | Phase      | What is happening                             |
 | ---------- | --------------------------------------------- |
-| `waiting`  | Drupal is still installing and importing      |
+| `waiting`  | Drupal is still installing or updating        |
 | `building` | The app is building against Drupal            |
 | `starting` | The build is done and the server is coming up |
 | `failed`   | The build failed, and the container restarts  |

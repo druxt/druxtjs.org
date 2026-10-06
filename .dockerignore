@@ -1,7 +1,6 @@
 .git
 **/node_modules
 .docs-source
-.docs-ir
 reports
 drupal/vendor
 drupal/keys

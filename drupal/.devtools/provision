@@ -15,11 +15,8 @@
  * keeps `provision` working on the commit that adds the content model and
  * on every commit before it.
  *
- * Content is never installed here. It lives in the site's database rather
- * than in the repository, so a provisioned site starts empty and
- * `.devtools/import` seeds it. That is also what lets the import job assert
- * something: from an empty site, an importer that writes nothing leaves a
- * page count of zero instead of hiding behind content the install loaded.
+ * Content is never installed here. It lives in production's database, not
+ * in the repository, so a provisioned site starts empty.
  *
  * The SQLite override lives in `web/sites/default/settings.local.php`
  * (gitignored), not `settings.php`. Only `default.settings.php` is
@@ -91,7 +88,7 @@ $has_config = file_exists('config/sync/core.extension.yml');
 // The committed config is authored against whatever database the editorial
 // environment uses, and Drupal refuses to uninstall the module providing the
 // active database driver. Enabling sqlite in this checkout only keeps the
-// import from failing without changing what is committed.
+// config import from failing without changing what is committed.
 $extension_yml = 'config/sync/core.extension.yml';
 $extension_patched = FALSE;
 if ($has_config) {
@@ -148,7 +145,7 @@ echo '===============================' . PHP_EOL;
 echo PHP_EOL;
 echo 'Database: ' . $db_file . PHP_EOL;
 echo 'Config:   ' . ($has_config ? 'imported' : 'none committed yet') . PHP_EOL;
-echo 'Content:  ' . 'none, run .devtools/import to seed it' . PHP_EOL;
+echo 'Content:  ' . 'none, production holds it' . PHP_EOL;
 echo PHP_EOL;
 echo '> Next steps:' . PHP_EOL;
 echo '  .devtools/start    # Start the webserver' . PHP_EOL;
