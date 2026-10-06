@@ -17,6 +17,10 @@ Druxt 1.0.0.
   the index and the three menus, four of its backend calls. The path lookup,
   the page and its blocks are still fetched per render. A request with an
   Authorization header or a session cookie never reads or writes that cache.
+- A change to a display in Drupal shows without a rebuild. The Nuxt server
+  regenerates a schema the first time a page needs it after a cache clear,
+  from druxt.js pull request 903, carried as patches to `druxt` and
+  `druxt-schema`.
 - Purge clears that cache when content changes: `purge_queuer_coretags`
   queues the tags a save invalidates, the bundled HTTP purger sends one
   `POST /_druxt/cache/clear` per batch with the shared secret, and the
@@ -34,10 +38,14 @@ Druxt 1.0.0.
 - Drupal core 11.4.8, the security release. The two JSON:API patches apply
   to it unchanged.
 - `druxt`, `druxt-blocks`, `druxt-breadcrumb`, `druxt-entity`, `druxt-menu`,
-  `druxt-router`, `druxt-schema`, `druxt-site` and `druxt-views` are vendored
-  from the 0.25.0 candidate under `nuxt/vendor/`, so the site runs it on
-  Lagoon before it is released. Each carries a `VENDORED.md` naming the
-  commit.
+  `druxt-router`, `druxt-schema`, `druxt-site` and `druxt-views` are on the
+  Druxt development snapshot 20261006094246, so the site runs 0.25.0 on
+  Lagoon before it is released.
+
+### Fixed
+
+- The page cache no longer stores `/_druxt/` routes as pages, which would
+  have served HTML in place of a refreshed schema.
 
 ## [0.10.0] - 2026-09-27
 
