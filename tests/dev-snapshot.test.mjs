@@ -160,7 +160,7 @@ describe('sources', async () => {
     assert.match(calls.at(-1).url, /registry\.npmjs\.org\/-\/package\/druxt\/dist-tags$/)
   })
 
-  it("reads druxt.js's successful Release runs on develop, with a token when there is one", async (t) => {
+  it("reads druxt.js's successful Release runs on 0.x, with a token when there is one", async (t) => {
     const saved = process.env.GITHUB_TOKEN
     t.after(() => {
       globalThis.fetch = realFetch
@@ -172,7 +172,7 @@ describe('sources', async () => {
     assert.deepEqual(await sources.releaseRuns(), runs)
     assert.match(
       calls.at(-1).url,
-      /druxt\.js\/actions\/workflows\/release\.yml\/runs\?branch=develop&event=push&status=success/
+      /druxt\.js\/actions\/workflows\/release\.yml\/runs\?branch=0\.x&event=push&status=success/
     )
     assert.equal(calls.at(-1).headers.Authorization, 'Bearer token')
     delete process.env.GITHUB_TOKEN
