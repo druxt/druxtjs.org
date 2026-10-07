@@ -51,7 +51,10 @@ subdomains, are set in `.lagoon.yml`.
    caches, sessions, logs and tokens are copied without their rows. It copies the dump production writes nightly
    (`lagoon/dump-for-environments.sh`, under the private files directory
    nginx does not serve) and falls back to reading production's live
-   database only when that file is not there. `DOCS_SKIP_SYNC=1` keeps the
+   database only when that file is not there. Production's public files
+   come with it, since the content's images live there and not in the
+   database; its private files (keys, the dump, the rollout's markers) stay
+   each environment's own. `DOCS_SKIP_SYNC=1` keeps the
    database an environment already has. Production syncs from nothing.
    Sanitising replaces every password and every address, so two things are
    put back: an address at the maintainers' domain

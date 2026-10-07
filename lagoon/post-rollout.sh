@@ -108,6 +108,21 @@ load_from_production() {
   drush sql:sync "$production_alias" @self --yes --structure-tables-list="$volatile_tables"
 }
 
+# The public files the copied content refers to. Images and documents live in
+# production's files directory, not its database, so a copy of the one
+# without the other shows every image broken. Private files stay each
+# environment's own: its keys, the dump and the rollout's markers. Derived
+# files are left to Drupal, which makes them again on demand.
+copy_files_from_production() {
+  echo "Copying production's public files."
+  if drush rsync -y "${production_alias}:%files/" "$app/drupal/web/sites/default/files/" -- \
+    --exclude=/private --exclude=/php --exclude=/css --exclude=/js --exclude=/styles 2>/dev/null; then
+    echo "  copied."
+  else
+    echo "  could not copy production's files; images the content refers to may be missing here."
+  fi
+}
+
 # The addresses that survive the sanitise: this site's own maintainers, so
 # someone editing a non-production environment is the person they are in
 # production. Every other address is scrubbed.
@@ -266,6 +281,7 @@ if may_sync; then
   echo "  target: ${environment_name:-unnamed} (${environment_type:-untyped})"
   echo "  source: ${production_alias}"
   load_from_production
+  copy_files_from_production
   sanitise
 fi
 

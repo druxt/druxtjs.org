@@ -295,6 +295,18 @@ else
   no "went straight to the live database without trying the scheduled dump"
 fi
 
+# Production's public files come with its database; its private files do not.
+if grep -q 'rsync -y .*:%files/ .*sites/default/files/' "$app/calls.log"; then
+  ok "copies production's public files after its database"
+else
+  no "left production's public files behind, so the content's images are missing"
+fi
+if grep 'rsync -y .*:%files/ ' "$app/calls.log" | grep -q -- '--exclude=/private'; then
+  ok "leaves production's private files where they are"
+else
+  no "copied production's private files: keys, dumps and markers"
+fi
+
 # --------------------------------------------------------------------------
 # The deployed revision is recorded last, and only when there is one.
 # --------------------------------------------------------------------------
