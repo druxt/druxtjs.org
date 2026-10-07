@@ -6,9 +6,9 @@
  * druxt was a thank-you from 2020. Each page gets its package's name instead.
  */
 
-/** A package's release notes, keyed by the unprefixed directory docgen uses. */
 const { packageName } = require('./site')
 
+/** A package's release notes, keyed by the unprefixed directory docgen uses. */
 const RELEASE_NOTES = /^\/api\/packages\/([^/]+)\/CHANGELOG\/?$/
 
 /**

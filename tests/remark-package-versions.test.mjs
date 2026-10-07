@@ -90,6 +90,11 @@ describe('remark-package-versions', () => {
     const config = readFileSync(new URL('../nuxt/nuxt.config.js', import.meta.url), 'utf8')
     assert.match(config, /remarkPlugins: \['~\/lib\/remark-package-versions\.js'\]/)
     assert.ok(existsSync(new URL('../nuxt/lib/remark-package-versions.js', import.meta.url)))
+    // What the content module calls: the export is a plugin, and attaching it
+    // yields the transformer.
+    const plugin = require('../nuxt/lib/remark-package-versions.js')
+    assert.equal(typeof plugin, 'function')
+    assert.equal(typeof plugin(), 'function')
   })
 
   test('a changelog line keeps its text, with each package as code', () => {
