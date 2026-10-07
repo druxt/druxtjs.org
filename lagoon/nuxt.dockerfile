@@ -29,6 +29,8 @@ FROM amazeeio/node:16@sha256:11f2d4ce2e741dbdc87cf4929e3a30f0d06ece1e137b33073aa
 COPY --from=deps --chown=10000:0 /app /app
 COPY --chown=10000:0 nuxt /app
 COPY --from=docs --chown=10000:0 /src/docs/nuxt/content /app/content
+# The version the badge names: druxt at the pinned commit, not the installed one.
+COPY --from=docs --chown=10000:0 /src/packages/druxt/package.json /app/.pinned-druxt.json
 ENV HOST=0.0.0.0 PORT=3000 DRUXT_BASE_URL=http://nginx:8080
 EXPOSE 3000
 CMD ["node", "server/start.js"]

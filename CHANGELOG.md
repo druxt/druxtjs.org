@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/). Versions
 count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
 Druxt 1.0.0.
 
+## [Unreleased]
+
+### Changed
+
+- The Druxt packages follow npm's `dev` tag, the development release the
+  druxt.js README describes, so the 0.25.0 work runs here before it is
+  released. The footer badge names the version the documentation describes,
+  `druxt` at the pinned commit, so a development release never shows there.
+- The site no longer registers Druxt's components as synchronous imports
+  itself. The modules register them that way now, so the hook that worked
+  around the first-load refetch is gone.
+
 ## [0.10.0] - 2026-09-27
 
 ### Changed

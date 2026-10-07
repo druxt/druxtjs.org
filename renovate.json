@@ -13,6 +13,22 @@
       "enabled": false
     },
     {
+      "description": "The Druxt packages follow npm's `dev` tag until 0.25.0 is released, and a tag is not a version to update. Move them by hand.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "druxt",
+        "druxt-blocks",
+        "druxt-breadcrumb",
+        "druxt-entity",
+        "druxt-menu",
+        "druxt-router",
+        "druxt-schema",
+        "druxt-site",
+        "druxt-views"
+      ],
+      "enabled": false
+    },
+    {
       "description": "The root lint tooling is held at the last versions that run on Node 16.20.1, the Node Nuxt 2 builds with. Move it with the Node upgrade, not before.",
       "matchManagers": ["npm"],
       "matchFileNames": ["package.json"],
