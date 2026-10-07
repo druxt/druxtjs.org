@@ -1,4 +1,6 @@
 {
   "repository": "https://github.com/druxt/druxt.js.git",
-  "ref": "e7bddfe32f5c00083a4eb650f1106414279442d3"
+  "ref": "e7bddfe32f5c00083a4eb650f1106414279442d3",
+  "docgenRef": "25d6fb86b6fabeb899b1ca2736432f0749189556",
+  "snapshot": "20261006113740"
 }
