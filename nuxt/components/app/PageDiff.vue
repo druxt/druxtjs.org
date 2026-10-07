@@ -80,8 +80,10 @@ export default {
     goneLabel: ({ shown }) => (shown.kind === 'draft' ? 'Removed in this draft' : 'Not in this revision'),
     /** The jsonapi_diff version on the right: the draft, or a revision by id. */
     rightVersion: ({ shown }) => (shown.kind === 'draft' ? 'rel:working-copy' : shown.revision ? `id:${shown.revision.vid}` : null),
+    // Both sides have to be known: a revision chosen by id has no right side
+    // until the revision list has it.
     key: ({ editor, leftVersion, rightVersion, active }) =>
-      active && editor.page && leftVersion ? `${editor.page.uuid}@${leftVersion}..${rightVersion}` : null,
+      active && editor.page && leftVersion && rightVersion ? `${editor.page.uuid}@${leftVersion}..${rightVersion}` : null,
   },
 
   watch: {
