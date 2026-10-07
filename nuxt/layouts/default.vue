@@ -72,7 +72,7 @@ export default {
 
   computed: {
     /** The version badge: a development build names its tag, with the build time in the title. */
-    badge: ({ $config }) => ($config.druxtVersion ? 'v' + $config.druxtVersion.replace(/-dev\.\d{14}$/, '-dev') : null),
+    badge: ({ $config }) => ($config.druxtVersion ? 'v' + $config.druxtVersion.replace(/-dev\.\d+$/, '-dev') : null),
     versionTitle: ({ $config }) => ($config.druxtVersion ? 'v' + $config.druxtVersion : null),
     /** Home, sign-in and the OAuth callback are full-bleed; everything else is documentation. */
     isDocs: ({ $route }) => !['/', '/login', '/callback'].includes($route.path.replace(/(.)\/$/, '$1')),
