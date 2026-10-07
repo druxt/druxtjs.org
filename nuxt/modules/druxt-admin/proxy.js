@@ -110,11 +110,20 @@ const ASSET_FILE = /\.(css|js|mjs|map|json|png|jpe?g|gif|svg|webp|avif|ico|woff2
  */
 const UNSAFE_PATH = /(^|\/)\.\.?(\/|$)|%2e|%2f|%5c|\\/i
 
-/** Whether a request is Drupal's to answer. */
+/**
+ * Whether a request is Drupal's to answer.
+ *
+ * `options.except` is the way back out: a site that renders one of these
+ * paths itself passes a pattern for it, and the proxy leaves it alone. A
+ * decoupled site that renders profiles is the case this exists for, because
+ * `/user` has to be proxied whole for the login form's cookie and `/user/2`
+ * sits inside it.
+ */
 export function shouldProxy(path, options = {}) {
   const subject = String(path || '').split('?')[0]
   if (!subject) return false
   if (UNSAFE_PATH.test(subject)) return false
+  if ((options.except || []).some((pattern) => pattern.test(subject))) return false
   if (isAdminPath(subject, options.paths || ADMIN_PATHS)) return true
   if (EDIT_PATH.test(subject)) return true
   if (FILES_PATH.test(subject)) return true

@@ -3357,13 +3357,22 @@ __metadata:
 
 "@druxt-contrib/diff@file:vendor/druxt-diff::locator=druxtjs-org%40workspace%3A.":
   version: 0.0.0
-  resolution: "@druxt-contrib/diff@file:vendor/druxt-diff#vendor/druxt-diff::hash=59b74e&locator=druxtjs-org%40workspace%3A."
+  resolution: "@druxt-contrib/diff@file:vendor/druxt-diff#vendor/druxt-diff::hash=831661&locator=druxtjs-org%40workspace%3A."
   peerDependencies:
     vue: ^2.7.0
   peerDependenciesMeta:
     vue:
       optional: true
-  checksum: 350ededd3f4901c18a2c102cdd1beebd17597c092796e779b1cc08be31d45ab5cc732d5c3916377a4c18c833c29e928d95a5e183320fa3d33913fdfc429fc3fa
+  checksum: 9d92451727018bf97ce3e91c0bcb6de91e35b757639750cb7c7571ab887ddc1b759ea4f6297a981667371858883d76ed552a2c86a23bd548ae551abbe7b32000
+  languageName: node
+  linkType: hard
+
+"@druxt-contrib/user@file:vendor/druxt-user::locator=druxtjs-org%40workspace%3A.":
+  version: 0.0.0
+  resolution: "@druxt-contrib/user@file:vendor/druxt-user#vendor/druxt-user::hash=06dbb2&locator=druxtjs-org%40workspace%3A."
+  dependencies:
+    drupal-jsonapi-params: ^2.3.1
+  checksum: 5e09161a85f9275b9ac300860749706e7e8fd92fd2681b4682f2f90d3f0ed30f0db85ec30335602652e54326c72b558f52bd3c0231dc1a6fdbf4bba7a2a3a873
   languageName: node
   linkType: hard
 
@@ -10916,7 +10925,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"drupal-jsonapi-params@npm:2.3.2, drupal-jsonapi-params@npm:^2.3.2":
+"drupal-jsonapi-params@npm:2.3.2, drupal-jsonapi-params@npm:^2.3.1, drupal-jsonapi-params@npm:^2.3.2":
   version: 2.3.2
   resolution: "drupal-jsonapi-params@npm:2.3.2"
   dependencies:
@@ -11116,6 +11125,7 @@ __metadata:
     "@babel/plugin-proposal-private-property-in-object": ^7.21.11
     "@druxt-contrib/anchors": "file:vendor/druxt-anchors"
     "@druxt-contrib/diff": "file:vendor/druxt-diff"
+    "@druxt-contrib/user": "file:vendor/druxt-user"
     "@nuxt/content": 1.15.1
     "@nuxt/postcss8": 1.1.3
     "@nuxtjs/color-mode": 2.1.1

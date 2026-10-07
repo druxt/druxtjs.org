@@ -118,8 +118,20 @@
 <script>
 import { signInError } from '~/lib/account'
 
-/** The druxt-auth strategy this form signs in with. */
-const STRATEGY = 'drupal-authorization_code'
+/**
+ * The druxt-auth strategy this form signs in with: the password grant, through
+ * simple_oauth_password_grant. The site's own server exchanges the credentials
+ * for a token, so there is no browser redirect, and no session left open in
+ * the browser can decide who the token belongs to.
+ */
+const STRATEGY = 'drupal-password'
+
+/**
+ * The scopes a sign-in asks for: one per role an editor might hold. A token
+ * carries only those the account also has, so each person gets their own.
+ * The consumer's list is `OAuthClient::SCOPES` in the druxtjsorg module.
+ */
+const SCOPES = ['authenticated', 'editor', 'contributor', 'administrator']
 
 /**
  * The site's own sign-in form.
@@ -171,8 +183,33 @@ export default {
       this.error = null
       try {
         this.$auth.$storage.setUniversal('redirect', this.destination || this.$route.fullPath)
-        // Navigates away to the authorize step; nothing after this runs on success.
-        await this.$auth.loginWith(STRATEGY, { credentials: { name: this.name.trim(), pass: this.pass } })
+        // The password grant: the site's own server exchanges these for a
+        // token. No redirect, so this does return, and the reader is sent on
+        // from here rather than by a callback.
+        await this.$auth.loginWith(STRATEGY, {
+          data: {
+            grant_type: 'password',
+            username: this.name.trim(),
+            password: this.pass,
+            scope: SCOPES.join(' '),
+          },
+        })
+        // The password grant returns rather than redirecting, so nothing
+        // tears this down for us: the dialog has to be closed and the reader
+        // moved on from here. The redirect flow did both by navigating away.
+        this.$store.commit('setSignIn', false)
+        // The spinner is this component's, and this component survives: the
+        // redirect flow used to take the whole page with it.
+        this.busy = false
+        const to = this.destination || this.$route.fullPath
+        if (to !== this.$route.fullPath) {
+          this.$router.push(to)
+        } else if (this.$nuxt && this.$nuxt.refresh) {
+          // Staying put: the page was read as an anonymous visitor, so it
+          // carries no editor context and the bar would sit idle on a page
+          // Drupal does hold. Reading it again as this account fills it in.
+          this.$nuxt.refresh()
+        }
       } catch (error) {
         // A session already open is refused by the scheme rather than reused,
         // so it arrives as an error of its own with nothing from Drupal on it.

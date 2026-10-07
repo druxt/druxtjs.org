@@ -53,6 +53,7 @@
     "prettier": "3.3.3"
   },
   "dependencies": {
+    "@druxt-contrib/anchors": "file:nuxt/vendor/druxt-anchors",
     "@druxt-contrib/diff": "file:nuxt/vendor/druxt-diff"
   }
 }
