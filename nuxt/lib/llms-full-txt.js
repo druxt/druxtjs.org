@@ -47,6 +47,10 @@ const SECTION_ORDER = ['tutorials', 'how-to', 'explanation', 'modules', 'api']
  */
 const isChangelog = (route) => route.endsWith('/CHANGELOG')
 
+/** Whether a document goes into the file: a guide or reference page with a body. */
+const included = (doc) =>
+  SECTION_ORDER.includes(doc.section) && (doc.content || '').trim() && !isChangelog(doc.route)
+
 /**
  * Rewrite root-relative links to absolute ones.
  *
@@ -91,7 +95,7 @@ const buildLlmsFullTxt = (docs, options) => {
 
   SECTION_ORDER.forEach((section) => {
     const entries = docs
-      .filter((doc) => doc.section === section && (doc.content || '').trim() && !isChangelog(doc.route))
+      .filter((doc) => doc.section === section && included(doc))
       .sort((a, b) => (a.weight - b.weight) || a.route.localeCompare(b.route))
 
     if (!entries.length) return
@@ -133,7 +137,8 @@ const scanFences = (markdown) => {
   const headings = []
   let fence = null
 
-  markdown.split('\n').forEach((text, index) => {
+  const lines = markdown.split('\n')
+  lines.forEach((text, index) => {
     const marker = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(text)
     if (fence) {
       if (marker && marker[1][0] === fence.char && marker[1].length >= fence.length && !marker[2].trim()) fence = null
@@ -142,6 +147,14 @@ const scanFences = (markdown) => {
     } else {
       const heading = /^ {0,3}(#{1,6})(\s|$)/.exec(text)
       if (heading) headings.push({ line: index + 1, level: heading[1].length, text })
+      // A setext heading: a line of = or - under a line of text, which
+      // CommonMark reads as an H1 or H2 just as it reads the # forms.
+      const underline = /^ {0,3}(=+|-+)\s*$/.exec(text)
+      const above = index > 0 ? lines[index - 1] : ''
+      const last = headings[headings.length - 1]
+      if (underline && above.trim() && !(last && last.line === index)) {
+        headings.push({ line: index, level: underline[1][0] === '=' ? 1 : 2, text: above })
+      }
     }
   })
 
@@ -166,15 +179,26 @@ const outlineProblems = (docs, text) => {
   const expected = ['# ' + SITE_NAME, ...SECTION_ORDER.map((section) => '# ' + SECTIONS[section].label)]
   const problems = []
 
-  docs.forEach((doc) => {
-    const open = scanFences(doc.content || '').open
-    if (open) problems.push(doc.route + ' line ' + open + ': code fence never closes')
+  // Only the pages the file carries: a fence left open in a changelog, which
+  // the file drops, breaks nothing. An H1 in a body is reported here with its
+  // page, whatever its text: one that reads like a section heading would
+  // otherwise pass the file-level check below.
+  const inBodies = new Set()
+  docs.filter(included).forEach((doc) => {
+    const body = scanFences(doc.content)
+    if (body.open) problems.push(doc.route + ' line ' + body.open + ': code fence never closes')
+    body.headings
+      .filter((heading) => heading.level === 1)
+      .forEach((heading) => {
+        inBodies.add(heading.text)
+        problems.push(doc.route + ' line ' + heading.line + ': top-level heading "' + heading.text + '" in a page body')
+      })
   })
 
   const file = scanFences(text)
   file.headings
     .filter((heading) => heading.level === 1)
-    .filter((heading) => !expected.includes(heading.text))
+    .filter((heading) => !expected.includes(heading.text) && !inBodies.has(heading.text))
     .forEach((heading) => problems.push('line ' + heading.line + ': unexpected top-level heading "' + heading.text + '"'))
   if (file.open) problems.push('line ' + file.open + ': code fence never closes')
 

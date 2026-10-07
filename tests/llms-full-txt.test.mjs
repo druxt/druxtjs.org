@@ -174,8 +174,33 @@ describe('outlineProblems', () => {
   test('reports a heading in a body, which claims the sections after it', () => {
     const found = outline('# NUXT_TARGET=static')
 
-    assert.equal(found.length, 1)
-    assert.match(found[0], /unexpected top-level heading "# NUXT_TARGET=static"/)
+    assert.deepEqual(found, [
+      '/how-to/theming line 1: top-level heading "# NUXT_TARGET=static" in a page body',
+    ])
+  })
+
+  test('reports a body heading that reads like a section heading, which the file alone accepts', () => {
+    const found = outline('Intro.\n\n# Tutorials\n\nMore.')
+
+    assert.deepEqual(found, [
+      '/how-to/theming line 3: top-level heading "# Tutorials" in a page body',
+    ])
+  })
+
+  test('reports a setext heading, which a CommonMark reader takes as an H1', () => {
+    const found = outline('Overview\n========\n\nText.')
+
+    assert.deepEqual(found, ['/how-to/theming line 1: top-level heading "Overview" in a page body'])
+  })
+
+  test('ignores a page the file drops, such as a changelog with a fence left open', () => {
+    const found = problems([
+      doc(),
+      doc({ route: '/api/packages/druxt/CHANGELOG', section: 'api', content: '```sh\n# .env' }),
+      doc({ route: '/playground', section: 'playground', content: '```sh\n# .env' }),
+    ])
+
+    assert.deepEqual(found, [])
   })
 
   test('closes a fence only on a matching marker at least as long', () => {
@@ -198,6 +223,13 @@ describe('scanFences', () => {
       ],
       open: null,
     })
+  })
+
+  test('reads setext headings at the level their underline gives them', () => {
+    assert.deepEqual(scanFences('Guide\n=====\n\nPage\n----\n\n---\n\n```\nx\n===\n```').headings, [
+      { line: 1, level: 1, text: 'Guide' },
+      { line: 4, level: 2, text: 'Page' },
+    ])
   })
 })
 

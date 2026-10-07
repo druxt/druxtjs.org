@@ -88,3 +88,4 @@ Revisionable
 SAMESITE
 SIMPLETEST
 coderabbit
+setext
