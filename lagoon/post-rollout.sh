@@ -31,8 +31,8 @@ volatile_tables="cache,cache_*,cachetags,semaphore,sessions,watchdog,flood,key_v
 
 # While this exists Drupal answers every web request with a 503
 # (settings.replacing.php). A request that bootstraps Drupal against a
-# half-imported database writes into it, and the import then collides with
-# its own rows.
+# half-copied database writes into it, and the copy then collides with its
+# own rows.
 replacing="$app/drupal/web/sites/default/files/private/.replacing-database"
 
 # How often the marker says the rollout is still going, and the pid of the

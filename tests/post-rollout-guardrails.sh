@@ -291,7 +291,7 @@ fi
 
 # --------------------------------------------------------------------------
 # Drupal refuses web requests while its database is replaced, so nothing
-# writes into a half-imported database, and the copy leaves out what a
+# writes into a half-copied database, and the copy leaves out what a
 # request would write.
 # --------------------------------------------------------------------------
 

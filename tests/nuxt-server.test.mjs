@@ -685,19 +685,19 @@ describe('backend', () => {
     assert.equal(backendOrigin({}), 'http://127.0.0.1:8899')
   })
 
-  test('is ready once the footer menu has items', async () => {
+  test('is ready once the JSON:API index answers', async () => {
     let answer
     const drupal = (req, res) => {
-      const [status, body] = req.url === '/jsonapi/menu_items/footer' ? answer : [404, '{}']
+      const [status, body] = req.url === '/jsonapi' ? answer : [404, '{}']
       res.writeHead(status, { 'Content-Type': 'application/vnd.api+json' })
       res.end(body)
     }
     await withServer(drupal, async (base) => {
       for (const [status, body, expected] of [
-        [200, '{"data":[{"id":"a"}]}', true],
+        [200, '{"jsonapi":{"version":"1.0"},"links":{"self":{"href":"/jsonapi"}}}', true],
         [200, '{"data":[]}', false],
         [200, '<html>', false],
-        [404, '{"data":[{"id":"a"}]}', false],
+        [404, '{"links":{}}', false],
       ]) {
         answer = [status, body]
         assert.equal(await backendReady(base), expected, `${status} ${body}`)
@@ -731,13 +731,13 @@ describe('backend', () => {
 
   test('is ready once Drupal reports the revision this build is from', async () => {
     let deployment
-    let footer = [200, '{"data":[{"id":"a"}]}']
+    let index = [200, '{"links":{}}']
     const drupal = (req, res) => {
       const [status, body] =
         req.url === '/druxt-docs/deployment'
           ? deployment
-          : req.url === '/jsonapi/menu_items/footer'
-            ? footer
+          : req.url === '/jsonapi'
+            ? index
             : [404, '{}']
       res.writeHead(status, { 'Content-Type': 'application/json' })
       res.end(body)
@@ -747,8 +747,8 @@ describe('backend', () => {
       deployment = [200, '{"revision":"abc123"}']
       assert.equal(await deploymentReady(base, { revision: 'abc123' }), true, 'matching revision')
 
-      // An older revision keeps it waiting, even though the footer menu
-      // has items, which is exactly the case the old probe passed.
+      // An older revision keeps it waiting, even though the index answers,
+      // which is exactly the case the fallback probe passes.
       deployment = [200, '{"revision":"older"}']
       assert.equal(await deploymentReady(base, { revision: 'abc123' }), false, 'older revision')
 
@@ -761,23 +761,23 @@ describe('backend', () => {
       )
 
       // No endpoint means a backend deployed before this existed, so the
-      // footer-menu probe decides, in both directions.
+      // index probe decides, in both directions.
       deployment = [404, '{}']
       assert.equal(
         await deploymentReady(base, { revision: 'abc123' }),
         true,
-        'no endpoint, menu has items'
+        'no endpoint, index answers'
       )
-      footer = [200, '{"data":[]}']
+      index = [503, '{}']
       assert.equal(
         await deploymentReady(base, { revision: 'abc123' }),
         false,
-        'no endpoint, menu empty'
+        'no endpoint, index down'
       )
 
       // Without a revision of its own there is nothing to compare, so the
       // gate does not apply and the fallback decides.
-      footer = [200, '{"data":[{"id":"a"}]}']
+      index = [200, '{"links":{}}']
       deployment = [200, '{"revision":"anything"}']
       assert.equal(await deploymentReady(base, {}), true, 'no local revision')
     })

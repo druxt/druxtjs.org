@@ -35,15 +35,16 @@ const getJson = (url, timeout = 10000) =>
   })
 
 /**
- * Whether Drupal holds the imported documentation. The footer menu is the
- * importer's last migration, so its items mean the import has finished.
+ * Whether Drupal answers for the site: its JSON:API index, which is there
+ * once the site is installed. A copied database carries its content by
+ * then, and an environment started empty has nothing further to wait for.
  *
  * @param {string} baseUrl - Drupal's base URL.
- * @returns {Promise<boolean>} True once the footer menu has items.
+ * @returns {Promise<boolean>} True once the JSON:API index answers.
  */
 const backendReady = async (baseUrl) => {
-  const menu = await getJson(new URL('/jsonapi/menu_items/footer', baseUrl).href)
-  return Boolean(menu && Array.isArray(menu.data) && menu.data.length)
+  const index = await getJson(new URL('/jsonapi', baseUrl).href)
+  return Boolean(index && index.links)
 }
 
 /**
