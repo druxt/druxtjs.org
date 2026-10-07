@@ -81,6 +81,8 @@ Druxt 1.0.0.
   the API reference. The migrate packages stay in `composer.json` until every
   database has imported their uninstall, since Drupal needs a module's code
   to uninstall it. A later change removes them.
+- The Tome backup under `drupal/content` and `drupal/files`, an export of the
+  content from before the database was its only copy, which nothing read.
 
 ### Fixed
 
