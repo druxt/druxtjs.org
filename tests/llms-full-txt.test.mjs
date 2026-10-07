@@ -224,6 +224,24 @@ describe('outlineProblems', () => {
     ])
   })
 
+  test('closes a fence in a list item whose content column is four or more', () => {
+    assert.deepEqual(outline('*   ```sh\n    # .env\n    ```\n\nText.'), [])
+    assert.deepEqual(outline('1.  ```sh\n    # .env\n    ```'), [])
+    assert.deepEqual(outline('1. Step\n   - ```sh\n     # .env\n     ```\n   - Next'), [])
+    // A column-0 marker ends the item, closing its fence, and opens one of its own.
+    assert.match(outline('*   ```sh\n    # .env\n```')[0], /line 3: code fence never closes/)
+  })
+
+  test('leaves a list item as a list item under an underline, not a setext heading', () => {
+    assert.deepEqual(outline('- Overview\n===\n\nText.'), [])
+  })
+
+  test('lets a tag follow paragraph text without opening an HTML block', () => {
+    assert.deepEqual(outline('Text\n<span>x</span>\n# Loose'), [
+      '/how-to/theming line 3: top-level heading "# Loose" in a page body',
+    ])
+  })
+
   test('reads an unindented marker after a list-item fence as a new fence, not the closer', () => {
     const found = outline('- ```sh\n  # .env\n```\n## Next')
 

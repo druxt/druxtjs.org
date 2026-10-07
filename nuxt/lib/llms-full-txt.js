@@ -173,10 +173,12 @@ const scanFences = (markdown) => {
         fence = null
         return read(line, index)
       }
-      const closer = fenceMarker(line)
+      // The closer sits at the fence's own column, up to three spaces past it,
+      // which inside a list item is past the three a bare marker may take.
+      const run = line.trimStart()
       const closes =
-        closer && !closer.indent && closer.char === fence.char && closer.length >= fence.length
-        && !closer.info.trim() && indentOf(line) <= fence.indent + 3
+        indentOf(line) <= fence.indent + 3 && run[0] === fence.char
+        && /^(`+|~+)\s*$/.test(run) && run.trim().length >= fence.length
       if (closes) fence = null
       text = false
       return
@@ -191,9 +193,9 @@ const scanFences = (markdown) => {
       text = false
       return
     }
-    if (/^ {0,3}<[a-zA-Z/!?]/.test(line)) {
+    // A tag opens an HTML block only between paragraphs: it cannot interrupt one.
+    if (!text && /^ {0,3}<[a-zA-Z/!?]/.test(line)) {
       html = 'tag'
-      text = false
       return
     }
     const opener = fenceMarker(line)
@@ -208,7 +210,9 @@ const scanFences = (markdown) => {
     const underline = /^ {0,3}(=+|-+)\s*$/.exec(line)
     if (heading) headings.push({ line: index + 1, level: heading[1].length, text: line })
     else if (underline && text) headings.push({ line: index, level: underline[1][0] === '=' ? 1 : 2, text: lines[index - 1] })
-    text = !heading && !underline && Boolean(line.trim())
+    // A list item's first line is not paragraph text an underline can follow:
+    // the underline would have to be indented to the item to belong to it.
+    text = !heading && !underline && !/^ {0,3}(?:[-*+]|\d{1,9}[.)])(\s|$)/.test(line) && Boolean(line.trim())
   }
 
   lines.forEach(read)
