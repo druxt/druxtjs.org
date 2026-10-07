@@ -67,6 +67,13 @@ module:
   page_cache: 0
   path: 0
   path_alias: 0
+  purge: 0
+  purge_drush: 0
+  purge_processor_lateruntime: 0
+  purge_purger_http: 0
+  purge_queuer_coretags: 0
+  purge_tokens: 0
+  purge_ui: 0
   redirect: 0
   serialization: 0
   simple_oauth: 0

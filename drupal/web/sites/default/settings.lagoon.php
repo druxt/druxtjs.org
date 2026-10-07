@@ -77,6 +77,22 @@ if ($frontend) {
   $settings['druxt_docs_frontend_url'] = rtrim($frontend, '/');
 }
 
+// Purge clears the Nuxt server's shared JSON:API cache when content changes.
+// The purger is exported with a placeholder; the address and the secret come
+// from this environment. The secret is the value the Nuxt server holds as
+// druxt.cache.secret.
+$purger = 'purge_purger_http.settings.705a5122da';
+$lagoon = (bool) getenv('LAGOON_ENVIRONMENT');
+$frontend_url = parse_url((string) $frontend) ?: [];
+// Lagoon reaches its nuxt service over its own network. Anywhere else the
+// clear goes to the frontend's URL, over the scheme that URL names, so the
+// secret never travels in the clear to an https host.
+$scheme = getenv('DRUXT_CACHE_CLEAR_SCHEME') ?: ($lagoon || getenv('DRUXT_CACHE_CLEAR_HOST') ? 'http' : ($frontend_url['scheme'] ?? 'http'));
+$config[$purger]['scheme'] = $scheme;
+$config[$purger]['hostname'] = getenv('DRUXT_CACHE_CLEAR_HOST') ?: ($lagoon ? 'nuxt' : (string) ($frontend_url['host'] ?? ''));
+$config[$purger]['port'] = (int) (getenv('DRUXT_CACHE_CLEAR_PORT') ?: ($lagoon ? 3000 : ($frontend_url['port'] ?? ($scheme === 'https' ? 443 : 80))));
+$config[$purger]['headers'][0]['value'] = getenv('DRUXT_CACHE_SECRET') ?: '';
+
 $environment_type = getenv('LAGOON_ENVIRONMENT_TYPE') ?: 'development';
 $config['environment_indicator.indicator'] = [
   'name' => $environment_type === 'production' ? 'Production' : ucfirst($environment_type) . ': ' . getenv('LAGOON_ENVIRONMENT'),

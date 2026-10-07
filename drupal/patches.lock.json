@@ -1,6 +1,28 @@
 {
-    "_hash": "de4f7c66907b8b386b72079ec97aa968f9f2c896659c0e39b99eace23db5ff14",
+    "_hash": "a0c2a204993abdf77cc5304b0bd6374e1fd6b5e19ceb023f20c0efae77b5d725",
     "patches": {
+        "drupal/core": [
+            {
+                "package": "drupal/core",
+                "description": "Issue #3626255: prefetch JSON:API resource object normalizations (MR 17265 at a9227f7b, vendored)",
+                "url": "patches/drupal-core-3626255-prefetch-normalizations-mr17265-a9227f7b.patch",
+                "sha256": "a9b87aff390c5ab00c16a0bf421e31c17e4642a1de2cf6f268ba28411c8147a8",
+                "depth": 2,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/core",
+                "description": "Issue #3626255: inject the normalization cacher, which 11.x does not autowire",
+                "url": "patches/jsonapi-3626255-data-normalizer-argument.patch",
+                "sha256": "578caf52d23e10cedc67480d62204ed45f794883d07e1fdef26c7918996bf26c",
+                "depth": 2,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
         "drupal/decoupled_settings": [
             {
                 "package": "drupal/decoupled_settings",
