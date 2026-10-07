@@ -298,9 +298,9 @@ export default {
 
   mounted() {
     this.refreshHint()
-    // The bar floats over the page, so the page keeps room for it and its
-    // last line is never the one under the bar.
-    document.body.classList.add('has-editor-bar')
+    // While the bar shows, the page keeps room for it, so its last line is
+    // never the one under the bar. A reader without a bar gets no room.
+    this.$watch('show', (shown) => document.body.classList.toggle('has-editor-bar', shown), { immediate: true })
     // The pointer and the keyboard both choose a subject, and a touch reader
     // uses the list, so all three end at the same place.
     this.onPointer = (event) => this.bind(subjectFromElement(event.target))
