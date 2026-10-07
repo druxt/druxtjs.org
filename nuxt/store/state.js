@@ -92,6 +92,10 @@ export default () => ({
     version: 'working-copy',
     revisions: [],
     page: null,
+    // Whether the page shows its diff against live, and that diff, from
+    // jsonapi_diff through @druxt-contrib/diff's normaliseDiff().
+    compare: false,
+    diff: null,
   },
 
   // The sign-in dialog, opened from the header and by the auth middleware.

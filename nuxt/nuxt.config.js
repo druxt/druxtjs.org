@@ -52,7 +52,9 @@ const CONSUMER_ID = process.env.DRUXT_CONSUMER_ID || 'druxtjs_org'
  * session the login starts is the one the authorize step finds. A session
  * left open in the browser is ended through drupal/logout_token's route.
  */
-const OAUTH_CLIENT = { clientId: CONSUMER_ID, scope: ['editor'] }
+// Every role scope an editor might hold: a token carries only the roles its
+// scopes name that the account also has, so each person gets exactly their own.
+const OAUTH_CLIENT = { clientId: CONSUMER_ID, scope: ['editor', 'contributor', 'administrator'] }
 const OAUTH_STRATEGY = { endpoints: { logoutToken: '/session/logout/token' } }
 
 // Drupal's login, its editing screens and their assets, served on this origin
@@ -205,6 +207,8 @@ export default {
     'druxt-site',
     // Editor sign-in.
     ['druxt-auth', OAUTH_CLIENT],
+    // The revision diff: registers `v-diff`, which marks a changed field in place.
+    '@druxt-contrib/diff',
     // The consumer's decoupled settings and theme manifest, baked in at build.
     // A copy of the unreleased @druxt-contrib/decoupled-settings module.
     '~/modules/decoupled-settings',
