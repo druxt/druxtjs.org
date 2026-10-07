@@ -8,7 +8,7 @@
  */
 
 /** An address whose host is a version: `name@1.2.3`, or a snapshot of one. */
-const PACKAGE_VERSION = /^@?[^@\s]+@\d+\.\d+\.\d+(?:[-+.][\w.]+)?$/
+const PACKAGE_VERSION = /^[^@\s/]+@\d+\.\d+\.\d+(?:[-+.][\w.]+)?$/
 
 /**
  * Whether a link is a package version GFM mistook for an email address.

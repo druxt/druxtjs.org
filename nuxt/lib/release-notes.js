@@ -7,6 +7,8 @@
  */
 
 /** A package's release notes, keyed by the unprefixed directory docgen uses. */
+const { packageName } = require('./site')
+
 const RELEASE_NOTES = /^\/api\/packages\/([^/]+)\/CHANGELOG\/?$/
 
 /**
@@ -19,7 +21,7 @@ const RELEASE_NOTES = /^\/api\/packages\/([^/]+)\/CHANGELOG\/?$/
 const releaseNotes = (route) => {
   const match = RELEASE_NOTES.exec(String(route || ''))
   if (!match) return null
-  const pkg = match[1] === 'druxt' ? 'druxt' : `druxt-${match[1]}`
+  const pkg = packageName(match[1])
   return {
     pkg,
     title: `${pkg} release notes`,

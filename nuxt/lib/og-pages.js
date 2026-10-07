@@ -6,6 +6,7 @@
  */
 
 const { releaseNotes } = require('./release-notes')
+const { packageName } = require('./site')
 
 /** Reference kinds, from the route bucket ApiIndex groups by. */
 const KINDS = {
@@ -32,13 +33,13 @@ const pageFromDoc = (doc) => {
 
   if (doc.section === 'modules' && parts[1]) {
     page.module = parts[1]
-    page.pkg = parts[1] === 'druxt' ? 'druxt' : 'druxt-' + parts[1]
+    page.pkg = packageName(parts[1])
   }
 
   if (doc.section === 'api' && parts[1] === 'packages' && parts[2]) {
     // The generated api tree keys packages by unprefixed slug; the card
     // shows the npm name.
-    page.pkg = parts[2] === 'druxt' ? 'druxt' : 'druxt-' + parts[2]
+    page.pkg = packageName(parts[2])
     // The package's own module icon is the identity mark on API pages too.
     page.module = parts[2]
     const bucket = parts[3]
