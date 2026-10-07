@@ -99,7 +99,7 @@
         aria-haspopup="menu"
         :aria-label="`${choices.length} editable on this page`"
         data-testid="editor-bar-choose"
-        @click="choosing = !choosing"
+        @click="toggleChoices"
       >
         {{ choices.length }}<span class="editor-bar-word">&nbsp;editable</span>
         <svg class="editor-bar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 15l-6-6-6 6" /></svg>
@@ -425,6 +425,17 @@ export default {
     window.addEventListener('scroll', this.onViewport, { passive: true })
     window.addEventListener('resize', this.onViewport)
     this.readChoices()
+    // Druxt renders a page's blocks after the page itself, so the list is
+    // read again, once the document has settled, after anything outside the
+    // bar changes.
+    if (window.MutationObserver) {
+      this.observer = new MutationObserver((mutations) => {
+        if (mutations.every((mutation) => this.$el && this.$el.contains(mutation.target))) return
+        clearTimeout(this.rereading)
+        this.rereading = setTimeout(this.readChoices, 150)
+      })
+      this.observer.observe(document.body, { childList: true, subtree: true })
+    }
   },
 
   beforeDestroy() {
@@ -437,7 +448,9 @@ export default {
     window.removeEventListener('resize', this.onViewport)
     clearTimeout(this.linger)
     clearTimeout(this.switching)
+    clearTimeout(this.rereading)
     clearInterval(this.hintPoll)
+    if (this.observer) this.observer.disconnect()
     if (this.frame) cancelAnimationFrame(this.frame)
     this.mark(null)
   },
@@ -533,7 +546,17 @@ export default {
 
     /** What the page has anchored, for the chooser. */
     readChoices() {
-      this.choices = typeof document === 'undefined' ? [] : subjectsOn(document, this.page)
+      const found = typeof document === 'undefined' ? [] : subjectsOn(document, this.page)
+      // Assigned only on a change: the list re-renders the bar, which the
+      // observer below would otherwise read as the document settling again.
+      const key = (list) => list.map((subject) => subject.uuid).join(' ')
+      if (key(found) !== key(this.choices)) this.choices = found
+    },
+
+    /** Opens the list of what is editable, read afresh: blocks render after the page. */
+    toggleChoices() {
+      if (!this.choosing) this.readChoices()
+      this.choosing = !this.choosing
     },
 
     /**
