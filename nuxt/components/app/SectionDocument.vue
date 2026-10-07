@@ -82,6 +82,20 @@ export default {
       path: this.$route.path,
     })
   },
+  watch: {
+    // The URL is the view's record. A navigation on the same page that drops
+    // `revision` or `diff` from it puts the store back to what the URL says;
+    // a change the pill made and wrote to the URL comes through unchanged.
+    '$route.query'(query) {
+      if (!this.drupal || !(this.$auth && this.$auth.loggedIn)) return
+      const editor = this.$store.state.editor
+      const version = versionFromQuery(query) || 'working-copy'
+      if (version !== editor.version) this.$store.commit('setEditorVersion', version)
+      const compare = Boolean(query.diff)
+      if (compare !== editor.compare) this.$store.commit('setEditorCompare', compare)
+    },
+  },
+
   computed: {
     /** The page's Drupal node, for an editor's operations; none for markdown. */
     operationsEntity() {
