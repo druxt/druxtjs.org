@@ -29,6 +29,7 @@
 import { seoHead } from '~/utils/seo'
 import { apiSourceUrl } from '~/utils/api-source'
 import { documentDescription } from '~/utils/content'
+import { releaseNotes } from '~/lib/release-notes'
 import { knowsComponent } from '~/utils/live-examples'
 import { isPackageRoot } from '~/components/app/icon/module'
 export default {
@@ -57,9 +58,11 @@ export default {
   },
 
   head() {
+    // A changelog is titled for its package; docgen titles them all alike.
+    const notes = releaseNotes(this.$route.path)
     return seoHead({
-      title: this.document.title,
-      description: documentDescription(this.document),
+      title: notes ? notes.title : this.document.title,
+      description: notes ? notes.description : documentDescription(this.document),
       path: this.$route.path,
     })
   },

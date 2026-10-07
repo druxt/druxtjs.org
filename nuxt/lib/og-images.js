@@ -9,6 +9,7 @@
 const fs = require('fs')
 const path = require('path')
 const { ogCard, ogSiteCard } = require('./og-card')
+const { releaseNotes } = require('./release-notes')
 
 /** Reference kinds, from the route bucket ApiIndex groups by. */
 const KINDS = {
@@ -51,7 +52,10 @@ const pageFromDoc = (doc) => {
     // Generated API markdown has no prose worth excerpting; the kind line
     // says what the page is instead.
     page.description = undefined
-    page.kind = /changelog/i.test(doc.route) ? 'Release notes' : KINDS[bucket] || 'Reference'
+    page.kind = KINDS[bucket] || 'Reference'
+    // The changelog's card names the package, with the kind as its line.
+    const notes = releaseNotes(doc.route)
+    if (notes) Object.assign(page, { title: notes.pkg, kind: 'Release notes' })
   }
 
   return page
