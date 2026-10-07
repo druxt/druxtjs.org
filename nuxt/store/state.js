@@ -84,4 +84,16 @@ export default () => ({
 
   // Recent search queries, read by components/app/Search.vue.
   searches: [],
+
+  // The editor's view of the current page. `version` selects which revision
+  // the frontend requests: the published default, the latest working copy
+  // (draft), or a specific revision as `id:<vid>`.
+  editor: {
+    version: 'working-copy',
+    revisions: [],
+    page: null,
+  },
+
+  // The sign-in dialog, opened from the header and by the auth middleware.
+  signIn: false,
 })

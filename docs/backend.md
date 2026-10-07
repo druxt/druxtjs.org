@@ -27,6 +27,72 @@ $settings['druxt_docs_preview_url'] = '/druxt/node/preview?vm={view_mode}#/jsona
 
 Without it, the tab says the frontend preview isn't configured.
 
+## Draft authoring and preview
+
+A page can hold a draft. The editorial workflow on `doc_page` keeps the
+published revision live while a later revision is a draft, and a signed-in
+editor sees the draft on the page's own URL. The importer still seeds every
+page published. Drafts are for changes prepared after a site is seeded.
+
+### The workflow and who may use it
+
+`content_moderation` runs an editorial workflow (draft, published, archived)
+on `doc_page`, worked by the `contributor` and `editor` roles:
+
+| Role          | May                                                                  |
+| ------------- | -------------------------------------------------------------------- |
+| `contributor` | Create a page, save a new draft, and see its own unpublished content |
+| `editor`      | Edit any page, publish and archive, and see any unpublished content  |
+
+Both roles also hold `grant simple_oauth codes`, which the OAuth authorize
+step needs, and `create url aliases`, which a new page's path needs.
+
+### Signing in
+
+The frontend signs an editor in against the `druxtjs_org` consumer with the
+authorization code grant and PKCE, no client secret, requesting the `editor`
+scope. `druxt-auth` provides the strategy, the callback route, the store and
+`@nuxtjs/auth-next`. With `druxt.proxy.api` on, it serves every step a browser
+makes on the frontend's own origin, so Drupal does not need CORS to sign an
+editor in. The site configures one endpoint: `logoutToken`.
+
+On the Drupal side, contrib modules provide the rest:
+
+| Module                | Route                       | Used for                                                          |
+| --------------------- | --------------------------- | ----------------------------------------------------------------- |
+| `simple_oauth_revoke` | `POST /oauth/revoke`        | Revoking the access and refresh tokens when an editor signs out   |
+| `logout_token`        | `GET /session/logout/token` | Ending a Drupal session left open in the browser before a sign-in |
+
+`nuxt/patches/druxt-auth-0.5.0.patch` carries `druxt-auth` changes that are
+not released yet:
+
+- Revoking both tokens at sign-out.
+- Ending a session through `logout_token`.
+- Checking `/user/login_status` when Drupal refuses a logout, so a session
+  whose stored logout token has gone stale is still ended.
+- The `hasAuthCookie` check the page cache uses.
+
+Delete it, and pin the release, once a `druxt-auth` release includes them.
+
+A signed-in editor's requests send their bearer token on the server render
+and in the browser, because Druxt's client and `@nuxtjs/auth-next` share one
+axios instance. A "Sign in" control sits in the site header.
+
+### The local loop
+
+The whole loop runs on one machine, with Drupal and the frontend on
+different origins, as in production:
+
+```sh
+npm run setup                 # assemble, provision, import, start Drupal
+npm run dev                   # the frontend, on another origin
+# create an editor account, sign in through the header, then edit a page in Drupal
+```
+
+The draft renders for the signed-in editor on the page's URL. An editor
+publishes it from Drupal's content administration, and the anonymous site
+then serves it.
+
 ## Export configuration after changing it
 
 A change made through the admin UI or `drush` stays in the database until

@@ -80,6 +80,18 @@ theme's regions and settings from
 patched to expose the regions and to let a consumer select its theme, and the
 `docs_consumer` migration gives the `druxtjs_org` consumer the `druxtjs` theme.
 
+## Draft authoring
+
+`content_moderation` runs an editorial workflow on `doc_page`, so a page can
+carry a draft while its published revision stays live. A signed-in editor
+(the `editor` or `contributor` role, over `druxt-auth` PKCE against the
+`druxtjs_org` consumer) sees the draft on the page's own URL. JSON:API writes
+are enabled (`jsonapi.settings` `read_only: false`), so a signed-in client can
+write a page and its paragraphs as a draft. The site is a JSON:API client and
+doesn't carry a writer of its own. Content goes through a Druxt client.
+[docs/backend.md](docs/backend.md#draft-authoring-and-preview) covers it. The
+importer still seeds every page published.
+
 ## Layout
 
 | Path                                    | Purpose                                                                                |

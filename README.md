@@ -97,6 +97,11 @@ An edit made here is local to this machine's database: it previews and tests
 the site, and is not how page text is published. See
 [Where changes go](#where-changes-go) for what belongs where.
 
+Editors can also sign in on <http://localhost:3000> and see a page's latest
+draft on its own URL.
+[docs/backend.md](docs/backend.md#draft-authoring-and-preview) covers the
+workflow and the sign-in.
+
 The Modules, API reference and Components pages come from the druxt.js
 packages. `npm run docs:generate` builds them locally, in the pinned druxt.js
 checkout. It installs and builds druxt.js first, so the first run is slow.
