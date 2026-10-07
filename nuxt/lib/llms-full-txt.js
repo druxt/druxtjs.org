@@ -126,6 +126,13 @@ const buildLlmsFullTxt = (docs, options) => {
   return lines.join('\n')
 }
 
+/** The HTML block tags CommonMark lets interrupt a paragraph (its type 6). */
+const BLOCK_TAGS = new Set(
+  'address article aside base basefont blockquote body caption center col colgroup dd details dialog dir div dl dt fieldset figcaption figure footer form frame frameset h1 h2 h3 h4 h5 h6 head header hr html iframe legend li link main menu menuitem nav noframes ol optgroup option p param search section summary table tbody td tfoot th thead title tr track ul'.split(
+    ' '
+  )
+)
+
 /** The leading spaces of a line. */
 const indentOf = (line) => line.length - line.trimStart().length
 
@@ -184,7 +191,11 @@ const scanFences = (markdown) => {
       return
     }
     if (html) {
-      if (html === 'comment' ? line.includes('-->') : !line.trim()) html = null
+      if (html === 'comment') {
+        if (line.includes('-->')) html = null
+      } else if (html === 'tag') {
+        if (!line.trim()) html = null
+      } else if (new RegExp('</' + html + '>', 'i').test(line)) html = null
       text = false
       return
     }
@@ -193,8 +204,17 @@ const scanFences = (markdown) => {
       text = false
       return
     }
-    // A tag opens an HTML block only between paragraphs: it cannot interrupt one.
-    if (!text && /^ {0,3}<[a-zA-Z/!?]/.test(line)) {
+    // A raw-text element runs to its closing tag, blank lines included.
+    const raw = /^ {0,3}<(pre|script|style|textarea)(?=[\s>]|$)/i.exec(line)
+    if (raw) {
+      html = new RegExp('</' + raw[1] + '>', 'i').test(line) ? null : raw[1].toLowerCase()
+      text = false
+      return
+    }
+    // A known block tag opens an HTML block anywhere; any other tag only
+    // between paragraphs, since it cannot interrupt one.
+    const tag = /^ {0,3}<\/?([a-zA-Z][a-zA-Z0-9-]*)(?=[\s/>]|$)/.exec(line)
+    if (tag && (!text || BLOCK_TAGS.has(tag[1].toLowerCase()))) {
       html = 'tag'
       return
     }

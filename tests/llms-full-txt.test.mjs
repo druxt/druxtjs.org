@@ -236,6 +236,19 @@ describe('outlineProblems', () => {
     assert.deepEqual(outline('- Overview\n===\n\nText.'), [])
   })
 
+  test('keeps a raw-text element open to its closing tag, blank lines and all', () => {
+    assert.deepEqual(outline('<pre>\n# not a heading\n\n```\n# nor this\n</pre>\n\nText.'), [])
+    assert.deepEqual(outline('<script>\n// # x\n</script>\n\n# After'), [
+      '/how-to/theming line 5: top-level heading "# After" in a page body',
+    ])
+  })
+
+  test('lets a block tag interrupt a paragraph, as CommonMark does', () => {
+    assert.deepEqual(outline('Text\n<div>\n# raw\n</div>\n\n# After'), [
+      '/how-to/theming line 6: top-level heading "# After" in a page body',
+    ])
+  })
+
   test('lets a tag follow paragraph text without opening an HTML block', () => {
     assert.deepEqual(outline('Text\n<span>x</span>\n# Loose'), [
       '/how-to/theming line 3: top-level heading "# Loose" in a page body',
