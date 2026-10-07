@@ -20,8 +20,9 @@ use Drupal\paragraphs\ParagraphInterface;
  * The page's current paragraphs are read in the order layout_paragraphs
  * renders them: section by section, and within a section, region by region
  * in the order its layout declares them. Markdown blocks give the headings in
- * their source, as the IR builder reads them. Rich text blocks give the
- * headings in the HTML their text format renders, which is what Druxt shows.
+ * their source, read by TableOfContents::markdownHeadings(). Rich text blocks
+ * give the headings in the HTML their text format renders, which is what
+ * Druxt shows.
  * A block readers never see, because it or its section is unpublished or
  * layout_paragraphs has disabled it, gives none.
  *
