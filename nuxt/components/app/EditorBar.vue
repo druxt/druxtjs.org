@@ -300,7 +300,14 @@ export default {
     this.refreshHint()
     // While the bar shows, the page keeps room for it, so its last line is
     // never the one under the bar. A reader without a bar gets no room.
-    this.$watch('show', (shown) => document.body.classList.toggle('has-editor-bar', shown), { immediate: true })
+    this.$watch(
+      'show',
+      (shown) => {
+        document.body.classList.toggle('has-editor-bar', shown)
+        if (!shown) this.unlock()
+      },
+      { immediate: true }
+    )
     // The pointer and the keyboard both choose a subject, and a touch reader
     // uses the list, so all three end at the same place.
     this.onPointer = (event) => this.bind(subjectFromElement(event.target))
@@ -420,6 +427,8 @@ export default {
      * @param {object|null} subject - The subject under the pointer.
      */
     bind(subject) {
+      // No bar, nothing to bind: a reader who cannot edit gets no outline.
+      if (!this.show) return
       // A locked subject was chosen outright, and the pointer moving on is
       // not a reason to take it away again.
       if (this.locked) return
