@@ -149,11 +149,13 @@
       >
         <span class="truncate">{{ link.label }}</span>
       </a>
-      <!-- Workspaces: read the site as live, or as a workspace has it. -->
-      <template v-if="workspaces.length">
+      <!-- Workspaces: read the site as live, or as a workspace has it. Live
+           stays on offer while a workspace is chosen, even one the list no
+           longer holds, so the way back is never hidden. -->
+      <template v-if="workspaces.length || workspace">
         <p class="editor-bar-choices-title">Workspaces</p>
         <button
-          v-for="choice of [{ id: null, label: 'Live' }, ...workspaces]"
+          v-for="choice of workspaceChoices"
           :key="choice.id || 'live'"
           type="button"
           class="editor-bar-choice"
@@ -164,7 +166,8 @@
           @click="chooseWorkspace(choice.id)"
         >
           <span class="truncate">{{ choice.label }}</span>
-          <span v-if="choice.id === workspace" class="editor-bar-choice-kind">Current</span>
+          <span v-if="choice.unavailable" class="editor-bar-choice-kind">Unavailable</span>
+          <span v-else-if="choice.id === workspace" class="editor-bar-choice-kind">Current</span>
         </button>
         <NuxtLink
           v-if="workspace"
@@ -267,6 +270,14 @@ export default {
     position: ({ blocks, active }) => blocks.findIndex(({ uuid }) => uuid === (active || {}).uuid),
     /** The workspace's label once the list is in, its id until then. */
     workspaceLabel: ({ workspace, workspaces }) => (workspaces.find(({ id }) => id === workspace) || {}).label || workspace,
+    /** Live, the workspaces on offer, and the chosen one when it is no longer among them. */
+    workspaceChoices: ({ workspace, workspaces, workspaceLabel }) => [
+      { id: null, label: 'Live' },
+      ...workspaces,
+      ...(workspace && !workspaces.some(({ id }) => id === workspace)
+        ? [{ id: workspace, label: workspaceLabel, unavailable: true }]
+        : []),
+    ],
     /**
      * The store's page, but only where it is this route's page.
      *
@@ -549,7 +560,7 @@ export default {
       const found = typeof document === 'undefined' ? [] : subjectsOn(document, this.page)
       // Assigned only on a change: the list re-renders the bar, which the
       // observer below would otherwise read as the document settling again.
-      const key = (list) => list.map((subject) => subject.uuid).join(' ')
+      const key = (list) => list.map((subject) => `${subject.uuid}:${subject.label}`).join(' ')
       if (key(found) !== key(this.choices)) this.choices = found
     },
 
@@ -648,7 +659,8 @@ export default {
      * @param {Event} event - The click.
      */
     lockOn(event) {
-      if (!event.target) return
+      // No bar, nothing to choose: a reader who cannot edit gets no outline.
+      if (!this.show || !event.target) return
       if (this.$el && this.$el.contains(event.target)) return
       if (event.target.closest && event.target.closest(INTERACTIVE)) return
       const selection = typeof window !== 'undefined' && window.getSelection ? window.getSelection() : null
