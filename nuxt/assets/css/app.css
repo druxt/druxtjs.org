@@ -407,6 +407,19 @@ html {
 .prose table a {
   overflow-wrap: normal;
 }
+/* An options table in the API reference: the description keeps room to be
+   read, and a long default wraps in its own cell rather than squeezing the
+   description to a word a line. Below 640px the table stacks instead. */
+.prose .docs-table td[data-label='Description'] {
+  min-width: 13rem;
+}
+.prose .docs-table td[data-label='Default'] {
+  min-width: 10rem;
+}
+.prose .docs-table td[data-label='Default'] code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 .prose thead {
   border-bottom: 0;
 }
