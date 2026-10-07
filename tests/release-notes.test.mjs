@@ -4,7 +4,7 @@ import { describe, test } from 'node:test'
 
 const require = createRequire(import.meta.url)
 const { releaseNotes } = require('../nuxt/lib/release-notes.js')
-const { pageFromDoc } = require('../nuxt/lib/og-images.js')
+const { pageFromDoc } = require('../nuxt/lib/og-pages.js')
 
 describe('releaseNotes', () => {
   test('names the package, with druxt itself unprefixed', () => {
