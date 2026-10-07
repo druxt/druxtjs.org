@@ -10,6 +10,8 @@ export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 cp nuxt/package.json nuxt/yarn.lock "$work/"
+# The patched packages resolve against their patch files.
+[ -d nuxt/patches ] && cp -R nuxt/patches "$work/patches"
 printf 'nodeLinker: node-modules\nenableGlobalCache: true\n' > "$work/.yarnrc.yml"
 cd "$work"
 corepack yarn@4.9.2 install --mode=update-lockfile > /dev/null
