@@ -186,7 +186,7 @@ Its Storybook is `storybook.dev.druxtjs.org`, and its Drupal `cms.dev.druxtjs.or
 | Packages      | Every Druxt package at the npm `dev` tag, one build, one copy each |
 | API reference | Generated at the druxt.js commit the build came from (`docgenRef`) |
 | Release notes | The pending changesets, headed with the version the site installs  |
-| Version badge | `v0.25.0-dev`, with the build time in its title                    |
+| Version badge | The build's own version, read from the generated reference         |
 
 druxt.js publishes a snapshot on each merge to its develop branch. The
 workflow looks for a new one every 20 minutes, or at once when druxt.js

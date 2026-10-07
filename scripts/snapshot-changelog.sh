@@ -3,10 +3,11 @@
 # written into each package's CHANGELOG.md in a throwaway checkout, before
 # docgen copies them into the API reference.
 #
-# changesets heads each entry with the time it runs. The heading is set back
-# to the snapshot's own build time, so the notes name the version the site
-# installs. The checkout needs its history, which changesets reads to link
-# each entry to its commit: a blobless fetch has it, a shallow one does not.
+# changesets stamps the versions with the time it runs. Every stamp is set
+# back to the snapshot's own build time, in the notes and in the packages, so
+# the notes and the version badge name the build the site installs. The
+# checkout needs its history, which changesets reads to link each entry to
+# its commit: a blobless fetch has it, a shallow one does not.
 #
 # Usage: snapshot-changelog.sh <druxt.js checkout> <build time YYYYMMDDhhmmss>
 set -eu
@@ -20,6 +21,6 @@ esac
 
 cd "$checkout"
 node node_modules/@changesets/cli/bin.js version --snapshot dev
-for changelog in packages/*/CHANGELOG.md; do
-  sed -i -E "s/^(## [0-9]+\.[0-9]+\.[0-9]+-dev\.)[0-9]{14}$/\1${stamp}/" "$changelog"
+for file in packages/*/CHANGELOG.md packages/*/package.json; do
+  sed -i -E "s/-dev\.[0-9]{14}/-dev.${stamp}/g" "$file"
 done
