@@ -116,14 +116,15 @@ export default {
       })))
       this.fetched = Date.now()
       await this.$nextTick()
-      // A revision whose paragraphs the store would not give back leaves a
-      // blank page, which reads as a broken site rather than a failed fetch.
-      // One retry covers a request that lost a race; after that, say so.
-      if (this.refs.length && !this.paragraphs.length && !this.retried) {
+      // A paragraph the store would not give back leaves a hole in the page,
+      // which reads as a broken site rather than a failed fetch. One retry
+      // covers a request that lost a race; after that, say so, even for one.
+      const unresolved = () => this.refs.filter((ref) => !this.stored(ref))
+      if (unresolved().length && !this.retried) {
         this.retried = true
         return this.loadParagraphs()
       }
-      this.missing = Boolean(this.refs.length) && !this.paragraphs.length
+      this.missing = unresolved().length > 0
       return
     }
     const missing = this.refs.filter((ref) => !this.stored(ref))
