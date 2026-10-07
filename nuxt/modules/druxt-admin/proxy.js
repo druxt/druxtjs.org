@@ -30,12 +30,6 @@ import { ADMIN_PATHS, isAdminPath } from './lib/admin.js'
  * itself. Their editing paths come back in through `EDIT_PATH`.
  */
 export const BACKEND_PATHS = [
-  // Assets: core's own, contributed, themes, and the public files directory.
-  '/core',
-  '/libraries',
-  '/modules',
-  '/profiles',
-  '/themes',
   // The endpoints an administration screen talks to while it is open.
   '/batch',
   '/system',
@@ -102,6 +96,14 @@ const HOP_BY_HOP = [
 ]
 
 /**
+ * Drupal's asset directories. Only a file under one is Drupal's: the bare
+ * directory and the paths beside its files are the site's own pages, and
+ * `/modules/<name>` is one of them.
+ */
+export const ASSET_PATHS = ['/core', '/libraries', '/modules', '/profiles', '/themes']
+const ASSET_FILE = /\.(css|js|mjs|map|json|png|jpe?g|gif|svg|webp|avif|ico|woff2?|ttf|eot|otf)$/i
+
+/**
  * A dot segment, an encoded separator or a backslash: Drupal's server would
  * normalise it, this proxy sends the path as it came, so a path the allowlist
  * excludes could reach Drupal under an allowed prefix.
@@ -116,6 +118,7 @@ export function shouldProxy(path, options = {}) {
   if (isAdminPath(subject, options.paths || ADMIN_PATHS)) return true
   if (EDIT_PATH.test(subject)) return true
   if (FILES_PATH.test(subject)) return true
+  if (ASSET_FILE.test(subject) && ASSET_PATHS.some((prefix) => subject.startsWith(`${prefix}/`))) return true
   const prefixes = options.backendPaths || BACKEND_PATHS
   return prefixes.some(
     (prefix) => subject === prefix || subject.startsWith(`${prefix}/`)

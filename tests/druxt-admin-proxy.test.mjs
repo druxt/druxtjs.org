@@ -6,13 +6,35 @@ const { shouldProxy } = await import('../nuxt/modules/druxt-admin/proxy.js')
 describe('shouldProxy', () => {
   it('proxies an allowed prefix and its descendants, and nothing beside it', () => {
     assert.equal(shouldProxy('/core/misc/drupal.js'), true)
-    assert.equal(shouldProxy('/core'), true)
+    assert.equal(shouldProxy('/batch'), true)
     assert.equal(shouldProxy('/cores'), false)
     assert.equal(shouldProxy('/node/1'), false)
   })
 
   // The path goes upstream as it came, so a segment Drupal's server would
   // fold away is refused here rather than resolved past the allowlist.
+  it('proxies the files under an asset directory, and leaves the pages beside them to the site', () => {
+    for (const path of [
+      '/core/misc/drupal.js',
+      '/modules/contrib/gin/dist/gin.css',
+      '/themes/contrib/gin/logo.svg',
+      '/libraries/x/font.woff2',
+    ]) {
+      assert.equal(shouldProxy(path), true, path)
+    }
+    // Drupal sends an anonymous visitor to these on the frontend, so proxying them would loop.
+    for (const path of [
+      '/modules',
+      '/modules/',
+      '/modules/views',
+      '/core',
+      '/themes/custom',
+      '/modules/contrib/gin/README.md',
+    ]) {
+      assert.equal(shouldProxy(path), false, path)
+    }
+  })
+
   it('refuses dot segments, encoded separators and backslashes under an allowed prefix', () => {
     for (const path of [
       '/core/../sites/default/settings.php',
