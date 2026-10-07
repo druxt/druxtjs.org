@@ -126,8 +126,31 @@ const buildLlmsFullTxt = (docs, options) => {
   return lines.join('\n')
 }
 
+/** The leading spaces of a line. */
+const indentOf = (line) => line.length - line.trimStart().length
+
+/**
+ * A fence marker on a line, past a list item's marker if the line opens one.
+ *
+ * @param {string} line - The line.
+ * @returns {?{ char: string, length: number, indent: number, info: string }} The
+ *   marker, with the column its block's content starts at.
+ */
+const fenceMarker = (line) => {
+  const item = /^( {0,3}(?:[-*+]|\d{1,9}[.)]) {1,4})/.exec(line)
+  const rest = item ? line.slice(item[1].length) : line
+  const marker = /^( {0,3})(`{3,}|~{3,})(.*)$/.exec(rest)
+  if (!marker) return null
+  return { char: marker[2][0], length: marker[2].length, indent: item ? item[1].length : 0, info: marker[3] }
+}
+
 /**
  * Walk markdown the way a CommonMark reader does, tracking code fences.
+ *
+ * Fences, HTML blocks and list items are the containers that change what a
+ * `#` means: inside a fence or an HTML block it is text, and a fence opened
+ * inside a list item is closed by a marker indented to that item, while a
+ * marker dedented past the item ends the item and opens a fence of its own.
  *
  * @param {string} markdown - Text to scan.
  * @returns {{ headings: Array<{ line: number, level: number, text: string }>, open: ?number }}
@@ -137,31 +160,58 @@ const scanFences = (markdown) => {
   const headings = []
   const lines = markdown.split('\n')
   let fence = null
+  // An HTML block: a comment runs to its `-->`, any other tag to a blank line.
+  let html = null
   // Whether the line before was paragraph text: what a setext underline needs.
   let text = false
 
-  lines.forEach((line, index) => {
-    // A fence may open inside a list item, after its marker; its content and
-    // its closer are then indented to the item, which is what `indent` holds.
-    const item = /^( {0,3}(?:[-*+]|\d{1,9}[.)]) {1,4})/.exec(line)
-    const opener = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(item ? line.slice(item[1].length) : line)
+  const read = (line, index) => {
     if (fence) {
-      const closer = new RegExp('^ {0,' + (fence.indent + 3) + '}(' + fence.char + '{' + fence.length + ',})\\s*$').exec(line)
-      if (closer) fence = null
+      // Inside a list item, a non-blank line indented less than the item ends it,
+      // and with it the fence; the line is then read afresh.
+      if (fence.indent && line.trim() && indentOf(line) < fence.indent) {
+        fence = null
+        return read(line, index)
+      }
+      const closer = fenceMarker(line)
+      const closes =
+        closer && !closer.indent && closer.char === fence.char && closer.length >= fence.length
+        && !closer.info.trim() && indentOf(line) <= fence.indent + 3
+      if (closes) fence = null
       text = false
-    } else if (opener && !(opener[1][0] === '`' && opener[2].includes('`'))) {
-      fence = { char: opener[1][0], length: opener[1].length, indent: item ? item[1].length : 0, line: index + 1 }
-      text = false
-    } else {
-      const heading = /^ {0,3}(#{1,6})(\s|$)/.exec(line)
-      // A setext heading: a line of = or - under paragraph text, which
-      // CommonMark reads as an H1 or H2 just as it reads the # forms.
-      const underline = /^ {0,3}(=+|-+)\s*$/.exec(line)
-      if (heading) headings.push({ line: index + 1, level: heading[1].length, text: line })
-      else if (underline && text) headings.push({ line: index, level: underline[1][0] === '=' ? 1 : 2, text: lines[index - 1] })
-      text = !heading && !underline && Boolean(line.trim())
+      return
     }
-  })
+    if (html) {
+      if (html === 'comment' ? line.includes('-->') : !line.trim()) html = null
+      text = false
+      return
+    }
+    if (/^ {0,3}<!--/.test(line)) {
+      html = line.includes('-->') ? null : 'comment'
+      text = false
+      return
+    }
+    if (/^ {0,3}<[a-zA-Z/!?]/.test(line)) {
+      html = 'tag'
+      text = false
+      return
+    }
+    const opener = fenceMarker(line)
+    if (opener && !(opener.char === '`' && opener.info.includes('`'))) {
+      fence = { ...opener, line: index + 1 }
+      text = false
+      return
+    }
+    const heading = /^ {0,3}(#{1,6})(\s|$)/.exec(line)
+    // A setext heading: a line of = or - under paragraph text, which
+    // CommonMark reads as an H1 or H2 just as it reads the # forms.
+    const underline = /^ {0,3}(=+|-+)\s*$/.exec(line)
+    if (heading) headings.push({ line: index + 1, level: heading[1].length, text: line })
+    else if (underline && text) headings.push({ line: index, level: underline[1][0] === '=' ? 1 : 2, text: lines[index - 1] })
+    text = !heading && !underline && Boolean(line.trim())
+  }
+
+  lines.forEach(read)
 
   return { headings, open: fence && fence.line }
 }

@@ -224,6 +224,23 @@ describe('outlineProblems', () => {
     ])
   })
 
+  test('reads an unindented marker after a list-item fence as a new fence, not the closer', () => {
+    const found = outline('- ```sh\n  # .env\n```\n## Next')
+
+    assert.equal(found.length, 2)
+    assert.match(found[0], /^\/how-to\/theming line 3: code fence never closes/)
+  })
+
+  test('leaves a # inside an HTML comment or block as text, which is what it is', () => {
+    assert.deepEqual(outline('<!--\n# not a heading\n-->\n\nText.'), [])
+    assert.deepEqual(outline('<!-- # inline --> text\n\n# Loose'), [
+      '/how-to/theming line 3: top-level heading "# Loose" in a page body',
+    ])
+    assert.deepEqual(outline('<div>\n# raw\n</div>\n\n# After'), [
+      '/how-to/theming line 5: top-level heading "# After" in a page body',
+    ])
+  })
+
   test('takes a setext underline only under paragraph text, not under a closing fence', () => {
     assert.deepEqual(outline('```sh\nls\n```\n===\n\nText.'), [])
     assert.deepEqual(outline('# Title\n===\n'), [
