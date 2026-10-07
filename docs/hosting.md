@@ -188,7 +188,7 @@ Its Storybook is `storybook.dev.druxtjs.org`, and its Drupal `cms.dev.druxtjs.or
 | Release notes | The pending changesets, headed with the version the site installs  |
 | Version badge | The build's own version, read from the generated reference         |
 
-druxt.js publishes a snapshot on each merge to its develop branch. The
+druxt.js publishes a snapshot on each merge to its 0.x branch. The
 workflow looks for a new one every 20 minutes, or at once when druxt.js
 sends a `druxt-dev-snapshot` repository dispatch. It finds the commit a
 snapshot came from in druxt.js's Release runs, and refuses a snapshot that no

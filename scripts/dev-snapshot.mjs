@@ -87,7 +87,7 @@ export const applyDocs = (source, sha, stamp) => {
  * The run must have been going when the build was stamped, or it published
  * something else and its commit would be the wrong one.
  *
- * @param {Array<object>} runs - Successful Release runs on develop, newest first.
+ * @param {Array<object>} runs - Successful Release runs on 0.x, newest first.
  * @param {string} stamp - The build's UTC timestamp, `YYYYMMDDhhmmss`.
  * @returns {string} The commit.
  */
@@ -118,7 +118,7 @@ export const sources = {
   releaseRuns: async () => {
     const token = process.env.GITHUB_TOKEN
     const runs = await getJson(
-      'https://api.github.com/repos/druxt/druxt.js/actions/workflows/release.yml/runs?branch=develop&event=push&status=success&per_page=20',
+      'https://api.github.com/repos/druxt/druxt.js/actions/workflows/release.yml/runs?branch=0.x&event=push&status=success&per_page=20',
       token ? { Authorization: `Bearer ${token}` } : {}
     )
     return runs.workflow_runs

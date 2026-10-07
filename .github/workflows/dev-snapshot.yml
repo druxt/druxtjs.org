@@ -5,7 +5,7 @@ name: Dev snapshot
 # which Lagoon deploys to dev.druxtjs.org.
 #
 # druxt.js publishes a snapshot to the npm `dev` tag on each merge to its
-# develop branch. This finds it, and the commit it came from, and rebuilds
+# 0.x branch. This finds it, and the commit it came from, and rebuilds
 # the branch as this repository's base plus one commit: the snapshot's
 # packages, and the API reference generated at that commit with the pending
 # changesets as its release notes. The branch belongs to this workflow and is
