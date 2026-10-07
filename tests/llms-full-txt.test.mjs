@@ -212,6 +212,24 @@ describe('outlineProblems', () => {
   test('treats inline code at the start of a line as text, not a fence', () => {
     assert.deepEqual(outline('```inline``` then prose'), [])
   })
+
+  test('follows a fence opened inside a list item, whose closer is indented to the item', () => {
+    assert.deepEqual(
+      outline('- Set the file:\n\n  ```sh\n  # .env\n  BASE_URL=x\n  ```\n- Then run it.'),
+      []
+    )
+    assert.deepEqual(outline('1. ```sh\n   # .env\n   ```'), [])
+    assert.deepEqual(outline('- ```sh\n  # .env\n  ```\n\n# Loose'), [
+      '/how-to/theming line 5: top-level heading "# Loose" in a page body',
+    ])
+  })
+
+  test('takes a setext underline only under paragraph text, not under a closing fence', () => {
+    assert.deepEqual(outline('```sh\nls\n```\n===\n\nText.'), [])
+    assert.deepEqual(outline('# Title\n===\n'), [
+      '/how-to/theming line 1: top-level heading "# Title" in a page body',
+    ])
+  })
 })
 
 describe('scanFences', () => {

@@ -135,26 +135,31 @@ const buildLlmsFullTxt = (docs, options) => {
  */
 const scanFences = (markdown) => {
   const headings = []
-  let fence = null
-
   const lines = markdown.split('\n')
-  lines.forEach((text, index) => {
-    const marker = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(text)
+  let fence = null
+  // Whether the line before was paragraph text: what a setext underline needs.
+  let text = false
+
+  lines.forEach((line, index) => {
+    // A fence may open inside a list item, after its marker; its content and
+    // its closer are then indented to the item, which is what `indent` holds.
+    const item = /^( {0,3}(?:[-*+]|\d{1,9}[.)]) {1,4})/.exec(line)
+    const opener = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(item ? line.slice(item[1].length) : line)
     if (fence) {
-      if (marker && marker[1][0] === fence.char && marker[1].length >= fence.length && !marker[2].trim()) fence = null
-    } else if (marker && !(marker[1][0] === '`' && marker[2].includes('`'))) {
-      fence = { char: marker[1][0], length: marker[1].length, line: index + 1 }
+      const closer = new RegExp('^ {0,' + (fence.indent + 3) + '}(' + fence.char + '{' + fence.length + ',})\\s*$').exec(line)
+      if (closer) fence = null
+      text = false
+    } else if (opener && !(opener[1][0] === '`' && opener[2].includes('`'))) {
+      fence = { char: opener[1][0], length: opener[1].length, indent: item ? item[1].length : 0, line: index + 1 }
+      text = false
     } else {
-      const heading = /^ {0,3}(#{1,6})(\s|$)/.exec(text)
-      if (heading) headings.push({ line: index + 1, level: heading[1].length, text })
-      // A setext heading: a line of = or - under a line of text, which
+      const heading = /^ {0,3}(#{1,6})(\s|$)/.exec(line)
+      // A setext heading: a line of = or - under paragraph text, which
       // CommonMark reads as an H1 or H2 just as it reads the # forms.
-      const underline = /^ {0,3}(=+|-+)\s*$/.exec(text)
-      const above = index > 0 ? lines[index - 1] : ''
-      const last = headings[headings.length - 1]
-      if (underline && above.trim() && !(last && last.line === index)) {
-        headings.push({ line: index, level: underline[1][0] === '=' ? 1 : 2, text: above })
-      }
+      const underline = /^ {0,3}(=+|-+)\s*$/.exec(line)
+      if (heading) headings.push({ line: index + 1, level: heading[1].length, text: line })
+      else if (underline && text) headings.push({ line: index, level: underline[1][0] === '=' ? 1 : 2, text: lines[index - 1] })
+      text = !heading && !underline && Boolean(line.trim())
     }
   })
 
