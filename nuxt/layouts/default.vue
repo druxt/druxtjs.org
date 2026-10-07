@@ -8,7 +8,8 @@
     <AppHeader
       class="sticky top-0 z-50"
       title="DruxtJS"
-      :version="$config.druxtVersion ? 'v' + $config.druxtVersion : null"
+      :version="badge"
+      :version-title="versionTitle"
       :docs="isDocs"
       @open-search="searchOpen = true"
       @open-nav="sidebar = true"
@@ -46,7 +47,7 @@
     </template>
 
     <!-- Outside both layouts above, so it renders on every route. -->
-    <AppSiteFooter :version="$config.druxtVersion ? 'v' + $config.druxtVersion : null" />
+    <AppSiteFooter :version="badge" :version-title="versionTitle" />
 
     <AppSearch :open="searchOpen" @close="searchOpen = false" />
 
@@ -70,6 +71,9 @@ export default {
   }),
 
   computed: {
+    /** The version badge: a development build names its tag, with the build time in the title. */
+    badge: ({ $config }) => ($config.druxtVersion ? 'v' + $config.druxtVersion.replace(/-dev\.\d+$/, '-dev') : null),
+    versionTitle: ({ $config }) => ($config.druxtVersion ? 'v' + $config.druxtVersion : null),
     /** Home, sign-in and the OAuth callback are full-bleed; everything else is documentation. */
     isDocs: ({ $route }) => !['/', '/login', '/callback'].includes($route.path.replace(/(.)\/$/, '$1')),
     /** The playground has no prose to cap and no headings to list. */
