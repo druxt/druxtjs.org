@@ -18,7 +18,7 @@ source:
     -
       id: druxtjs_org
       label: druxtjs.org
-      description: 'The documentation site. A public client: authorization code with PKCE, approved automatically.'
+      description: 'The documentation site. A public client: the password grant for editors, and authorization code with PKCE, approved by a person, for a client outside the site.'
       redirect:
         - 'https://druxtjs.org/callback'
         - 'http://localhost:3000/callback'
@@ -49,7 +49,7 @@ process:
     default_value: 1
   automatic_authorization:
     plugin: default_value
-    default_value: 1
+    default_value: 0
   grant_types:
     plugin: default_value
     default_value:

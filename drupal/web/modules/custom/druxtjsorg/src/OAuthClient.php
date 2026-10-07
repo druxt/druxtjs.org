@@ -42,7 +42,11 @@ final class OAuthClient {
     return [
       'confidential' => FALSE,
       'pkce' => TRUE,
-      'automatic_authorization' => TRUE,
+      // The site signs editors in with the password grant, which never shows
+      // the authorize screen. A person approves each authorization code
+      // grant: an automatic one would hand whatever answers a registered
+      // callback an administrator's token.
+      'automatic_authorization' => FALSE,
       'grant_types' => ['authorization_code', 'password', 'refresh_token'],
       'authorization_code_scopes' => self::SCOPES,
       'redirect' => array_values(array_unique(array_filter($redirects))),
