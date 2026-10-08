@@ -135,6 +135,45 @@ describe('createPageCache', () => {
     }
   })
 
+  test('remembers a purge across a restart', async () => {
+    const dir = tempDir()
+    try {
+      const first = createPageCache({ dir, ttl: 60000, render: async () => ({ html: '<p>a</p>' }) })
+      await first.store('/a')
+      await new Promise((resolve) => setTimeout(resolve, 5))
+      first.invalidate()
+      await new Promise((resolve) => setTimeout(resolve, 20))
+      const second = createPageCache({
+        dir,
+        ttl: 60000,
+        render: async () => ({ html: '<p>a</p>' }),
+      })
+      assert.equal((await second.read('/a')).stale, true)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  test('does not store a page whose render began before a purge', async () => {
+    const dir = tempDir()
+    try {
+      let finish
+      const lines = []
+      const render = () =>
+        new Promise((resolve) => (finish = () => resolve({ html: '<p>old</p>' })))
+      const cache = createPageCache({ dir, ttl: 60000, render, log: (line) => lines.push(line) })
+      const storing = cache.store('/a')
+      await new Promise((resolve) => setTimeout(resolve, 5))
+      cache.invalidate()
+      finish()
+      assert.equal(await storing, '<p>old</p>')
+      assert.equal(existsSync(path.join(dir, 'a', 'index.html')), false)
+      assert.ok(lines.some((line) => line.includes('purged while rendering')))
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
   test('keeps brotli and gzip copies, and reads the one the client accepts', async () => {
     const dir = tempDir()
     try {

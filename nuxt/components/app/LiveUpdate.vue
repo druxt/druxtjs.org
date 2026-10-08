@@ -3,9 +3,9 @@
   <div class="live-update" role="status" aria-live="polite" data-testid="live-update">
     <transition name="live-update">
       <div v-if="shown" class="live-update-card">
-        <p class="live-update-text">This page has changed since you opened it.</p>
+        <p class="live-update-text">{{ failed ? 'The update did not load.' : 'This page has changed since you opened it.' }}</p>
         <button type="button" class="btn btn-primary btn-sm" :disabled="loading" data-testid="live-update-show" @click="show">
-          {{ loading ? 'Loading…' : 'Show the update' }}
+          {{ loading ? 'Loading…' : failed ? 'Try again' : 'Show the update' }}
         </button>
         <button type="button" class="btn btn-ghost btn-sm btn-square" aria-label="Dismiss" @click="dismiss">
           <svg viewBox="0 0 24 24" class="h-4 w-4" aria-hidden="true">
@@ -29,7 +29,7 @@ const FRESH_FOR = 15000
 export default {
   name: 'AppLiveUpdate',
 
-  data: () => ({ dismissedAt: 0, loading: false }),
+  data: () => ({ dismissedAt: 0, loading: false, failed: false }),
 
   computed: {
     changedAt: ({ $liveUpdates }) => ($liveUpdates || {}).changedAt || 0,
@@ -48,15 +48,19 @@ export default {
       this.dismissedAt = Date.now()
     },
 
+    // The notice stays, with a retry, when the refresh fails: the page is still out of date.
     async show() {
       this.loading = true
       try {
         this.$liveUpdates.freshUntil = Date.now() + FRESH_FOR
         await this.$store.dispatch('druxt/clearCache')
         await this.$nuxt.refresh()
+        this.failed = false
+        this.dismissedAt = Date.now()
+      } catch (error) {
+        this.failed = true
       } finally {
         this.loading = false
-        this.dismissedAt = Date.now()
       }
     },
   },
