@@ -25,7 +25,8 @@ The Lagoon project is named in the workflow's `LAGOON_PROJECT` variable.
 
 ## Running it by hand
 
-With the Lagoon CLI signed in and a GitHub token in `GITHUB_TOKEN`:
+With the Lagoon CLI signed in, a GitHub token in `GITHUB_TOKEN` and Node 20 or
+later, which the script's `fetch` and `URL.canParse` calls need:
 
 ```sh
 lagoon raw --raw "$(node scripts/sync-environments.mjs --query druxtjs-org)" > lagoon.json

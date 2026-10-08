@@ -33,18 +33,25 @@ jobs:
         with:
           persist-credentials: false
 
+      # The script uses fetch and URL.canParse, so it needs the Node the test
+      # job runs on, not the frontend's .nvmrc.
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version-file: .nvmrc
+          node-version: '22'
 
       - name: Wait for Lagoon to act on the deleted branch
         if: github.event_name == 'delete'
         run: sleep 180
 
+      # The binary runs with both secrets in scope, so it is verified against
+      # the release's published checksum before it is executable.
       - name: Install the Lagoon CLI
+        env:
+          LAGOON_CLI_SHA256: d8500f65d6c6c73b061cb330cef9f41c08457caf82c927735b93cfe35cf56580
         run: |
           curl -fsSL -o /usr/local/bin/lagoon \
             "https://github.com/uselagoon/lagoon-cli/releases/download/${LAGOON_CLI_VERSION}/lagoon-cli-${LAGOON_CLI_VERSION}-linux-amd64"
+          echo "${LAGOON_CLI_SHA256}  /usr/local/bin/lagoon" | sha256sum -c -
           chmod +x /usr/local/bin/lagoon
           lagoon version
 
