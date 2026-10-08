@@ -75,8 +75,10 @@ lint:audit:nuxt` audits `nuxt/` with Yarn 4 in a scratch copy, because Yarn
 
 ## How Drupal serves the site
 
-Drupal renders only administration. `default_admin` is both the default theme
-and the admin theme. Druxt renders the public site.
+Drupal renders only administration. Gin, from contrib, is both the default
+theme and the admin theme, with Gin Login for the sign-in page and core
+Navigation for the sidebar. `druxtjsorg` adds a small stylesheet for phones
+(`css/admin.css`). Druxt renders the public site.
 
 The `druxtjs` theme holds only the frontend's regions and its 10 blocks, and
 Drupal renders it only in the block region demo. The frontend reads the

@@ -60,6 +60,15 @@ Druxt 1.0.0.
   around the first-load refetch is gone.
 - Drupal core 11.4.8, the security release. The two JSON:API patches apply
   to it unchanged.
+- `druxt`, `druxt-blocks`, `druxt-breadcrumb`, `druxt-entity`, `druxt-menu`,
+  `druxt-router`, `druxt-schema`, `druxt-site` and `druxt-views` are vendored
+  from the 0.25.0 candidate under `nuxt/vendor/`, so the site runs it on
+  Lagoon before it is released. Each carries a `VENDORED.md` naming the
+  commit.
+- The admin theme is contrib Gin, replacing core's experimental Default
+  Admin, with Gin Login for the sign-in page. On a phone the page form's top
+  bar stacks the breadcrumb, the title and the actions instead of laying Save
+  over the title, and the content listings no longer draw their header twice.
 
 ### Fixed
 

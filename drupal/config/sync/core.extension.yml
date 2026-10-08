@@ -39,6 +39,7 @@ module:
   field_ui: 0
   file: 0
   filter: 0
+  gin_login: 0
   image: 0
   js_cookie: 0
   jsonapi: 0
@@ -99,6 +100,7 @@ module:
   minimal: 1000
 theme:
   stark: 0
-  default_admin: 0
   druxtjs: 0
+  claro: 0
+  gin: 0
 profile: minimal

@@ -1,0 +1,52 @@
+/**
+ * @file
+ * Small fixes to Gin, the admin theme, for editors on a phone.
+ */
+
+/* Claro hyphenates the whole page, which splits short table cells into
+   "Docu-menta-tion"; a table wraps between words instead. */
+:is(#extra-specificity-hack, [data-drupal-admin-styles]) table {
+  hyphens: manual;
+}
+
+@media (max-width: 47.99em) {
+  /* A little zoomed out on a phone: Gin sizes in rem, so this scales the
+     whole admin evenly, and form fields stay 16px or more where they hold
+     text, so a phone does not zoom in on focus. */
+  :root {
+    font-size: 87.5%;
+  }
+  :is(#extra-specificity-hack, [data-drupal-admin-styles]) :is(input:not([type="checkbox"], [type="radio"]), select, textarea) {
+    font-size: max(1rem, 16px);
+  }
+
+  /* Tables keep their last column, the operations, on screen. */
+  :is(#extra-specificity-hack, [data-drupal-admin-styles]) :is(td, th) {
+    padding-inline: 0.5rem;
+  }
+  :is(#extra-specificity-hack, [data-drupal-admin-styles]) td .dropbutton-wrapper {
+    white-space: nowrap;
+  }
+
+  /* The top bar's three columns left the title none at all on a phone, and
+     laid Save over it. One column: the breadcrumb, the title and its state,
+     then the actions. Raised the way Gin raises its own rules. */
+  :is(#extra-specificity-hack, [data-drupal-admin-styles]).gin--navigation-top-bar {
+    height: auto;
+    padding-block: 0.5rem;
+  }
+  :is(#extra-specificity-hack, [data-drupal-admin-styles]).gin--navigation-top-bar .top-bar__content {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.5rem;
+  }
+  :is(#extra-specificity-hack, [data-drupal-admin-styles]).gin--navigation-top-bar .top-bar__context {
+    min-width: 0;
+  }
+  :is(#extra-specificity-hack, [data-drupal-admin-styles]).gin--navigation-top-bar .toolbar-badge {
+    white-space: nowrap;
+  }
+  :is(#extra-specificity-hack, [data-drupal-admin-styles]).gin--navigation-top-bar .top-bar__actions {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+}

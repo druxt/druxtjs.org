@@ -4,3 +4,8 @@ edit-paragraph:
   dependencies:
     - core/drupal
     - core/drupalSettings
+
+admin:
+  css:
+    theme:
+      css/admin.css: {}
