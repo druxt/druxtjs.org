@@ -25,12 +25,11 @@
           >
         </div>
 
-        <div class="flex flex-col gap-1.5">
-          <div class="flex items-baseline justify-between">
-            <label for="sign-in-pass" class="text-xs font-semibold">Password</label>
-            <button type="button" class="text-xs text-primary-focus hover:underline" :disabled="busy" @click="show('forgot')">Forgot password?</button>
-          </div>
-          <div class="relative">
+        <!-- The link follows the field in the DOM so Tab goes username, password, reveal, link. -->
+        <div class="flex flex-wrap items-baseline gap-y-1.5">
+          <label for="sign-in-pass" class="order-1 text-xs font-semibold">Password</label>
+          <button type="button" class="order-2 ml-auto text-xs text-primary-focus hover:underline" :disabled="busy" @click="show('forgot')">Forgot password?</button>
+          <div class="relative order-3 w-full">
             <input
               id="sign-in-pass"
               v-model="pass"
