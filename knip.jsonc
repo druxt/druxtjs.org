@@ -4,7 +4,7 @@
   // drupal/ are applications with their own manifests.
   "entry": ["scripts/*.mjs", "tests/*.mjs"],
   "project": ["scripts/**/*.mjs", "tests/**/*.mjs"],
-  "ignore": ["nuxt/**", "drupal/**", ".docs-source/**", ".docs-ir/**"],
+  "ignore": ["nuxt/**", "drupal/**", ".docs-source/**"],
   // node --test's built-in reporters, which knip reads as packages in the
   // test:coverage script, and two of nuxt/'s packages the tests reach
   // through nuxt/: the diff package through nuxt/lib/diff.js, and druxt-auth

@@ -35,15 +35,16 @@ const getJson = (url, timeout = 10000) =>
   })
 
 /**
- * Whether Drupal holds the imported documentation. The footer menu is the
- * importer's last migration, so its items mean the import has finished.
+ * Whether Drupal answers for the site: its JSON:API index, which is there
+ * once the site is installed. A copied database carries its content by
+ * then, and an environment started empty has nothing further to wait for.
  *
  * @param {string} baseUrl - Drupal's base URL.
- * @returns {Promise<boolean>} True once the footer menu has items.
+ * @returns {Promise<boolean>} True once the JSON:API index answers.
  */
 const backendReady = async (baseUrl) => {
-  const menu = await getJson(new URL('/jsonapi/menu_items/footer', baseUrl).href)
-  return Boolean(menu && Array.isArray(menu.data) && menu.data.length)
+  const index = await getJson(new URL('/jsonapi', baseUrl).href)
+  return Boolean(index && index.links)
 }
 
 /**
@@ -66,17 +67,16 @@ const deployedRevision = async (baseUrl) => {
 /**
  * Whether Drupal has finished deploying the revision this build is from.
  *
- * The footer-menu check this replaces asks whether the documentation is
- * there, which an established site answers yes to throughout a rollout,
- * including while its database updates and configuration import are still
- * running. A frontend that builds then reads the previous release's
- * display configuration. Comparing revisions asks the question that
- * actually matters.
+ * Asking whether Drupal answers is not enough: an established site answers
+ * throughout a rollout, including while its database updates and
+ * configuration import are still running, and a frontend that builds then
+ * reads the previous release's display configuration. Comparing revisions
+ * asks the question that actually matters.
  *
  * It gives way rather than blocking, in two cases. Without a revision of
  * its own there is nothing to compare, so the gate does not apply: that is
  * local development. Where the endpoint is absent the backend predates
- * this check, so it falls back to the footer-menu probe.
+ * this check, so it falls back to the index probe above.
  *
  * @param {string} baseUrl - Drupal's base URL.
  * @param {object} [options] - Options.

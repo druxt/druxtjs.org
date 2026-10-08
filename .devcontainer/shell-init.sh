@@ -35,7 +35,7 @@ druxtjs.org
   Backend:  ${backend}
   Frontend: http://localhost:3000 once \`npm run dev\` is running
 
-  npm run setup           Assemble, provision, import and start the backend
+  npm run setup           Assemble, provision and start the backend
   npm run dev             Nuxt dev server against the backend
   npm run login           One-time login link for Drupal
   npm run docs:generate   Build the Modules, API and Components pages

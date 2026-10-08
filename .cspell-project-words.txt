@@ -65,14 +65,12 @@ phpize
 pidfile
 pkce
 pullrequests
-serialiser
 setuptools
 starterkit
 tablespaces
 threecol
 toplevel
 twocol
-unindexed
 urandom
 uselagoon
 vfox
@@ -85,7 +83,6 @@ coretags
 httpbundled
 lateruntime
 druxtjsorg
-endcode
 itok
 Revisionable
 SAMESITE

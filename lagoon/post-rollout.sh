@@ -7,17 +7,13 @@
 # updates and configuration are applied on top, so it holds real content on
 # new code before anything reads it.
 #
-# On Lagoon there is always a database to be had, because production's can
-# be copied, so seeding from the pinned corpus is the last resort and not
-# the routine. It happens only when the sync was turned off and nothing is
-# installed. A local checkout is the other way round: a contributor has no
-# production to copy, so `npm run setup` seeds from the pin, and this script
-# is not part of that path.
+# An environment with no database to copy or keep is installed from the
+# committed configuration and starts empty.
 #
 # DOCS_SKIP_SYNC=1 turns the sync off for an environment that wants to keep
 # the database it has.
 #
-# Production syncs from nothing and seeds from nothing. It is the source.
+# Production syncs from nothing. It is the source.
 set -eu
 
 app=$(cd "$(dirname "$0")/.." && pwd)
@@ -35,8 +31,8 @@ volatile_tables="cache,cache_*,cachetags,semaphore,sessions,watchdog,flood,key_v
 
 # While this exists Drupal answers every web request with a 503
 # (settings.replacing.php). A request that bootstraps Drupal against a
-# half-imported database writes into it, and the import then collides with
-# its own rows.
+# half-copied database writes into it, and the copy then collides with its
+# own rows.
 replacing="$app/drupal/web/sites/default/files/private/.replacing-database"
 
 # How often the marker says the rollout is still going, and the pid of the
@@ -272,21 +268,12 @@ fi
 if drush status --field=bootstrap 2>/dev/null | grep -q Successful; then
   echo "Updating the site."
   drush deploy --yes
-  seed_needed=0
 else
   echo "No database to update. Installing the site from its committed configuration."
   # A password drush did not generate is one it does not print into the deploy log.
   drush site:install --existing-config --yes --account-pass="$(head -c 32 /dev/urandom | base64)"
-  # Without this, the first import on Lagoon found no migrations and the web found no field types.
+  # Without this, the web found no field types after the first install on Lagoon.
   drush cache:rebuild
-  # Nothing was synced and nothing was installed before this, so the pinned
-  # corpus is the only content there is.
-  seed_needed=1
-fi
-
-if [ "$seed_needed" = "1" ]; then
-  echo "Nothing was copied and nothing was installed before this, so the pinned source is the only content there is."
-  php .devtools/import
 fi
 
 # The frontend's consumer comes from production's database, where neither

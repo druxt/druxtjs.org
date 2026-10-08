@@ -10,11 +10,11 @@ php = "8.4"
 node = "16.20.1"
 
 [tasks.install]
-description = "Install the root tooling and the IR builder's dependency"
+description = "Install the root tooling"
 run = "npm ci"
 
 [tasks.setup]
-description = "Assemble and provision Drupal, import the documentation, start the backend"
+description = "Assemble and provision Drupal, fetch the pinned druxt.js, start the backend"
 run = "npm run setup"
 
 [tasks.dev]
@@ -59,7 +59,7 @@ run = "npm test"
 
 [tasks."test:guardrails"]
 description = "Run the guardrail tests for .devtools and the scripts"
-run = "bash tests/start-guardrails.sh && bash tests/import-guardrails.sh && bash tests/validate-guardrails.sh"
+run = "bash tests/start-guardrails.sh"
 
 [tasks."test:phpunit"]
 description = "Run PHPUnit for druxt_docs"

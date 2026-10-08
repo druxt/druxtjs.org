@@ -23,7 +23,7 @@ final class DruxtjsorgCommands extends DrushCommands {
   }
 
   /**
-   * Sets the frontend consumer's OAuth settings and this frontend's callback.
+   * Creates the frontend consumer, or sets its OAuth settings and callback.
    */
   #[CLI\Command(name: 'druxtjsorg:oauth-client')]
   #[CLI\Option(name: 'frontend', description: 'The frontend origin. Defaults to the druxt_docs_frontend_url setting.')]
@@ -31,11 +31,7 @@ final class DruxtjsorgCommands extends DrushCommands {
   public function oauthClient(array $options = ['frontend' => NULL]): int {
     $storage = $this->entityTypeManager->getStorage('consumer');
     $consumers = $storage->loadByProperties(['client_id' => OAuthClient::CLIENT_ID]);
-    $consumer = reset($consumers);
-    if (!$consumer) {
-      $this->logger()->error(sprintf('No consumer has the client ID %s.', OAuthClient::CLIENT_ID));
-      return self::EXIT_FAILURE;
-    }
+    $consumer = reset($consumers) ?: $storage->create(OAuthClient::initial());
 
     $frontend = $options['frontend'] ?: Settings::get('druxt_docs_frontend_url');
     $redirects = array_column($consumer->get('redirect')->getValue(), 'value');

@@ -3,8 +3,8 @@
 // measuring what github-slugger 1.5.0 and JavaScript do to every code point.
 //
 // Drupal computes field_toc on read, and every heading has to get the id the
-// IR builder gives it: buildToc() in build-ir.mjs, which matches headings
-// with a JavaScript regex and slugs them with github-slugger. Nothing below
+// markdown site gave it, matching headings with a JavaScript regex and
+// slugging them with github-slugger. Nothing below
 // is transcribed from either. Each table is what Node answers when asked
 // about each code point, so the port cannot misread a rule.
 //

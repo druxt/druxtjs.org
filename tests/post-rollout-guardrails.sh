@@ -38,7 +38,7 @@ trap 'rm -rf "$scratch"' EXIT
 build_app() {
   local bootstrap="$1" sessions="${2:-0}" tokens="${3:-0}"
   local app="$scratch/app-$RANDOM"
-  mkdir -p "$app/lagoon" "$app/drupal/vendor/bin" "$app/drupal/.devtools"
+  mkdir -p "$app/lagoon" "$app/drupal/vendor/bin"
   cp "$ROLLOUT" "$app/lagoon/post-rollout.sh"
 
   # Keys already in place: generating them is a real drush call this stub
@@ -77,13 +77,6 @@ esac
 exit 0
 EOF
   chmod +x "$app/drupal/vendor/bin/drush"
-
-  cat > "$app/drupal/vendor/bin/php" <<EOF
-#!/usr/bin/env bash
-printf 'php %s\n' "\$*" >> "$app/calls.log"
-exit 0
-EOF
-  chmod +x "$app/drupal/vendor/bin/php"
 
   printf '%s' "$app"
 }
@@ -241,31 +234,15 @@ else
 fi
 
 # --------------------------------------------------------------------------
-# Seeding is the last resort, not the routine.
+# An environment with nothing to copy or keep is installed, not seeded.
 # --------------------------------------------------------------------------
-
-app="$(build_app yes)"
-run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
-if called "$app" ".devtools/import"; then
-  no "a synced environment: seeded from the pin anyway"
-else
-  ok "a synced environment: took its content from the sync, not the pin"
-fi
-
-app="$(build_app yes)"
-run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=production LAGOON_ENVIRONMENT=main > /dev/null
-if called "$app" ".devtools/import"; then
-  no "production: seeded from the pin"
-else
-  ok "production: never seeded"
-fi
 
 app="$(build_app no)"
 run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
-if called "$app" ".devtools/import"; then
-  ok "no database to start from: seeded from the pin, because nothing else has the content"
+if called "$app" "site:install --existing-config"; then
+  ok "no database to start from: installed from the committed configuration"
 else
-  no "no database to start from: nothing installed the content"
+  no "no database to start from: nothing installed the site"
 fi
 
 app="$(build_app yes)"
@@ -276,14 +253,6 @@ elif printf '%s' "$output" | grep -q "keeping the database this environment alre
   ok "DOCS_SKIP_SYNC=1: kept the existing database, and said why"
 else
   no "DOCS_SKIP_SYNC=1: skipped the sync without saying why"
-fi
-
-# Skipping the sync must not start seeding from the pin over a database that
-# is already there.
-if called "$app" ".devtools/import"; then
-  no "DOCS_SKIP_SYNC=1: seeded over the database it was told to keep"
-else
-  ok "DOCS_SKIP_SYNC=1: left the content alone"
 fi
 
 # Production's scheduled dump is preferred over reading its live database.
@@ -322,7 +291,7 @@ fi
 
 # --------------------------------------------------------------------------
 # Drupal refuses web requests while its database is replaced, so nothing
-# writes into a half-imported database, and the copy leaves out what a
+# writes into a half-copied database, and the copy leaves out what a
 # request would write.
 # --------------------------------------------------------------------------
 
