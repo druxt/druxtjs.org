@@ -25,10 +25,9 @@
           >
         </div>
 
-        <!-- The link follows the field in the DOM so Tab goes username, password, reveal, link. -->
+        <!-- The link follows the field in the DOM so Tab goes username, password, reveal, link; order-* keeps it beside the label. -->
         <div class="flex flex-wrap items-baseline gap-y-1.5">
           <label for="sign-in-pass" class="order-1 text-xs font-semibold">Password</label>
-          <button type="button" class="order-2 ml-auto text-xs text-primary-focus hover:underline" :disabled="busy" @click="show('forgot')">Forgot password?</button>
           <div class="relative order-3 w-full">
             <input
               id="sign-in-pass"
@@ -56,7 +55,8 @@
               </svg>
             </button>
           </div>
-          <p v-if="error" id="sign-in-error" class="sign-in-error" role="alert">
+          <button type="button" class="order-2 ml-auto text-xs text-primary-focus hover:underline" :disabled="busy" @click="show('forgot')">Forgot password?</button>
+          <p v-if="error" id="sign-in-error" class="sign-in-error order-4 w-full" role="alert">
             <svg class="account-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
             {{ error }}
           </p>
