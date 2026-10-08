@@ -1,0 +1,83 @@
+---
+name: Environments
+
+# Keeps this repository's GitHub Environments equal to the Lagoon project's:
+# one per Lagoon environment, opening its frontend route, and none for a
+# branch Lagoon no longer runs. Lagoon removes an environment when GitHub
+# tells it a branch was deleted, a minute or two later, so the run on a
+# delete waits before it looks.
+
+on:
+  delete:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: environments
+  cancel-in-progress: false
+
+env:
+  LAGOON_PROJECT: druxtjs-org
+  LAGOON_CLI_VERSION: v0.33.0
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Wait for Lagoon to act on the deleted branch
+        if: github.event_name == 'delete'
+        run: sleep 180
+
+      - name: Install the Lagoon CLI
+        run: |
+          curl -fsSL -o /usr/local/bin/lagoon \
+            "https://github.com/uselagoon/lagoon-cli/releases/download/${LAGOON_CLI_VERSION}/lagoon-cli-${LAGOON_CLI_VERSION}-linux-amd64"
+          chmod +x /usr/local/bin/lagoon
+          lagoon version
+
+      # The CLI signs in over SSH with a key registered to a Lagoon user that
+      # can read the project. The key is the only secret Lagoon needs.
+      - name: Sign in to Lagoon
+        env:
+          LAGOON_SSH_KEY: ${{ secrets.LAGOON_SSH_KEY }}
+        run: |
+          if [ -z "$LAGOON_SSH_KEY" ]; then
+            echo "::error::LAGOON_SSH_KEY is not set; add a private key whose public half is on a Lagoon user."
+            exit 1
+          fi
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$LAGOON_SSH_KEY" > ~/.ssh/lagoon
+          chmod 600 ~/.ssh/lagoon
+          lagoon config add --lagoon amazeeio --force \
+            --hostname ssh.lagoon.amazeeio.cloud --port 32222 \
+            --graphql https://api.lagoon.amazeeio.cloud/graphql \
+            --ssh-key ~/.ssh/lagoon --strict-host-key-checking accept-new
+          lagoon config default --lagoon amazeeio
+
+      - name: Read the Lagoon environments
+        run: |
+          lagoon --skip-update-check raw \
+            --raw "$(node scripts/sync-environments.mjs --query "$LAGOON_PROJECT")" > lagoon.json
+          node -e "const d = require('./lagoon.json'); console.log((d.data || d).projectByName.environments.map((e) => e.name).join('\n'))"
+
+      # Deleting an environment needs repository administration, which the
+      # workflow token never has. ENVIRONMENTS_TOKEN is a fine-grained token
+      # with Administration and Deployments write; without it, deployments
+      # still update and the deletions are listed as failed.
+      - name: Sync the GitHub environments
+        env:
+          GITHUB_TOKEN: ${{ secrets.ENVIRONMENTS_TOKEN || github.token }}
+        run: node scripts/sync-environments.mjs --lagoon lagoon.json --repo "$GITHUB_REPOSITORY"

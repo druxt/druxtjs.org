@@ -17,6 +17,12 @@ Druxt 1.0.0.
   same page the frontend shows as it starts, with the brand, a progress bar
   and a refresh every 15 seconds, instead of one line of text. The response
   is still a 503 with `Retry-After: 30`.
+- The repository's GitHub Environments mirror the Lagoon project. An hourly
+  workflow, also run when a branch is deleted, reads the Lagoon environments
+  over the CLI, records a deployment with each one's frontend route, and
+  removes any environment Lagoon no longer runs. It needs a Lagoon SSH key
+  and a token with repository administration, as `docs/environments.md`
+  describes.
 - Tab moves from the username field to the password field on the sign-in
   form. The "Forgot password?" link follows the password field in the page
   so a keyboard reaches it after the field it belongs to.
