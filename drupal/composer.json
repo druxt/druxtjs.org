@@ -33,6 +33,8 @@
         "drupal/logout_token": "^2.0.1",
         "drupal/markdown_easy": "^2.0",
         "drupal/maxlength": "^3.2",
+        "drupal/migrate_plus": "^6.0",
+        "drupal/migrate_tools": "^6.1",
         "drupal/node_edit_protection": "^1.2",
         "drupal/paragraphs": "^1.23",
         "drupal/pathauto": "^1.15",

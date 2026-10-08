@@ -78,7 +78,9 @@ Druxt 1.0.0.
   no longer carries `field_source_path`. A site with no database to copy
   starts empty, and `drush druxtjsorg:oauth-client` creates the frontend's consumer
   when there is none. `npm run docs:fetch` checks out the pinned druxt.js for
-  the API reference.
+  the API reference. The migrate packages stay in `composer.json` until every
+  database has imported their uninstall, since Drupal needs a module's code
+  to uninstall it. A later change removes them.
 
 ### Fixed
 
