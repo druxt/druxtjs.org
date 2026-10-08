@@ -504,7 +504,9 @@ export default {
 
     /** The workspaces this editor may read the site in, by machine name and label. */
     async loadWorkspaces() {
-      if (this.workspaces.length) return
+      // Once at a time: the menu opening and the bar showing can both ask.
+      if (this.workspaces.length || this.loadingWorkspaces) return
+      this.loadingWorkspaces = true
       try {
         // JSON:API pages the collection at fifty, so the list follows `next`
         // until there is none; the bound is for a backend that never stops.
@@ -523,6 +525,8 @@ export default {
         }))
       } catch (error) {
         // Without the list there is no choice to offer, and live still reads.
+      } finally {
+        this.loadingWorkspaces = false
       }
     },
 

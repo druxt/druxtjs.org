@@ -17,7 +17,12 @@ const SORTS = {
   // offset, and two offsets sort as text in the wrong order.
   newest: { label: 'Newest first', short: 'Newest', compare: (a, b) => (Date.parse(b.changed) || 0) - (Date.parse(a.changed) || 0) },
   oldest: { label: 'Oldest first', short: 'Oldest', compare: (a, b) => (Date.parse(a.changed) || 0) - (Date.parse(b.changed) || 0) },
-  title: { label: 'Title', short: 'Title', compare: (a, b) => String(a.title).localeCompare(String(b.title)) },
+  title: {
+    label: 'Title',
+    short: 'Title',
+    // Numeric, so "Page 2" comes before "Page 10".
+    compare: (a, b) => String(a.title).localeCompare(String(b.title), undefined, { numeric: true }),
+  },
 }
 
 /** Whether a page is new to live or a change to a page live has. */

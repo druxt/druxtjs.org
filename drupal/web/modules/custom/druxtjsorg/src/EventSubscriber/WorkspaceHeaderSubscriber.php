@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\druxtjsorg\EventSubscriber;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\druxtjsorg\Negotiator\CookieWorkspaceNegotiator;
 use Drupal\druxtjsorg\Negotiator\HeaderWorkspaceNegotiator;
@@ -29,7 +30,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * A write whose header names a workspace it cannot have is refused, never sent
  * to live. A cookie naming one is a stale choice, kept for thirty days past a
  * workspace an editor deleted or lost: the request reads and writes live, and
- * the response's cookie follows the active workspace, so the choice clears.
+ * says so in the log. The cookie stays until the editor chooses Live in the
+ * bar or switches in Drupal, since only a switch writes it.
  */
 final class WorkspaceHeaderSubscriber implements EventSubscriberInterface {
 
@@ -44,6 +46,7 @@ final class WorkspaceHeaderSubscriber implements EventSubscriberInterface {
     private readonly WorkspaceManagerInterface $workspaceManager,
     private readonly HeaderWorkspaceNegotiator $negotiator,
     private readonly ?CookieWorkspaceNegotiator $cookieNegotiator = NULL,
+    private readonly ?LoggerChannelFactoryInterface $loggerFactory = NULL,
   ) {}
 
   /**
@@ -93,6 +96,11 @@ final class WorkspaceHeaderSubscriber implements EventSubscriberInterface {
     // the editor submits in Drupal, the workspace switcher among them.
     if ($header && !$request->isMethodSafe()) {
       throw new AccessDeniedHttpException('The workspace this request names is not available.');
+    }
+    // A trace of a write that lands on live under a stale choice, since no
+    // bar shows on Drupal's own screens to say so.
+    if (!$header && !$request->isMethodSafe()) {
+      $this->loggerFactory?->get('druxtjsorg')->notice('The workspace cookie names @id, which is not available; the request was answered from live.', ['@id' => $id]);
     }
   }
 

@@ -52,6 +52,7 @@ final class DruxtjsorgServiceProvider extends ServiceProviderBase {
         new Reference('workspaces.manager'),
         new Reference('druxtjsorg.workspace_negotiator.header'),
         new Reference('druxtjsorg.workspace_negotiator.cookie'),
+        new Reference('logger.factory'),
       ])
       ->addTag('event_subscriber');
     $container->register('druxtjsorg.live_working_copy', LiveWorkingCopy::class)

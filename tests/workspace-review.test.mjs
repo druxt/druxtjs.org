@@ -130,6 +130,20 @@ describe('the filters', () => {
     assert.deepEqual(ids(reviewOf(mixed, { ...NO_FILTERS, sort: 'oldest' })), ['a', 'b'])
   })
 
+  test('orders titles with their numbers read as numbers', () => {
+    const numbered = changesFrom(
+      {
+        data: [
+          page('ten', 'Page 10', '/ten', '2026-10-07T10:00:00+00:00', 'u1'),
+          page('two', 'Page 2', '/two', '2026-10-07T11:00:00+00:00', 'u1'),
+        ],
+        included: document.included,
+      },
+      []
+    )
+    assert.deepEqual(ids(reviewOf(numbered, { ...NO_FILTERS, sort: 'title' })), ['two', 'ten'])
+  })
+
   test('narrow by status, section, author and every searched word', () => {
     assert.deepEqual(ids(reviewOf(pages, { ...NO_FILTERS, status: 'new' })), ['c'])
     assert.deepEqual(ids(reviewOf(pages, { ...NO_FILTERS, section: 'how-to' })), ['b'])
