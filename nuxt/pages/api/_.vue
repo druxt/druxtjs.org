@@ -77,7 +77,7 @@ export default {
      */
     inModuleHeader: ({ $route }) => isPackageRoot($route.path),
 
-    source: ({ document }) => apiSourceUrl(document.dir, document.slug),
+    source: ({ document, $config }) => apiSourceUrl(document.dir, document.slug, $config.druxtSourceRef),
 
     /** The component this page documents, when it has a live card. */
     example: ({ document }) => (/\/components$/.test(document.dir || '') && knowsComponent(document.slug) ? document.slug : null),

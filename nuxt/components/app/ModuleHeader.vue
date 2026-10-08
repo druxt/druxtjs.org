@@ -226,9 +226,11 @@ export default {
      *
      * @param {object} vm - The component ViewModel.
      * @param {string} vm.pkg - The package directory name.
-     * @returns {string} The package directory URL on GitHub.
+     * @param {object} vm.$config - The runtime config, with the documented commit.
+     * @returns {string} The package directory URL on GitHub, at that commit.
      */
-    repo: ({ pkg }) => 'https://github.com/druxt/druxt.js/tree/develop/packages/' + pkg,
+    repo: ({ pkg, $config }) =>
+      `https://github.com/druxt/druxt.js/tree/${$config.druxtSourceRef || 'HEAD'}/packages/${pkg}`,
 
     /**
      * The other modules, for the switcher.
