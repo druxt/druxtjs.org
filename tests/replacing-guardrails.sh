@@ -11,6 +11,7 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 
 readonly GUARD="$PWD/drupal/web/sites/default/settings.replacing.php"
+readonly PAGE="$PWD/drupal/web/sites/default/replacing.html"
 
 pass=0
 fail=0
@@ -73,6 +74,23 @@ if curl -s -D - -o /dev/null "http://127.0.0.1:$port/index.php" | grep -qi '^Ret
   ok "during a replacement: says when to try again"
 else
   no "during a replacement: no Retry-After"
+fi
+
+# The page ships beside the guard, so a pod answers with the site's own face;
+# the plain line is only for a guard that finds no page next to it.
+cp "$PAGE" "$site/replacing.html"
+headers="$(curl -s -D - -o "$scratch/body" "http://127.0.0.1:$port/index.php")"
+if printf '%s' "$headers" | grep -qi '^HTTP/[0-9.]* 503' && printf '%s' "$headers" | grep -qi '^Content-Type: text/html' && grep -q 'Refreshing the content' "$scratch/body"; then
+  ok "during a replacement, with the page: 503 and the splash page as HTML"
+else
+  no "during a replacement, with the page: no HTML splash in the 503"
+fi
+rm "$site/replacing.html"
+code="$(request)"
+if [ "$code" = "503" ] && grep -q 'being replaced' "$scratch/body"; then
+  ok "during a replacement, without the page: 503 with the plain line"
+else
+  no "during a replacement, without the page: ${code}, no plain line"
 fi
 
 # The rollout touches the marker while it works, so a long copy is still a
