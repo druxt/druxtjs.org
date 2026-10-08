@@ -26,7 +26,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * the rest of the request. This runs after authentication and before routing
  * loads any entity, and activates the workspace for this request only.
  *
- * A write that names a workspace it cannot have is refused, never sent to live.
+ * A write whose header names a workspace it cannot have is refused, never sent
+ * to live. A cookie naming one is a stale choice, kept for thirty days past a
+ * workspace an editor deleted or lost: the request reads and writes live, and
+ * the response's cookie follows the active workspace, so the choice clears.
  */
 final class WorkspaceHeaderSubscriber implements EventSubscriberInterface {
 
@@ -66,7 +69,8 @@ final class WorkspaceHeaderSubscriber implements EventSubscriberInterface {
       return;
     }
     // The header, or else the editor's cookie; the header always wins.
-    if ($this->negotiator->applies($request)) {
+    $header = $this->negotiator->applies($request);
+    if ($header) {
       $id = $this->negotiator->getActiveWorkspaceId($request);
     }
     elseif ($this->cookieNegotiator?->applies($request) && $request->cookies->has(CookieWorkspaceNegotiator::COOKIE)) {
@@ -84,8 +88,10 @@ final class WorkspaceHeaderSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    // One answer for unknown and forbidden, so neither reveals the other.
-    if (!$request->isMethodSafe()) {
+    // One answer for unknown and forbidden, so neither reveals the other. Only
+    // the header is refused: a stale cookie would otherwise block every form
+    // the editor submits in Drupal, the workspace switcher among them.
+    if ($header && !$request->isMethodSafe()) {
       throw new AccessDeniedHttpException('The workspace this request names is not available.');
     }
   }

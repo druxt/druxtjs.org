@@ -8,6 +8,7 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\druxtjsorg\Controller\WorkspaceEntityResource;
 use Drupal\druxtjsorg\EventSubscriber\WorkspaceHeaderSubscriber;
+use Drupal\druxtjsorg\Negotiator\CookieWorkspaceNegotiator;
 use Drupal\druxtjsorg\Hook\WorkspaceCacheHooks;
 use Drupal\druxtjsorg\Revisions\LiveWorkingCopy;
 use Drupal\druxtjsorg\Revisions\WorkspaceVersionNegotiator;
@@ -147,6 +148,28 @@ final class WorkspaceJsonapiTest extends KernelTestBase {
     self::assertSame(403, $this->patch('Nowhere', 'stage', $other)->getStatusCode());
     self::assertSame('Live title', $this->liveTitle());
     self::assertSame('Live title', $this->title($this->editor));
+  }
+
+  /**
+   * A cookie naming a workspace that is gone falls back to live, not to a 403.
+   *
+   * The cookie outlives a workspace the editor deleted; refusing every write
+   * would take Drupal's forms with it, the switcher back to live included.
+   */
+  public function testAStaleCookieIsAnsweredFromLive(): void {
+    $body = Json::encode([
+      'data' => [
+        'type' => 'node--page',
+        'id' => $this->page->uuid(),
+        'attributes' => ['title' => 'Written with a stale cookie'],
+      ],
+    ]);
+    $request = Request::create('/jsonapi/node/page/' . $this->page->uuid(), 'PATCH', [], [], [], [], $body);
+    $request->headers->set('Content-Type', 'application/vnd.api+json');
+    $request->cookies->set(CookieWorkspaceNegotiator::COOKIE, 'gone');
+
+    self::assertSame(200, $this->send($request, $this->editor, NULL)->getStatusCode());
+    self::assertSame('Written with a stale cookie', $this->liveTitle());
   }
 
   /**

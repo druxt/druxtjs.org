@@ -96,7 +96,9 @@ write a page and its paragraphs as a draft on live or into a workspace. The
 site is a JSON:API client and doesn't carry a writer of its own. Content goes
 through a Druxt client. Workspaces stage a set of changes off live, chosen per
 request with the `X-Druxt-Workspace` header, which `druxtjsorg` honours only
-for a signed-in account.
+for a signed-in account that may view that workspace: the `editor` role has
+`view any workspace`, `contributor` does not, and a write naming a workspace
+the account cannot see is refused rather than sent to live.
 [docs/backend.md](docs/backend.md#staging-in-a-workspace) covers both. The
 importer still seeds every page published.
 
