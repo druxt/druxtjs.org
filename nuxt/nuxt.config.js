@@ -107,7 +107,7 @@ export default {
     // server sends the same link as a header on every response.
     link: [
       { rel: 'icon', type: 'image/png', href: '/icon.png' },
-      { hid: 'llms', rel: 'describedby', type: 'text/markdown', href: '/llms.txt' },
+      { hid: 'llms', rel: 'describedby', type: 'text/plain', href: '/llms.txt' },
     ],
     script: [
       // Sets data-theme before first paint, from the stored or OS preference.

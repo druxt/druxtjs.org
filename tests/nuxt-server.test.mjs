@@ -436,6 +436,22 @@ describe('createHandler', () => {
     })
   })
 
+  test('points the starting page and its status at llms.txt too, when told the link', async () => {
+    const state = { phase: 'waiting', since: Date.now() }
+    await withServer(
+      createStartingHandler(state, { headers: { Link: LLMS_LINK } }),
+      async (base) => {
+        for (const path of ['/__status', '/']) {
+          const res = await request(`${base}${path}`)
+          assert.equal(res.headers.link, LLMS_LINK, `Link on ${path}`)
+        }
+      }
+    )
+    await withServer(createStartingHandler(state), async (base) => {
+      assert.equal((await request(`${base}/`)).headers.link, undefined, 'no link unless told one')
+    })
+  })
+
   test('points every response at llms.txt with a describedby link', async () => {
     await withServer(createHandler({ cache: null, live: live() }), async (base) => {
       for (const target of [`${base}/`, `${base}/how-to/proxy`, `${base}/jsonapi/x`]) {
@@ -443,7 +459,7 @@ describe('createHandler', () => {
         assert.equal(res.headers.link, LLMS_LINK, `Link on ${target}`)
       }
     })
-    assert.equal(LLMS_LINK, '</llms.txt>; rel="describedby"; type="text/markdown"')
+    assert.equal(LLMS_LINK, '</llms.txt>; rel="describedby"; type="text/plain"')
   })
 
   test('never stores a page that did not answer 200', async () => {

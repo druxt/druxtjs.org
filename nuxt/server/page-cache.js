@@ -31,7 +31,7 @@ const SECURITY_HEADERS = {
  * `describedby` link, sent as a header so a non-HTML response carries it too.
  * nuxt.config.js puts the same link in every page's head.
  */
-const LLMS_LINK = '</llms.txt>; rel="describedby"; type="text/markdown"'
+const LLMS_LINK = '</llms.txt>; rel="describedby"; type="text/plain"'
 
 /** The compressed copies stored beside each page, in order of preference. */
 const ENCODINGS = [
