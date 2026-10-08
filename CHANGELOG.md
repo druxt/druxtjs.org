@@ -74,9 +74,9 @@ Druxt 1.0.0.
 
 - The markdown import. Production's database is the only copy of the
   content, so the importer, its migrations and the migrate modules, the IR
-  builder, the content baseline and validation and `field_source_path` are
-  gone. A site with no database to copy starts
-  empty, and `drush druxtjsorg:oauth-client` creates the frontend's consumer
+  builder and the content baseline and validation are gone, and the page type
+  no longer carries `field_source_path`. A site with no database to copy
+  starts empty, and `drush druxtjsorg:oauth-client` creates the frontend's consumer
   when there is none. `npm run docs:fetch` checks out the pinned druxt.js for
   the API reference.
 
