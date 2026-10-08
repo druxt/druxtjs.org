@@ -136,6 +136,12 @@ if ($has_config && str_contains((string) file_get_contents('config/sync/core.ext
   TASK('Generating OAuth keys in ../keys if there are none.');
   drush('php:eval %s', ['$dir = DRUPAL_ROOT . "/../keys"; if (!is_file("$dir/private.key")) { @mkdir($dir, 0700, TRUE); \Drupal::service("simple_oauth.key.generator")->generateKeys($dir); }']);
   PASS('OAuth keys in place.');
+
+  // The consumer the frontend signs editors in through: production's database
+  // carries one, a site provisioned from nothing does not.
+  TASK('Creating the frontend\'s OAuth consumer if there is none.');
+  drush('druxtjsorg:oauth-client');
+  PASS('Frontend consumer in place.');
 }
 
 echo PHP_EOL;
