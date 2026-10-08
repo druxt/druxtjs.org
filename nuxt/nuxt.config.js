@@ -365,6 +365,8 @@ export default {
       // Anchors are what components/app/Toc.vue scroll-spies against.
       // Token colours come from assets/css/code.css, not a Prism theme.
       prism: { theme: false },
+      // The release notes name `druxt@0.24.0`, which GFM would link as mail.
+      remarkPlugins: ['~/lib/remark-package-versions.js'],
     },
   },
 

@@ -212,6 +212,16 @@ const PAGES = [
   },
 ]
 
+
+/**
+ * A package's npm name from its directory under packages/, which docgen keys
+ * the reference by: `druxt` is itself, the rest take the `druxt-` prefix.
+ *
+ * @param {string} dir - The directory name, e.g. 'menu'.
+ * @returns {string} The npm name, e.g. 'druxt-menu'.
+ */
+const packageName = (dir) => (dir === 'druxt' ? 'druxt' : `druxt-${dir}`)
+
 module.exports = {
   PAGES,
   PLAYGROUND_DESCRIPTION,
@@ -227,5 +237,4 @@ module.exports = {
   sectionFor,
   titleFromPath,
   docTypeFor,
-  docTypeExpression,
-}
+  docTypeExpression, packageName }
