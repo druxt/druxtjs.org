@@ -403,6 +403,7 @@ export default {
         document.body.classList.toggle('has-editor-bar', shown)
         if (shown) this.observe()
         else {
+          clearTimeout(this.switching)
           this.unlock()
           this.unobserve()
         }
@@ -505,10 +506,18 @@ export default {
     async loadWorkspaces() {
       if (this.workspaces.length) return
       try {
-        const { data } = await this.$druxt.axios.get('/jsonapi/workspace/workspace', {
-          params: { 'fields[workspace--workspace]': 'drupal_internal__id,label', sort: 'label' },
-        })
-        this.workspaces = ((data && data.data) || []).map(({ attributes }) => ({
+        // JSON:API pages the collection at fifty, so the list follows `next`
+        // until there is none; the bound is for a backend that never stops.
+        const found = []
+        let url = '/jsonapi/workspace/workspace'
+        let params = { 'fields[workspace--workspace]': 'drupal_internal__id,label', sort: 'label' }
+        for (let page = 0; url && page < 20; page += 1) {
+          const { data } = await this.$druxt.axios.get(url, { params })
+          found.push(...((data && data.data) || []))
+          url = (((data && data.links) || {}).next || {}).href || null
+          params = undefined
+        }
+        this.workspaces = found.map(({ attributes }) => ({
           id: attributes.drupal_internal__id,
           label: attributes.label,
         }))
@@ -605,7 +614,7 @@ export default {
       // controls used to move the bar out from under the pointer.
       if (subject && this.active && subject.uuid !== this.active.uuid) {
         this.switching = setTimeout(() => {
-          if (!this.hovering && !this.locked) this.take(subject)
+          if (this.show && !this.hovering && !this.locked) this.take(subject)
         }, SWITCH_DELAY)
         return
       }

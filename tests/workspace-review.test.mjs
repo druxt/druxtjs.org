@@ -114,6 +114,22 @@ describe('the filters', () => {
     assert.deepEqual(ids(reviewOf(pages, { ...NO_FILTERS, sort: 'title' })), ['a', 'b', 'c'])
   })
 
+  test('order by the time, so a different offset does not reorder the list', () => {
+    // As text, a's stamp sorts after b's; as a time it is the earlier one.
+    const mixed = changesFrom(
+      {
+        data: [
+          page('a', 'Later as text', '/a', '2026-10-07T23:30:00+10:00', 'u1'),
+          page('b', 'Later in time', '/b', '2026-10-07T14:00:00+00:00', 'u1'),
+        ],
+        included: document.included,
+      },
+      []
+    )
+    assert.deepEqual(ids(reviewOf(mixed)), ['b', 'a'])
+    assert.deepEqual(ids(reviewOf(mixed, { ...NO_FILTERS, sort: 'oldest' })), ['a', 'b'])
+  })
+
   test('narrow by status, section, author and every searched word', () => {
     assert.deepEqual(ids(reviewOf(pages, { ...NO_FILTERS, status: 'new' })), ['c'])
     assert.deepEqual(ids(reviewOf(pages, { ...NO_FILTERS, section: 'how-to' })), ['b'])

@@ -13,8 +13,10 @@ const CHANGES_LIMIT = 50
 
 /** The orders the review offers, by key. The first is the default. */
 const SORTS = {
-  newest: { label: 'Newest first', short: 'Newest', compare: (a, b) => String(b.changed).localeCompare(String(a.changed)) },
-  oldest: { label: 'Oldest first', short: 'Oldest', compare: (a, b) => String(a.changed).localeCompare(String(b.changed)) },
+  // By the time, not the string: Drupal writes `changed` with the site's
+  // offset, and two offsets sort as text in the wrong order.
+  newest: { label: 'Newest first', short: 'Newest', compare: (a, b) => (Date.parse(b.changed) || 0) - (Date.parse(a.changed) || 0) },
+  oldest: { label: 'Oldest first', short: 'Oldest', compare: (a, b) => (Date.parse(a.changed) || 0) - (Date.parse(b.changed) || 0) },
   title: { label: 'Title', short: 'Title', compare: (a, b) => String(a.title).localeCompare(String(b.title)) },
 }
 
