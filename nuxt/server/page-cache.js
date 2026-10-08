@@ -148,6 +148,11 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
       await fs.promises.mkdir(path.dirname(file), { recursive: true })
       for (const { suffix, compress } of ENCODINGS) await write(file + suffix, compress(html))
       await write(file, html)
+      if (began !== generation) {
+        // Purged while the files were written: they carry a post-purge time, so drop them.
+        log(`cache: ${pathname} dropped: purged while storing`)
+        await Promise.all(['', ...ENCODINGS.map((e) => e.suffix)].map((s) => fs.promises.rm(file + s, { force: true })))
+      }
       return html
     })()
       .catch((e) => {
@@ -160,12 +165,15 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
   }
 
   /** Marks every stored page stale, as a purge cannot say which pages it touched. */
+  // Marker writes queue in purge order, so two purges never share a partial file.
+  let marking = Promise.resolve()
   const invalidate = () => {
     purgedAt = Date.now()
     generation += 1
-    fs.promises
-      .mkdir(root, { recursive: true })
-      .then(() => write(purgeFile, String(purgedAt)))
+    const at = purgedAt
+    marking = marking
+      .then(() => fs.promises.mkdir(root, { recursive: true }))
+      .then(() => write(purgeFile, String(at)))
       .catch((e) => log(`cache: purge time not kept: ${e.message}`))
   }
 

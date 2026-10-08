@@ -51,12 +51,14 @@ export default {
     // The notice stays, with a retry, when the refresh fails: the page is still out of date.
     async show() {
       this.loading = true
+      // Only the change in hand is dismissed: one that lands mid-refresh keeps the notice.
+      const handled = this.changedAt
       try {
         this.$liveUpdates.freshUntil = Date.now() + FRESH_FOR
         await this.$store.dispatch('druxt/clearCache')
         await this.$nuxt.refresh()
         this.failed = false
-        this.dismissedAt = Date.now()
+        this.dismissedAt = handled
       } catch (error) {
         this.failed = true
       } finally {
