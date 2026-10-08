@@ -236,6 +236,17 @@ describe('outlineProblems', () => {
     assert.deepEqual(outline('- Overview\n===\n\nText.'), [])
   })
 
+  test('reports a raw-text element that never closes, which would swallow the rest', () => {
+    // The page names it, and the file does too, as with a fence left open.
+    const pre = outline('<pre>\n# swallowed\n\nText.')
+    assert.equal(pre.length, 2)
+    assert.equal(pre[0], '/how-to/theming line 1: <pre> never closes')
+    assert.match(pre[1], /^line \d+: <pre> never closes$/)
+    const style = outline('<script>\nx()\n</script>\n\n<style>\np {}')
+    assert.equal(style[0], '/how-to/theming line 5: <style> never closes')
+    assert.match(style[1], /<style> never closes$/)
+  })
+
   test('keeps a raw-text element open to its closing tag, blank lines and all', () => {
     assert.deepEqual(outline('<pre>\n# not a heading\n\n```\n# nor this\n</pre>\n\nText.'), [])
     assert.deepEqual(outline('<script>\n// # x\n</script>\n\n# After'), [
@@ -288,6 +299,7 @@ describe('scanFences', () => {
         { line: 7, level: 2, text: '## Page' },
       ],
       open: null,
+      raw: null,
     })
   })
 

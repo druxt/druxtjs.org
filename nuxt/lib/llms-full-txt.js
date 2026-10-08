@@ -160,8 +160,9 @@ const fenceMarker = (line) => {
  * marker dedented past the item ends the item and opens a fence of its own.
  *
  * @param {string} markdown - Text to scan.
- * @returns {{ headings: Array<{ line: number, level: number, text: string }>, open: ?number }}
- *   Headings outside fences, at every level, and the line of a fence left open.
+ * @returns {{ headings: Array<{ line: number, level: number, text: string }>, open: ?number, raw: ?{ tag: string, line: number } }}
+ *   Headings outside fences, at every level, the line of a fence left open, and
+ *   a raw-text element left open.
  */
 const scanFences = (markdown) => {
   const headings = []
@@ -169,6 +170,9 @@ const scanFences = (markdown) => {
   let fence = null
   // An HTML block: a comment runs to its `-->`, any other tag to a blank line.
   let html = null
+  // The raw-text element still open at the end, if one is: `<pre>`, `<script>`,
+  // `<style>` or `<textarea>` run to their closing tag, however far that is.
+  let rawOpen = null
   // Whether the line before was paragraph text: what a setext underline needs.
   let text = false
 
@@ -195,7 +199,10 @@ const scanFences = (markdown) => {
         if (line.includes('-->')) html = null
       } else if (html === 'tag') {
         if (!line.trim()) html = null
-      } else if (new RegExp('</' + html + '>', 'i').test(line)) html = null
+      } else if (new RegExp('</' + html + '>', 'i').test(line)) {
+        html = null
+        rawOpen = null
+      }
       text = false
       return
     }
@@ -208,6 +215,8 @@ const scanFences = (markdown) => {
     const raw = /^ {0,3}<(pre|script|style|textarea)(?=[\s>]|$)/i.exec(line)
     if (raw) {
       html = new RegExp('</' + raw[1] + '>', 'i').test(line) ? null : raw[1].toLowerCase()
+      // Remembered like a fence: left open, it swallows the rest of the page.
+      if (html) rawOpen = { tag: html, line: index + 1 }
       text = false
       return
     }
@@ -237,7 +246,7 @@ const scanFences = (markdown) => {
 
   lines.forEach(read)
 
-  return { headings, open: fence && fence.line }
+  return { headings, open: fence && fence.line, raw: rawOpen }
 }
 
 /**
@@ -266,6 +275,7 @@ const outlineProblems = (docs, text) => {
   docs.filter(included).forEach((doc) => {
     const body = scanFences(doc.content)
     if (body.open) problems.push(doc.route + ' line ' + body.open + ': code fence never closes')
+    if (body.raw) problems.push(doc.route + ' line ' + body.raw.line + ': <' + body.raw.tag + '> never closes')
     body.headings
       .filter((heading) => heading.level === 1)
       .forEach((heading) => {
@@ -280,6 +290,7 @@ const outlineProblems = (docs, text) => {
     .filter((heading) => !expected.includes(heading.text) && !inBodies.has(heading.text))
     .forEach((heading) => problems.push('line ' + heading.line + ': unexpected top-level heading "' + heading.text + '"'))
   if (file.open) problems.push('line ' + file.open + ': code fence never closes')
+  if (file.raw) problems.push('line ' + file.raw.line + ': <' + file.raw.tag + '> never closes')
 
   return problems
 }
