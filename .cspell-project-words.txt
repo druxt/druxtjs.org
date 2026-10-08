@@ -91,3 +91,5 @@ SAMESITE
 SIMPLETEST
 coderabbit
 setext
+describedby
+llmstxt

@@ -11,7 +11,7 @@ const http = require('http')
 const path = require('path')
 const { execFileSync, spawn } = require('child_process')
 const { deploymentReady, resolveOrigin, waitForBackend } = require('./backend')
-const { createHandler, createPageCache, crawl } = require('./page-cache')
+const { createHandler, createPageCache, crawl, LLMS_LINK } = require('./page-cache')
 const { createArtefacts } = require('./artefacts')
 const { createStartingHandler } = require('./starting')
 
@@ -29,7 +29,8 @@ const setPhase = (phase) => {
   state.since = new Date().toISOString()
 }
 
-let handler = createStartingHandler(state)
+// The describedby link from the first response: the starting page is one too.
+let handler = createStartingHandler(state, { headers: { Link: LLMS_LINK } })
 const server = http.createServer((req, res) => handler(req, res))
 
 const nuxt = (args, extraEnv) =>

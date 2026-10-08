@@ -26,6 +26,13 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 }
 
+/**
+ * The llms.txt that describes every page, as llmstxt.org v2 discovers it: a
+ * `describedby` link, sent as a header so a non-HTML response carries it too.
+ * nuxt.config.js puts the same link in every page's head.
+ */
+const LLMS_LINK = '</llms.txt>; rel="describedby"; type="text/plain"'
+
 /** The compressed copies stored beside each page, in order of preference. */
 const ENCODINGS = [
   {
@@ -184,6 +191,7 @@ const createHandler =
   ({ cache, live, noindex = false, artefacts = null, passThrough = null }) =>
   async (req, res) => {
     for (const [name, value] of Object.entries(SECURITY_HEADERS)) res.setHeader(name, value)
+    res.setHeader('Link', LLMS_LINK)
     if (String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https') {
       res.setHeader('Strict-Transport-Security', 'max-age=31536000')
     }
@@ -265,4 +273,5 @@ const createHandler =
     return res.end(req.method === 'HEAD' ? undefined : page.body)
   }
 
-module.exports = { SECURITY_HEADERS, createHandler, createPageCache, crawl, isPage }
+module.exports = {
+  LLMS_LINK, SECURITY_HEADERS, createHandler, createPageCache, crawl, isPage }

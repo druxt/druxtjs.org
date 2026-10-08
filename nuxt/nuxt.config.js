@@ -103,7 +103,12 @@ export default {
     // static/ ships icon.png, from which @nuxtjs/pwa generates the rest of
     // the icon set, and favicon.ico for the consumers that ask for one by
     // name.
-    link: [{ rel: 'icon', type: 'image/png', href: '/icon.png' }],
+    // llmstxt.org v2 discovery: the llms.txt that describes this page. The
+    // server sends the same link as a header on every response.
+    link: [
+      { rel: 'icon', type: 'image/png', href: '/icon.png' },
+      { hid: 'llms', rel: 'describedby', type: 'text/plain', href: '/llms.txt' },
+    ],
     script: [
       // Sets data-theme before first paint, from the stored or OS preference.
       // plugins/color-mode-theme.client.js keeps it in sync after that.
