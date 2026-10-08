@@ -401,7 +401,11 @@ export default {
       'show',
       (shown) => {
         document.body.classList.toggle('has-editor-bar', shown)
-        if (!shown) this.unlock()
+        if (shown) this.observe()
+        else {
+          this.unlock()
+          this.unobserve()
+        }
       },
       { immediate: true }
     )
@@ -436,17 +440,6 @@ export default {
     window.addEventListener('scroll', this.onViewport, { passive: true })
     window.addEventListener('resize', this.onViewport)
     this.readChoices()
-    // Druxt renders a page's blocks after the page itself, so the list is
-    // read again, once the document has settled, after anything outside the
-    // bar changes.
-    if (window.MutationObserver) {
-      this.observer = new MutationObserver((mutations) => {
-        if (mutations.every((mutation) => this.$el && this.$el.contains(mutation.target))) return
-        clearTimeout(this.rereading)
-        this.rereading = setTimeout(this.readChoices, 150)
-      })
-      this.observer.observe(document.body, { childList: true, subtree: true })
-    }
   },
 
   beforeDestroy() {
@@ -459,9 +452,8 @@ export default {
     window.removeEventListener('resize', this.onViewport)
     clearTimeout(this.linger)
     clearTimeout(this.switching)
-    clearTimeout(this.rereading)
     clearInterval(this.hintPoll)
-    if (this.observer) this.observer.disconnect()
+    this.unobserve()
     if (this.frame) cancelAnimationFrame(this.frame)
     this.mark(null)
   },
@@ -562,6 +554,28 @@ export default {
       // observer below would otherwise read as the document settling again.
       const key = (list) => list.map((subject) => `${subject.uuid}:${subject.label}`).join(' ')
       if (key(found) !== key(this.choices)) this.choices = found
+    },
+
+    /**
+     * Reads the list again as the document settles: Druxt renders a page's
+     * blocks after the page itself. Only while the bar shows, since a reader
+     * without it has no list to keep.
+     */
+    observe() {
+      if (this.observer || typeof window === 'undefined' || !window.MutationObserver) return
+      this.readChoices()
+      this.observer = new MutationObserver((mutations) => {
+        if (mutations.every((mutation) => this.$el && this.$el.contains(mutation.target))) return
+        clearTimeout(this.rereading)
+        this.rereading = setTimeout(this.readChoices, 150)
+      })
+      this.observer.observe(document.body, { childList: true, subtree: true })
+    },
+
+    unobserve() {
+      clearTimeout(this.rereading)
+      if (this.observer) this.observer.disconnect()
+      this.observer = null
     },
 
     /** Opens the list of what is editable, read afresh: blocks render after the page. */
