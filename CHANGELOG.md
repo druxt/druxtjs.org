@@ -9,6 +9,10 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+- `llms-full.txt` keeps its outline when a page shows a code fence. A Drupal
+  code paragraph is fenced longer than any fence it contains, and the build
+  refuses to write the file when a fence or raw-text element is left open,
+  checked with the parser the site renders with.
 - The Nuxt server keeps the JSON:API index and the menus between server
   renders for as long as Drupal's page `max_age` allows, now set to 300
   seconds. A warm render of a documentation page no longer asks Drupal for

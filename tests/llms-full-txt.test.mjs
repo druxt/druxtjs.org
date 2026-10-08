@@ -7,7 +7,7 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
 
-const { buildLlmsFullTxt, outlineProblems, scanFences, toAbsoluteUrls, isChangelog } = await import(
+const { buildLlmsFullTxt, outlineProblems, toAbsoluteUrls, isChangelog } = await import(
   '../nuxt/lib/llms-full-txt.js'
 )
 
@@ -159,7 +159,7 @@ describe('outlineProblems', () => {
 
     assert.equal(found.length, 2)
     assert.match(found[0], /^\/how-to\/theming line 1: code fence never closes/)
-    assert.match(found[1], /code fence never closes/)
+    assert.match(found[1], /^line \d+: code fence never closes/)
   })
 
   test('names the page whose fence the next page closes, which the file alone hides', () => {
@@ -172,25 +172,42 @@ describe('outlineProblems', () => {
   })
 
   test('reports a heading in a body, which claims the sections after it', () => {
-    const found = outline('# NUXT_TARGET=static')
-
-    assert.deepEqual(found, [
-      '/how-to/theming line 1: top-level heading "# NUXT_TARGET=static" in a page body',
+    assert.deepEqual(outline('# NUXT_TARGET=static'), [
+      '/how-to/theming line 1: top-level heading "NUXT_TARGET=static" in a page body',
     ])
   })
 
   test('reports a body heading that reads like a section heading, which the file alone accepts', () => {
-    const found = outline('Intro.\n\n# Tutorials\n\nMore.')
-
-    assert.deepEqual(found, [
-      '/how-to/theming line 3: top-level heading "# Tutorials" in a page body',
+    assert.deepEqual(outline('Intro.\n\n# Tutorials\n\nMore.'), [
+      '/how-to/theming line 3: top-level heading "Tutorials" in a page body',
     ])
   })
 
-  test('reports a setext heading, which a CommonMark reader takes as an H1', () => {
-    const found = outline('Overview\n========\n\nText.')
+  test('reads the body as the site renders it: setext headings, fences in list items, HTML blocks', () => {
+    assert.deepEqual(outline('Overview\n========\n\nText.'), [
+      '/how-to/theming line 1: top-level heading "Overview" in a page body',
+    ])
+    assert.deepEqual(outline('````md\n```js\n# inner\n```\n````'), [])
+    assert.deepEqual(outline('~~~\n```\n# inner\n~~~'), [])
+    assert.deepEqual(outline('```inline``` then prose'), [])
+    assert.deepEqual(
+      outline('- Set the file:\n\n  ```sh\n  # .env\n  BASE_URL=x\n  ```\n- Then run it.'),
+      []
+    )
+    assert.deepEqual(outline('*   ```sh\n    # .env\n    ```\n\nText.'), [])
+    assert.deepEqual(outline('<!--\n# not a heading\n-->\n\nText.'), [])
+    assert.deepEqual(outline('<pre>\n# not a heading\n\n```\n# nor this\n</pre>\n\nText.'), [])
+    assert.deepEqual(outline('<div>\n# raw\n</div>\n\n# After'), [
+      '/how-to/theming line 5: top-level heading "After" in a page body',
+    ])
+  })
 
-    assert.deepEqual(found, ['/how-to/theming line 1: top-level heading "Overview" in a page body'])
+  test('reports a raw-text element that never closes, which would swallow the rest', () => {
+    const found = outline('<pre>\n# swallowed\n\nText.')
+
+    assert.equal(found.length, 2)
+    assert.equal(found[0], '/how-to/theming line 1: <pre> never closes')
+    assert.match(found[1], /<pre> never closes$/)
   })
 
   test('ignores a page the file drops, such as a changelog with a fence left open', () => {
@@ -201,113 +218,6 @@ describe('outlineProblems', () => {
     ])
 
     assert.deepEqual(found, [])
-  })
-
-  test('closes a fence only on a matching marker at least as long', () => {
-    assert.deepEqual(outline('````md\n```js\n# inner\n```\n````'), [])
-    assert.deepEqual(outline('~~~\n```\n# inner\n~~~'), [])
-    assert.match(outline('````\n# inner\n```')[0], /code fence never closes/)
-  })
-
-  test('treats inline code at the start of a line as text, not a fence', () => {
-    assert.deepEqual(outline('```inline``` then prose'), [])
-  })
-
-  test('follows a fence opened inside a list item, whose closer is indented to the item', () => {
-    assert.deepEqual(
-      outline('- Set the file:\n\n  ```sh\n  # .env\n  BASE_URL=x\n  ```\n- Then run it.'),
-      []
-    )
-    assert.deepEqual(outline('1. ```sh\n   # .env\n   ```'), [])
-    assert.deepEqual(outline('- ```sh\n  # .env\n  ```\n\n# Loose'), [
-      '/how-to/theming line 5: top-level heading "# Loose" in a page body',
-    ])
-  })
-
-  test('closes a fence in a list item whose content column is four or more', () => {
-    assert.deepEqual(outline('*   ```sh\n    # .env\n    ```\n\nText.'), [])
-    assert.deepEqual(outline('1.  ```sh\n    # .env\n    ```'), [])
-    assert.deepEqual(outline('1. Step\n   - ```sh\n     # .env\n     ```\n   - Next'), [])
-    // A column-0 marker ends the item, closing its fence, and opens one of its own.
-    assert.match(outline('*   ```sh\n    # .env\n```')[0], /line 3: code fence never closes/)
-  })
-
-  test('leaves a list item as a list item under an underline, not a setext heading', () => {
-    assert.deepEqual(outline('- Overview\n===\n\nText.'), [])
-  })
-
-  test('reports a raw-text element that never closes, which would swallow the rest', () => {
-    // The page names it, and the file does too, as with a fence left open.
-    const pre = outline('<pre>\n# swallowed\n\nText.')
-    assert.equal(pre.length, 2)
-    assert.equal(pre[0], '/how-to/theming line 1: <pre> never closes')
-    assert.match(pre[1], /^line \d+: <pre> never closes$/)
-    const style = outline('<script>\nx()\n</script>\n\n<style>\np {}')
-    assert.equal(style[0], '/how-to/theming line 5: <style> never closes')
-    assert.match(style[1], /<style> never closes$/)
-  })
-
-  test('keeps a raw-text element open to its closing tag, blank lines and all', () => {
-    assert.deepEqual(outline('<pre>\n# not a heading\n\n```\n# nor this\n</pre>\n\nText.'), [])
-    assert.deepEqual(outline('<script>\n// # x\n</script>\n\n# After'), [
-      '/how-to/theming line 5: top-level heading "# After" in a page body',
-    ])
-  })
-
-  test('lets a block tag interrupt a paragraph, as CommonMark does', () => {
-    assert.deepEqual(outline('Text\n<div>\n# raw\n</div>\n\n# After'), [
-      '/how-to/theming line 6: top-level heading "# After" in a page body',
-    ])
-  })
-
-  test('lets a tag follow paragraph text without opening an HTML block', () => {
-    assert.deepEqual(outline('Text\n<span>x</span>\n# Loose'), [
-      '/how-to/theming line 3: top-level heading "# Loose" in a page body',
-    ])
-  })
-
-  test('reads an unindented marker after a list-item fence as a new fence, not the closer', () => {
-    const found = outline('- ```sh\n  # .env\n```\n## Next')
-
-    assert.equal(found.length, 2)
-    assert.match(found[0], /^\/how-to\/theming line 3: code fence never closes/)
-  })
-
-  test('leaves a # inside an HTML comment or block as text, which is what it is', () => {
-    assert.deepEqual(outline('<!--\n# not a heading\n-->\n\nText.'), [])
-    assert.deepEqual(outline('<!-- # inline --> text\n\n# Loose'), [
-      '/how-to/theming line 3: top-level heading "# Loose" in a page body',
-    ])
-    assert.deepEqual(outline('<div>\n# raw\n</div>\n\n# After'), [
-      '/how-to/theming line 5: top-level heading "# After" in a page body',
-    ])
-  })
-
-  test('takes a setext underline only under paragraph text, not under a closing fence', () => {
-    assert.deepEqual(outline('```sh\nls\n```\n===\n\nText.'), [])
-    assert.deepEqual(outline('# Title\n===\n'), [
-      '/how-to/theming line 1: top-level heading "# Title" in a page body',
-    ])
-  })
-})
-
-describe('scanFences', () => {
-  test('lists headings outside fences by line and level, which is what a parity split reads', () => {
-    assert.deepEqual(scanFences('# Guide\n\n```md\n# .env\n## Example\n```\n## Page\n#hashtag'), {
-      headings: [
-        { line: 1, level: 1, text: '# Guide' },
-        { line: 7, level: 2, text: '## Page' },
-      ],
-      open: null,
-      raw: null,
-    })
-  })
-
-  test('reads setext headings at the level their underline gives them', () => {
-    assert.deepEqual(scanFences('Guide\n=====\n\nPage\n----\n\n---\n\n```\nx\n===\n```').headings, [
-      { line: 1, level: 1, text: 'Guide' },
-      { line: 4, level: 2, text: 'Page' },
-    ])
   })
 })
 

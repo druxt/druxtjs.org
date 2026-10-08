@@ -36,9 +36,13 @@
     "druxt-site": "dev",
     "druxt-views": "dev",
     "github-slugger": "1.5.0",
+    "mdast-util-to-string": "^2.0.0",
     "mermaid": "8.14.0",
     "nuxt": "2.18.1",
-    "prismjs": "1.29.0"
+    "prismjs": "1.29.0",
+    "remark-parse": "8.0.3",
+    "unified": "^9.2.1",
+    "unist-util-visit": "^2.0.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",

@@ -11152,11 +11152,15 @@ __metadata:
     druxt-site: dev
     druxt-views: dev
     github-slugger: 1.5.0
+    mdast-util-to-string: ^2.0.0
     mermaid: 8.14.0
     nuxt: 2.18.1
     prismjs: 1.29.0
+    remark-parse: 8.0.3
     satori: 0.33.4
     tailwindcss: ^2.2.19
+    unified: ^9.2.1
+    unist-util-visit: ^2.0.0
   languageName: unknown
   linkType: soft
 
