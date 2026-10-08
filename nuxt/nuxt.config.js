@@ -417,13 +417,21 @@ export default {
       const { readContent } = require('./lib/content-index')
       const { buildLlmsTxt } = require('./lib/llms-txt')
       const { buildSitemap } = require('./lib/sitemap')
-      const { buildLlmsFullTxt } = require('./lib/llms-full-txt')
+      const { buildLlmsFullTxt, outlineProblems } = require('./lib/llms-full-txt')
 
       const { srcDir, generate } = generator.nuxt.options
       const docs = readContent(path.join(srcDir, 'content'))
 
+      // Readers split this file by heading, so a page that leaves a fence
+      // open would mis-attribute every section after it.
+      const llmsFullTxt = buildLlmsFullTxt(docs)
+      const problems = outlineProblems(docs, llmsFullTxt)
+      if (problems.length) {
+        throw new Error('Refusing to ship llms-full.txt with a broken outline: ' + problems.join('; '))
+      }
+
       await fs.promises.writeFile(path.join(generate.dir, 'llms.txt'), buildLlmsTxt(docs))
-      await fs.promises.writeFile(path.join(generate.dir, 'llms-full.txt'), buildLlmsFullTxt(docs))
+      await fs.promises.writeFile(path.join(generate.dir, 'llms-full.txt'), llmsFullTxt)
       await fs.promises.writeFile(path.join(generate.dir, 'sitemap.xml'), buildSitemap(docs))
 
       // A child process, not a require: satori and resvg crash under the esm

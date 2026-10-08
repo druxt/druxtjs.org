@@ -5,6 +5,7 @@ DDEV
 Diataxis
 Fqix
 Ksection
+mdast
 PCRE
 aarch
 amazee
@@ -71,6 +72,7 @@ tablespaces
 threecol
 toplevel
 twocol
+unist
 urandom
 uselagoon
 vfox
@@ -88,3 +90,4 @@ Revisionable
 SAMESITE
 SIMPLETEST
 coderabbit
+setext
