@@ -72,10 +72,10 @@ export const FILES_PATH = /^\/sites\/[^/]+\/files(\/|$)/
  * The editing paths that hang off a canonical entity route.
  *
  * `/node/12` belongs to the decoupled site. `/node/12/edit` belongs to Drupal,
- * and so does every other operation on it.
+ * and so does every other operation on it, the JSON:API preview tab included.
  */
 export const EDIT_PATH =
-  /^\/(node|media|taxonomy\/term|comment|user)\/[^/]+\/(edit|delete|revisions|translations|devel|layout)(\/|$)/
+  /^\/(node|media|taxonomy\/term|comment|user)\/[^/]+\/(edit|delete|revisions|translations|devel|layout|json-preview)(\/|$)/
 
 /**
  * Headers that describe one hop and must not be copied to the next.
