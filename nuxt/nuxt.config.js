@@ -24,7 +24,15 @@ import { isTrackableHostname } from './lib/analytics'
  * The installed packages may be a development release, which the badge never
  * says. Hidden when neither is here.
  */
-const docsSource = require('../docs-source.json')
+// The druxt.js checkout the API reference comes from. The container holds a
+// copy beside /app; a tree without one links the source at HEAD.
+const docsSource = (() => {
+  try {
+    return require('../docs-source.json')
+  } catch (e) {
+    return {}
+  }
+})()
 const druxtVersion = ['.pinned-druxt.json', '../.docs-source/packages/druxt/package.json'].reduce(
   (found, file) => {
     if (found) return found
@@ -85,7 +93,7 @@ export default {
     druxtVersion,
     // The druxt.js commit the API reference is generated from: where its
     // source links point, so they never depend on a branch name.
-    druxtSourceRef: docsSource.docgenRef || docsSource.ref,
+    druxtSourceRef: docsSource.docgenRef || docsSource.ref || 'HEAD',
     // "markdown" reads the authored pages from content/ instead of Drupal.
     docsSource: process.env.DOCS_SOURCE || 'drupal',
     // The environment's Storybook, when it has one: linked from the footer and the playground.
