@@ -29,7 +29,16 @@ if (PHP_SAPI !== 'cli' && is_file($druxt_docs_replacing) && time() - filemtime($
   http_response_code(503);
   header('Retry-After: 30');
   header('Cache-Control: no-store');
-  print 'The database is being replaced. Try again shortly.';
+  // The same page the frontend shows while it starts, so a visitor to the
+  // Drupal host sees the site's own face rather than a line of text.
+  $druxt_docs_replacing_page = __DIR__ . '/replacing.html';
+  if (is_file($druxt_docs_replacing_page)) {
+    header('Content-Type: text/html; charset=utf-8');
+    readfile($druxt_docs_replacing_page);
+  }
+  else {
+    print 'The database is being replaced. Try again shortly.';
+  }
   exit;
 }
-unset($druxt_docs_replacing);
+unset($druxt_docs_replacing, $druxt_docs_replacing_page);

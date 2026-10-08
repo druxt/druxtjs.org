@@ -13,6 +13,10 @@ Druxt 1.0.0.
   its preview fills the screen: the iframe is pinned to the viewport inside
   the admin toolbar's edges, following the toolbar when it collapses or
   stands at the side, instead of sitting in a 600px box on the page.
+- While a rollout replaces the database, the Drupal host answers with the
+  same page the frontend shows as it starts, with the brand, a progress bar
+  and a refresh every 15 seconds, instead of one line of text. The response
+  is still a 503 with `Retry-After: 30`.
 - Tab moves from the username field to the password field on the sign-in
   form. The "Forgot password?" link follows the password field in the page
   so a keyboard reaches it after the field it belongs to.
