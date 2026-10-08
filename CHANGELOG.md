@@ -70,6 +70,18 @@ Druxt 1.0.0.
   bar stacks the breadcrumb, the title and the actions instead of laying Save
   over the title, and the content listings no longer draw their header twice.
 
+### Removed
+
+- The markdown import. Production's database is the only copy of the
+  content, so the importer, its migrations and the migrate modules, the IR
+  builder and the content baseline and validation are gone, and the page type
+  no longer carries `field_source_path`. A site with no database to copy
+  starts empty, and `drush druxtjsorg:oauth-client` creates the frontend's consumer
+  when there is none. `npm run docs:fetch` checks out the pinned druxt.js for
+  the API reference. The migrate packages stay in `composer.json` until every
+  database has imported their uninstall, since Drupal needs a module's code
+  to uninstall it. A later change removes them.
+
 ### Fixed
 
 - Inside a workspace, JSON:API answered from live for a bearer token, served

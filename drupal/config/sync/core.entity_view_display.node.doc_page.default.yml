@@ -7,7 +7,6 @@ dependencies:
     - field.field.node.doc_page.field_description
     - field.field.node.doc_page.field_is_landing
     - field.field.node.doc_page.field_section
-    - field.field.node.doc_page.field_source_path
     - field.field.node.doc_page.field_weight
     - node.type.doc_page
   module:
@@ -18,6 +17,11 @@ targetEntityType: node
 bundle: doc_page
 mode: default
 content:
+  content_moderation_control:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -20
+    region: content
   field_content:
     type: layout_paragraphs
     label: hidden
@@ -36,5 +40,4 @@ hidden:
   field_description: true
   field_is_landing: true
   field_section: true
-  field_source_path: true
   field_weight: true
