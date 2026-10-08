@@ -81,6 +81,63 @@ A signed-in editor's requests send their bearer token on the server render
 and in the browser, because Druxt's client and `@nuxtjs/auth-next` share one
 axios instance. A "Sign in" control sits in the site header.
 
+### Staging in a workspace
+
+Core Workspaces holds a set of changes off live until the workspace is
+published, and publishing moves the whole set at once. That is how a release
+of several pages, and embargoed content, waits. Editors may create, view and
+edit any workspace, and publish one (`administer workspaces`, which core
+requires for publishing).
+
+A request chooses its workspace with the `X-Druxt-Workspace` header. The
+`druxtjsorg` module applies it only when the account is signed in and may
+view that workspace. The choice lasts the one request and leaves the
+account's session alone. A reader's header is ignored. A write that names a
+workspace it cannot have is refused with 403 rather than saved to live.
+JSON:API needed these changes to be safe in a workspace:
+
+| Piece                       | Why                                                                                              |
+| --------------------------- | ------------------------------------------------------------------------------------------------ |
+| `WorkspaceHeaderSubscriber` | Simple OAuth resolves the path while the request is anonymous, fixing live for the whole request |
+| `WorkspaceCacheHooks`       | JSON:API's normalization cache is not keyed by workspace, so reads in and out served each other  |
+| `WorkspaceEntityResource`   | JSON:API refuses to update a non-default revision, so a second write in a workspace failed       |
+| `LiveWorkingCopy`           | On live, the newest revision was a workspace's, so editors saw staged content as live's draft    |
+
+Inside a workspace a page is saved published: it goes live with the
+workspace. Core refuses to publish a workspace that holds a draft. A page
+created in a workspace exists on live only as an unpublished placeholder,
+which readers cannot see by id, path or collection.
+
+A signed-in editor chooses a workspace under **Workspaces** in the
+editor bar's Drupal menu. The choice is kept in the `druxt-workspace` cookie,
+the bar names it on every page, and the frontend adds the header to the
+editor's content requests on the server render and in the browser. A
+request without the editor's token never carries it, and the stored-page
+cache is bypassed for a signed-in editor as before. The page diff compares
+the workspace's revision with live.
+
+**Review changes** in the same menu opens `/workspace`, which lists the
+pages the workspace has changed, newest first, each linking to the page with
+its diff against live on. It reads JSON:API alone: with the workspace
+active, pages filtered on `workspace`, the workspace their revision was made
+in, are the ones it changed. The list links on to Drupal's own overview of
+the workspace, where it is published.
+
+Core lists every paragraph of a changed page in that overview as a row of
+its own, which buries the pages. The `druxtjsorg` module keeps only the
+entities that stand on their own, and marks the columns a phone can drop.
+
+Drupal reads the same cookie for a signed-in editor, below the header, so its
+own screens open in the workspace the frontend shows. Switching in Drupal's
+toolbar writes the cookie back, and switching to live clears it.
+
+A block's Edit opens the page's form with `?paragraph=<uuid>`, and the
+`druxtjsorg` module opens that block's dialog in the Layout Paragraphs
+builder. The change is saved with the page, so moderation, revisions and the
+workspace all apply. Paragraphs Edit offers a paragraph form of its own, but
+it saves the page from its default revision in its current moderation state,
+which would publish a live page straight away and drop any draft.
+
 ### The local loop
 
 The whole loop runs on one machine, with Drupal and the frontend on

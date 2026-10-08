@@ -1,0 +1,6 @@
+edit-paragraph:
+  js:
+    js/edit-paragraph.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings

@@ -49,6 +49,27 @@ const kindOf = (type) => {
   return entity ? entity.charAt(0).toUpperCase() + entity.slice(1) : 'Item'
 }
 
+/** How long a block's excerpt may run, in characters. */
+const EXCERPT = 48
+
+/**
+ * Words that tell one block from another: its heading, or how it begins.
+ *
+ * Every text block is "Text", so the kind alone could not tell a reader which
+ * of seven they were choosing.
+ *
+ * @param {Element} el - The block's anchor.
+ * @returns {string} The excerpt, or '' where the block has no text.
+ */
+const excerptOf = (el) => {
+  if (!el) return ''
+  const heading = el.querySelector ? el.querySelector('h1, h2, h3, h4, h5, h6') : null
+  const text = String((heading || el).textContent || '').replace(/\s+/g, ' ').trim()
+  if (text.length <= EXCERPT) return text
+  const cut = text.slice(0, EXCERPT)
+  return `${cut.slice(0, cut.lastIndexOf(' ') > EXCERPT / 2 ? cut.lastIndexOf(' ') : EXCERPT)}…`
+}
+
 /**
  * The subject an element stands for, or null where it stands for nothing.
  *
@@ -70,14 +91,15 @@ const subjectFromElement = (el, { closest } = {}) => {
   const type = anchor.getAttribute(TYPE) || ''
   const field = anchor.getAttribute(FIELD) || null
   const kind = kindOf(type)
+  // A code block whose field is the code says "Code", not "Code, the code".
+  const named = field && FIELDS[field] && FIELDS[field] !== kind.toLowerCase() ? `${kind}, the ${FIELDS[field]}` : kind
   return {
     uuid,
     type,
     field,
     kind,
     el: anchor,
-    // A code block whose field is the code says "Code", not "Code, the code".
-    label: field && FIELDS[field] && FIELDS[field] !== kind.toLowerCase() ? `${kind}, the ${FIELDS[field]}` : kind,
+    label: excerptOf(anchor) || named,
   }
 }
 
@@ -103,8 +125,9 @@ const pageSubject = (page) => {
  * Where Edit goes for a subject.
  *
  * Drupal edits a paragraph inside the form of the page that holds it, so a
- * block's Edit opens that form at the field the block lives in. Editing a
- * block on its own waits for the in-place editor.
+ * block's Edit opens that form with `?paragraph=`, and the page form's builder
+ * opens that block's own dialog. Saving goes through the page, so moderation,
+ * revisions and the workspace all apply.
  *
  * @param {object} subject - The subject.
  * @param {object} page - The page subject, which owns the form.
@@ -114,11 +137,11 @@ const pageSubject = (page) => {
  */
 const editHref = (subject, page, href, back) => {
   if (!href) return null
-  const destination = back ? `${href.includes('?') ? '&' : '?'}destination=${encodeURIComponent(back)}` : ''
-  const url = `${href}${destination}`
-  if (!subject || !page || subject.uuid === page.uuid) return url
-  // The builder holds every block, and Drupal has no page of its own for one.
-  return `${url}#edit-field-content-wrapper`
+  const query = []
+  if (back) query.push(`destination=${encodeURIComponent(back)}`)
+  const block = subject && page && subject.uuid !== page.uuid
+  if (block) query.push(`paragraph=${encodeURIComponent(subject.uuid)}`)
+  return query.length ? `${href}${href.includes('?') ? '&' : '?'}${query.join('&')}` : href
 }
 
 /**
@@ -130,8 +153,7 @@ const editHref = (subject, page, href, back) => {
  */
 const editLabel = (subject, page) => {
   if (!subject || !page || subject.uuid === page.uuid) return 'Edit this page'
-  const what = subject.field && FIELDS[subject.field] ? FIELDS[subject.field] : String(subject.kind || 'block').toLowerCase()
-  return `Edit this page, at the ${what}`
+  return `Edit this ${String(subject.kind || 'block').toLowerCase()} block`
 }
 
 /**
@@ -157,4 +179,4 @@ const subjectsOn = (root, page) => {
   return found
 }
 
-module.exports = { editHref, editLabel, kindOf, pageSubject, subjectFromElement, subjectsOn }
+module.exports = { editHref, editLabel, excerptOf, kindOf, pageSubject, subjectFromElement, subjectsOn }

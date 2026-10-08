@@ -3,7 +3,7 @@
   <div
     v-if="show"
     class="editor-bar"
-    :class="{ idle, docked: Boolean(dock), locked }"
+    :class="{ idle, docked: Boolean(dock), locked, 'with-workspace': Boolean(workspace) }"
     :style="dockStyle"
     role="region"
     aria-label="Editing controls"
@@ -32,6 +32,15 @@
       </svg>
     </button>
 
+    <!-- The workspace the site is being read in, on every page, so an editor
+         never mistakes it for live. -->
+    <span
+      v-if="workspace"
+      class="editor-bar-workspace"
+      :title="`Workspace: ${workspaceLabel}`"
+      data-testid="editor-bar-workspace"
+    >{{ workspaceLabel }}</span>
+
     <template v-if="!idle">
       <!-- The revision being read takes the bar over, and the controls stay put. -->
       <AppRevisionPill v-if="viewingRevision" bare />
@@ -42,6 +51,31 @@
         <span v-if="draft" class="editor-bar-draft">Draft</span>
         <!-- Locked on a block, so the bar stays on it while the pointer goes
              anywhere else. Letting go is one press, and so is Escape. -->
+        <!-- One block to the next, without hunting for it. -->
+        <span v-if="active && blocks.length > 1" class="editor-bar-step">
+          <button
+            type="button"
+            class="editor-bar-unlock"
+            aria-label="Previous block"
+            title="Previous block"
+            data-testid="editor-bar-previous"
+            :disabled="position <= 0"
+            @click="step(-1)"
+          >
+            <svg class="editor-bar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 15l-6-6-6 6" /></svg>
+          </button>
+          <button
+            type="button"
+            class="editor-bar-unlock"
+            aria-label="Next block"
+            title="Next block"
+            data-testid="editor-bar-next"
+            :disabled="position < 0 || position >= blocks.length - 1"
+            @click="step(1)"
+          >
+            <svg class="editor-bar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+          </button>
+        </span>
         <button
           v-if="locked"
           type="button"
@@ -63,10 +97,11 @@
         class="editor-bar-btn ghost"
         :aria-expanded="String(choosing)"
         aria-haspopup="menu"
+        :aria-label="`${choices.length} editable on this page`"
         data-testid="editor-bar-choose"
-        @click="choosing = !choosing"
+        @click="toggleChoices"
       >
-        {{ choices.length }} editable
+        {{ choices.length }}<span class="editor-bar-word">&nbsp;editable</span>
         <svg class="editor-bar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 15l-6-6-6 6" /></svg>
       </button>
 
@@ -114,6 +149,37 @@
       >
         <span class="truncate">{{ link.label }}</span>
       </a>
+      <!-- Workspaces: read the site as live, or as a workspace has it. Live
+           stays on offer while a workspace is chosen, even one the list no
+           longer holds, so the way back is never hidden. -->
+      <template v-if="workspaces.length || workspace">
+        <p class="editor-bar-choices-title">Workspaces</p>
+        <button
+          v-for="choice of workspaceChoices"
+          :key="choice.id || 'live'"
+          type="button"
+          class="editor-bar-choice"
+          :class="{ on: choice.id === workspace }"
+          role="menuitemradio"
+          :aria-checked="String(choice.id === workspace)"
+          :data-testid="`editor-bar-workspace-${choice.id || 'live'}`"
+          @click="chooseWorkspace(choice.id)"
+        >
+          <span class="truncate">{{ choice.label }}</span>
+          <span v-if="choice.unavailable" class="editor-bar-choice-kind">Unavailable</span>
+          <span v-else-if="choice.id === workspace" class="editor-bar-choice-kind">Current</span>
+        </button>
+        <NuxtLink
+          v-if="workspace"
+          to="/workspace"
+          class="editor-bar-choice"
+          role="menuitem"
+          data-testid="editor-bar-workspace-review"
+          @click.native="gateway = false"
+        >
+          <span class="truncate">Review changes in {{ workspaceLabel }}</span>
+        </NuxtLink>
+      </template>
     </div>
   </div>
 </template>
@@ -124,9 +190,13 @@ import { hasEditorHint, operationsUrl, operationsOf } from '~/lib/entity-operati
 import { gatewayFor } from '~/lib/editor-gateway'
 import { editHref, editLabel, pageSubject, subjectFromElement, subjectsOn } from '~/lib/editor-subject'
 import { hasDraft, viewing } from '~/lib/revisions'
+import { workspaceCookie } from '~/lib/workspace'
 
 /** How long a subject survives the pointer leaving it, in milliseconds. */
 const LINGER = 260
+
+/** How long the pointer must rest on another block before the bar moves to it. */
+const SWITCH_DELAY = 220
 
 /** The gap the bar keeps from the block it is docked to, in pixels. */
 const DOCK_GAP = 10
@@ -182,6 +252,8 @@ export default {
     choices: [],
     choosing: false,
     gateway: false,
+    /** The workspaces this editor may read the site in, once asked for. */
+    workspaces: [],
     hovering: false,
     /** Whether this browser has been told the account may edit. */
     hinted: false,
@@ -192,6 +264,20 @@ export default {
   computed: {
     editor: ({ $store }) => $store.state.editor,
     signedIn: ({ $auth }) => Boolean($auth && $auth.loggedIn),
+    workspace: ({ editor }) => editor.workspace,
+    /** The page's blocks, in reading order, for stepping between them. */
+    blocks: ({ choices, page }) => choices.filter(({ uuid }) => !page || uuid !== page.uuid),
+    position: ({ blocks, active }) => blocks.findIndex(({ uuid }) => uuid === (active || {}).uuid),
+    /** The workspace's label once the list is in, its id until then. */
+    workspaceLabel: ({ workspace, workspaces }) => (workspaces.find(({ id }) => id === workspace) || {}).label || workspace,
+    /** Live, the workspaces on offer, and the chosen one when it is no longer among them. */
+    workspaceChoices: ({ workspace, workspaces, workspaceLabel }) => [
+      { id: null, label: 'Live' },
+      ...workspaces,
+      ...(workspace && !workspaces.some(({ id }) => id === workspace)
+        ? [{ id: workspace, label: workspaceLabel, unavailable: true }]
+        : []),
+    ],
     /**
      * The store's page, but only where it is this route's page.
      *
@@ -243,6 +329,17 @@ export default {
   },
 
   watch: {
+    // Asked for when first wanted: the menu opening, or a workspace to name.
+    gateway(open) {
+      if (open) this.loadWorkspaces()
+    },
+    show: {
+      handler(on) {
+        if (on && this.workspace) this.loadWorkspaces()
+      },
+      immediate: true,
+    },
+
     // The hint arrives with the login, which is after this mounted, so the
     // cookie is read again whenever the account changes rather than once.
     //
@@ -304,7 +401,12 @@ export default {
       'show',
       (shown) => {
         document.body.classList.toggle('has-editor-bar', shown)
-        if (!shown) this.unlock()
+        if (shown) this.observe()
+        else {
+          clearTimeout(this.switching)
+          this.unlock()
+          this.unobserve()
+        }
       },
       { immediate: true }
     )
@@ -350,7 +452,9 @@ export default {
     window.removeEventListener('scroll', this.onViewport)
     window.removeEventListener('resize', this.onViewport)
     clearTimeout(this.linger)
+    clearTimeout(this.switching)
     clearInterval(this.hintPoll)
+    this.unobserve()
     if (this.frame) cancelAnimationFrame(this.frame)
     this.mark(null)
   },
@@ -398,6 +502,49 @@ export default {
       }
     },
 
+    /** The workspaces this editor may read the site in, by machine name and label. */
+    async loadWorkspaces() {
+      // Once at a time: the menu opening and the bar showing can both ask.
+      if (this.workspaces.length || this.loadingWorkspaces) return
+      this.loadingWorkspaces = true
+      try {
+        // JSON:API pages the collection at fifty, so the list follows `next`
+        // until there is none; the bound is for a backend that never stops.
+        const found = []
+        let url = '/jsonapi/workspace/workspace'
+        let params = { 'fields[workspace--workspace]': 'drupal_internal__id,label', sort: 'label' }
+        for (let page = 0; url && page < 20; page += 1) {
+          const { data } = await this.$druxt.axios.get(url, { params })
+          found.push(...((data && data.data) || []))
+          url = (((data && data.links) || {}).next || {}).href || null
+          params = undefined
+        }
+        this.workspaces = found.map(({ attributes }) => ({
+          id: attributes.drupal_internal__id,
+          label: attributes.label,
+        }))
+      } catch (error) {
+        // Without the list there is no choice to offer, and live still reads.
+      } finally {
+        this.loadingWorkspaces = false
+      }
+    },
+
+    /**
+     * Reads the site in a workspace, or live for null.
+     *
+     * A reload, not a refetch: the store already holds pages read in the old
+     * workspace, and only a fresh render is sure to hold none of them.
+     *
+     * @param {string|null} id - The workspace's machine name.
+     */
+    chooseWorkspace(id) {
+      this.gateway = false
+      if (id === this.workspace) return
+      document.cookie = workspaceCookie(id, window.location.protocol === 'https:')
+      window.location.reload()
+    },
+
     /** The page's revisions, for the submenu and for the draft dot. */
     async loadRevisions(uuid) {
       let revisions = []
@@ -415,7 +562,39 @@ export default {
 
     /** What the page has anchored, for the chooser. */
     readChoices() {
-      this.choices = typeof document === 'undefined' ? [] : subjectsOn(document, this.page)
+      const found = typeof document === 'undefined' ? [] : subjectsOn(document, this.page)
+      // Assigned only on a change: the list re-renders the bar, which the
+      // observer below would otherwise read as the document settling again.
+      const key = (list) => list.map((subject) => `${subject.uuid}:${subject.label}`).join(' ')
+      if (key(found) !== key(this.choices)) this.choices = found
+    },
+
+    /**
+     * Reads the list again as the document settles: Druxt renders a page's
+     * blocks after the page itself. Only while the bar shows, since a reader
+     * without it has no list to keep.
+     */
+    observe() {
+      if (this.observer || typeof window === 'undefined' || !window.MutationObserver) return
+      this.readChoices()
+      this.observer = new MutationObserver((mutations) => {
+        if (mutations.every((mutation) => this.$el && this.$el.contains(mutation.target))) return
+        clearTimeout(this.rereading)
+        this.rereading = setTimeout(this.readChoices, 150)
+      })
+      this.observer.observe(document.body, { childList: true, subtree: true })
+    },
+
+    unobserve() {
+      clearTimeout(this.rereading)
+      if (this.observer) this.observer.disconnect()
+      this.observer = null
+    },
+
+    /** Opens the list of what is editable, read afresh: blocks render after the page. */
+    toggleChoices() {
+      if (!this.choosing) this.readChoices()
+      this.choosing = !this.choosing
     },
 
     /**
@@ -433,14 +612,18 @@ export default {
       // not a reason to take it away again.
       if (this.locked) return
       clearTimeout(this.linger)
+      clearTimeout(this.switching)
+      // Moving from one block to another waits a moment, and gives way if the
+      // pointer reaches the bar: crossing a neighbour on the way to the bar's
+      // controls used to move the bar out from under the pointer.
+      if (subject && this.active && subject.uuid !== this.active.uuid) {
+        this.switching = setTimeout(() => {
+          if (this.show && !this.hovering && !this.locked) this.take(subject)
+        }, SWITCH_DELAY)
+        return
+      }
       if (subject) {
-        this.choosing = false
-        // Frozen, and without the element: Vue would otherwise walk a DOM
-        // node making it reactive, and the assignment never takes.
-        const { el, ...rest } = subject
-        this.active = Object.freeze(rest)
-        this.mark(el)
-        this.$nextTick(this.place)
+        this.take(subject)
         return
       }
       if (this.hovering) return
@@ -449,6 +632,17 @@ export default {
         this.dock = null
         this.mark(null)
       }, LINGER)
+    },
+
+    /** Binds the bar to a subject now. */
+    take(subject) {
+      this.choosing = false
+      // Frozen, and without the element: Vue would otherwise walk a DOM
+      // node making it reactive, and the assignment never takes.
+      const { el, ...rest } = subject
+      this.active = Object.freeze(rest)
+      this.mark(el)
+      this.$nextTick(this.place)
     },
 
     /**
@@ -492,15 +686,30 @@ export default {
      * @param {Event} event - The click.
      */
     lockOn(event) {
-      if (this.locked || !this.active || !event.target) return
+      // No bar, nothing to choose: a reader who cannot edit gets no outline.
+      if (!this.show || !event.target) return
       if (this.$el && this.$el.contains(event.target)) return
       if (event.target.closest && event.target.closest(INTERACTIVE)) return
       const selection = typeof window !== 'undefined' && window.getSelection ? window.getSelection() : null
       if (selection && String(selection).length) return
       const subject = subjectFromElement(event.target)
-      if (!subject || subject.uuid !== this.active.uuid) return
+      if (!subject) return
+      // Clicking another block moves the lock to it.
+      clearTimeout(this.switching)
+      if (!this.active || subject.uuid !== this.active.uuid) this.take(subject)
       this.locked = true
       this.dock = null
+    },
+
+    /**
+     * Moves to the block before or after this one, in reading order.
+     *
+     * @param {number} step - -1 for the previous block, 1 for the next.
+     */
+    step(step) {
+      const at = this.blocks.findIndex(({ uuid }) => uuid === (this.active || {}).uuid)
+      const next = this.blocks[at + step]
+      if (next) this.choose(next)
     },
 
     /** Lets a chosen block go, and the bar falls back to the page. */

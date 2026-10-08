@@ -9,6 +9,7 @@ const require = createRequire(import.meta.url)
 const {
   editHref,
   editLabel,
+  excerptOf,
   kindOf,
   pageSubject,
   subjectFromElement,
@@ -113,10 +114,14 @@ describe('editHref', () => {
     assert.equal(href, `/node/27/edit?destination=${encodeURIComponent(back)}`)
   })
 
-  test('a block opens the page form at the field that holds it', () => {
-    const block = { uuid: 'p-1', kind: 'Text', label: 'Text, the text' }
+  test("a block opens the page form with that block's dialog named", () => {
+    const block = { uuid: 'p-1', kind: 'Text', label: 'Text' }
     const href = editHref(block, page, '/node/27/edit', '/how-to/configure-cors')
-    assert.match(href, /#edit-field-content-wrapper$/)
+    assert.equal(
+      href,
+      `/node/27/edit?destination=${encodeURIComponent('/how-to/configure-cors')}&paragraph=p-1`
+    )
+    assert.equal(editHref(block, page, '/node/27/edit?x=1'), '/node/27/edit?x=1&paragraph=p-1')
   })
 
   test('an operation Drupal did not offer is not a link', () => {
@@ -127,10 +132,10 @@ describe('editHref', () => {
 describe('editLabel', () => {
   test('says what Edit will open, before it is pressed', () => {
     assert.equal(editLabel(page, page), 'Edit this page')
-    assert.equal(editLabel({ uuid: 'p-1', kind: 'Code' }, page), 'Edit this page, at the code')
+    assert.equal(editLabel({ uuid: 'p-1', kind: 'Code' }, page), 'Edit this code block')
     assert.equal(
       editLabel({ uuid: 'p-2', kind: 'Text', field: 'field_text' }, page),
-      'Edit this page, at the text'
+      'Edit this text block'
     )
   })
 })
@@ -181,5 +186,29 @@ describe('which /user paths this site claims', () => {
     assert.equal(isProfilePath('/users/2'), false)
     assert.equal(isProfilePath('/how-to/proxy'), false)
     assert.equal(isProfilePath(''), false)
+  })
+})
+
+describe('excerptOf', () => {
+  const el = (text, heading) => ({
+    textContent: text,
+    querySelector: () => (heading ? { textContent: heading } : null),
+  })
+
+  test('names a block by its heading, where it has one', () => {
+    assert.equal(
+      excerptOf(el('Choose the workspace Open the Drupal menu.', ' Choose the  workspace ')),
+      'Choose the workspace'
+    )
+  })
+
+  test('otherwise by how it begins, cut at a word', () => {
+    const text = 'A workspace holds changes to pages, menus and media away from the live site.'
+    assert.equal(excerptOf(el(text)), 'A workspace holds changes to pages, menus and…')
+  })
+
+  test('says nothing for a block with no text', () => {
+    assert.equal(excerptOf(el('   ')), '')
+    assert.equal(excerptOf(null), '')
   })
 })

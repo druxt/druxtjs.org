@@ -92,6 +92,8 @@ module:
   update: 0
   user: 0
   workflows: 0
+  workspaces: 0
+  workspaces_ui: 0
   views: 10
   paragraphs: 11
   minimal: 1000
