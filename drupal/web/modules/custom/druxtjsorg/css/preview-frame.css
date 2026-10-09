@@ -2,13 +2,24 @@
  * @file
  * The JSON:API preview tab's iframe, pinned to the viewport.
  *
- * preview-frame.js sets the edges from Drupal.displace, so the frame sits
- * inside the toolbar whichever side it is on.
+ * The side and bottom edges come from the custom properties core's
+ * Drupal.displace keeps on the root for the toolbar, so they follow it as it
+ * collapses or moves. The top edge is set by preview-frame.js, which keeps
+ * the admin theme's top bar, with its "Back to site" link, in view.
  */
 
 .druxtjsorg-preview-frame {
+  --druxtjsorg-preview-top: var(--drupal-displace-offset-top, 0px);
+
   position: fixed;
-  z-index: 500;
+  z-index: 480;
+  top: var(--druxtjsorg-preview-top);
+  right: var(--drupal-displace-offset-right, 0px);
+  bottom: var(--drupal-displace-offset-bottom, 0px);
+  left: var(--drupal-displace-offset-left, 0px);
+  width: calc(100vw - var(--drupal-displace-offset-left, 0px) - var(--drupal-displace-offset-right, 0px)) !important;
+  height: calc(100vh - var(--druxtjsorg-preview-top) - var(--drupal-displace-offset-bottom, 0px)) !important;
+  min-height: 0 !important;
   border: 0;
   background: #fff;
 }
