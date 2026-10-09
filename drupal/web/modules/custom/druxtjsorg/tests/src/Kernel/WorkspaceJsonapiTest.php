@@ -151,6 +151,27 @@ final class WorkspaceJsonapiTest extends KernelTestBase {
   }
 
   /**
+   * A closed workspace is unavailable: a write naming it is refused, not live.
+   *
+   * Workspaces Extra closes a workspace it publishes and answers from live
+   * for a closed one that is active, so without this a stale choice would
+   * write to live.
+   */
+  public function testAClosedWorkspaceIsRefused(): void {
+    $this->enableModules(['options', 'wse']);
+    $this->installConfig(['wse']);
+    // The status field it adds to workspaces, as a module install would.
+    $definitions = $this->container->get('entity_field.manager')->getFieldStorageDefinitions('workspace');
+    $this->container->get('entity.definition_update_manager')->installFieldStorageDefinition('status', 'workspace', 'wse', $definitions['status']);
+    $stage = Workspace::load('stage');
+    $stage->set('status', 'closed')->save();
+
+    self::assertSame(403, $this->patch('Nowhere', 'stage')->getStatusCode());
+    self::assertSame('Live title', $this->liveTitle());
+    self::assertSame('Live title', $this->title($this->editor, 'stage'));
+  }
+
+  /**
    * A cookie naming a workspace that is gone falls back to live, not to a 403.
    *
    * The cookie outlives a workspace the editor deleted; refusing every write
@@ -269,6 +290,10 @@ final class WorkspaceJsonapiTest extends KernelTestBase {
     // fresh PHP process would. Services hold the manager, so it is reset, not
     // replaced.
     $manager = $this->container->get('workspaces.manager');
+    // Workspaces Extra decorates the manager; the state is on core's.
+    while (!property_exists($manager, 'activeWorkspace') && property_exists($manager, 'inner')) {
+      $manager = (new \ReflectionProperty($manager, 'inner'))->getValue($manager);
+    }
     (new \ReflectionProperty($manager, 'activeWorkspace'))->setValue($manager, NULL);
     $this->setCurrentUser(new AnonymousUserSession());
     $this->container->get('entity.memory_cache')->deleteAll();

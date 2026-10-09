@@ -9,6 +9,13 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+- Workspaces Extra on the backend, with its scheduler. A workspace can be
+  published at a set time, which is how a release waits for its date, and an
+  editor may schedule one. A published workspace is closed rather than left
+  open, and a closed one can be rolled back. Drupal's toolbar switcher lists
+  the recent workspaces only. The editor bar offers the open workspaces, and
+  a request that names a closed one is refused on a write and answered from
+  live on a read, as for a workspace the account cannot have.
 - The JSON:API tab on a page's edit screen opens through the site again, and
   its preview fills the screen: the iframe is pinned to the viewport inside
   the admin toolbar's edges, following the toolbar when it collapses or

@@ -512,7 +512,9 @@ export default {
         // until there is none; the bound is for a backend that never stops.
         const found = []
         let url = '/jsonapi/workspace/workspace'
-        let params = { 'fields[workspace--workspace]': 'drupal_internal__id,label', sort: 'label' }
+        // Open ones only: Workspaces Extra closes a published workspace, and
+        // Drupal answers from live for a closed one, so it is no choice.
+        let params = { 'fields[workspace--workspace]': 'drupal_internal__id,label', 'filter[status]': 'open', sort: 'label' }
         for (let page = 0; url && page < 20; page += 1) {
           const { data } = await this.$druxt.axios.get(url, { params })
           found.push(...((data && data.data) || []))

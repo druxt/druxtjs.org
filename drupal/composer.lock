@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d04c58487b4a05b467dc38ba98e94144",
+    "content-hash": "a2aac5dc1e20b80a141b4b464e208aa2",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -4269,6 +4269,74 @@
             "homepage": "https://www.drupal.org/project/token",
             "support": {
                 "source": "https://git.drupalcode.org/project/token"
+            }
+        },
+        {
+            "name": "drupal/wse",
+            "version": "dev-3.0.x",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/wse.git",
+                "reference": "532aca3b"
+            },
+            "require": {
+                "drupal/core": "^11.3 || ^12"
+            },
+            "require-dev": {
+                "drupal/depcalc": "*",
+                "drupal/diff": "*",
+                "drupal/group_content_menu": "*",
+                "drupal/s3fs": "*",
+                "drupal/trash": "*",
+                "drupal/workspace_config": "*",
+                "drupal/workspace_preview": "*",
+                "graphp/graph": "^1",
+                "graphp/graphviz": "*"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-3.0.x": "3.0.x-dev"
+                },
+                "drupal": {
+                    "version": "3.0.0-alpha5+14-dev",
+                    "datestamp": "1791210948",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Dev releases are not covered by Drupal security advisories."
+                    }
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "amateescu",
+                    "homepage": "https://www.drupal.org/user/729614"
+                },
+                {
+                    "name": "fabianx",
+                    "homepage": "https://www.drupal.org/user/693738"
+                },
+                {
+                    "name": "plach",
+                    "homepage": "https://www.drupal.org/user/183211"
+                },
+                {
+                    "name": "s_leu",
+                    "homepage": "https://www.drupal.org/user/1336864"
+                },
+                {
+                    "name": "tim bozeman",
+                    "homepage": "https://www.drupal.org/user/2241356"
+                }
+            ],
+            "description": "Workspaces Extra.",
+            "homepage": "https://www.drupal.org/project/wse",
+            "support": {
+                "source": "https://git.drupalcode.org/project/wse"
             }
         },
         {
@@ -16411,7 +16479,8 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "drupal/decoupled_settings": 10,
-        "drupal/jsonapi_node_preview": 10
+        "drupal/jsonapi_node_preview": 10,
+        "drupal/wse": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
