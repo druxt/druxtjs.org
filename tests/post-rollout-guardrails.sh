@@ -264,6 +264,33 @@ else
   no "went straight to the live database without trying the scheduled dump"
 fi
 
+# Production's public files come with its database, after it and before the
+# sanitise; its private files and Drupal's derived directories do not.
+files_line=$(grep -n 'rsync -y .*:%files/ .*sites/default/files/' "$app/calls.log" | head -1 | cut -d: -f1)
+database_line=$(grep -n 'sql:query --file=\|sql:sync' "$app/calls.log" | head -1 | cut -d: -f1)
+sanitise_line=$(grep -n 'sql:sanitize' "$app/calls.log" | head -1 | cut -d: -f1)
+if [ -n "$files_line" ] && [ -n "$database_line" ] && [ "$files_line" -gt "$database_line" ]; then
+  ok "copies production's public files after its database"
+else
+  no "left production's public files behind, or copied them before the database (files ${files_line:-none}, database ${database_line:-none})"
+fi
+if [ -n "$files_line" ] && [ -n "$sanitise_line" ] && [ "$files_line" -lt "$sanitise_line" ]; then
+  ok "copies the files before the sanitise, inside the same window"
+else
+  no "copied the files outside the replacing window (files ${files_line:-none}, sanitise ${sanitise_line:-none})"
+fi
+files_call=$(grep 'rsync -y .*:%files/ ' "$app/calls.log" | head -1)
+if printf '%s' "$files_call" | grep -q -- '--exclude=/private'; then
+  ok "leaves production's private files where they are"
+else
+  no "copied production's private files: keys, dumps and markers"
+fi
+if printf '%s' "$files_call" | grep -q -- '--exclude=/php .*--exclude=/css .*--exclude=/js .*--exclude=/styles'; then
+  ok "leaves Drupal's derived directories for it to make again"
+else
+  no "copied Drupal's derived directories"
+fi
+
 # --------------------------------------------------------------------------
 # The deployed revision is recorded last, and only when there is one.
 # --------------------------------------------------------------------------

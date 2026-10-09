@@ -104,6 +104,29 @@ load_from_production() {
   drush sql:sync "$production_alias" @self --yes --structure-tables-list="$volatile_tables"
 }
 
+# The public files the copied content refers to. Images and documents live in
+# production's files directory, not its database, so a copy of the one
+# without the other shows every image broken. Private files stay each
+# environment's own: its keys, the dump and the rollout's markers. Derived
+# files are left to Drupal, which makes them again on demand.
+copy_files_from_production() {
+  echo "Copying production's public files."
+  # The output is kept for the failure, which names its cause: an alias that
+  # does not resolve, a refused connection or a file that vanished mid-copy.
+  # The last is rsync's status 24 and costs one file on a live site, not the
+  # copy, so it is reported and taken.
+  set +e
+  output=$(drush rsync -y "${production_alias}:%files/" "$app/drupal/web/sites/default/files/" -- \
+    --exclude=/private --exclude=/php --exclude=/css --exclude=/js --exclude=/styles 2>&1)
+  status=$?
+  set -e
+  case "$status" in
+    0) echo "  copied." ;;
+    24) echo "  copied, except files that vanished on production while the copy ran:"; printf '%s\n' "$output" | sed 's/^/    /' ;;
+    *) echo "  could not copy production's files; images the content refers to may be missing here:"; printf '%s\n' "$output" | sed 's/^/    /' ;;
+  esac
+}
+
 # The addresses that survive the sanitise: this site's own maintainers, so
 # someone editing a non-production environment is the person they are in
 # production. Every other address is scrubbed.
@@ -262,6 +285,7 @@ if may_sync; then
   echo "  target: ${environment_name:-unnamed} (${environment_type:-untyped})"
   echo "  source: ${production_alias}"
   load_from_production
+  copy_files_from_production
   sanitise
 fi
 
