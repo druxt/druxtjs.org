@@ -1,0 +1,25 @@
+{
+  "name": "@druxt-contrib/node-preview",
+  "version": "0.1.0",
+  "description": "Renders Drupal node previews in a Druxt frontend, fed by JSON:API Node Preview and Consumer Node Preview.",
+  "main": "dist/index.ssr.js",
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "keywords": [
+    "decoupled",
+    "drupal",
+    "druxt",
+    "jsonapi",
+    "json:api",
+    "module",
+    "node preview",
+    "nuxt",
+    "preview"
+  ],
+  "module": "dist/index.esm.js",
+  "peerDependencies": {
+    "druxt": ">=0.21.0 <1"
+  }
+}

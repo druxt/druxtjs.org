@@ -83,6 +83,7 @@ const OAUTH_STRATEGY = { endpoints: { logoutToken: '/session/logout/token' } }
 // in server/start.js which requests are Drupal's, so none of them is stored.
 const { shouldProxy } = require('./modules/druxt-admin/proxy')
 const { PROFILE_PATH, isProfilePath } = require('./lib/profile-path')
+const { PREVIEW_INCLUDE } = require('./lib/node-preview')
 
 export default {
   // Pages render live from Drupal. In production, server/start.js serves
@@ -169,6 +170,7 @@ export default {
     // a foreign 401 was replayed twice with the token attached, and once with
     // only the module's.
     '~/plugins/entity-operations.js',
+    '~/plugins/node-preview-workspace.client.js',
     '~/plugins/color-mode-theme.client.js',
     '~/plugins/analytics.client.js',
     '~/plugins/chunk-reload.client.js',
@@ -243,6 +245,10 @@ export default {
     'druxt-blocks',
     'druxt-views',
     'druxt-breadcrumb',
+    // Drupal's Preview button renders the unsaved page here, at
+    // /druxt/node/preview, from the JSON:API Node Preview document it is
+    // handed in the URL fragment.
+    '@druxt-contrib/node-preview',
     // Every core module, so the playground can render every component. Its
     // layout is only added to a site without one.
     'druxt-site',
@@ -270,6 +276,9 @@ export default {
     proxy: { api: true, files: true },
     // The section pages resolve paths themselves; no catch-all route.
     router: { wildcard: false },
+    // A preview carries the page's paragraphs and their media, as a render
+    // of the saved page would fetch them.
+    nodePreview: { include: PREVIEW_INCLUDE },
     // Menus ask for the fields a menu needs, not every attribute of a link.
     menu: { jsonApiMenuItems: true, query: { requiredOnly: true } },
     // No deprecated default field components: fields render through
