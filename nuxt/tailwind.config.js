@@ -9,6 +9,21 @@ const colors = {
   accentFocus: '#2aa79b',
 }
 
+// A callout paragraph, by the type its entity wrapper carries.
+const callout = '[data-druxt-type="paragraph--docs_callout"]'
+
+// The box a quote and a callout share. The rule's colour is the one daisyUI's
+// own prose rule gives a quote, which wins over a colour set here.
+const box = {
+  borderLeftWidth: '0.25rem',
+  borderLeftColor: 'hsl(var(--bc) / 0.4)',
+  backgroundColor: 'hsl(var(--b2))',
+  padding: '0.75rem 1.25rem',
+  borderRadius: '0 0.5rem 0.5rem 0',
+  fontStyle: 'normal',
+  color: 'hsl(var(--bc) / 0.75)',
+}
+
 // Shared prose rules. Colours reference the daisyUI CSS variables so the same
 // config serves both themes.
 const prose = (theme) => ({
@@ -36,7 +51,7 @@ const prose = (theme) => ({
     'h1, h2, h3, h4': { color: 'hsl(var(--bc))', scrollMarginTop: '10.5rem' },
     'h2 > a, h3 > a': { borderBottom: 'none', fontWeight: 'inherit' },
     strong: { color: 'hsl(var(--bc))', fontWeight: '600' },
-    'a strong, blockquote strong, thead th strong': { color: 'inherit' },
+    [`a strong, blockquote strong, ${callout} strong, thead th strong`]: { color: 'inherit' },
     'ul > li::marker, ol > li::marker': { color: 'hsl(var(--bc) / 0.6)' },
     'th, dt': { color: 'hsl(var(--bc))' },
     'figcaption, .lead': { color: 'hsl(var(--bc) / 0.7)' },
@@ -53,14 +68,13 @@ const prose = (theme) => ({
     'code::after': { content: 'none' },
     // pre: surface, Prism palette and copy button live in assets/css/code.css.
     'pre code': { backgroundColor: 'transparent', color: 'inherit', padding: 0 },
-    blockquote: {
-      borderLeftColor: colors.secondary,
-      backgroundColor: 'hsl(var(--b2))',
-      padding: '0.75rem 1.25rem',
-      borderRadius: '0 0.5rem 0.5rem 0',
-      fontStyle: 'normal',
-      color: 'hsl(var(--bc) / 0.75)',
-    },
+    // One box for a quote and for a callout. A callout is a paragraph type
+    // with no markup of its own, so it draws the same box here, keyed on the
+    // type the entity wrapper always carries; a quote it still holds, from
+    // before the markdown markers were taken out, draws nothing of its own.
+    blockquote: box,
+    [callout]: { ...box, marginTop: '1.6em', marginBottom: '1.6em', fontWeight: '500' },
+    [`${callout} blockquote`]: { border: '0', backgroundColor: 'transparent', padding: '0', margin: '0', borderRadius: '0' },
     'blockquote p:first-of-type::before': { content: 'none' },
     'blockquote p:last-of-type::after': { content: 'none' },
     // table: header, row rules, scroll region and stacking live in assets/css/app.css.
