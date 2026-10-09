@@ -9,3 +9,15 @@ admin:
   css:
     theme:
       css/admin.css: {}
+
+preview-frame:
+  css:
+    theme:
+      css/preview-frame.css: {}
+  js:
+    js/preview-frame.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.displace
+    - core/jquery
+    - core/once

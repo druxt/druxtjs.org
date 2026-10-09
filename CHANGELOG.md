@@ -9,6 +9,10 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+- The JSON:API tab on a page's edit screen opens through the site again, and
+  its preview fills the screen: the iframe is pinned to the viewport inside
+  the admin toolbar's edges, following the toolbar when it collapses or
+  stands at the side, instead of sitting in a 600px box on the page.
 - Tab moves from the username field to the password field on the sign-in
   form. The "Forgot password?" link follows the password field in the page
   so a keyboard reaches it after the field it belongs to.

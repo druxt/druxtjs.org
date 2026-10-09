@@ -9,6 +9,10 @@ describe('shouldProxy', () => {
     assert.equal(shouldProxy('/batch'), true)
     assert.equal(shouldProxy('/cores'), false)
     assert.equal(shouldProxy('/node/1'), false)
+    // Every operation Drupal offers on a page, the JSON:API preview tab included.
+    for (const operation of ['edit', 'delete', 'revisions', 'json-preview']) {
+      assert.equal(shouldProxy(`/node/25/${operation}`), true, operation)
+    }
   })
 
   // The path goes upstream as it came, so a segment Drupal's server would
