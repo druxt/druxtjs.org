@@ -18,6 +18,11 @@ Druxt 1.0.0.
   live on a read, as for a workspace the account cannot have. A new
   workspace's id is the UUID Workspaces Extra gives it, and the header, the
   cookie and the editor bar accept that form beside a machine name.
+- The Operations button on Drupal's listings is drawn at one size. Claro
+  renders it as its small dropbutton while Gin sizes the toggle and the
+  label for its large one, so "Edit" sank to the bottom of the button, the
+  toggle's edge hung below it, and a hover filled a box of the wrong shape.
+  The button takes Gin's size, and a hover fills it to its rounded corners.
 - The JSON:API tab on a page's edit screen opens through the site again, and
   its preview fills the screen: the iframe is pinned to the viewport inside
   the admin toolbar's edges, following the toolbar when it collapses or

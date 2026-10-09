@@ -50,3 +50,23 @@
     justify-content: flex-end;
   }
 }
+
+/* Claro renders a table's operations as its extrasmall dropbutton, a 1.5rem
+   list, while Gin sizes the toggle and the first item for its 3rem one: the
+   label sinks, the toggle's edge hangs below, and a hover fills a box the
+   wrong size. Gin's own extrasmall rules never match, since they are written
+   as descendants of `html`. The extrasmall sizes are the regular ones here,
+   and the two ends take the inner radius of the border, raised the way Gin
+   raises its own rules. */
+:is(#extra-specificity-hack, .dropbutton-wrapper) {
+  --dropbutton-extrasmall-toggle-size: var(--dropbutton-toggle-size);
+  --dropbutton-extrasmall-spacing-size: var(--dropbutton-spacing-size);
+  --dropbutton-extrasmall-font-size: var(--dropbutton-font-size);
+  --dropbutton-extrasmall-line-height: var(--dropbutton-line-height);
+}
+:is(#extra-specificity-hack, .dropbutton-wrapper) .dropbutton--multiple > .dropbutton__item:first-of-type > * {
+  border-radius: calc(var(--gin-border-m) - 2px) 0 0 calc(var(--gin-border-m) - 2px);
+}
+:is(#extra-specificity-hack, .dropbutton-wrapper) .dropbutton__toggle {
+  border-radius: 0 calc(var(--gin-border-m) - 2px) calc(var(--gin-border-m) - 2px) 0;
+}
