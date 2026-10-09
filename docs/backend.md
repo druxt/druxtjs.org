@@ -210,6 +210,26 @@ so the two sides must share history: every Lagoon environment is a copy of
 production, and a local site needs a copy of a production database before
 it can deploy to one.
 
+## Section lists and next steps
+
+A section landing (`field_is_landing`) lists its pages from the
+`docs_section` view, read through JSON:API Views with the section's term as
+the argument and rendered by `DruxtView` below the landing's own text. The
+view holds the published `doc_page` nodes of the section in `field_weight`
+then title order, so a page appears as soon as it is published with a
+section. Nothing lists pages by hand any more.
+
+A page's **Where to go next** is the `field_next` link field on the page, in
+the editor's order. A link to a page on this site is shown as that page is
+now, title and description included, so a rename or a move follows. A link to
+a generated page, the API reference say, is a path with the text the editor
+gave it. A page with no links shows the next page in the docs menu, so none
+ends without a way on.
+
+The release that made this moved every hand-written list once, in
+`druxtjsorg_deploy_next_steps()`: each page's section into its field, and
+each landing's list out of its text. Running the hook again changes nothing.
+
 ## Export configuration after changing it
 
 A change made through the admin UI or `drush` stays in the database until

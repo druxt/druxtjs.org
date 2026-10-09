@@ -44,6 +44,16 @@ Druxt 1.0.0.
   box, so the callout now draws the same box itself, with or without a
   quote inside. Drupal's own render of a callout no longer prints the
   type's label above the text either, as the site never did.
+- A section landing lists its pages from Drupal, not from its text: the
+  `docs_section` view, read through JSON:API Views with the section as its
+  argument, holds the published pages in weight then title order, so a new
+  page appears as soon as it is published with a section. "Where to go next"
+  at the end of a page is the page's own link field, in the editor's order: a
+  page on this site is shown as it is now, title and description included,
+  a generated page by its path and text, and a link off the site opens in a
+  new tab. A page without links shows the next page in the docs menu. A
+  deploy hook moved the hand-written lists of 35 pages and 4 landings across
+  once.
 - The JSON:API tab on a page's edit screen opens through the site again, and
   its preview fills the screen: the iframe is pinned to the viewport inside
   the admin toolbar's edges, following the toolbar when it collapses or

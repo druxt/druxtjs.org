@@ -9,7 +9,7 @@ import assert from 'node:assert/strict'
 
 import { readdirSync } from 'node:fs'
 
-const { PARAGRAPH_TYPES, fetchDrupalPage, pageQuery, sectionOf } = await import(
+const { PARAGRAPH_TYPES, fetchDrupalPage, nextSteps, pageQuery, sectionOf } = await import(
   '../nuxt/lib/drupal-document.js'
 )
 
@@ -74,7 +74,7 @@ describe('fetchDrupalPage', () => {
     // What the page reads itself, then what its display renders.
     assert.equal(
       fields['node--doc_page'],
-      'title,field_toc,moderation_state,drupal_internal__nid,field_description,field_content'
+      'title,field_toc,moderation_state,drupal_internal__nid,field_next,field_section,field_is_landing,field_description,field_content'
     )
     assert.equal(fields['paragraph--docs_text'], 'behavior_settings,field_text')
     assert.equal(fields['paragraph--docs_layout_section'], 'behavior_settings')
@@ -89,6 +89,95 @@ describe('fetchDrupalPage', () => {
       await fetchDrupalPage(store({ entity: { type: 'taxonomy_term' } }), '/tags/x'),
       null
     )
+  })
+
+  test('carries the next-step links, the section and whether it is the landing', async () => {
+    const landing = {
+      data: {
+        attributes: {
+          title: 'How-to guides',
+          field_is_landing: true,
+          field_next: [
+            { uri: 'entity:node/2', title: 'Caching', resolvable_uri: '/how-to/caching' },
+          ],
+        },
+        relationships: {
+          field_section: { data: { meta: { drupal_internal__target_id: 2 } } },
+        },
+      },
+    }
+    const doc = await fetchDrupalPage(store(page, false, landing), '/how-to')
+    assert.equal(doc.isLanding, true)
+    assert.equal(doc.sectionId, 2)
+    assert.equal(doc.next.length, 1)
+    // A page with none of them.
+    const plain = await fetchDrupalPage(store(page, false, node), '/tutorials/getting-started')
+    assert.deepEqual([plain.isLanding, plain.sectionId, plain.next], [false, null, []])
+  })
+})
+
+// The links an editor lists under "Where to go next": a page on this site is
+// shown as it is now, anything else as the editor wrote it.
+describe('nextSteps', () => {
+  const links = [
+    { uri: 'entity:node/2', title: 'Old caching title', resolvable_uri: '/how-to/caching' },
+    {
+      uri: 'internal:/api/packages/schema',
+      title: 'DruxtSchema API reference',
+      resolvable_uri: '/api/packages/schema',
+    },
+    { uri: 'entity:node/9', title: 'Gone', resolvable_uri: '/how-to/gone' },
+    {
+      uri: 'https://demo.druxtjs.org',
+      title: 'The demo site',
+      resolvable_uri: 'https://demo.druxtjs.org',
+    },
+  ]
+  const pages = {
+    data: [
+      {
+        attributes: {
+          drupal_internal__nid: 2,
+          title: 'Caching',
+          field_description: 'Drupal decides.',
+          path: { alias: '/how-to/caching-now' },
+        },
+      },
+    ],
+  }
+
+  test('resolves a page link to the page as it is now, in one request, and keeps other links', async () => {
+    const calls = []
+    const store = { dispatch: async (action, payload) => (calls.push({ action, payload }), pages) }
+    const items = await nextSteps(store, links)
+    assert.equal(calls.length, 1)
+    assert.equal(calls[0].action, 'druxt/getCollection')
+    assert.equal(calls[0].payload.type, 'node--doc_page')
+    assert.equal(calls[0].payload.query['filter[nid][condition][operator]'], 'IN')
+    assert.deepEqual(
+      [
+        calls[0].payload.query['filter[nid][condition][value][0]'],
+        calls[0].payload.query['filter[nid][condition][value][1]'],
+      ],
+      [2, 9]
+    )
+    assert.deepEqual(items, [
+      { text: 'Caching', to: '/how-to/caching-now', description: 'Drupal decides.' },
+      { text: 'DruxtSchema API reference', to: '/api/packages/schema', description: '' },
+      // A page that no longer answers keeps its stored path and text.
+      { text: 'Gone', to: '/how-to/gone', description: '' },
+      // An absolute URL is kept whole, for the component to open as a link out.
+      { text: 'The demo site', to: 'https://demo.druxtjs.org', description: '' },
+    ])
+  })
+
+  test('asks nothing without page links, and is empty without links', async () => {
+    const store = { dispatch: async () => assert.fail('no request expected') }
+    assert.deepEqual(await nextSteps(store, [links[1]]), [
+      { text: 'DruxtSchema API reference', to: '/api/packages/schema', description: '' },
+    ])
+    assert.deepEqual(await nextSteps(store, []), [])
+    assert.deepEqual(await nextSteps(store, undefined), [])
   })
 })
 
