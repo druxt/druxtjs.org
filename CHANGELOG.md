@@ -9,6 +9,12 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+- An API options table, Param, Type, Default and Description, re-flows from
+  640px up: each row shows its three short facts on one line and the
+  description on its own line beneath, so nothing leaves the page and a long
+  default wraps in its column. The stacked layout below 640px stays. The
+  content column is 46rem at most, so such a table used to scroll at every
+  width with the whole Description column off to the right.
 - `llms-full.txt` keeps its outline when a page shows a code fence. A Drupal
   code paragraph is fenced longer than any fence it contains, and the build
   refuses to write the file when a fence or raw-text element is left open,

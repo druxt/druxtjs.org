@@ -441,6 +441,62 @@ html {
 .prose tbody tr:last-child {
   border-bottom: 0;
 }
+/* An options table, Param, Type, Default and Description, from 640px up: the
+   content column caps at 46rem, too narrow for four columns with a default
+   that never wraps, so each row becomes a grid with the three short facts on
+   one line and the description on its own line beneath. The markup stays a
+   table, with ARIA roles from AppProse, so column headings still read. */
+@media (min-width: 640px) {
+  .prose .docs-table[data-tiers] table,
+  .prose .docs-table[data-tiers] thead,
+  .prose .docs-table[data-tiers] tbody {
+    display: block;
+    width: 100%;
+  }
+  .prose .docs-table[data-tiers] tr {
+    display: grid;
+    grid-template-columns: 11rem 6rem minmax(0, 1fr);
+    column-gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid hsl(var(--b3));
+  }
+  .prose .docs-table[data-tiers] thead tr {
+    grid-template-columns: 11rem 6rem max-content minmax(0, 1fr);
+    border-bottom: 1px solid hsl(var(--bc) / 0.4);
+  }
+  .prose .docs-table[data-tiers] tbody tr:last-child {
+    border-bottom: 0;
+  }
+  .prose .docs-table[data-tiers] th,
+  .prose .docs-table[data-tiers] td {
+    display: block;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  .prose .docs-table[data-tiers] thead th:last-child {
+    margin-left: -8px;
+    font-weight: 400;
+    color: hsl(var(--bc) / 0.55);
+  }
+  .prose .docs-table[data-tiers] thead th:last-child::before {
+    content: '/ ';
+  }
+  .prose .docs-table[data-tiers] tbody td:first-child {
+    font-weight: 500;
+  }
+  .prose .docs-table[data-tiers] tbody td:last-child {
+    grid-column: 1 / -1;
+    margin-top: 2px;
+    font-size: 0.95em;
+    color: hsl(var(--bc) / 0.8);
+  }
+  /* A long default wraps in its own column instead of pushing the table out. */
+  .prose .docs-table[data-tiers] td code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
 /* Right-edge fade while there is more table to the right. Painted as an
    overlay, not a scroll shadow: cells are transparent, so a gradient behind
    them would never show. AppProse toggles data-overflow from the scroller. */
