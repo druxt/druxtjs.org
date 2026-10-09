@@ -75,6 +75,11 @@ if (!$frontend && getenv('LAGOON_ENVIRONMENT_TYPE') === 'production') {
 }
 if ($frontend) {
   $settings['druxt_docs_frontend_url'] = rtrim($frontend, '/');
+  // The Frontend tab of a page's preview: this site's preview page, handed
+  // the JSON:API Node Preview document in the fragment. The document's path
+  // is relative, so the page fetches it on its own origin, through the
+  // proxy, with the editor's session.
+  $settings['druxt_docs_preview_url'] = rtrim($frontend, '/') . '/druxt/node/preview?vm={view_mode}#/jsonapi/node/doc_page/{uuid}/preview';
 }
 
 // Purge clears the Nuxt server's shared JSON:API cache when content changes.

@@ -18,6 +18,15 @@ Druxt 1.0.0.
   live on a read, as for a workspace the account cannot have. A new
   workspace's id is the UUID Workspaces Extra gives it, and the header, the
   cookie and the editor bar accept that form beside a machine name.
+- Drupal's Preview button shows the unsaved page as this site renders it. The
+  preview screen's Frontend tab now has a page to show: `@druxt-contrib/node-preview`,
+  carried as a copy in `nuxt/vendor/druxt-node-preview` (built from its source
+  commit `09c9ae88`) until it is published, adds `/druxt/node/preview`, which
+  reads the JSON:API Node Preview document from the URL fragment and renders
+  it. Each Lagoon environment points the tab at its own frontend, and the
+  preview is fetched with the editor's workspace, which the module's own
+  fetch would not send. The preview screen itself reaches Drupal through the
+  site like the other editing screens.
 - The JSON:API tab on a page's edit screen opens through the site again, and
   its preview fills the screen: the iframe is pinned to the viewport inside
   the admin toolbar's edges, following the toolbar when it collapses or

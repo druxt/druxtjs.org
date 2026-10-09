@@ -18,11 +18,16 @@ with three tabs. All three show the unsaved changes.
 | Drupal   | The page's content in the admin theme, its paragraphs styled like the frontend's |
 | JSON:API | The `jsonapi_node_preview` document, with the page's paragraphs included         |
 
-The Frontend tab needs the frontend's preview URL in `settings.php`.
+The Frontend tab shows the page at `/druxt/node/preview`, which the vendored
+`@druxt-contrib/node-preview` module adds to the site. The page reads the
+JSON:API Node Preview document from the URL fragment and fetches it with the
+editor's session and workspace. The render goes through the same components
+as a saved page. On Lagoon, `settings.lagoon.php` points the tab at the
+environment's own frontend. Elsewhere set the URL in `settings.php`;
 `{uuid}` and `{view_mode}` are filled in for each preview:
 
 ```php
-$settings['druxt_docs_preview_url'] = '/druxt/node/preview?vm={view_mode}#/jsonapi/node/doc_page/{uuid}/preview';
+$settings['druxt_docs_preview_url'] = 'http://localhost:3000/druxt/node/preview?vm={view_mode}#/jsonapi/node/doc_page/{uuid}/preview';
 ```
 
 Without it, the tab says the frontend preview isn't configured.
