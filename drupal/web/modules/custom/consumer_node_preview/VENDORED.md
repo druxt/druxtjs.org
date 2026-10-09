@@ -7,5 +7,5 @@ this directory.
 | | |
 | --- | --- |
 | Commit | `3c7ffcb` (branch `feature/1-tabbed-preview`) |
-| Left out | The repository's own CI, dev tooling, lint configuration, contributor files and tunnel scripts |
+| Taken | What `git archive 3c7ffcb` exports, which the module's `.gitattributes` keeps to the distributed set, without the three files that still slip through it (`.gitlab-ci.yml`, `CONTRIBUTING.md`, `phpunit.gitlab-ci.xml`), plus its tests, which the export leaves out and the site's suite runs |
 | Changed | Nothing |
