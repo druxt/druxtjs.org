@@ -249,6 +249,9 @@ export default {
     // /druxt/node/preview, from the JSON:API Node Preview document it is
     // handed in the URL fragment.
     '@druxt-contrib/node-preview',
+    // After it: puts this site's page on that route, so a preview gets the
+    // page header and prose shell a saved page gets.
+    '~/modules/node-preview-page',
     // Every core module, so the playground can render every component. Its
     // layout is only added to a site without one.
     'druxt-site',

@@ -3,8 +3,33 @@ import { describe, it } from 'node:test'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
-const { PREVIEW_INCLUDE, previewRequest } = require('../nuxt/lib/node-preview.js')
+const { PREVIEW_INCLUDE, previewRequest, previewRoute } = require('../nuxt/lib/node-preview.js')
 const { HEADER } = require('../nuxt/lib/workspace.js')
+
+describe('previewRoute', () => {
+  it("puts the site's page on the module's route, and leaves every other route alone", () => {
+    const routes = [
+      { name: 'how-to-slug', path: '/how-to/:slug', component: 'pages/how-to/_.vue' },
+      {
+        name: 'druxt-node-preview',
+        path: '/druxt/node/preview',
+        component: '.nuxt/components/druxt-node-preview-page.vue',
+      },
+    ]
+    const result = previewRoute(routes, '~/components/app/NodePreviewPage.vue')
+    assert.equal(result, routes)
+    assert.equal(routes[1].component, '~/components/app/NodePreviewPage.vue')
+    assert.equal(routes[1].path, '/druxt/node/preview')
+    assert.equal(routes[0].component, 'pages/how-to/_.vue')
+  })
+
+  it('does nothing without the module', () => {
+    const routes = [{ name: 'index', path: '/', component: 'pages/index.vue' }]
+    assert.deepEqual(previewRoute(routes, 'x'), [
+      { name: 'index', path: '/', component: 'pages/index.vue' },
+    ])
+  })
+})
 
 describe('previewRequest', () => {
   const endpoint = '/jsonapi/node/doc_page/0039a826-1e00-43ad-aa6a-6bbf4c6b6fba/preview'
