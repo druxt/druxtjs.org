@@ -33,4 +33,23 @@ const previewRequest = (endpoint, { include = [], workspace = null } = {}) => {
   return { url, init: { credentials: 'include', headers } }
 }
 
-module.exports = { PREVIEW_INCLUDE, previewRequest }
+/**
+ * Puts the site's page on the preview module's route.
+ *
+ * The module registers `/druxt/node/preview` with its own page, which draws
+ * the entity alone. The route keeps its name and path; only the component
+ * changes, so the module's plugin, Drupal's preview URL and the proxy are
+ * untouched.
+ *
+ * @param {object[]} routes - The router's routes, as extendRoutes passes them.
+ * @param {string} component - The site's page component path.
+ * @returns {object[]} The same routes.
+ */
+const previewRoute = (routes, component) => {
+  for (const route of routes) {
+    if (route.name === 'druxt-node-preview') route.component = component
+  }
+  return routes
+}
+
+module.exports = { PREVIEW_INCLUDE, previewRequest, previewRoute }
