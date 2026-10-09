@@ -23,9 +23,9 @@ Druxt 1.0.0.
   carried as a copy in `nuxt/vendor/druxt-node-preview` (built from its source
   commit `09c9ae88`) until it is published, adds `/druxt/node/preview`, which
   reads the JSON:API Node Preview document from the URL fragment and renders
-  it. On that route this site puts its own page, so the preview sits in the
-  page header and prose shell a saved page gets, title and description
-  included, rather than the bare entity the module's page draws. Each Lagoon
+  it. On that route this site puts its own page, so the preview has the page
+  header and prose shell a saved page has, title and description included,
+  rather than the bare entity the module's page draws. Each Lagoon
   environment points the tab at its own frontend, and the
   preview is fetched with the editor's workspace, which the module's own
   fetch would not send. The preview screen itself reaches Drupal through the
