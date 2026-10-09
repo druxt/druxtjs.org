@@ -3369,10 +3369,10 @@ __metadata:
 
 "@druxt-contrib/node-preview@file:vendor/druxt-node-preview::locator=druxtjs-org%40workspace%3A.":
   version: 0.1.0
-  resolution: "@druxt-contrib/node-preview@file:vendor/druxt-node-preview#vendor/druxt-node-preview::hash=e4b1ba&locator=druxtjs-org%40workspace%3A."
+  resolution: "@druxt-contrib/node-preview@file:vendor/druxt-node-preview#vendor/druxt-node-preview::hash=12ca07&locator=druxtjs-org%40workspace%3A."
   peerDependencies:
     druxt: ">=0.21.0 <1"
-  checksum: cde38c00db5ed6c1f324ce53b4beb45c9dc1e213ae752f3ed4f532cbccfecd11adc3fab260f96880af4a09799eb79dfbca26ff265a5920741399b4ac0ae08307
+  checksum: c316283b2aa444c61af71bafeaac1a3546076575e55fb10aaab42951f659aba443836c377d0d491b87259ff5063d64a01059e521ed09a024a35513c4271c3276
   languageName: node
   linkType: hard
 

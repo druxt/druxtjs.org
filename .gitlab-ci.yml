@@ -161,7 +161,7 @@ lint:prose:
   image: node:22
   variables:
     GIT_DEPTH: 0
-    PROSE_LINT_GLOB: "!nuxt/**"
+    PROSE_LINT_GLOB: "!{nuxt,drupal/web/modules/custom/consumer_node_preview}/**"
   cache:
     key: vale-3.17.1
     paths:

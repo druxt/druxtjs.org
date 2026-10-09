@@ -18,18 +18,19 @@ Druxt 1.0.0.
   live on a read, as for a workspace the account cannot have. A new
   workspace's id is the UUID Workspaces Extra gives it, and the header, the
   cookie and the editor bar accept that form beside a machine name.
-- Drupal's Preview button shows the unsaved page as this site renders it. The
-  preview screen's Frontend tab now has a page to show: `@druxt-contrib/node-preview`,
-  carried as a copy in `nuxt/vendor/druxt-node-preview` (built from its source
-  commit `09c9ae88`) until it is published, adds `/druxt/node/preview`, which
-  reads the JSON:API Node Preview document from the URL fragment and renders
-  it. On that route this site puts its own page, so the preview has the page
-  header and prose shell a saved page has, title and description included,
-  rather than the bare entity the module's page draws. Each Lagoon
-  environment points the tab at its own frontend, and the
-  preview is fetched with the editor's workspace, which the module's own
-  fetch would not send. The preview screen itself reaches Drupal through the
-  site like the other editing screens.
+- Drupal's Preview button shows the unsaved page as this site renders it,
+  through two modules this site now runs ahead of their release:
+  `consumer_node_preview`, carried in `drupal/web/modules/custom` from its
+  commit `3c7ffcb`, is the preview screen with its Frontend, Drupal and
+  JSON:API tabs, the width presets and a per-environment target, which
+  `druxt_docs` provided until now; `@druxt-contrib/node-preview`, carried in
+  `nuxt/vendor/druxt-node-preview` from its commit `349e45a`, adds
+  `/druxt/node/preview`, which reads the preview document's path from the
+  URL fragment, fetches it through the Druxt client with the editor's
+  session and workspace, and renders the node through a site wrapper that
+  gives it the page header and prose shell a saved page has. Each Lagoon
+  environment points the tab at its own frontend, and the preview screen
+  reaches Drupal through the site like the other editing screens.
 - The JSON:API tab on a page's edit screen opens through the site again, and
   its preview fills the screen: the iframe is pinned to the viewport inside
   the admin toolbar's edges, following the toolbar when it collapses or
