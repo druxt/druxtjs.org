@@ -71,11 +71,23 @@ const isPage = (method, pathname) =>
  * @param {number} options.ttl - Milliseconds before a stored page renders again.
  * @param {Function} options.render - Renders a path to `{ html, error, redirected }`.
  * @param {Function} [options.log] - Logs a line.
- * @returns {{ read: Function, store: Function, fileFor: Function }} The cache.
+ * @returns {{ read: Function, store: Function, fileFor: Function, invalidate: Function }} The cache.
  */
 const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
   const root = path.resolve(dir)
   const pending = new Map()
+  // Pages stored before Drupal's last purge are stale, whatever their age.
+  // The time is kept beside the pages, so a restart does not forget a purge
+  // that the files on disk predate.
+  const purgeFile = path.join(root, '.purged-at')
+  let purgedAt = 0
+  try {
+    purgedAt = Number(fs.readFileSync(purgeFile, 'utf8')) || 0
+  } catch (e) {
+    // No purge recorded.
+  }
+  // Counts purges, so a render that began before one is not stored after it.
+  let generation = 0
 
   const fileFor = (pathname) => {
     const file = path.resolve(root, `.${pathname}`, 'index.html')
@@ -105,7 +117,8 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
         // Floored: a file written this millisecond carries a fractional time
         // that would otherwise read as newer than the clock.
         const age = Date.now() - Math.floor(stats.mtimeMs)
-        return { body, encoding, modified: stats.mtime, stale: age >= ttl }
+        // A file written in the purge's own millisecond is stale too.
+        return { body, encoding, modified: stats.mtime, stale: age >= ttl || Math.floor(stats.mtimeMs) <= purgedAt }
       } catch (e) {
         // This copy is missing: try the next.
       }
@@ -118,7 +131,13 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
     const job = (async () => {
       const file = fileFor(pathname)
       if (!file) return null
+      const began = generation
       const { html, error, redirected } = (await render(pathname)) || {}
+      if (html && !error && !redirected && began !== generation) {
+        // Rendered from before a purge: served once, never stored.
+        log(`cache: ${pathname} not stored: purged while rendering`)
+        return html
+      }
       if (!html || error || redirected) {
         // Gone, moved or failing: the next request renders live.
         const reason = error ? error.statusCode || 'error' : redirected ? 'redirect' : 'empty'
@@ -129,6 +148,11 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
       await fs.promises.mkdir(path.dirname(file), { recursive: true })
       for (const { suffix, compress } of ENCODINGS) await write(file + suffix, compress(html))
       await write(file, html)
+      if (began !== generation) {
+        // Purged while the files were written: they carry a post-purge time, so drop them.
+        log(`cache: ${pathname} dropped: purged while storing`)
+        await Promise.all(['', ...ENCODINGS.map((e) => e.suffix)].map((s) => fs.promises.rm(file + s, { force: true })))
+      }
       return html
     })()
       .catch((e) => {
@@ -140,7 +164,20 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
     return job
   }
 
-  return { read, store, fileFor }
+  /** Marks every stored page stale, as a purge cannot say which pages it touched. */
+  // Marker writes queue in purge order, so two purges never share a partial file.
+  let marking = Promise.resolve()
+  const invalidate = () => {
+    purgedAt = Date.now()
+    generation += 1
+    const at = purgedAt
+    marking = marking
+      .then(() => fs.promises.mkdir(root, { recursive: true }))
+      .then(() => write(purgeFile, String(at)))
+      .catch((e) => log(`cache: purge time not kept: ${e.message}`))
+  }
+
+  return { read, store, fileFor, invalidate }
 }
 
 /**

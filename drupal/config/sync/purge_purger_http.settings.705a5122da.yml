@@ -16,7 +16,7 @@ headers:
   -
     field: X-Druxt-Secret
     value: ''
-body: ''
+body: '[invalidations:separated_comma]'
 body_content_type: text/plain
 runtime_measurement: true
 timeout: 3.0

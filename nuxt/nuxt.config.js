@@ -174,6 +174,8 @@ export default {
     '~/plugins/chunk-reload.client.js',
     '~/plugins/content-links.client.js',
     '~/plugins/mermaid.client.js',
+    // Offers the reader a change Drupal made to the open page.
+    '~/plugins/live-updates.client.js',
     // After the Druxt and auth plugins the modules add: it wraps the client.
     '~/plugins/working-copy.js',
     // Also after the Druxt and auth plugins: it adds to the client they share.
@@ -253,10 +255,17 @@ export default {
     // A Drupal user, by uuid, by the number a path carries, or whoever is
     // signed in. The profile pages use it.
     '@druxt-contrib/user',
+    // Open pages refetch what a Drupal purge touches, over a WebSocket.
+    '@druxt-contrib/sockets',
     // The consumer's decoupled settings and theme manifest, baked in at build.
     // A copy of the unreleased @druxt-contrib/decoupled-settings module.
     '~/modules/decoupled-settings',
   ],
+
+  // The browser half only: server/start.js attaches the socket to its own
+  // server, which Nuxt never listens on. Pages are not refetched behind the
+  // reader's back: plugins/live-updates offers the change instead.
+  sockets: { path: '/_live', server: false, refresh: false },
 
   decoupledSettings: {
     consumerId: CONSUMER_ID,

@@ -19,9 +19,34 @@ so a publish shows on the next render instead of after the `max_age`.
 | purger    | `purge_purger_http`, `httpbundled` | sends one `POST /_druxt/cache/clear` per batch, the secret in `X-Druxt-Secret`  |
 | processor | `purge_processor_lateruntime`      | works the queue after the response, so an editor never waits on it              |
 
-The Nuxt server clears its whole cache on that POST and ignores the body, so
-the tags never leave Drupal. Clearing by tag is druxt.js 0.26.0 work; when it
-lands, the same purger gains a body.
+The body lists the purged tags, from `purge_tokens`'
+`[invalidations:separated_comma]`. Druxt clears its whole cache on the POST
+and ignores the body. Clearing by tag is druxt.js 0.26.0 work.
+
+## Open pages
+
+`server/start.js` reads the tags of each purge Druxt accepts and does two
+things with them:
+
+- It marks every stored page stale, so the next visit renders it again. A
+  purge cannot say which pages it touched.
+- It sends them, as `content:changed`, to every page open on the site, over a
+  WebSocket on `/_live` from `@druxt-contrib/sockets` (vendored in
+  `nuxt/vendor/druxt-sockets`). A batch of sign-in bookkeeping
+  (`oauth2_token`, `consumer`, `session`) is not a content change and reaches
+  no page.
+
+A page whose content changed tells its reader rather than changing under
+them. `plugins/live-updates.client.js` decides whether the tags touch the page:
+an entity it loaded, a menu, or a purge that lists no tags. A list
+tag alone, such as the `node_list` every save purges, does not count.
+`AppLiveUpdate` then shows a small notice with **Show the update**, which
+clears Druxt's stores and runs the page's data again, so the header, the body
+and the menus all follow. The module's own refetch is off (`refresh: false`).
+
+The socket opens only from a page on the same host, and the module runs here
+without presence or channels. Each Nuxt process has its own sockets, as it has
+its own cache.
 
 ## Configuration
 
