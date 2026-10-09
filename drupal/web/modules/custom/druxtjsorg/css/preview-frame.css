@@ -1,0 +1,14 @@
+/**
+ * @file
+ * The JSON:API preview tab's iframe, pinned to the viewport.
+ *
+ * preview-frame.js sets the edges from Drupal.displace, so the frame sits
+ * inside the toolbar whichever side it is on.
+ */
+
+.druxtjsorg-preview-frame {
+  position: fixed;
+  z-index: 500;
+  border: 0;
+  background: #fff;
+}
