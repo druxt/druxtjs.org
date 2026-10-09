@@ -64,6 +64,19 @@ Druxt 1.0.0.
   box, so the callout now draws the same box itself, with or without a
   quote inside. Drupal's own render of a callout no longer prints the
   type's label above the text either, as the site never did.
+- Drupal's Preview button shows the unsaved page as this site renders it,
+  through two modules this site now runs ahead of their release:
+  `consumer_node_preview`, carried in `drupal/web/modules/custom` from its
+  commit `3c7ffcb`, is the preview screen with its Frontend, Drupal and
+  JSON:API tabs, the width presets and a per-environment target, which
+  `druxt_docs` provided until now; `@druxt-contrib/node-preview`, carried in
+  `nuxt/vendor/druxt-node-preview` from its commit `349e45a`, adds
+  `/druxt/node/preview`, which reads the preview document's path from the
+  URL fragment, fetches it through the Druxt client with the editor's
+  session and workspace, and renders the node through a site wrapper that
+  gives it the page header and prose shell a saved page has. Each Lagoon
+  environment points the tab at its own frontend, and the preview screen
+  reaches Drupal through the site like the other editing screens.
 - Drupal's Preview button shows the unsaved page as this site renders it. The
   preview screen's Frontend tab now has a page to show: `@druxt-contrib/node-preview`,
   carried as a copy in `nuxt/vendor/druxt-node-preview` (built from its source

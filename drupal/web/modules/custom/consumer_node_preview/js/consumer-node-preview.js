@@ -1,11 +1,11 @@
 /**
  * @file
- * Tabs, preview widths and the JSON:API document on the node preview page.
+ * Tabs, frontend targets, widths and the JSON:API document on the preview.
  */
 ((Drupal, once) => {
-  const key = (name) => `druxt_docs.preview.${name}`;
+  const key = (name) => `consumer_node_preview.${name}`;
 
-  // Storage can be blocked; the page works without it.
+  // Storage can be blocked. The page works without it.
   const recall = (name) => {
     try {
       return window.localStorage.getItem(key(name));
@@ -23,11 +23,14 @@
 
   /**
    * Fetches the preview document with the editor's session and prints it.
+   *
+   * @param {HTMLElement} output
+   *   The element that holds the document.
    */
   async function loadDocument(output) {
     const code = output.querySelector('code');
     try {
-      const response = await fetch(output.dataset.druxtPreviewJsonapi, {
+      const response = await fetch(output.dataset.consumerNodePreviewJsonapi, {
         credentials: 'same-origin',
         headers: { Accept: 'application/vnd.api+json' },
       });
@@ -36,21 +39,32 @@
       try {
         body = JSON.stringify(JSON.parse(text), null, 2);
       } catch {
-        // Not JSON: shown as it came.
+        // Not JSON. It is shown as it came.
       }
       code.textContent = response.ok
         ? body
         : `${response.status} ${response.statusText}\n\n${body}`;
     } catch (error) {
-      code.textContent = Drupal.t('The document could not be loaded: @message', {
-        '@message': error.message,
-      });
+      code.textContent = Drupal.t(
+        'The document could not be loaded: @message',
+        {
+          '@message': error.message,
+        },
+      );
     }
   }
 
+  /**
+   * Sets up one preview page.
+   *
+   * @param {HTMLElement} preview
+   *   The preview's wrapper.
+   */
   function init(preview) {
     const tabs = Array.from(preview.querySelectorAll('[role="tab"]'));
-    const output = preview.querySelector('[data-druxt-preview-jsonapi]');
+    const output = preview.querySelector(
+      '[data-consumer-node-preview-jsonapi]',
+    );
     let loaded = false;
 
     // Only a tab the editor picks is remembered, not the page's default.
@@ -65,7 +79,7 @@
           !selected;
       });
       if (picked) {
-        remember('tab', tab.dataset.druxtPreviewTab);
+        remember('tab', tab.dataset.consumerNodePreviewTab);
       }
       if (output && !loaded && !output.closest('[role="tabpanel"]').hidden) {
         loaded = true;
@@ -97,15 +111,50 @@
     });
 
     select(
-      tabs.find((tab) => tab.dataset.druxtPreviewTab === recall('tab')) ||
+      tabs.find(
+        (tab) => tab.dataset.consumerNodePreviewTab === recall('tab'),
+      ) ||
         tabs.find((tab) => tab.getAttribute('aria-selected') === 'true') ||
         tabs[0],
       false,
     );
 
-    const viewport = preview.querySelector('[data-druxt-preview-viewport]');
+    // Switching frontend reloads the frame and the new tab link. A target in
+    // the URL wins over the remembered one.
+    const frame = preview.querySelector('[data-consumer-node-preview-frame]');
+    const open = preview.querySelector('[data-consumer-node-preview-open]');
+    const targets = preview.querySelector(
+      '[data-consumer-node-preview-target]',
+    );
+    if (targets) {
+      const show = (option) => {
+        option.selected = true;
+        if (frame.getAttribute('src') !== option.value) {
+          frame.setAttribute('src', option.value);
+        }
+        open.setAttribute('href', option.value);
+      };
+      targets.addEventListener('change', () => {
+        const option = targets.selectedOptions[0];
+        show(option);
+        remember('target', option.dataset.key);
+      });
+      const requested = new URLSearchParams(window.location.search).has(
+        'frontend',
+      );
+      const remembered = Array.from(targets.options).find(
+        (option) => option.dataset.key === recall('target'),
+      );
+      if (!requested && remembered) {
+        show(remembered);
+      }
+    }
+
+    const viewport = preview.querySelector(
+      '[data-consumer-node-preview-viewport]',
+    );
     const widths = Array.from(
-      preview.querySelectorAll('[data-druxt-preview-width]'),
+      preview.querySelectorAll('[data-consumer-node-preview-width]'),
     );
     const resize = (button) => {
       widths.forEach((each) => {
@@ -114,16 +163,16 @@
         each.classList.toggle('button--primary', pressed);
       });
       viewport.style.setProperty(
-        '--druxt-preview-width',
-        button.dataset.druxtPreviewWidth,
+        '--consumer-node-preview-width',
+        button.dataset.consumerNodePreviewWidth,
       );
-      remember('width', button.dataset.druxtPreviewWidth);
+      remember('width', button.dataset.consumerNodePreviewWidth);
     };
     widths.forEach((button) =>
       button.addEventListener('click', () => resize(button)),
     );
     const width = widths.find(
-      (button) => button.dataset.druxtPreviewWidth === recall('width'),
+      (button) => button.dataset.consumerNodePreviewWidth === recall('width'),
     );
     if (width) {
       resize(width);
@@ -135,11 +184,18 @@
     });
   }
 
-  Drupal.behaviors.druxtDocsNodePreview = {
+  /**
+   * Attaches the tabbed node preview.
+   *
+   * @type {Drupal~behavior}
+   */
+  Drupal.behaviors.consumerNodePreview = {
     attach(context) {
-      once('druxt-docs-node-preview', '[data-druxt-preview]', context).forEach(
-        init,
-      );
+      once(
+        'consumer-node-preview',
+        '[data-consumer-node-preview]',
+        context,
+      ).forEach(init);
     },
   };
 })(Drupal, once);

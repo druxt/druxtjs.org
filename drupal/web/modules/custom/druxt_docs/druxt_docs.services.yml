@@ -4,7 +4,3 @@ services:
     arguments: ['@current_user', '@path_alias.manager']
     tags:
       - { name: event_subscriber }
-  druxt_docs.preview_route_subscriber:
-    class: Drupal\druxt_docs\Routing\PreviewRouteSubscriber
-    tags:
-      - { name: event_subscriber }

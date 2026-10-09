@@ -33,7 +33,7 @@
     "lint:knip": "knip --include dependencies,unlisted --no-config-hints",
     "lint:md": "markdownlint-cli2 \"**/*.md\"",
     "lint:private": "node scripts/lint-private-refs.mjs",
-    "lint:prose": "PROSE_LINT_GLOB='!nuxt/**' bash .gitlab/scripts/lint-prose.sh --all",
+    "lint:prose": "PROSE_LINT_GLOB='!{nuxt,drupal/web/modules/custom/consumer_node_preview}/**' bash .gitlab/scripts/lint-prose.sh --all",
     "lint:prose:install": "bash .gitlab/scripts/install-vale.sh .vale/bin .vale/styles",
     "prepare": "node scripts/prepare.mjs",
     "test": "node --test tests/*.test.mjs",

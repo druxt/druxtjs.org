@@ -11,6 +11,10 @@ const NuxtModule = function(moduleOptions = {}) {
     ...moduleOptions
   };
   this.options.store = true;
+  this.addTemplate({
+    src: path.resolve(__dirname, "../templates/DruxtNodePreview.vue"),
+    fileName: "components/druxt-node-preview.vue"
+  });
   const { dst } = this.addTemplate({
     src: path.resolve(__dirname, "../templates/DruxtNodePreviewPage.vue"),
     fileName: "components/druxt-node-preview-page.vue"
