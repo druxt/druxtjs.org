@@ -9,6 +9,9 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+- Tab moves from the username field to the password field on the sign-in
+  form. The "Forgot password?" link follows the password field in the page
+  so a keyboard reaches it after the field it belongs to.
 - An API options table, Param, Type, Default and Description, re-flows from
   640px up: each row shows its three short facts on one line and the
   description on its own line beneath, so nothing leaves the page and a long
