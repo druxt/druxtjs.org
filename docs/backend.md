@@ -95,7 +95,9 @@ workspace to publish at a time (`schedule workspace releases`), which is how
 a release waits for its date. Drupal's toolbar switcher lists the recent
 workspaces only. A closed workspace is no choice, since Drupal answers from
 live when one is active. The editor bar lists the open ones, and the header
-treats a closed one as unavailable.
+treats a closed one as unavailable. A workspace made under Workspaces Extra
+has a UUID for its id rather than a machine name, and the header, the cookie
+and the bar accept either.
 
 A request chooses its workspace with the `X-Druxt-Workspace` header. The
 `druxtjsorg` module applies it only when the account is signed in and may

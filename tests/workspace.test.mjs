@@ -93,9 +93,10 @@ describe('the cookie', () => {
   })
 })
 
-test('a workspace id is a machine name', () => {
+test('a workspace id is a machine name, or the UUID Workspaces Extra gives a new one', () => {
   assert.equal(isWorkspaceId('release_2_0'), true)
-  for (const id of ['', 'Stage', 'a-b', 'a b', 'a'.repeat(129), 7, null])
+  assert.equal(isWorkspaceId('1d0167cd-101b-498a-9827-d060f1c260f9'), true)
+  for (const id of ['', 'Stage', 'a b', 'a/b', 'a'.repeat(129), 7, null])
     assert.equal(isWorkspaceId(id), false, String(id))
   assert.equal(isContentRequest('/jsonapi'), true)
 })

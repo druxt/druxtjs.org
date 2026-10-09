@@ -103,7 +103,16 @@ final class HeaderWorkspaceNegotiatorTest extends KernelTestBase {
   }
 
   /**
-   * An id that could not be a machine name is not looked up.
+   * The UUID Workspaces Extra gives a new workspace is an id too.
+   */
+  public function testAUuidIdIsNegotiated(): void {
+    $id = '1d0167cd-101b-498a-9827-d060f1c260f9';
+    Workspace::create(['id' => $id, 'label' => 'Release'])->save();
+    self::assertSame($id, $this->negotiate($this->editor(), $id));
+  }
+
+  /**
+   * An id that could not be a machine name or a UUID is not looked up.
    */
   public function testMalformedIdIsNotLookedUp(): void {
     $negotiator = new HeaderWorkspaceNegotiator($this->editor());

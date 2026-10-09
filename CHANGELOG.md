@@ -15,7 +15,9 @@ Druxt 1.0.0.
   open, and a closed one can be rolled back. Drupal's toolbar switcher lists
   the recent workspaces only. The editor bar offers the open workspaces, and
   a request that names a closed one is refused on a write and answered from
-  live on a read, as for a workspace the account cannot have.
+  live on a read, as for a workspace the account cannot have. A new
+  workspace's id is the UUID Workspaces Extra gives it, and the header, the
+  cookie and the editor bar accept that form beside a machine name.
 - The JSON:API tab on a page's edit screen opens through the site again, and
   its preview fills the screen: the iframe is pinned to the viewport inside
   the admin toolbar's edges, following the toolbar when it collapses or

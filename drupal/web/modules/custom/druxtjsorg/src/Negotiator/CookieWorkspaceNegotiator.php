@@ -62,7 +62,8 @@ final class CookieWorkspaceNegotiator implements WorkspaceNegotiatorInterface, W
    */
   public function getActiveWorkspaceId(Request $request): ?string {
     $id = (string) $request->cookies->get(self::COOKIE, '');
-    return preg_match('/^[a-z0-9_]{1,128}$/', $id) ? $id : NULL;
+    // A machine name, or the UUID Workspaces Extra gives a new workspace.
+    return preg_match('/^[a-z0-9_-]{1,128}$/', $id) ? $id : NULL;
   }
 
   /**
