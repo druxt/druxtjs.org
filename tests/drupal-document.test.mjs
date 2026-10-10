@@ -171,6 +171,20 @@ describe('nextSteps', () => {
     ])
   })
 
+  test('keeps the stored title and path of every link when the lookup fails', async () => {
+    const store = {
+      dispatch: async () => {
+        throw new Error('503')
+      },
+    }
+    assert.deepEqual(await nextSteps(store, links), [
+      { text: 'Old caching title', to: '/how-to/caching', description: '' },
+      { text: 'DruxtSchema API reference', to: '/api/packages/schema', description: '' },
+      { text: 'Gone', to: '/how-to/gone', description: '' },
+      { text: 'The demo site', to: 'https://demo.druxtjs.org', description: '' },
+    ])
+  })
+
   test('asks nothing without page links, and is empty without links', async () => {
     const store = { dispatch: async () => assert.fail('no request expected') }
     assert.deepEqual(await nextSteps(store, [links[1]]), [

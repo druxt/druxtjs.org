@@ -156,7 +156,8 @@ function druxtjsorg_deploy_topics(array &$sandbox): string {
   $created = 0;
   $assigned = 0;
   foreach (NextSteps::TOPICS as $weight => [$name, $paths]) {
-    $term = reset($terms->loadByProperties(['vid' => 'documentation_topic', 'name' => $name])) ?: NULL;
+    $existing = $terms->loadByProperties(['vid' => 'documentation_topic', 'name' => $name]);
+    $term = $existing ? reset($existing) : NULL;
     if (!$term) {
       $term = Term::create(['vid' => 'documentation_topic', 'name' => $name, 'weight' => $weight]);
       $term->save();

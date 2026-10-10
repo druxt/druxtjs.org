@@ -35,7 +35,9 @@ export const nextSteps = async (store, links) => {
       'fields[node--doc_page]': 'title,field_description,path,drupal_internal__nid',
     }
     nids.forEach((nid, index) => (query[`filter[nid][condition][value][${index}]`] = nid))
-    const collection = await store.dispatch('druxt/getCollection', { type: 'node--doc_page', query })
+    // A lookup that fails leaves the links as the editor stored them, title
+    // and path, rather than failing the page.
+    const collection = await store.dispatch('druxt/getCollection', { type: 'node--doc_page', query }).catch(() => null)
     const pages = new Map(((collection && collection.data) || []).map((page) => [page.attributes.drupal_internal__nid, page.attributes]))
     for (const item of items) {
       const page = item.nid && pages.get(item.nid)
