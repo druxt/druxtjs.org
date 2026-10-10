@@ -5,7 +5,7 @@
  * this half has no such dependency, so the tests can read it.
  */
 
-const { releaseNotes } = require('./release-notes')
+const { releaseNotes, trim } = require('./release-notes')
 const { packageName } = require('./site')
 
 /** Reference kinds, from the route bucket ApiIndex groups by. */
@@ -50,9 +50,21 @@ const pageFromDoc = (doc) => {
     // says what the page is instead.
     page.description = undefined
     page.kind = KINDS[bucket] || 'Reference'
-    // The changelog's card names the package, with the kind as its line.
-    const notes = releaseNotes(doc.route)
-    if (notes) Object.assign(page, { title: notes.pkg, kind: 'Release notes' })
+    // The changelog's card leads with the newest version: the version is the
+    // title, the kind line says when and how much, and the first change says
+    // what. A changelog with no version heading keeps the package's name.
+    const notes = releaseNotes(doc.route, doc.content)
+    if (notes) {
+      const { latest } = notes
+      const count = latest ? latest.changes.length : 0
+      Object.assign(page, {
+        title: latest ? latest.version : notes.pkg,
+        kind: latest
+          ? ['Release notes', latest.date, count ? `${count} ${count === 1 ? 'change' : 'changes'}` : null].filter(Boolean).join(' \u00b7 ')
+          : 'Release notes',
+        description: latest && latest.changes[0] ? trim(latest.changes[0], 150) : undefined,
+      })
+    }
   }
 
   return page

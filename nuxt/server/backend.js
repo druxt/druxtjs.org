@@ -166,16 +166,25 @@ const parsedRoutes = (routes) =>
  * @param {string} [domain] - The project's public domain.
  * @returns {string|undefined} The route's origin, if the service has one.
  */
+/** The labels the other services answer on, which are never the frontend's. */
+const SIBLING_SERVICES = /^(storybook|cms|nginx|mariadb|php)\./
+
 const serviceRoute = (routes, service, domain = 'druxtjs.org') => {
   const urls = parsedRoutes(routes)
   const hostnames = urls.map((url) => url.hostname)
   // The apex and www belong to the site's frontend alone; a sibling
-  // service (Storybook) only ever answers on its own labelled route.
+  // service (Storybook) only ever answers on its own labelled route. So does
+  // any other name under the site's domain, dev.druxtjs.org say, unless it
+  // is a sibling service's own.
   if (service === 'nuxt') {
     const site = hostnames.indexOf(domain)
     if (site !== -1) return urls[site].origin
     const www = hostnames.indexOf(`www.${domain}`)
     if (www !== -1) return urls[www].origin
+    const own = urls.find(
+      (url) => url.hostname.endsWith(`.${domain}`) && !SIBLING_SERVICES.test(url.hostname)
+    )
+    if (own) return own.origin
   }
   const labelled = urls.filter((url) => url.hostname.startsWith(`${service}.`))
   const custom = labelled.find((url) => !url.hostname.endsWith('.amazee.io'))
