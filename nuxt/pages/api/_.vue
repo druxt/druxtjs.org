@@ -59,7 +59,8 @@ export default {
 
   head() {
     // A changelog is titled for its package; docgen titles them all alike.
-    const notes = releaseNotes(this.$route.path)
+    // Its description leads with the newest version, read from the text.
+    const notes = releaseNotes(this.$route.path, this.document.text)
     return seoHead({
       title: notes ? notes.title : this.document.title,
       description: notes ? notes.description : documentDescription(this.document),
