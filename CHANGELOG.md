@@ -23,6 +23,14 @@ Druxt 1.0.0.
   label for its large one, so "Edit" sank to the bottom of the button, the
   toggle's edge hung below it, and a hover filled a box of the wrong shape.
   The button takes Gin's size, and a hover fills it to its rounded corners.
+- A callout no longer draws a quote inside its box. The 67 callouts came
+  from markdown pages, where a callout was a blockquote, and kept the
+  marker, so the callout's green rule and tint held a second rule and a
+  quote. A deploy hook took the marker out of each one, once, with its bold
+  "Before you start" kept. On the site, that quote was the callout's only
+  box, so the callout now draws the same box itself, with or without a
+  quote inside. Drupal's own render of a callout no longer prints the
+  type's label above the text either, as the site never did.
 - The JSON:API tab on a page's edit screen opens through the site again, and
   its preview fills the screen: the iframe is pinned to the viewport inside
   the admin toolbar's edges, following the toolbar when it collapses or
