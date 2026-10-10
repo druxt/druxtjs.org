@@ -9,6 +9,13 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+- A workspace can be deployed to another environment. Workspaces Deploy, from
+  Workspaces Extra, exports a workspace's changed pages, paragraphs, media
+  and files and posts them to another environment's Drupal, where they land
+  in a workspace of the same name to be previewed and published there. The
+  site proxies the deploy endpoints to its Drupal, so a target is named by
+  its own URL in `WSE_DEPLOY_TARGET`, and the deploy pair shares
+  `DRUPAL_HASH_SALT` and `WSE_DEPLOY_KEY`, which sign every request.
 - Workspaces Extra on the backend, with its scheduler. A workspace can be
   published at a set time, which is how a release waits for its date, and an
   editor may schedule one. A published workspace is closed rather than left

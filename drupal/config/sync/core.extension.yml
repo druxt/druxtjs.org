@@ -93,6 +93,7 @@ module:
   workspaces: 0
   workspaces_ui: 0
   wse: 0
+  wse_deploy: 0
   wse_scheduler: 0
   views: 10
   paragraphs: 11

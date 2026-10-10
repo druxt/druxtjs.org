@@ -163,6 +163,40 @@ The draft renders for the signed-in editor on the page's URL. An editor
 publishes it from Drupal's content administration, and the anonymous site
 then serves it.
 
+## Deploy a workspace to another environment
+
+Workspaces Deploy (`wse_deploy`, part of Workspaces Extra) moves one
+workspace's content from one environment's Drupal to another's: the changed
+pages, paragraphs, media and menu links, with the files they reference. The
+target receives them into a workspace of the same name, where they are
+previewed with a reviewer link and published, or reverted, like any other.
+Configuration is not part of it: that deploys with the code, and both sides
+must run the same.
+
+An editor with `administer workspaces` opens the workspace's **Export** tab
+(`/admin/config/workflow/workspaces/manage/<id>/export`). The export is
+written under `private://workspaces` and posted to the target's
+`/wse-deploy/import` endpoint. On the target, the Drush commands
+`wse-deploy-workspace-publish <id>` and `wse-deploy-workspace-revert <id>`
+finish or undo it, and `wse-deploy-workspace-import <path>` imports an
+export by hand.
+
+Each request is signed with a token made from a key and the hash salt, which
+the target recomputes, so a deploy pair has to share both. On Lagoon that is
+three variables, read by `settings.lagoon.php`:
+
+| Variable            | Scope       | Value                                                                                                                                                                            |
+| ------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DRUPAL_HASH_SALT`  | project     | One salt for every environment. Production's existing salt, so nothing there changes.                                                                                            |
+| `WSE_DEPLOY_KEY`    | project     | A random secret, the signing key in place of the private key, which a sanitised copy replaces.                                                                                   |
+| `WSE_DEPLOY_TARGET` | environment | The site this environment deploys to, scheme and host only: the target's own URL, since the site proxies `/wse-deploy` to its Drupal. Unset, the Export tab has nowhere to send. |
+
+A token expires ten seconds after it is made, so the two clocks have to
+agree, which they do on one platform. The import matches entities by UUID,
+so the two sides must share history: every Lagoon environment is a copy of
+production, and a local site needs a copy of a production database before
+it can deploy to one.
+
 ## Export configuration after changing it
 
 A change made through the admin UI or `drush` stays in the database until
