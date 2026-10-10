@@ -99,8 +99,9 @@ export default {
      */
     async loadParagraphs() {
     // A preview has seeded the store with the unsaved paragraphs; a fetch
-    // here would replace them with the saved ones.
-    if ((this.$store.state.druxtNodePreview || {}).active) {
+    // here would replace them with the saved ones. On the preview route
+    // only: the flag outlives the preview when the reader follows a link.
+    if ((this.$store.state.druxtNodePreview || {}).active && this.$route.name === 'druxt-node-preview') {
       this.fetched += 1
       return
     }
