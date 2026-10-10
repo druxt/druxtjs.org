@@ -88,9 +88,20 @@ of several pages, and embargoed content, waits. Editors may create, view and
 edit any workspace, and publish one (`administer workspaces`, which core
 requires for publishing).
 
+Workspaces Extra (`wse`, with `wse_scheduler`) adds what core leaves out: a
+workspace is open until published and closed after, a closed one can be
+rolled back, content can move between workspaces, and an editor can set a
+workspace to publish at a time (`schedule workspace releases`), which is how
+a release waits for its date. Drupal's toolbar switcher lists the recent
+workspaces only. A closed workspace is no choice, since Drupal answers from
+live when one is active. The editor bar lists the open ones, and the header
+treats a closed one as unavailable. A workspace made under Workspaces Extra
+has a UUID for its id rather than a machine name, and the header, the cookie
+and the bar accept either.
+
 A request chooses its workspace with the `X-Druxt-Workspace` header. The
 `druxtjsorg` module applies it only when the account is signed in and may
-view that workspace. The choice lasts the one request and leaves the
+view that workspace, and the workspace is open. The choice lasts the one request and leaves the
 account's session alone. A reader's header is ignored. A write that names a
 workspace it cannot have is refused with 403 rather than saved to live.
 JSON:API needed these changes to be safe in a workspace:

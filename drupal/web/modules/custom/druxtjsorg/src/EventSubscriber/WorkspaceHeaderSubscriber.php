@@ -121,7 +121,15 @@ final class WorkspaceHeaderSubscriber implements EventSubscriberInterface {
       return NULL;
     }
     $workspace = $this->entityTypeManager->getStorage('workspace')->load($id);
-    return $workspace instanceof WorkspaceInterface && $workspace->access('view', $this->currentUser) ? $workspace : NULL;
+    if (!$workspace instanceof WorkspaceInterface || !$workspace->access('view', $this->currentUser)) {
+      return NULL;
+    }
+    // Workspaces Extra closes a published workspace and answers from live for
+    // one that is active, so a write naming it would land on live unrefused.
+    if ($workspace->hasField('status') && $workspace->get('status')->value === 'closed') {
+      return NULL;
+    }
+    return $workspace;
   }
 
 }

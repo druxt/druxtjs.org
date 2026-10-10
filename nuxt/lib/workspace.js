@@ -27,7 +27,8 @@ const CONTENT_PATHS = [/^\/jsonapi(\/|$)/, /^\/router\/translate-path(\/|$)/, /^
  * @param {*} id - The value.
  * @returns {boolean} True for a lowercase machine name.
  */
-const isWorkspaceId = (id) => typeof id === 'string' && /^[a-z0-9_]{1,128}$/.test(id)
+// A machine name, or the UUID Workspaces Extra gives a new workspace.
+const isWorkspaceId = (id) => typeof id === 'string' && /^[a-z0-9_-]{1,128}$/.test(id)
 
 /**
  * The workspace a Cookie header names, or null.

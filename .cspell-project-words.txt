@@ -93,3 +93,4 @@ coderabbit
 setext
 describedby
 llmstxt
+wse
