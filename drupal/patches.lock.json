@@ -1,5 +1,5 @@
 {
-    "_hash": "159b270b09968f8cfa4e6db0a5903cdae6ba8c6aaea4be8c2b4c157212cc844c",
+    "_hash": "212152985982cf516f23bafe9074c4e9666a5038a97f5b60dde0f35373b83a7d",
     "patches": {
         "drupal/core": [
             {
@@ -75,6 +75,16 @@
                 "description": "Workspaces Deploy: a configured hash key signs alone, so a deploy pair keeps separate hash salts",
                 "url": "patches/wse-deploy-key-signs-alone.patch",
                 "sha256": "ddc3898b2d72491392f4ea66bc314d25e40f581b88fc761932b06822c61797ba",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/wse",
+                "description": "Workspaces Deploy: an accept key verifies a deploy signed by the environment before this one",
+                "url": "patches/wse-deploy-accept-key.patch",
+                "sha256": "00e87b43ed9541556ef8a2cb9d6ce48ec0df92c1212526235550400410f2479e",
                 "depth": 1,
                 "extra": {
                     "provenance": "root"

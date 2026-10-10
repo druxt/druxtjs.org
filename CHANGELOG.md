@@ -9,6 +9,14 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+- Staging environments, where content is reviewed before production. A `staging/`
+  branch cut from `main` builds an environment that copies production once
+  and then keeps its database, so a workspace deployed to it for review
+  survives its own redeploys. `scripts/staging.sh` creates and removes one.
+  A deploy to it is signed with the key local machines hold, and it deploys
+  on to production with a key only the two of them hold: a patch lets an
+  environment accept a key other than the one it signs with, so nothing a
+  local machine holds reaches production directly.
 - A package's release notes page shares as its newest version. The share
   card leads with the version, dated and counted, and the first change of
   that release, and the page's description does the same, where both read

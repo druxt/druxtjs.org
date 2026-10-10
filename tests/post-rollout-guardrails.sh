@@ -255,6 +255,49 @@ else
   no "DOCS_SKIP_SYNC=1: skipped the sync without saying why"
 fi
 
+# A staging environment copies production once. With a database in place it
+# keeps it, whatever the branch's name looks like once Lagoon has flattened
+# it; without one it takes the copy like any other environment.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=staging-release LAGOON_GIT_BRANCH=staging/release)"
+if called "$app" "sql:sync" || called "$app" "rsync"; then
+  no "staging with a database: replaced it"
+elif printf '%s' "$output" | grep -q "staging environment keeps the database"; then
+  ok "staging with a database: kept it, and said why"
+else
+  no "staging with a database: skipped the sync without saying why"
+fi
+if called "$app" "deploy --yes"; then
+  ok "staging with a database: still updated the site"
+else
+  no "staging with a database: did not update the site"
+fi
+
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=staging-release > /dev/null
+if called "$app" "sql:sync" || called "$app" "rsync"; then
+  no "staging named only by its environment: replaced the database"
+else
+  ok "staging named only by its environment: kept the database"
+fi
+
+app="$(build_app no)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=staging-release LAGOON_GIT_BRANCH=staging/release > /dev/null
+if called "$app" "sql:sync" || called "$app" "rsync"; then
+  ok "staging without a database: took the copy of production"
+else
+  no "staging without a database: had nothing and copied nothing"
+fi
+
+# A branch that only resembles a staging one is synced like any other.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-staging-page LAGOON_GIT_BRANCH=feature/staging-page > /dev/null
+if called "$app" "sql:sync" || called "$app" "rsync"; then
+  ok "a feature branch about staging: synced like any other"
+else
+  no "a feature branch about staging: kept its database as if it were staging"
+fi
+
 # Production's scheduled dump is preferred over reading its live database.
 app="$(build_app yes)"
 run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null

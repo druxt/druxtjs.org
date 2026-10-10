@@ -11,7 +11,9 @@
 # committed configuration and starts empty.
 #
 # DOCS_SKIP_SYNC=1 turns the sync off for an environment that wants to keep
-# the database it has.
+# the database it has. A staging environment, one built from a `staging/`
+# branch, takes its copy on its first rollout and keeps it from then on: it
+# holds a workspace deployed to it for review, which a fresh copy would lose.
 #
 # Production syncs from nothing. It is the source.
 set -eu
@@ -22,6 +24,7 @@ cd "$app/drupal"
 
 environment_type="${LAGOON_ENVIRONMENT_TYPE:-}"
 environment_name="${LAGOON_ENVIRONMENT:-}"
+branch_name="${LAGOON_GIT_BRANCH:-}"
 production_alias="@lagoon.druxtjs-org-main"
 
 # Copied without their rows: what a request writes, and what production's
@@ -49,9 +52,27 @@ is_production() {
   [ "$environment_type" = "production" ] || [ "$environment_name" = "main" ]
 }
 
+# Read from the branch, which Lagoon passes whole; the environment's name is
+# the branch with its slash replaced, so it is the fallback, not the source.
+is_staging() {
+  case "$branch_name" in
+    staging/?*) return 0 ;;
+    "") case "$environment_name" in staging-?*) return 0 ;; esac ;;
+  esac
+  return 1
+}
+
+has_database() {
+  drush status --field=bootstrap 2>/dev/null | grep -q Successful
+}
+
 may_sync() {
   if [ "${DOCS_SKIP_SYNC:-}" = "1" ]; then
     echo "DOCS_SKIP_SYNC is set; keeping the database this environment already has."
+    return 1
+  fi
+  if is_staging && has_database; then
+    echo "A staging environment keeps the database it already has; a review in progress would be lost with it."
     return 1
   fi
   if [ -z "$environment_type" ] && [ -z "$environment_name" ]; then
@@ -289,7 +310,7 @@ if may_sync; then
   sanitise
 fi
 
-if drush status --field=bootstrap 2>/dev/null | grep -q Successful; then
+if has_database; then
   echo "Updating the site."
   drush deploy --yes
 else
