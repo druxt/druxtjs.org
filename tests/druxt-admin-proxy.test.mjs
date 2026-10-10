@@ -7,6 +7,9 @@ describe('shouldProxy', () => {
   it('proxies an allowed prefix and its descendants, and nothing beside it', () => {
     assert.equal(shouldProxy('/core/misc/drupal.js'), true)
     assert.equal(shouldProxy('/batch'), true)
+    // Another environment deploys a workspace to this site's URL.
+    assert.equal(shouldProxy('/wse-deploy/import/data/stage'), true)
+    assert.equal(shouldProxy('/wse-deploy/status/ready/stage'), true)
     assert.equal(shouldProxy('/cores'), false)
     assert.equal(shouldProxy('/node/1'), false)
     // Every operation Drupal offers on a page, the JSON:API preview tab included.

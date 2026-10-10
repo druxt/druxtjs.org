@@ -147,7 +147,7 @@ lint:attribution:
     GIT_DEPTH: 0
   before_script:
     - !reference [default, before_script]
-    - apk add --no-cache bash git > /dev/null
+    - apk add --no-cache bash git curl > /dev/null
   script:
     - section_start "attribution" "Checking for AI attribution"
     - bash .gitlab/scripts/check-attribution.sh

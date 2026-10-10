@@ -55,6 +55,10 @@ export const BACKEND_PATHS = [
   // another origin sets its cookie there, which is the problem the proxy
   // exists to solve.
   '/user',
+  // A workspace deploy from another environment: its import and status
+  // posts arrive at this site's URL, the one every environment is named by,
+  // and each is signed with a token Drupal checks.
+  '/wse-deploy',
 ]
 
 /**

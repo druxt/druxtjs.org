@@ -161,6 +161,10 @@
             },
             "drupal/druxt": {
                 "Stand aside for a path the wildcard resolver cannot rebuild, so the entity resolver answers it": "patches/druxt-wildcard-stands-aside.patch"
+            },
+            "drupal/wse": {
+                "Workspaces Deploy: read the upload type, status and workspace id from the route, as the HTTP export sends them": "patches/wse-deploy-route-parameters.patch",
+                "Workspaces Deploy: a configured hash key signs alone, so a deploy pair keeps separate hash salts": "patches/wse-deploy-key-signs-alone.patch"
             }
         }
     }
