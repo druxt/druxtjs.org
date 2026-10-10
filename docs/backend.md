@@ -192,7 +192,11 @@ three variables, read by `settings.lagoon.php`:
 | `WSE_DEPLOY_TARGET` | environment | The site this environment deploys to, scheme and host only: the target's own URL, since the site proxies `/wse-deploy` to its Drupal. Unset, the Export tab has nowhere to send. |
 
 A token expires ten seconds after it is made, so the two clocks have to
-agree, which they do on one platform. The import matches entities by UUID,
+agree, which they do on one platform. The module's import controller is
+patched (`patches/wse-deploy-route-parameters.patch`) to read the upload
+type, the status and the workspace id from the route, where the HTTP export
+sends them. Without it the controller reads them from a request body that
+holds only the file, and every deploy fails with a 500 on the first upload. The import matches entities by UUID,
 so the two sides must share history: every Lagoon environment is a copy of
 production, and a local site needs a copy of a production database before
 it can deploy to one.

@@ -1,5 +1,5 @@
 {
-    "_hash": "4b98f5763e7dd61a2c6e46f6095b02966578cab2d3a010398aa4a295b1f9a6c5",
+    "_hash": "f1486f3a418615b85475949c5fce96631702092f90f0e1e5d3a8d29ba4402f03",
     "patches": {
         "drupal/core": [
             {
@@ -53,6 +53,18 @@
                 "description": "Stand aside for a path the wildcard resolver cannot rebuild, so the entity resolver answers it",
                 "url": "patches/druxt-wildcard-stands-aside.patch",
                 "sha256": "96515a192dcd64a8e98acdd1d9b1b4f38ff529eb488df5272efab7edc657b8f1",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/wse": [
+            {
+                "package": "drupal/wse",
+                "description": "Workspaces Deploy: read the upload type, status and workspace id from the route, as the HTTP export sends them",
+                "url": "patches/wse-deploy-route-parameters.patch",
+                "sha256": "0e8ef3c985ac061a503d6ddef6966e6537116af58ee908652094fee8bd7d1b29",
                 "depth": 1,
                 "extra": {
                     "provenance": "root"
