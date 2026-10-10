@@ -2003,3 +2003,12 @@ del.v-diff-del--trailing {
 .prose .page-sequence > li::marker {
   content: none;
 }
+
+/* A card's description stops at three lines, so a long one does not make
+   its row taller than the rest. The page itself has the whole of it. */
+.page-card-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
