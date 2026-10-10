@@ -15,8 +15,8 @@ Druxt 1.0.0.
   in a workspace of the same name to be previewed and published there. The
   site proxies the deploy endpoints to its Drupal, so a target is named by
   its own URL in `WSE_DEPLOY_TARGET`, and the deploy pair shares
-  `DRUPAL_HASH_SALT` and `WSE_DEPLOY_KEY`, which sign every request. A
-  patch makes the module's import read the upload type, the status and the
+  `WSE_DEPLOY_KEY`, which signs every request. A patch has that key sign
+  alone, so each environment keeps its own hash salt. Another patch makes the module's import read the upload type, the status and the
   workspace id from the request path, where its own HTTP export puts them;
   unpatched, every upload failed on a missing workspace id. Paragraphs are
   tracked by Workspaces again. Workspaces Extra had marked them ignored,

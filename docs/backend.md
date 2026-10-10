@@ -181,15 +181,20 @@ written under `private://workspaces` and posted to the target's
 finish or undo it, and `wse-deploy-workspace-import <path>` imports an
 export by hand.
 
-Each request is signed with a token made from a key and the hash salt, which
-the target recomputes, so a deploy pair has to share both. On Lagoon that is
-three variables, read by `settings.lagoon.php`:
+Each request is signed with a key the pair shares, which the target checks.
+On Lagoon that is two variables, read by `settings.lagoon.php`:
 
 | Variable            | Scope       | Value                                                                                                                                                                            |
 | ------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DRUPAL_HASH_SALT`  | project     | One salt for every environment. Production's existing salt, so nothing there changes.                                                                                            |
-| `WSE_DEPLOY_KEY`    | project     | A random secret, the signing key in place of the private key, which a sanitised copy replaces.                                                                                   |
+| `WSE_DEPLOY_KEY`    | project     | A random secret, the signing key. Unset, an environment has no target.                                                                                                           |
 | `WSE_DEPLOY_TARGET` | environment | The site this environment deploys to, scheme and host only: the target's own URL, since the site proxies `/wse-deploy` to its Drupal. Unset, the Export tab has nowhere to send. |
+
+Unpatched, the module signs with the key and the hash salt together, so a
+pair would have to share a salt. The salt also signs one-time login links,
+and a shared one would let a link made on a preview copy sign in on
+production. A patch (`patches/wse-deploy-key-signs-alone.patch`) signs with
+the key alone when one is set, so every environment keeps its own salt and
+`DRUPAL_HASH_SALT` stays unset.
 
 A token expires ten seconds after it is made, so the two clocks have to
 agree, which they do on one platform. The module's import controller is

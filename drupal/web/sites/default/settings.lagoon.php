@@ -25,19 +25,16 @@ $databases['default']['default'] = [
 ];
 
 // Secret per environment: the database password never leaves the platform.
-// DRUPAL_HASH_SALT, set on the project, gives every environment the same
-// salt, which a workspace deploy between two of them needs: the deploy token
-// is signed with the key below and the salt, on both ends.
 $settings['hash_salt'] = getenv('DRUPAL_HASH_SALT') ?: hash('sha256', getenv('LAGOON_PROJECT') . ':' . getenv('LAGOON_ENVIRONMENT') . ':' . getenv('MARIADB_PASSWORD'));
 
 // A workspace deploy pushes a workspace's content to another environment's
-// Drupal. The key signs each request in place of the private key, which a
-// sanitised copy replaces, so two environments can share it. The target is
-// this environment's own: the Drupal host it deploys to, with no path.
+// Drupal. The pair shares this key, which signs each request on its own
+// (patched), so each environment keeps its own hash salt. Without the key
+// there is no target, since the other end would refuse every request.
 if (getenv('WSE_DEPLOY_KEY')) {
   $settings['wse_deploy.hash.key'] = getenv('WSE_DEPLOY_KEY');
+  $config['wse_deploy.settings']['export_plugin_configuration']['remote_endpoint'] = rtrim((string) getenv('WSE_DEPLOY_TARGET'), '/');
 }
-$config['wse_deploy.settings']['export_plugin_configuration']['remote_endpoint'] = rtrim((string) getenv('WSE_DEPLOY_TARGET'), '/');
 
 $settings['config_sync_directory'] = '../config/sync';
 $settings['file_private_path'] = 'sites/default/files/private';
