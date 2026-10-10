@@ -214,7 +214,12 @@ $config['wse_deploy.settings']['export_plugin_configuration']['remote_endpoint']
 
 The import matches entities by UUID, so the two sides must share history.
 Every Lagoon environment is a copy of production, and a local backend starts
-from the same sanitised copy, which keeps every content UUID. Sanitising
+from the same sanitised copy, which keeps every content UUID. A page the
+workspace creates arrives with the internal id it was given at its origin,
+and so does its alias, which names the page by that id. The target must not have used that id for something else in the meantime, so production creates
+no content of its own: everything new reaches it through the chain. A
+workspace deployed a second time, after a fix on staging, updates the one
+already on the target. Sanitising
 replaces the passwords, so an editor signs in to staging through a one-time
 login link (`drush user:login` over `lagoon ssh`) rather than with a
 production password, which never leaves production.
