@@ -9,6 +9,7 @@
  */
 const { redirectFor } = require('./redirects')
 const { hasAuthCookie } = require('druxt-auth')
+const { hasPreviewCookie } = require('../lib/workspace-preview')
 const { hasEditorHint } = require('../lib/entity-operations')
 const fs = require('fs')
 const path = require('path')
@@ -236,8 +237,9 @@ const createHandler =
     }
     // A signed-in editor may be shown a draft: rendered live, never stored,
     // and not to be kept by anything between here and the browser. Drupal's
-    // editor hint counts too, for a Drupal session without the site's token.
-    if (hasAuthCookie(req.headers.cookie) || hasEditorHint(req.headers.cookie)) {
+    // editor hint counts too, for a Drupal session without the site's token,
+    // and so does a reviewer's workspace preview cookie.
+    if (hasAuthCookie(req.headers.cookie) || hasEditorHint(req.headers.cookie) || hasPreviewCookie(req.headers.cookie)) {
       res.setHeader('X-Docs-Cache', 'BYPASS')
       res.setHeader('Cache-Control', 'no-store')
       return live(req, res)

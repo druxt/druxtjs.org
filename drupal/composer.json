@@ -45,6 +45,7 @@
         "drupal/simple_oauth_password_grant": "^2.1",
         "drupal/simple_oauth_revoke": "^3.0",
         "drupal/token": "^1.17",
+        "drupal/workspace_preview": "^1.0@RC",
         "drupal/wse": "3.0.x-dev#532aca3b",
         "drush/drush": "^13",
         "js-cookie/js-cookie": "3.0.5"

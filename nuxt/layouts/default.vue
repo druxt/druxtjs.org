@@ -5,6 +5,9 @@
       class="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:m-3 focus:px-4 focus:py-2 focus:rounded-btn focus:bg-primary focus:text-primary-content"
     >Skip to content</a>
 
+    <!-- For a reviewer on a workspace preview link: what they are looking at. -->
+    <AppWorkspacePreviewNotice />
+
     <AppHeader
       class="sticky top-0 z-50"
       title="DruxtJS"

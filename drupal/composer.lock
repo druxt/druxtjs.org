@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a2aac5dc1e20b80a141b4b464e208aa2",
+    "content-hash": "fe47e1e802e2718f9e0253285386f67a",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -4269,6 +4269,53 @@
             "homepage": "https://www.drupal.org/project/token",
             "support": {
                 "source": "https://git.drupalcode.org/project/token"
+            }
+        },
+        {
+            "name": "drupal/workspace_preview",
+            "version": "1.0.0-rc1",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/workspace_preview.git",
+                "reference": "1.0.0-rc1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/workspace_preview-1.0.0-rc1.zip",
+                "reference": "1.0.0-rc1",
+                "shasum": "6308cd51b29edb33ada6c8e1f408cdd354594c4f"
+            },
+            "require": {
+                "drupal/core": "^11.3 || ^12"
+            },
+            "require-dev": {
+                "drupal/wse": "*"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "1.0.0-rc1",
+                    "datestamp": "1789753365",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Project has not opted into security advisory coverage!"
+                    }
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "amateescu",
+                    "homepage": "https://www.drupal.org/user/729614"
+                }
+            ],
+            "description": "Workspace Preview.",
+            "homepage": "https://www.drupal.org/project/workspace_preview",
+            "support": {
+                "source": "https://git.drupalcode.org/project/workspace_preview"
             }
         },
         {
@@ -16480,6 +16527,7 @@
     "stability-flags": {
         "drupal/decoupled_settings": 10,
         "drupal/jsonapi_node_preview": 10,
+        "drupal/workspace_preview": 5,
         "drupal/wse": 20
     },
     "prefer-stable": true,

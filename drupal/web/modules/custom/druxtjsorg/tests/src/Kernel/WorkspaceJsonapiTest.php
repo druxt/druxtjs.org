@@ -264,6 +264,23 @@ final class WorkspaceJsonapiTest extends KernelTestBase {
   }
 
   /**
+   * A reader without revision permissions reads the workspace's revision as the page.
+   *
+   * A reviewer on a preview link has no revision permission, and the
+   * workspace's revision is not the default revision, which JSON:API would
+   * refuse as a revision view. Inside the workspace it is the page.
+   */
+  public function testTheWorkspaceRevisionReadsAsThePageWithoutRevisionPermissions(): void {
+    // Made before the write: the write leaves the workspace active, and a
+    // role, which the user needs, is only saved on live.
+    $reader = $this->createUser(['access content', 'view any workspace'], 'reader');
+    $reader->setPassword(self::PASSWORD)->save();
+    self::assertSame(200, $this->patch('Staged title', 'stage')->getStatusCode());
+    self::assertSame('Staged title', $this->title($reader, 'stage'));
+    self::assertSame('Live title', $this->title($reader));
+  }
+
+  /**
    * The page's title as an account reads it, optionally in a workspace.
    */
   private function title(?UserInterface $account, ?string $workspace = NULL, ?string $version = NULL): string {

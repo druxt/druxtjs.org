@@ -269,6 +269,13 @@ describe('createHandler', () => {
         const drupalOnly = await request(`${base}/how-to`, { headers: { cookie: `${HINT}=1` } })
         assert.equal(drupalOnly.body, '<p>rendered for the request</p>')
         assert.equal(drupalOnly.headers['x-docs-cache'], 'BYPASS')
+        // A reviewer on a workspace preview link reads the workspace, not the store.
+        const reviewer = await request(`${base}/how-to`, {
+          headers: { cookie: 'workspace_preview=abc123' },
+        })
+        assert.equal(reviewer.body, '<p>rendered for the request</p>')
+        assert.equal(reviewer.headers['x-docs-cache'], 'BYPASS')
+        assert.equal(reviewer.headers['cache-control'], 'no-store')
         // The store is untouched: the next anonymous reader gets the copy from before.
         const reader = await request(`${base}/how-to`)
         assert.equal(reader.headers['x-docs-cache'], 'HIT')

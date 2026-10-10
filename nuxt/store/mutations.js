@@ -57,6 +57,11 @@ export default {
     state.editor = { ...state.editor, workspace: workspace || null }
   },
 
+  /** Whether the reader follows a workspace preview link. */
+  setWorkspacePreview(state, on) {
+    state.editor = { ...state.editor, previewing: Boolean(on) }
+  },
+
   /** The page's normalised diff, or null. */
   setEditorDiff(state, diff) {
     state.editor = { ...state.editor, diff: diff || null }

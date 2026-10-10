@@ -7,6 +7,7 @@ dependencies:
     - druxt
     - media
     - system
+    - workspace_preview
 _core:
   default_config_hash: j5zLMOdJBqC0bMvSdth5UebkprJB8g_2FXHqhfpJzow
 id: anonymous
@@ -16,5 +17,6 @@ is_admin: false
 permissions:
   - 'access content'
   - 'access druxt resources'
+  - 'access workspace previews'
   - 'read decoupled settings'
   - 'view media'

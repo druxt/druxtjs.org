@@ -1,0 +1,13 @@
+uuid: 90d8bc3e-fc42-4ed6-991f-316fcca030f4
+langcode: en
+status: true
+dependencies:
+  module:
+    - workspace_preview
+_core:
+  default_config_hash: C1bOIYQ1tb3QU6EiB0afdiFhGJTAxQE3hEjMYbLYVyI
+id: workspace_preview_link_delete_action
+label: 'Delete preview link'
+type: workspace_preview_link
+plugin: 'entity:delete_action:workspace_preview_link'
+configuration: {  }

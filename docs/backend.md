@@ -148,6 +148,22 @@ workspace all apply. Paragraphs Edit offers a paragraph form of its own, but
 it saves the page from its default revision in its current moderation state,
 which would publish a live page straight away and drop any draft.
 
+### Sharing a workspace with a reviewer
+
+A reviewer without an account reads a workspace through a preview link from
+the `workspace_preview` module. An editor opens the workspace under
+**Workspaces**, its **Preview links** tab, and adds a link with an expiry
+and the page to open on. The link is the site's URL: `settings.lagoon.php`
+names each environment's frontend as the module's base URL, and the site
+proxies `/workspace-preview`, so following the link sets the module's
+`workspace_preview` cookie for the site's host and redirects to the page.
+Drupal then reads the site in that workspace for every request with the
+cookie, which the server render forwards, while the account holds
+`access workspace previews`, granted to anonymous here. The reader is never
+served a stored page or the shared JSON:API cache, and a notice at the top
+of every page says what they are looking at. Publishing the workspace
+deletes its links.
+
 ### The local loop
 
 The whole loop runs on one machine, with Drupal and the frontend on

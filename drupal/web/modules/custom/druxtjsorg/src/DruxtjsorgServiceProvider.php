@@ -7,6 +7,7 @@ namespace Drupal\druxtjsorg;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\druxtjsorg\Access\WorkspaceEntityAccessChecker;
 use Drupal\druxtjsorg\Controller\WorkspaceEntityResource;
 use Drupal\druxtjsorg\EventSubscriber\WorkspaceHeaderSubscriber;
 use Drupal\druxtjsorg\Negotiator\CookieWorkspaceNegotiator;
@@ -71,6 +72,8 @@ final class DruxtjsorgServiceProvider extends ServiceProviderBase {
     if ($container->hasDefinition('druxtjsorg.workspace_negotiator.header') && $container->hasDefinition('jsonapi.entity_resource')) {
       $container->getDefinition('jsonapi.entity_resource')->setClass(WorkspaceEntityResource::class);
       $container->getDefinition('jsonapi.version_negotiator')->setClass(WorkspaceVersionNegotiator::class);
+      // The workspace's revision reads as the page, not as a revision.
+      $container->getDefinition('jsonapi.entity_access_checker')->setClass(WorkspaceEntityAccessChecker::class);
     }
     if (!$container->hasParameter('simple_oauth.openid.claims')) {
       return;
