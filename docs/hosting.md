@@ -5,8 +5,9 @@ How druxtjs.org runs on [Lagoon](https://docs.lagoon.sh). The
 
 ## Status
 
-Lagoon builds `feature/lagoon` into a development environment and `main`
-into production. The checklist at the end is what the first production
+Lagoon builds `develop`, every `feature/`, `fix/`, `release/` and
+`staging/` branch into a development environment, and `main` into
+production. The checklist at the end is what the first production
 deployment needs.
 
 ## Services
@@ -175,6 +176,28 @@ environment variables. Nothing on your own machine reads that file.
 Lagoon, and `sqlite` for local sites and CI. Drupal refuses to uninstall the
 module that provides the database it runs on, so a configuration without
 the driver fails to install on that database.
+
+## Staging environments
+
+A staging environment is where content is reviewed before production. It is the
+branch `staging/<name>`, cut from `main` so its fields, paragraph types and
+view modes are production's: deploying a workspace moves its content, and
+nothing of the configuration. The project's branch rule builds every `staging/` branch, and
+deleting the branch removes the environment.
+
+Its first rollout copies production like any other environment's. After
+that it keeps its database: `lagoon/post-rollout.sh` sees the `staging/`
+branch and a database already in place, and leaves it, so a workspace
+deployed to it for review survives its own redeploys. A fresh copy of
+production is a deliberate step, between reviews: delete and create it
+again, or set `DOCS_SKIP_SYNC` off for one rollout.
+
+`scripts/staging.sh create <name>` does the rest: it pushes `main` to the
+branch, waits for the first build, sets the environment's deploy target and
+keys from the project's variables, and deploys it again so they take. The
+keys are described with the chain they form in
+[the backend guide](backend.md#the-chain). `scripts/staging.sh remove <name>`
+deletes the branch.
 
 ## Going to production
 

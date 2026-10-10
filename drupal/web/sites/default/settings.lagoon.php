@@ -28,12 +28,18 @@ $databases['default']['default'] = [
 $settings['hash_salt'] = getenv('DRUPAL_HASH_SALT') ?: hash('sha256', getenv('LAGOON_PROJECT') . ':' . getenv('LAGOON_ENVIRONMENT') . ':' . getenv('MARIADB_PASSWORD'));
 
 // A workspace deploy pushes a workspace's content to another environment's
-// Drupal. The pair shares this key, which signs each request on its own
-// (patched), so each environment keeps its own hash salt. Without the key
-// there is no target, since the other end would refuse every request.
+// Drupal, each request signed with this key (patched to sign on its own, so
+// each environment keeps its own hash salt). Without the key there is no
+// target, since the other end would refuse every request.
 if (getenv('WSE_DEPLOY_KEY')) {
   $settings['wse_deploy.hash.key'] = getenv('WSE_DEPLOY_KEY');
   $config['wse_deploy.settings']['export_plugin_configuration']['remote_endpoint'] = rtrim((string) getenv('WSE_DEPLOY_TARGET'), '/');
+}
+// The key a deploy to this environment is signed with, when it is not this
+// environment's own: staging accepts the key local machines sign with and
+// signs with one that production alone accepts, so a deploy cannot skip it.
+if (getenv('WSE_DEPLOY_ACCEPT_KEY')) {
+  $settings['wse_deploy.hash.accept_key'] = getenv('WSE_DEPLOY_ACCEPT_KEY');
 }
 
 $settings['config_sync_directory'] = '../config/sync';

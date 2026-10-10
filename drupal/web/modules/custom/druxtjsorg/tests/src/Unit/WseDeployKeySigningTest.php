@@ -20,6 +20,8 @@ use PHPUnit\Framework\Attributes\Group;
 #[Group('druxtjsorg')]
 final class WseDeployKeySigningTest extends UnitTestCase {
 
+  private const DATA = 'upload:data:533077c1:1760090000';
+
   /**
    * Two environments with one key and different salts accept each other.
    */
@@ -48,14 +50,56 @@ final class WseDeployKeySigningTest extends UnitTestCase {
   }
 
   /**
+   * Staging accepts the local key and signs with production's.
+   *
+   * A chain of three: local signs with A, staging accepts A and signs with
+   * B, production accepts B alone.
+   */
+  public function testChainAcceptsKeyBeforeItAndRefusesItsOwn(): void {
+    $local = ['hash_salt' => 'l', 'wse_deploy.hash.key' => 'A'];
+    $staging = ['hash_salt' => 's', 'wse_deploy.hash.key' => 'B', 'wse_deploy.hash.accept_key' => 'A'];
+    $production = ['hash_salt' => 'p', 'wse_deploy.hash.accept_key' => 'B'];
+
+    $from_local = $this->hashOn($local, 'private');
+    self::assertTrue($this->verifiesOn($staging, $from_local));
+    self::assertFalse($this->verifiesOn($production, $from_local));
+
+    $from_staging = $this->hashOn($staging, 'private');
+    self::assertTrue($this->verifiesOn($production, $from_staging));
+    self::assertFalse($this->verifiesOn($staging, $from_staging));
+  }
+
+  /**
+   * Without an accept key, a site accepts what it signs itself.
+   */
+  public function testWithoutAcceptKeySiteAcceptsItsOwnKey(): void {
+    $site = ['hash_salt' => 'salt', 'wse_deploy.hash.key' => 'shared'];
+    self::assertTrue($this->verifiesOn($site, $this->hashOn($site, 'private')));
+    self::assertFalse($this->verifiesOn($site, $this->hashOn(['hash_salt' => 'salt', 'wse_deploy.hash.key' => 'other'], 'private')));
+  }
+
+  /**
+   * Whether a hash made elsewhere verifies on a site with the given settings.
+   */
+  private function verifiesOn(array $settings, string $hash): bool {
+    return $this->handlerOn($settings, 'private')->validateHash(self::DATA, $hash);
+  }
+
+  /**
    * Signs one payload on a site with the given settings and private key.
    */
   private function hashOn(array $settings, string $private_key): string {
+    return $this->handlerOn($settings, $private_key)->getHash(self::DATA);
+  }
+
+  /**
+   * The module's handler on a site with the given settings and private key.
+   */
+  private function handlerOn(array $settings, string $private_key): EncryptionHandler {
     new Settings($settings);
     $state = $this->createMock(StateInterface::class);
     $state->method('get')->willReturn($private_key);
-    $handler = new EncryptionHandler(new PrivateKey($state), $this->createMock(TimeInterface::class));
-    return $handler->getHash('upload:data:533077c1:1760090000');
+    return new EncryptionHandler(new PrivateKey($state), $this->createMock(TimeInterface::class));
   }
 
 }
