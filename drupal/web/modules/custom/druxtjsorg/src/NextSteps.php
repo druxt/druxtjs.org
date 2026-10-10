@@ -21,6 +21,86 @@ final class NextSteps {
   public const HEADING = 'Where to go next';
 
   /**
+   * The topics, in order, each with the pages that sit under it.
+   *
+   * The order is the terms' weight and the order of the headings on a
+   * landing. Tutorials have none: they are read in sequence.
+   */
+  public const TOPICS = [
+    [
+      'Set up',
+      [
+        '/how-to/prepare-the-backend',
+        '/how-to/configure-cors',
+        '/how-to/proxy',
+        '/how-to/authentication',
+        '/how-to/environment-variables',
+      ],
+    ],
+    [
+      'Build',
+      [
+        '/how-to/theming',
+        '/how-to/multilingual',
+        '/how-to/use-the-druxt-client',
+        '/how-to/storybook',
+        '/how-to/devtools',
+        '/how-to/example-apps',
+      ],
+    ],
+    [
+      'Ship and maintain',
+      [
+        '/how-to/deploy-static',
+        '/how-to/deploy-server',
+        '/how-to/troubleshooting',
+        '/how-to/upgrade',
+        '/how-to/use-development-releases',
+      ],
+    ],
+    [
+      'Orientation',
+      [
+        '/explanation/architecture',
+        '/explanation/drupal-for-nuxt-developers',
+        '/explanation/nuxt-for-drupal-developers',
+      ],
+    ],
+    [
+      'How Druxt works',
+      [
+        '/explanation/druxt-store',
+        '/explanation/routing',
+        '/explanation/schemas',
+        '/explanation/component-resolution',
+        '/explanation/request-topology',
+      ],
+    ],
+    [
+      'Running a site',
+      [
+        '/explanation/deployment-models',
+        '/explanation/support-and-versioning',
+      ],
+    ],
+  ];
+
+  /**
+   * The values of a "Pages in this section" paragraph.
+   *
+   * @param int|null $section
+   *   The section term's id.
+   * @param string $style
+   *   The view display that lists the pages: `default` or `sequence`.
+   *
+   * @return array<string, mixed>
+   *   Values for Paragraph::create().
+   */
+  public static function sectionList(?int $section, string $style): array {
+    return ['type' => 'docs_section_list', 'field_section' => $section, 'field_section_list_style' => $style];
+  }
+
+  /**
    * The list of links under the "Where to go next" heading, and the text without it.
    *
    * A list item is `- [Text](/path)`, optionally followed by `: a description`
@@ -65,8 +145,10 @@ final class NextSteps {
    * @param string $markdown
    *   The landing's text.
    *
-   * @return array{links: array<int, array{title: string, path: string}>, text: string}
-   *   The links, and the text with that heading and list removed.
+   * @return array{links: array<int, array{title: string, path: string}>, text: string, before: string, after: string}
+   *   The links, the text with that heading and list removed, and that text
+   *   as the part before the list and the part after it, each a document of
+   *   its own or empty, so the list's block can sit between them.
    */
   public static function extractLanding(string $markdown): array {
     $lines = explode("\n", $markdown);
@@ -89,10 +171,30 @@ final class NextSteps {
         continue;
       }
       $body = array_slice($lines, $start, $i - $start);
-      $rest = array_merge(array_slice($lines, 0, $at), array_slice($lines, $i));
-      return ['links' => self::links($body), 'text' => self::join($rest)];
+      $before = array_slice($lines, 0, $at);
+      $after = array_slice($lines, $i);
+      return [
+        'links' => self::links($body),
+        'text' => self::join(array_merge($before, $after)),
+        'before' => self::part($before),
+        'after' => self::part($after),
+      ];
     }
-    return ['links' => [], 'text' => $markdown];
+    return ['links' => [], 'text' => $markdown, 'before' => $markdown, 'after' => ''];
+  }
+
+  /**
+   * One side of a split text: trimmed, ending in one newline, or empty.
+   *
+   * @param string[] $lines
+   *   The lines on that side of the list.
+   *
+   * @return string
+   *   The text, or an empty string when there was nothing but blank lines.
+   */
+  private static function part(array $lines): string {
+    $text = trim(implode("\n", $lines));
+    return $text === '' ? '' : $text . "\n";
   }
 
   /**

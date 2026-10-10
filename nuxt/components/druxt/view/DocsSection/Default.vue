@@ -1,25 +1,22 @@
 <template>
-  <!-- Cards, not a list: the prose styles every list it holds, markers included. -->
-  <nav v-if="pages.length" class="not-prose mt-6 grid gap-3" aria-label="Pages in this section">
-    <NuxtLink
-      v-for="page in pages"
-      :key="page.id"
-      :to="page.to"
-      class="group block rounded-box border border-base-300 p-4 no-underline hover:border-primary transition-colors"
-    >
-      <span class="block font-medium group-hover:text-primary-focus" v-text="page.title" />
-      <span v-if="page.description" class="block mt-1 text-sm text-base-content/70" v-text="page.description" />
-    </NuxtLink>
-  </nav>
+  <!-- The prose styles reach in here, so the heading and the cards carry their own rules (assets/css/app.css). -->
+  <div v-if="groups.length" class="mt-6 flex flex-col gap-6" aria-label="Pages in this section">
+    <section v-for="group in groups" :key="group.id">
+      <h2 v-if="group.name" class="page-group-heading" v-text="group.name" />
+      <div class="grid gap-3 sm:grid-cols-2">
+        <DruxtEntity v-for="page in group.pages" :key="page.id" :type="page.type" :uuid="page.id" mode="teaser" />
+      </div>
+    </section>
+  </div>
 </template>
 
 <script>
 /**
- * The docs_section view: a section's published pages in their order.
+ * The docs_section view's default display: the section's pages as cards.
  *
- * Rendered on the section landing below its introduction, in place of a
- * hand-written list, so a page appears as soon as it is published with a
- * section. The landing itself is a page of its section and is left out.
+ * Each page renders in its teaser view mode, under the heading of its topic
+ * term, in the terms' weight order. Pages with no topic come first, under
+ * no heading, and the landing itself is left out.
  */
 export default {
   props: {
@@ -29,20 +26,27 @@ export default {
     pager: { type: Object, default: () => ({}) },
     count: { type: Number, default: 0 },
   },
+  data: () => ({ topics: [] }),
+  async fetch() {
+    const collection = await this.$store.dispatch('druxt/getCollection', {
+      type: 'taxonomy_term--documentation_topic',
+      query: { 'fields[taxonomy_term--documentation_topic]': 'name,weight', sort: 'weight,name' },
+    })
+    this.topics = ((collection && collection.data) || []).map((term) => ({ id: term.id, name: term.attributes.name }))
+  },
   computed: {
     pages() {
       const current = this.$route.path.replace(/\/$/, '')
-      return this.results
-        .map((page) => {
-          const a = page.attributes || {}
-          return {
-            id: page.id,
-            title: a.title,
-            description: a.field_description || '',
-            to: (a.path && a.path.alias) || '',
-          }
-        })
-        .filter((page) => page.to && page.to !== current)
+      return this.results.filter((page) => (((page.attributes || {}).path || {}).alias || '') !== current)
+    },
+    groups() {
+      const topicOf = (page) => ((((page.relationships || {}).field_topic || {}).data) || {}).id || ''
+      const groups = [{ id: '', name: '', pages: [] }, ...this.topics.map((topic) => ({ ...topic, pages: [] }))]
+      for (const page of this.pages) {
+        const group = groups.find((o) => o.id === topicOf(page)) || groups[0]
+        group.pages.push(page)
+      }
+      return groups.filter((group) => group.pages.length)
     },
   },
 }

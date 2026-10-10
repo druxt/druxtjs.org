@@ -3,6 +3,8 @@ langcode: en
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.node.step
+    - core.entity_view_mode.node.teaser
     - field.storage.node.field_description
     - field.storage.node.field_section
     - field.storage.node.field_weight
@@ -15,7 +17,7 @@ dependencies:
 id: docs_section
 label: 'Documentation section'
 module: views
-description: "A section's published pages in their order: weight, then title. The section landing renders it below its introduction, through JSON:API Views, so a new page appears as soon as it is published with a section."
+description: 'A section''s published pages in their order: weight, then title. The "Pages in this section" paragraph renders it through JSON:API Views, so a new page appears as soon as it is published with a section. The default display renders each page as a teaser, the site groups those under their topics; the sequence display renders each as a step, numbered in order.'
 tag: ''
 base_table: node_field_data
 base_field: nid
@@ -238,6 +240,29 @@ display:
       relationships: {  }
       header: {  }
       footer: {  }
+      display_extenders: {  }
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - user.permissions
+      tags: {  }
+  sequence:
+    id: sequence
+    display_title: Sequence
+    display_plugin: embed
+    position: 1
+    display_options:
+      row:
+        type: 'entity:node'
+        options:
+          relationship: none
+          view_mode: step
+      defaults:
+        row: false
+      display_description: 'Each page as a numbered step, for a section read in order.'
       display_extenders: {  }
     cache_metadata:
       max-age: -1

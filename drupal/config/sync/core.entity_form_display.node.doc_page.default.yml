@@ -8,6 +8,7 @@ dependencies:
     - field.field.node.doc_page.field_is_landing
     - field.field.node.doc_page.field_next
     - field.field.node.doc_page.field_section
+    - field.field.node.doc_page.field_topic
     - field.field.node.doc_page.field_weight
     - node.type.doc_page
   module:
@@ -89,6 +90,12 @@ content:
   field_section:
     type: options_select
     weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_topic:
+    type: options_select
+    weight: 6
     region: content
     settings: {  }
     third_party_settings: {  }

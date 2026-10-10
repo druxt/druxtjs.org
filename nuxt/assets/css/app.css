@@ -1957,3 +1957,49 @@ del.v-diff-del--trailing {
 .header-region > *:first-child {
   flex: none;
 }
+
+/* A section's pages as a numbered sequence: the list counts, each step shows
+   its number, so the order is the view's and no page carries a number. */
+.page-sequence {
+  counter-reset: page-step;
+}
+.page-sequence > li {
+  counter-increment: page-step;
+}
+.page-card-step::before {
+  content: counter(page-step, decimal-leading-zero);
+}
+
+/* Page cards and their lists inside the prose. The prose styles every link,
+   list and heading it holds, and these sit in a landing's body, so each
+   carries its own rule at a specificity above the prose's. */
+.prose .page-card {
+  color: hsl(var(--bc));
+  font-weight: 400;
+  border-bottom: 1px solid hsl(var(--b3));
+}
+.prose .page-card:hover {
+  border-color: hsl(var(--p));
+}
+.prose .page-group-heading {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: hsl(var(--bc) / 0.7);
+}
+.prose .page-sequence {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.prose .page-sequence > li {
+  margin: 0;
+  padding: 0;
+}
+.prose .page-sequence > li::before,
+.prose .page-sequence > li::marker {
+  content: none;
+}

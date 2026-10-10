@@ -51,9 +51,16 @@ Druxt 1.0.0.
   at the end of a page is the page's own link field, in the editor's order: a
   page on this site is shown as it is now, title and description included,
   a generated page by its path and text, and a link off the site opens in a
-  new tab. A page without links shows the next page in the docs menu. A
-  deploy hook moved the hand-written lists of 35 pages and 4 landings across
-  once.
+  new tab. The first link is the page's Next, drawn large, the rest follow
+  under "Also", and a page without links takes the next page in the docs
+  menu. A deploy hook moved the hand-written lists of 35 pages and 4
+  landings across once.
+- A section landing lists its pages where the editor puts the "Pages in
+  this section" block, in one of the view's two displays. Cards, grouped
+  under the pages' topic headings, each page in its teaser view mode; or a
+  numbered sequence, each page in its step view mode, which the tutorials
+  use. The topic is a term on the page, and a deploy hook gave the how-to
+  guides and the concepts theirs.
 - The JSON:API tab on a page's edit screen opens through the site again, and
   its preview fills the screen: the iframe is pinned to the viewport inside
   the admin toolbar's edges, following the toolbar when it collapses or

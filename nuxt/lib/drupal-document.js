@@ -2,7 +2,7 @@
 export const sectionOf = (path) => path.split('/').filter(Boolean)[0] || ''
 
 /** The paragraph types a documentation page is built from. */
-export const PARAGRAPH_TYPES = ['docs_callout', 'docs_code', 'docs_diagram', 'docs_image', 'docs_layout_section', 'docs_rich_text', 'docs_text']
+export const PARAGRAPH_TYPES = ['docs_callout', 'docs_code', 'docs_diagram', 'docs_image', 'docs_layout_section', 'docs_rich_text', 'docs_section_list', 'docs_text']
 
 /** Everything the page's body renders, fetched with the page in one request. */
 const INCLUDE = ['field_content', 'field_content.field_media', 'field_content.field_media.field_media_image']

@@ -11,6 +11,7 @@ dependencies:
     - paragraphs.paragraphs_type.docs_image
     - paragraphs.paragraphs_type.docs_layout_section
     - paragraphs.paragraphs_type.docs_rich_text
+    - paragraphs.paragraphs_type.docs_section_list
     - paragraphs.paragraphs_type.docs_text
   module:
     - entity_reference_revisions
@@ -35,6 +36,7 @@ settings:
       docs_image: docs_image
       docs_rich_text: docs_rich_text
       docs_layout_section: docs_layout_section
+      docs_section_list: docs_section_list
     target_bundles_drag_drop:
       docs_callout:
         weight: 4
@@ -53,6 +55,9 @@ settings:
         enabled: true
       docs_rich_text:
         weight: 6
+        enabled: true
+      docs_section_list:
+        weight: 7
         enabled: true
       docs_text:
         weight: 1

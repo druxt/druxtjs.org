@@ -71,6 +71,18 @@ final class NextStepsTest extends UnitTestCase {
       ['title' => 'Configure CORS in Drupal', 'path' => '/how-to/configure-cors'],
     ], $result['links']);
     self::assertSame("How-to guides are **goal-oriented**: recipes.\n\nFor step-by-step lessons, see [Tutorials](/tutorials).\n", $result['text']);
+    self::assertSame("How-to guides are **goal-oriented**: recipes.\n", $result['before']);
+    self::assertSame("For step-by-step lessons, see [Tutorials](/tutorials).\n", $result['after']);
+  }
+
+  /**
+   * A landing that ends with its list has nothing after it.
+   */
+  public function testTheLandingThatEndsWithItsListHasNoTextAfter(): void {
+    $result = NextSteps::extractLanding("Intro.\n\n## Pages\n\n- [A](/a)\n- [B](/b)\n");
+    self::assertSame("Intro.\n", $result['before']);
+    self::assertSame('', $result['after']);
+    self::assertSame(['type' => 'docs_section_list', 'field_section' => 3, 'field_section_list_style' => 'sequence'], NextSteps::sectionList(3, 'sequence'));
   }
 
   /**
@@ -78,7 +90,7 @@ final class NextStepsTest extends UnitTestCase {
    */
   public function testTheLandingSectionWithProseIsNotTheList(): void {
     $markdown = "Intro.\n\n## Reading\n\nSome prose.\n\n- [A](/a)\n";
-    self::assertSame(['links' => [], 'text' => $markdown], NextSteps::extractLanding($markdown));
+    self::assertSame(['links' => [], 'text' => $markdown, 'before' => $markdown, 'after' => ''], NextSteps::extractLanding($markdown));
   }
 
   /**
