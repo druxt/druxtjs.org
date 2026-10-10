@@ -196,7 +196,11 @@ agree, which they do on one platform. The module's import controller is
 patched (`patches/wse-deploy-route-parameters.patch`) to read the upload
 type, the status and the workspace id from the route, where the HTTP export
 sends them. Without it the controller reads them from a request body that
-holds only the file, and every deploy fails with a 500 on the first upload. The import matches entities by UUID,
+holds only the file, and every deploy fails with a 500 on the first upload.
+The site also keeps paragraphs tracked by Workspaces
+(`WorkspaceEntityTypeHooks`), which Workspaces Extra would otherwise mark
+ignored. A deploy exports tracked entities alone, so an untracked paragraph
+never reaches the target and its page fails to import there. The import matches entities by UUID,
 so the two sides must share history: every Lagoon environment is a copy of
 production, and a local site needs a copy of a production database before
 it can deploy to one.

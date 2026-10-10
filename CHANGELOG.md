@@ -18,7 +18,10 @@ Druxt 1.0.0.
   `DRUPAL_HASH_SALT` and `WSE_DEPLOY_KEY`, which sign every request. A
   patch makes the module's import read the upload type, the status and the
   workspace id from the request path, where its own HTTP export puts them;
-  unpatched, every upload failed on a missing workspace id.
+  unpatched, every upload failed on a missing workspace id. Paragraphs are
+  tracked by Workspaces again. Workspaces Extra had marked them ignored,
+  which saved a paragraph edited in a workspace to live and left it out of
+  a deploy, so the page that referenced it could not be imported.
 - Workspaces Extra on the backend, with its scheduler. A workspace can be
   published at a set time, which is how a release waits for its date, and an
   editor may schedule one. A published workspace is closed rather than left
