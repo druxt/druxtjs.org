@@ -37,8 +37,15 @@ const releaseNotes = (route, markdown) => {
   return notes
 }
 
-/** A version heading as changesets writes it: `## 0.25.0 - 2026-10-06`, or the bare version. */
-const VERSION_HEADING = /^##\s+(\S+)(?:\s+-\s+(\d{4}-\d{2}-\d{2}))?\s*$/
+/**
+ * A version heading as changesets writes it: `## 0.25.0 - 2026-10-06`, or
+ * the bare version, bracketed or not. A snapshot's prerelease suffix counts;
+ * `## Unreleased` is not a release.
+ */
+const VERSION_HEADING = /^##\s+\[?v?(\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)\]?(?:\s+-\s+(\d{4}-\d{2}-\d{2}))?\s*$/
+
+/** The issue and commit links a changeset appends in brackets: `([#684](…), [26b1bc6](…))`. */
+const REFERENCES = /\s*\((?:\[(?:#\d+|`?[0-9a-f]{7,40}`?)\]\([^)]*\)[,\s]*)+\)/g
 
 /**
  * The newest release in a changelog: its version, date and changes.
@@ -70,14 +77,14 @@ const latestRelease = (markdown) => {
 
 /**
  * One change as plain text: links to their text, code to its text, and the
- * commit reference and the thanks a changeset appends dropped.
+ * issue and commit references and the thanks a changeset appends dropped.
  *
  * @param {string} text - A list item's markdown.
  * @returns {string} The sentence.
  */
 const plain = (text) =>
   String(text)
-    .replace(/\s*\((?:\[[^\]]*\]\([^)]*\)[,\s]*)+\)/g, '')
+    .replace(REFERENCES, '')
     .replace(/\s*Thanks\s+\[[^\]]*\]\([^)]*\)\.?/g, '')
     .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
     .replace(/`([^`]*)`/g, '$1')

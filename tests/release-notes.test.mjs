@@ -83,6 +83,29 @@ describe('latestRelease', () => {
     })
   })
 
+  test('an Unreleased heading is not a release, so the version under it leads', () => {
+    const notes = [
+      '## [Unreleased]',
+      '- Pending.',
+      '## Unreleased',
+      '## [1.3.1] - 2026-10-09',
+      '- Shipped.',
+    ].join('\n')
+    assert.deepEqual(latestRelease(notes), {
+      version: '1.3.1',
+      date: '2026-10-09',
+      changes: ['Shipped.'],
+    })
+  })
+
+  test("a change keeps a link's text, and loses only its issue and commit references", () => {
+    const notes = [
+      '## 1.0.0',
+      '- Added support ([guide](https://example.com/guide)). ([#684](https://example.com/684), [`26b1bc6`](https://example.com/26b1bc6))',
+    ].join('\n')
+    assert.deepEqual(latestRelease(notes).changes, ['Added support (guide).'])
+  })
+
   test('text without a version heading has no release', () => {
     assert.equal(latestRelease('# druxt\n\nNothing yet.\n'), null)
     assert.equal(latestRelease(undefined), null)
