@@ -20,6 +20,12 @@ Druxt 1.0.0.
   the topics by name, so each environment minted its own random UUID, and a
   page deployed from one site to another named a topic the target did not
   have. A deploy hook re-keys the existing terms once.
+- A page deployed from another site keeps its paragraphs. Workspaces
+  Deploy keeps an entity's id but gives each saved revision a new revision
+  id, and the deployed page still named its paragraphs by the other site's
+  revision ids, which on this site belonged to other paragraphs or to
+  nothing. A reference whose revision is not one of its own target now
+  takes the target's current revision when the entity is saved.
 
 - A database copied from before paragraphs were tracked by Workspaces gets
   the Workspace field installed on them by a deploy hook. Without it every
