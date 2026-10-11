@@ -9,6 +9,30 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-10-11
+
+### Fixed
+
+- A workspace deployed from another site imports its paragraphs' Layout
+  Paragraphs placement again. Core exports a paragraph's behavior settings
+  as the settings themselves rather than the stored string, then refuses that
+  shape on import as unknown properties, so every paragraph in a layout was
+  rejected. A site normalizer wraps the settings in their property again
+  before core serializes them.
+- Every documentation topic has the same UUID on every site, derived
+  from its name as the section terms already were. The deploy hook created
+  the topics by name, so each environment minted its own random UUID, and a
+  page deployed from one site to another named a topic the target did not
+  have. A deploy hook re-keys the existing terms once, and stops before any
+  change when two topics share a name.
+- A page deployed from another site keeps its paragraphs. Workspaces
+  Deploy keeps an entity's id but gives each saved revision a new revision
+  id, and the deployed page still named its paragraphs by the other site's
+  revision ids, which on this site belonged to other paragraphs or to
+  nothing. A reference whose revision is not one of its own target now
+  takes the target's current revision when the entity is saved, in every
+  translation.
+
 ## [0.11.0] - 2026-10-11
 
 ### Added
