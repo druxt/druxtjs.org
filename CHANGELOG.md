@@ -10,7 +10,7 @@ Druxt 1.0.0.
 ## [Unreleased]
 
 - A database copied from before paragraphs were tracked by Workspaces gets
-  the Workspace field installed on them by a post update. Without it every
+  the Workspace field installed on them by a deploy hook. Without it every
   revision query on a paragraph, which every page read makes, failed with
   "'workspace' not found", so a non-production environment answered 500 on
   every page. The site's hook that keeps paragraphs tracked now runs before

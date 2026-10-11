@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * The post update installs the paragraph Workspace field a copy lacks.
+ * The deploy hook installs the paragraph Workspace field a copy lacks.
  */
 #[Group('druxtjsorg')]
 #[RunTestsInSeparateProcesses]
@@ -42,7 +42,7 @@ final class ParagraphWorkspaceFieldUpdateTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('workspace');
     $this->installEntitySchema('paragraph');
-    $this->container->get('module_handler')->loadInclude('druxtjsorg', 'php', 'druxtjsorg.post_update');
+    $this->container->get('module_handler')->loadInclude('druxtjsorg', 'php', 'druxtjsorg.deploy');
 
     $manager = $this->container->get('entity.definition_update_manager');
     $storage = $this->container->get('entity_type.manager')->getStorage('paragraph');
@@ -57,12 +57,12 @@ final class ParagraphWorkspaceFieldUpdateTest extends KernelTestBase {
     self::assertFalse($schema->fieldExists($table, 'workspace'));
     self::assertNotEmpty($manager->getChangeSummary()['paragraph'] ?? [], 'core sees the field as missing');
 
-    druxtjsorg_post_update_paragraph_workspace_field();
+    self::assertStringStartsWith('Installed', druxtjsorg_deploy_paragraph_workspace_field());
 
     self::assertTrue($schema->fieldExists($table, 'workspace'));
     self::assertEmpty($manager->getChangeSummary()['paragraph'] ?? []);
     // Running again on a database that has the column changes nothing.
-    druxtjsorg_post_update_paragraph_workspace_field();
+    self::assertStringStartsWith('The paragraph Workspace field was already', druxtjsorg_deploy_paragraph_workspace_field());
     self::assertEmpty($manager->getChangeSummary()['paragraph'] ?? []);
     // The query that failed with "'workspace' not found" runs.
     self::assertSame([], $storage->getQuery()->allRevisions()->accessCheck(FALSE)->notExists('workspace')->execute());
