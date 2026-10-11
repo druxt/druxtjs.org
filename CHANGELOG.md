@@ -9,6 +9,12 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+- A database copied from before paragraphs were tracked by Workspaces gets
+  the Workspace field installed on them by a post update. Without it every
+  revision query on a paragraph, which every page read makes, failed with
+  "'workspace' not found", so a non-production environment answered 500 on
+  every page. The site's hook that keeps paragraphs tracked now runs before
+  core's, which reads the handler once and remembers the answer.
 - Staging environments, where content is reviewed before production. A `staging/`
   branch cut from `main` builds an environment that copies production once
   and then keeps its database, so a workspace deployed to it for review
