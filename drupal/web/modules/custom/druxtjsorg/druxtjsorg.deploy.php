@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Utility\UpdateException;
 use Drupal\druxtjsorg\CalloutText;
 use Drupal\druxtjsorg\NextSteps;
 use Drupal\druxtjsorg\TopicUuid;
@@ -193,12 +194,25 @@ function druxtjsorg_deploy_topics(array &$sandbox): string {
  * The topics were created by name, so each environment had its own random
  * UUIDs and a page deployed between sites named a topic the target lacked.
  * The UUID field is read-only on the entity, so the row is updated directly
- * and the term's caches cleared. Runs again without change.
+ * and the term's caches cleared. Runs again without change, and stops
+ * before any change when two topics share a name.
  */
 function druxtjsorg_deploy_topic_uuids(): string {
   $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  $terms = $storage->loadByProperties(['vid' => 'documentation_topic']);
+  // Two topics with one name would take one UUID, and the second update
+  // would fail on the unique key after the first had already changed.
+  $names = [];
+  foreach ($terms as $term) {
+    $names[$term->label()][] = $term->id();
+  }
+  $duplicates = array_filter($names, fn(array $ids) => count($ids) > 1);
+  if ($duplicates) {
+    $list = implode('; ', array_map(fn(string $name, array $ids) => "$name (" . implode(', ', $ids) . ')', array_keys($duplicates), $duplicates));
+    throw new UpdateException("Topics share a name and cannot be re-keyed: $list. Merge or rename them first.");
+  }
   $changed = 0;
-  foreach ($storage->loadByProperties(['vid' => 'documentation_topic']) as $term) {
+  foreach ($terms as $term) {
     $uuid = TopicUuid::for($term->label());
     if ($term->uuid() === $uuid) {
       continue;

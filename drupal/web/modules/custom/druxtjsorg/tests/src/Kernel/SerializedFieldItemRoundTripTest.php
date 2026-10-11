@@ -71,4 +71,28 @@ final class SerializedFieldItemRoundTripTest extends KernelTestBase {
     self::assertSame($settings, $imported->getAllBehaviorSettings());
   }
 
+  /**
+   * A value with a key named after the property beside others stays whole.
+   */
+  public function testValueKeyBesideOthersIsStillTheValue(): void {
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('paragraph');
+    ParagraphsType::create(['id' => 'text', 'label' => 'Text'])->save();
+    $serializer = $this->container->get('jsonapi.serializer');
+    $resource_type = $this->container->get('jsonapi.resource_type.repository')->get('paragraph', 'text');
+    $template = Paragraph::create(['type' => 'text']);
+    $template->save();
+    $document = new JsonApiDocumentTopLevel(new ResourceObjectData([ResourceObject::createFromEntity($resource_type, $template)], 1), new NullIncludedData(), new LinkCollection([]));
+    $export = $serializer->normalize($document, 'api_json', ['resource_type' => $resource_type])->getNormalization();
+
+    $settings = ['value' => ['enabled' => TRUE], 'layout_paragraphs' => ['region' => 'content']];
+    $export['data']['attributes']['behavior_settings'] = $settings;
+    $imported = $serializer->denormalize(['data' => $export['data']], JsonApiDocumentTopLevel::class, 'api_json', ['resource_type' => $resource_type]);
+    self::assertSame($settings, $imported->getAllBehaviorSettings(), 'a plugin named value does not unwrap the settings');
+
+    $export['data']['attributes']['behavior_settings'] = ['value' => $settings];
+    $imported = $serializer->denormalize(['data' => $export['data']], JsonApiDocumentTopLevel::class, 'api_json', ['resource_type' => $resource_type]);
+    self::assertSame($settings, $imported->getAllBehaviorSettings(), 'an explicitly wrapped item passes through');
+  }
+
 }

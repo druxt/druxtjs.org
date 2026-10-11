@@ -16,6 +16,8 @@ use Drupal\jsonapi\Normalizer\FieldItemNormalizer;
  * behavior_settings therefore reads {"layout_paragraphs": {...}} on output,
  * which the generic denormalizer rejects as unknown property names on the way
  * back in. Wrapping it in its main property again lets the parent serialize it.
+ * The one shape left ambiguous is a value whose only key is the property's
+ * own name; that is read as the wrapped item, which is core's own shape.
  */
 class SerializedFieldItemNormalizer extends FieldItemNormalizer {
 
@@ -28,7 +30,9 @@ class SerializedFieldItemNormalizer extends FieldItemNormalizer {
       $field_item = $this->getFieldItemInstance($context['resource_type'], $item_definition);
       $main = $item_definition->getMainPropertyName();
       $properties = array_keys($item_definition->getPropertyDefinitions());
-      if ($main !== NULL && count($properties) === 1 && $this->isSerialized($field_item, $main) && !array_key_exists($main, $data)) {
+      // A wrapped item carries the property and nothing else. A value that
+      // happens to hold a key of that name beside others is still the value.
+      if ($main !== NULL && count($properties) === 1 && $this->isSerialized($field_item, $main) && array_keys($data) !== [$main]) {
         $data = [$main => $data];
       }
     }

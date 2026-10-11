@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\druxtjsorg\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
@@ -30,6 +31,8 @@ final class ReferenceRevisionHooksTest extends KernelTestBase {
     'node',
     'entity_reference_revisions',
     'paragraphs',
+    'language',
+    'content_translation',
     'druxtjsorg',
   ];
 
@@ -82,6 +85,37 @@ final class ReferenceRevisionHooksTest extends KernelTestBase {
     self::assertSame((int) $current, (int) $items[0]['target_revision_id'], 'another paragraph\'s revision is replaced');
     self::assertSame((int) $other->getRevisionId(), (int) $items[1]['target_revision_id'], 'a revision that does not exist is replaced');
     self::assertSame((int) $other->getRevisionId(), (int) $items[2]['target_revision_id'], 'a right reference is kept');
+  }
+
+  /**
+   * A translation's own reference is re-pointed too.
+   */
+  public function testTranslationsAreRepointed(): void {
+    ConfigurableLanguage::createFromLangcode('fr')->save();
+    $field = FieldConfig::loadByName('node', 'page', 'field_content');
+    $field->setTranslatable(TRUE)->save();
+    $this->container->get('content_translation.manager')->setEnabled('node', 'page', TRUE);
+
+    $en = Paragraph::create(['type' => 'text']);
+    $en->save();
+    $fr = Paragraph::create(['type' => 'text']);
+    $fr->save();
+    $fr->setNewRevision(TRUE);
+    $fr->save();
+
+    $node = Node::create([
+      'type' => 'page',
+      'title' => 'Deployed',
+      'field_content' => [['target_id' => $en->id(), 'target_revision_id' => $en->getRevisionId()]],
+    ]);
+    $node->addTranslation('fr', [
+      'title' => 'Déployé',
+      'field_content' => [['target_id' => $fr->id(), 'target_revision_id' => $en->getRevisionId()]],
+    ]);
+    $node->save();
+
+    $items = Node::load($node->id())->getTranslation('fr')->get('field_content')->getValue();
+    self::assertSame((int) $fr->getRevisionId(), (int) $items[0]['target_revision_id'], 'the French reference lands on its own paragraph');
   }
 
 }

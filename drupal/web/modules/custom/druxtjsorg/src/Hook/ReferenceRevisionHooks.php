@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\entity_reference_revisions\Plugin\Field\FieldType\EntityReferenceRevisionsItem;
 
 /**
@@ -33,6 +34,18 @@ final class ReferenceRevisionHooks {
     if (!$entity instanceof FieldableEntityInterface) {
       return;
     }
+    $translations = $entity instanceof TranslatableInterface
+      ? array_map(fn(string $langcode) => $entity->getTranslation($langcode), array_keys($entity->getTranslationLanguages()))
+      : [$entity];
+    foreach ($translations as $translation) {
+      $this->repointFields($translation);
+    }
+  }
+
+  /**
+   * Re-points the stray references of one translation.
+   */
+  private function repointFields(FieldableEntityInterface $entity): void {
     foreach ($entity->getFields(FALSE) as $field) {
       if ($field->getFieldDefinition()->getType() !== 'entity_reference_revisions') {
         continue;

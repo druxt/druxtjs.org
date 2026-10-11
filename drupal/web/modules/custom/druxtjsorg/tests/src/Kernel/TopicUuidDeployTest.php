@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\druxtjsorg\Kernel;
 
+use Drupal\Core\Utility\UpdateException;
 use Drupal\druxtjsorg\TopicUuid;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\taxonomy\Entity\Term;
@@ -54,6 +55,21 @@ final class TopicUuidDeployTest extends KernelTestBase {
     self::assertSame($section->uuid(), $storage->load($section->id())->uuid(), 'other vocabularies are left alone');
 
     self::assertSame('Re-keyed 0 topics.', druxtjsorg_deploy_topic_uuids());
+
+    // Two topics with one name stop the hook before any row changes.
+    $twin = Term::create(['vid' => 'documentation_topic', 'name' => 'Build']);
+    $twin->save();
+    $other = Term::create(['vid' => 'documentation_topic', 'name' => 'Build']);
+    $other->save();
+    try {
+      druxtjsorg_deploy_topic_uuids();
+      self::fail('duplicate names were not refused');
+    }
+    catch (UpdateException $e) {
+      self::assertStringContainsString('Build (' . $twin->id() . ', ' . $other->id() . ')', $e->getMessage());
+    }
+    $storage->resetCache();
+    self::assertSame($twin->uuid(), $storage->load($twin->id())->uuid(), 'nothing was re-keyed');
     self::assertMatchesRegularExpression('/^[0-9a-f-]{36}$/', TopicUuid::for('Build'));
     self::assertNotSame(TopicUuid::for('Build'), TopicUuid::for('Set up'));
   }
