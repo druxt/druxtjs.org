@@ -243,6 +243,10 @@ export default {
     'druxt-blocks',
     'druxt-views',
     'druxt-breadcrumb',
+    // Drupal's Preview button renders the unsaved page here, at
+    // /druxt/node/preview, from the JSON:API Node Preview document it is
+    // handed in the URL fragment.
+    '@druxt-contrib/node-preview',
     // Every core module, so the playground can render every component. Its
     // layout is only added to a site without one.
     'druxt-site',

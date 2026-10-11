@@ -18,6 +18,14 @@ describe('shouldProxy', () => {
     }
   })
 
+  // Drupal's preview screen is Drupal's; the page it frames is this site's.
+  it('proxies the node preview screen, and leaves the preview page to the site', () => {
+    assert.equal(shouldProxy('/node/preview/0039a826-1e00-43ad-aa6a-6bbf4c6b6fba/full'), true)
+    assert.equal(shouldProxy('/node/preview/0039a826-1e00-43ad-aa6a-6bbf4c6b6fba/full/'), true)
+    assert.equal(shouldProxy('/node/preview'), false)
+    assert.equal(shouldProxy('/druxt/node/preview'), false)
+  })
+
   // The path goes upstream as it came, so a segment Drupal's server would
   // fold away is refused here rather than resolved past the allowlist.
   it('proxies the files under an asset directory, and leaves the pages beside them to the site', () => {

@@ -75,7 +75,7 @@ jobs:
         env:
           PROSE_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           MERGE_REQUEST_DESCRIPTION: ${{ github.event.pull_request.body }}
-          PROSE_LINT_GLOB: '!nuxt/**'
+          PROSE_LINT_GLOB: '!{nuxt,drupal/web/modules/custom/consumer_node_preview}/**'
         run: |
           bash .gitlab/scripts/install-vale.sh .vale/bin .vale/styles
           bash .gitlab/scripts/lint-prose.sh

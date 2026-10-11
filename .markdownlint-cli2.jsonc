@@ -18,6 +18,8 @@
     ".vale/**",
     ".docs-source/**",
     "drupal/vendor/**",
+    // Vendored until released; its README is upstream's.
+    "drupal/web/modules/custom/consumer_node_preview/README.md",
     "drupal/web/core/**",
     "drupal/web/libraries/**",
     "drupal/web/modules/contrib/**",

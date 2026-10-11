@@ -82,6 +82,13 @@ export const EDIT_PATH =
   /^\/(node|media|taxonomy\/term|comment|user)\/[^/]+\/(edit|delete|revisions|translations|devel|layout|json-preview)(\/|$)/
 
 /**
+ * Drupal's own node preview screen, `/node/preview/{uuid}/{view mode}`, where
+ * the edit form's Preview button lands. Consumer Node Preview renders this
+ * site in an iframe there; the site's preview page itself is under `/druxt/`.
+ */
+export const PREVIEW_PATH = /^\/node\/preview\/[^/]+\/[^/]+(\/|$)/
+
+/**
  * Headers that describe one hop and must not be copied to the next.
  *
  * Passing `connection` or `transfer-encoding` through re-frames a response
@@ -130,6 +137,7 @@ export function shouldProxy(path, options = {}) {
   if ((options.except || []).some((pattern) => pattern.test(subject))) return false
   if (isAdminPath(subject, options.paths || ADMIN_PATHS)) return true
   if (EDIT_PATH.test(subject)) return true
+  if (PREVIEW_PATH.test(subject)) return true
   if (FILES_PATH.test(subject)) return true
   if (ASSET_FILE.test(subject) && ASSET_PATHS.some((prefix) => subject.startsWith(`${prefix}/`))) return true
   const prefixes = options.backendPaths || BACKEND_PATHS

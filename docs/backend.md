@@ -10,7 +10,9 @@ Early. The content model is still being built.
 ## Previewing a page
 
 **Preview** on a page's edit form opens the preview in the admin theme,
-with three tabs. All three show the unsaved changes.
+with three tabs. All three show the unsaved changes. The screen is the
+`consumer_node_preview` module's, carried as a copy in
+`drupal/web/modules/custom/consumer_node_preview` until it is released.
 
 | Tab      | Shows                                                                            |
 | -------- | -------------------------------------------------------------------------------- |
@@ -18,14 +20,34 @@ with three tabs. All three show the unsaved changes.
 | Drupal   | The page's content in the admin theme, its paragraphs styled like the frontend's |
 | JSON:API | The `jsonapi_node_preview` document, with the page's paragraphs included         |
 
-The Frontend tab needs the frontend's preview URL in `settings.php`.
-`{uuid}` and `{view_mode}` are filled in for each preview:
+The Frontend tab shows the page at `/druxt/node/preview`, which the vendored
+`@druxt-contrib/node-preview` module adds to the site. The page reads the
+JSON:API Node Preview document's path from the URL fragment, fetches it
+through the Druxt client with the editor's session, so the workspace header
+goes with it, seeds the store and renders the node through
+`DruxtNodePreviewDocPage`, the wrapper in `components/druxt/node-preview/`
+that gives it the page header and prose shell a saved page has. While a
+preview is active the page's paragraphs are the seeded ones: `DocPageFull`
+skips its own fetch of them.
+
+The tab's target is a Consumer Node Preview target. On Lagoon,
+`settings.lagoon.php` points it at the environment's own frontend. Elsewhere
+set it in `settings.php`; `[view_mode]` and `[jsonapi_node_preview_path]` are
+filled in for each preview:
 
 ```php
-$settings['druxt_docs_preview_url'] = '/druxt/node/preview?vm={view_mode}#/jsonapi/node/doc_page/{uuid}/preview';
+$settings['consumer_node_preview'] = [
+  'targets' => [
+    'frontend' => [
+      'label' => 'Frontend',
+      'url' => 'http://localhost:3000/druxt/node/preview?vm=[view_mode]#[jsonapi_node_preview_path]',
+    ],
+  ],
+  'default' => 'settings:frontend',
+];
 ```
 
-Without it, the tab says the frontend preview isn't configured.
+Without a target, the tab says so.
 
 ## Draft authoring and preview
 

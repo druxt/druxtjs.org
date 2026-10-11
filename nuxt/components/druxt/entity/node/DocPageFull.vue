@@ -98,6 +98,13 @@ export default {
      * fetch() and again whenever the page's list of paragraphs changes.
      */
     async loadParagraphs() {
+    // A preview has seeded the store with the unsaved paragraphs; a fetch
+    // here would replace them with the saved ones. On the preview route
+    // only: the flag outlives the preview when the reader follows a link.
+    if ((this.$store.state.druxtNodePreview || {}).active && this.$route.name === 'druxt-node-preview') {
+      this.fetched += 1
+      return
+    }
     // A signed-in editor viewing a draft or an older revision reads each
     // paragraph at the revision the node names (its `target_revision_id`),
     // never the default: an include or a plain fetch would return published
