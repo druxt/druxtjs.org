@@ -301,7 +301,9 @@ export default {
     // front of Drupal ever renames it, this pattern is what has to change.
     cache: {
       secret: process.env.DRUXT_CACHE_SECRET,
-      sessionCookie: 'S?SESS[0-9a-f]+',
+      // Drupal's session, and the workspace_preview cookie a reviewer holds:
+      // either reads the site as someone, never from the shared cache.
+      sessionCookie: 'S?SESS[0-9a-f]+|workspace_preview',
     },
   },
 

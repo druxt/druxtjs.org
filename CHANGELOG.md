@@ -9,6 +9,13 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+- A workspace can be shared with someone who cannot sign in. An editor makes
+  a preview link for it in Drupal, under the workspace's Preview links tab,
+  with an expiry and a page to open on, and whoever follows the link reads
+  the site in that workspace until it expires, with a notice at the top of
+  every page. The link opens on the site, and the reader is never served a
+  stored page or the shared JSON:API cache. The `workspace_preview` module
+  provides the links, and its cookie is honoured through the site's proxy.
 - A database copied from before paragraphs were tracked by Workspaces gets
   the Workspace field installed on them by a post update. Without it every
   revision query on a paragraph, which every page read makes, failed with

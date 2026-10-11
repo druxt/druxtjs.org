@@ -59,6 +59,9 @@ export const BACKEND_PATHS = [
   // posts arrive at this site's URL, the one every environment is named by,
   // and each is signed with a token Drupal checks.
   '/wse-deploy',
+  // A workspace preview link: followed on the site's host, so the cookie
+  // it sets, which reads the site in that workspace, is set for this host.
+  '/workspace-preview',
 ]
 
 /**

@@ -99,6 +99,10 @@ export default () => ({
     // The Drupal workspace the editor reads the site in, or null for live.
     // Kept in a cookie by plugins/workspace.js.
     workspace: null,
+    // True for a reviewer following a workspace preview link: Drupal reads
+    // the site in that workspace for them, from a cookie only the server
+    // render sees. Set there by plugins/workspace.js.
+    previewing: false,
   },
 
   // The sign-in dialog, opened from the header and by the auth middleware.

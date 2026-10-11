@@ -90,6 +90,10 @@ if (!$frontend && getenv('LAGOON_ENVIRONMENT_TYPE') === 'production') {
 }
 if ($frontend) {
   $settings['druxt_docs_frontend_url'] = rtrim($frontend, '/');
+  // A workspace preview link is shared as the site's URL, not Drupal's route:
+  // the site proxies /workspace-preview, so the link opens on the site and
+  // the preview cookie is set for it.
+  $config['workspace_preview.settings']['preview_base_urls'] = [rtrim($frontend, '/')];
 }
 
 // Purge clears the Nuxt server's shared JSON:API cache when content changes.

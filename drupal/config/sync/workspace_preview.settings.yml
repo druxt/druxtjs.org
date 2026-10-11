@@ -1,0 +1,7 @@
+_core:
+  default_config_hash: GTwznHBr5rcf3RvfIzZ_68_AXz-ui3FO73NB4AqYEKQ
+preview_expiry_default: '8 hours'
+preview_base_urls: null
+preview_handler: cookie
+preview_handler_configuration:
+  cookie_name: workspace_preview
