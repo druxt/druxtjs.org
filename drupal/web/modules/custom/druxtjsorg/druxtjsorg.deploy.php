@@ -179,3 +179,28 @@ function druxtjsorg_deploy_topics(array &$sandbox): string {
   }
   return "Created $created topics and gave $assigned pages theirs.";
 }
+
+/**
+ * Installs the Workspace field on paragraphs, which Workspaces now tracks.
+ *
+ * The site keeps paragraphs tracked by Workspaces (WorkspaceEntityTypeHooks),
+ * so core declares its Workspace revision field on them. A database copied
+ * from before that has no column for it, and every revision query on a
+ * paragraph, the live working copy's included, failed with "'workspace' not
+ * found". A deploy hook rather than a post update: on a copy of production
+ * the site module is installed by the configuration import, after the
+ * updates have run, so a post update of its own is never pending there.
+ */
+function druxtjsorg_deploy_paragraph_workspace_field(): string {
+  $manager = \Drupal::entityDefinitionUpdateManager();
+  if ($manager->getFieldStorageDefinition('workspace', 'paragraph')) {
+    return 'The paragraph Workspace field was already installed.';
+  }
+  $definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('paragraph');
+  if (!isset($definitions['workspace'])) {
+    return 'Paragraphs are not tracked by Workspaces; nothing to install.';
+  }
+  $manager->installFieldStorageDefinition('workspace', 'paragraph', 'workspaces',
+    $definitions['workspace']);
+  return 'Installed the Workspace field on paragraphs.';
+}
