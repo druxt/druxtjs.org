@@ -173,6 +173,13 @@ lint:prose:
       - .vale/
   script:
     - section_start "prose" "Linting prose with Vale"
+    # A release into main lints what it adds to develop, as lint:commit does.
+    - |
+      if [ "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-}" = main ]; then
+        git fetch origin "+refs/heads/develop:refs/remotes/origin/develop"
+        PROSE_BASE_SHA=$(git rev-parse origin/develop)
+        export PROSE_BASE_SHA
+      fi
     - bash .gitlab/scripts/install-vale.sh .vale/bin .vale/styles
     - bash .gitlab/scripts/lint-prose.sh
     - section_end "prose"
