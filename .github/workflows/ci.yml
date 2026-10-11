@@ -70,13 +70,21 @@ jobs:
         run: bash .gitlab/scripts/check-attribution.sh
 
       # Project voice over the markdown a change touches, its commit messages
-      # and the pull request description.
+      # and the pull request description. A release into main lints what it
+      # adds to develop, as the commit check does: develop's squash subjects
+      # were linted on their own pull requests and cannot change now.
       - name: Lint prose
         env:
           PROSE_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
           MERGE_REQUEST_DESCRIPTION: ${{ github.event.pull_request.body }}
           PROSE_LINT_GLOB: '!{nuxt,drupal/web/modules/custom/consumer_node_preview}/**'
         run: |
+          if [ "$BASE_REF" = main ]; then
+            git fetch --no-tags origin +refs/heads/develop:refs/remotes/origin/develop
+            PROSE_BASE_SHA=$(git rev-parse origin/develop)
+            export PROSE_BASE_SHA
+          fi
           bash .gitlab/scripts/install-vale.sh .vale/bin .vale/styles
           bash .gitlab/scripts/lint-prose.sh
 
