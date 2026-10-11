@@ -9,6 +9,13 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+- A workspace deployed from another site imports its paragraphs' Layout
+  Paragraphs placement again. Core exports a paragraph's behavior settings
+  as the settings themselves rather than the stored string, then refuses that
+  shape on import as unknown properties, so every paragraph in a layout was
+  rejected. A site normalizer wraps the settings in their property again
+  before core serializes them.
+
 - A database copied from before paragraphs were tracked by Workspaces gets
   the Workspace field installed on them by a deploy hook. Without it every
   revision query on a paragraph, which every page read makes, failed with
