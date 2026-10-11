@@ -115,19 +115,24 @@ lint:knip:
     - npm run lint:knip
     - section_end "knip"
 
-# The merge request's own commits, not the whole history.
+# The merge request's own commits, not the whole history. A release into
+# main lints what it adds to develop: develop's commits were linted as they
+# merged, and GitHub's squash adds the pull request number to a title, which
+# can carry one past the limit.
 lint:commit:
   extends: .node-lint
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   variables:
-    # The range is origin/<target>..HEAD; a shallow target makes the fork
-    # point look like a root and pulls shared ancestors into the range.
+    # The range is origin/<base>..HEAD; a shallow base makes the fork point
+    # look like a root and pulls shared ancestors into the range.
     GIT_DEPTH: 0
   script:
     - section_start "commitlint" "Validating commit messages"
-    - git fetch origin "+refs/heads/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}:refs/remotes/origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
-    - npm run lint:commit -- --from "origin/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}" --to HEAD --verbose
+    - base="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
+    - if [ "$base" = main ]; then base=develop; fi
+    - git fetch origin "+refs/heads/${base}:refs/remotes/origin/${base}"
+    - npm run lint:commit -- --from "origin/${base}" --to HEAD --verbose
     - section_end "commitlint"
 
 lint:private-refs:

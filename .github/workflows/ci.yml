@@ -82,11 +82,21 @@ jobs:
 
       # The pull request's own commits. These repositories squash-merge, so a
       # prose title becomes the commit subject and breaks the target branch.
+      # A release into main lints what it adds to develop: develop's commits
+      # were linted as they merged, and the squash adds the pull request
+      # number to a title, which can carry one past the limit.
       - name: Validate commit messages
         if: github.event_name == 'pull_request'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: npm run lint:commit -- --from "$BASE_SHA" --to HEAD --verbose
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          from="$BASE_SHA"
+          if [ "$BASE_REF" = main ]; then
+            git fetch --no-tags origin +refs/heads/develop:refs/remotes/origin/develop
+            from=origin/develop
+          fi
+          npm run lint:commit -- --from "$from" --to HEAD --verbose
 
       # Production dependencies only: a devDependency advisory is worth knowing
       # about and not worth blocking a merge on. nuxt/'s audit stays report-only
