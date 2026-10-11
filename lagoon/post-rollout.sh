@@ -62,8 +62,21 @@ is_staging() {
   return 1
 }
 
+# installed, empty or unknown: drush could not say. A staging environment
+# must not take "unknown" for "empty", since the copy begins by dropping
+# what is there.
+database_state() {
+  if ! bootstrap="$(drush status --field=bootstrap 2>/dev/null)"; then
+    echo unknown
+  elif printf '%s' "$bootstrap" | grep -q Successful; then
+    echo installed
+  else
+    echo empty
+  fi
+}
+
 has_database() {
-  drush status --field=bootstrap 2>/dev/null | grep -q Successful
+  [ "$(database_state)" = installed ]
 }
 
 may_sync() {
@@ -71,9 +84,15 @@ may_sync() {
     echo "DOCS_SKIP_SYNC is set; keeping the database this environment already has."
     return 1
   fi
-  if is_staging && has_database; then
-    echo "A staging environment keeps the database it already has; a review in progress would be lost with it."
-    return 1
+  if is_staging; then
+    case "$(database_state)" in
+      installed)
+        echo "A staging environment keeps the database it already has; a review in progress would be lost with it."
+        return 1 ;;
+      unknown)
+        echo "Could not tell whether this staging environment has a database; refusing to replace what may be there."
+        exit 1 ;;
+    esac
   fi
   if [ -z "$environment_type" ] && [ -z "$environment_name" ]; then
     echo "This environment does not say what it is, so it will not be synced."

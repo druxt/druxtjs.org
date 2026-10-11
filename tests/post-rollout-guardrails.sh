@@ -61,7 +61,9 @@ case "\$*" in
       [ -e "\$marker" ] && expr "\$(date +%s)" - "\$(date -r "\$marker" +%s)" > "$app/marker-age.log"
     fi
     [ "\${STUB_SYNC_FAILS:-}" = "1" ] && exit 1 ;;
-  *"status --field=bootstrap"*) [ "$bootstrap" = "yes" ] && echo "Successful" ;;
+  *"status --field=bootstrap"*)
+    [ "\${STUB_STATUS_FAILS:-}" = "1" ] && exit 1
+    [ "$bootstrap" = "yes" ] && echo "Successful" ;;
   *"SELECT COUNT(*) FROM sessions"*) echo "$sessions" ;;
   *"SELECT COUNT(*) FROM oauth2_token"*) echo "$tokens" ;;
   *"mail LIKE"*)
@@ -287,6 +289,22 @@ if called "$app" "sql:sync" || called "$app" "rsync"; then
   ok "staging without a database: took the copy of production"
 else
   no "staging without a database: had nothing and copied nothing"
+fi
+
+# When drush cannot say whether staging has a database, nothing is dropped.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=staging-release LAGOON_GIT_BRANCH=staging/release STUB_STATUS_FAILS=1)"
+if called "$app" "sql:sync" || called "$app" "rsync"; then
+  no "staging with an unreadable database: replaced it"
+elif printf '%s' "$output" | grep -q "refusing to replace what may be there"; then
+  ok "staging with an unreadable database: stopped, and said why"
+else
+  no "staging with an unreadable database: went on without saying why"
+fi
+if called "$app" "deploy --yes"; then
+  no "staging with an unreadable database: ran the deploy anyway"
+else
+  ok "staging with an unreadable database: ran nothing further"
 fi
 
 # A branch that only resembles a staging one is synced like any other.

@@ -189,8 +189,8 @@ Its first rollout copies production like any other environment's. After
 that it keeps its database: `lagoon/post-rollout.sh` sees the `staging/`
 branch and a database already in place, and leaves it, so a workspace
 deployed to it for review survives its own redeploys. A fresh copy of
-production is a deliberate step, between reviews: delete and create it
-again, or set `DOCS_SKIP_SYNC` off for one rollout.
+production is a deliberate step, between reviews: remove the environment
+and create it again.
 
 `scripts/staging.sh create <name>` does the rest: it pushes `main` to the
 branch, waits for the first build, sets the environment's deploy target and

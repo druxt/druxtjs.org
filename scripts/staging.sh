@@ -73,26 +73,37 @@ environment_field() {
     ' "$2"
 }
 
-# Waits for the environment's newest deployment to finish, and says how.
+# The newest deployment, as "<id> <status>", or nothing.
+newest_build() {
+  lagoon list deployments -p "$project" -e "$1" --output-json 2>/dev/null \
+    | node -e '
+      let input = "";
+      process.stdin.on("data", (chunk) => { input += chunk; });
+      process.stdin.on("end", () => {
+        const parsed = JSON.parse(input || "{}");
+        const rows = Array.isArray(parsed) ? parsed : parsed.data || [];
+        if (rows.length) process.stdout.write(String(rows[0].id || "") + " " + String(rows[0].status || ""));
+      });
+    '
+}
+
+# Waits for a deployment newer than the one given to finish, and says how.
+# A deployment just asked for is not listed at once, so the previous one,
+# complete, would otherwise pass for it.
 wait_for_build() {
-  # $1 environment, $2 what is being waited for
+  # $1 environment, $2 what is being waited for, $3 the id of the build before it
   echo "Waiting for $2."
   attempts=0
   while :; do
-    status="$(lagoon list deployments -p "$project" -e "$1" --output-json 2>/dev/null \
-      | node -e '
-        let input = "";
-        process.stdin.on("data", (chunk) => { input += chunk; });
-        process.stdin.on("end", () => {
-          const parsed = JSON.parse(input || "{}");
-          const rows = Array.isArray(parsed) ? parsed : parsed.data || [];
-          process.stdout.write(rows.length ? String(rows[0].status || "") : "");
-        });
-      ')"
-    case "$status" in
-      complete) echo "  built."; return 0 ;;
-      failed | cancelled | error) fail "  the build ${status}; see 'lagoon list deployments -p $project -e $1'." ;;
-    esac
+    build="$(newest_build "$1")"
+    id="${build%% *}"
+    status="${build#* }"
+    if [ -n "$id" ] && [ "$id" != "${3:-}" ]; then
+      case "$status" in
+        complete) echo "  built."; return 0 ;;
+        failed | cancelled | error) fail "  the build ${status}; see 'lagoon list deployments -p $project -e $1'." ;;
+      esac
+    fi
     attempts=$((attempts + 1))
     [ "$attempts" -lt 120 ] || fail "  still not built after twenty minutes; look at it in Lagoon."
     sleep 10
@@ -109,7 +120,8 @@ set_variable() {
 create() {
   name="$1"
   from="main"
-  target="https://druxtjs.org"
+  production_target="https://druxtjs.org"
+  target="$production_target"
   shift
   while [ $# -gt 0 ]; do
     case "$1" in
@@ -125,8 +137,22 @@ create() {
 
   local_key="$(variable "" WSE_DEPLOY_KEY)"
   [ -n "$local_key" ] || fail "The project has no WSE_DEPLOY_KEY; local machines sign with it, and staging must accept it."
-  staging_key="${WSE_DEPLOY_STAGING_KEY:-$(variable "-e $production" WSE_DEPLOY_ACCEPT_KEY)}"
-  [ -n "$staging_key" ] || fail "$production has no WSE_DEPLOY_ACCEPT_KEY; staging signs with it, and nothing else may hold it."
+  # Staging signs with the key its target accepts. For production that is
+  # its WSE_DEPLOY_ACCEPT_KEY, which has to exist: without one production
+  # accepts the project key, and the chain is no gate. A trial against
+  # another target may bring its own key, since that target's accept key
+  # is the trial's to set.
+  production_key="$(variable "-e $production" WSE_DEPLOY_ACCEPT_KEY)"
+  if [ "$target" = "$production_target" ]; then
+    [ -n "$production_key" ] || fail "$production has no WSE_DEPLOY_ACCEPT_KEY, so it would accept the local key; set one before creating staging."
+    if [ -n "${WSE_DEPLOY_STAGING_KEY:-}" ] && [ "$WSE_DEPLOY_STAGING_KEY" != "$production_key" ]; then
+      fail "WSE_DEPLOY_STAGING_KEY is not the key $production accepts; a deploy from this staging would be refused."
+    fi
+    staging_key="$production_key"
+  else
+    staging_key="${WSE_DEPLOY_STAGING_KEY:-$production_key}"
+    [ -n "$staging_key" ] || fail "No key for staging to sign with: set WSE_DEPLOY_STAGING_KEY for a target other than $production."
+  fi
 
   echo "Pushing $from to $branch on $remote."
   git push "$remote" "$from:refs/heads/$branch"
@@ -138,7 +164,7 @@ create() {
     [ "$attempts" -lt 30 ] || fail "Lagoon has not created $branch after five minutes; is '^staging/.+\$' in the project's branch rule?"
     sleep 10
   done
-  wait_for_build "$branch" "its first build, which copies production"
+  wait_for_build "$branch" "its first build, which copies production" ""
 
   echo "Setting the deploy settings on $branch."
   set_variable "$branch" WSE_DEPLOY_TARGET "$target"
@@ -146,8 +172,9 @@ create() {
   set_variable "$branch" WSE_DEPLOY_ACCEPT_KEY "$local_key"
 
   echo "Deploying $branch again, so the settings take; its database is kept."
+  first="$(newest_build "$branch")"
   lagoon deploy latest -p "$project" -e "$branch" --force > /dev/null
-  wait_for_build "$branch" "the second build"
+  wait_for_build "$branch" "the second build" "${first%% *}"
 
   # Lagoon names the environment by its nginx route; the site is the nuxt one.
   route="$(environment_field "$branch" route | sed 's#^https://nginx\.#https://nuxt.#')"
