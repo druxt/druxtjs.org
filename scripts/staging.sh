@@ -130,6 +130,8 @@ create() {
       *) usage ;;
     esac
   done
+  # A trailing slash would make production look like a trial target.
+  target="${target%/}"
   branch="staging/$name"
 
   remote="$(remote)"
@@ -145,6 +147,7 @@ create() {
   production_key="$(variable "-e $production" WSE_DEPLOY_ACCEPT_KEY)"
   if [ "$target" = "$production_target" ]; then
     [ -n "$production_key" ] || fail "$production has no WSE_DEPLOY_ACCEPT_KEY, so it would accept the local key; set one before creating staging."
+    [ "$production_key" != "$local_key" ] || fail "$production accepts the project's own key, so a local machine could deploy to it; give WSE_DEPLOY_ACCEPT_KEY on $production a key of its own."
     if [ -n "${WSE_DEPLOY_STAGING_KEY:-}" ] && [ "$WSE_DEPLOY_STAGING_KEY" != "$production_key" ]; then
       fail "WSE_DEPLOY_STAGING_KEY is not the key $production accepts; a deploy from this staging would be refused."
     fi
