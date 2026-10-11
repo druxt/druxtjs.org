@@ -181,34 +181,70 @@ written under `private://workspaces` and posted to the target's
 finish or undo it, and `wse-deploy-workspace-import <path>` imports an
 export by hand.
 
-Each request is signed with a key the pair shares, which the target checks.
-On Lagoon that is two variables, read by `settings.lagoon.php`:
+### The chain
 
-| Variable            | Scope       | Value                                                                                                                                                                            |
-| ------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `WSE_DEPLOY_KEY`    | project     | A random secret, the signing key. Unset, an environment has no target.                                                                                                           |
-| `WSE_DEPLOY_TARGET` | environment | The site this environment deploys to, scheme and host only: the target's own URL, since the site proxies `/wse-deploy` to its Drupal. Unset, the Export tab has nowhere to send. |
+Content is written on a local backend and reaches production through a
+staging environment, never directly. Each hop is signed with a key the
+receiving end accepts, and the two hops use different keys, so a local
+machine cannot deploy to production.
 
-Unpatched, the module signs with the key and the hash salt together, so a
-pair would have to share a salt. The salt also signs one-time login links,
-and a shared one would let a link made on a preview copy sign in on
-production. A patch (`patches/wse-deploy-key-signs-alone.patch`) signs with
-the key alone when one is set, so every environment keeps its own salt and
-`DRUPAL_HASH_SALT` stays unset.
+| Hop                   | Signs with      | Accepted by                  |
+| --------------------- | --------------- | ---------------------------- |
+| Local to staging      | the local key   | staging                      |
+| Staging to production | the staging key | production, and nothing else |
+
+On Lagoon that is three variables, read by `settings.lagoon.php`:
+
+| Variable                | Where                      | Value                                                                                                                                   |
+| ----------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `WSE_DEPLOY_KEY`        | project; staging overrides | The key this environment signs with. The project's value is the local key, and a staging environment overrides it with the staging key. |
+| `WSE_DEPLOY_ACCEPT_KEY` | production and staging     | The key a deploy to this environment must be signed with. Production holds the staging key, staging the local key.                      |
+| `WSE_DEPLOY_TARGET`     | staging                    | The site this environment deploys to, scheme and host only: `https://druxtjs.org`. Unset, the Export tab has nowhere to send.           |
+
+`scripts/staging.sh create <name>` builds a staging environment with those
+settings, and `remove <name>` takes it down; [hosting](hosting.md) describes
+what one is. A local backend sets its side in `settings.local.php`, with the
+local key read from the project's variables (`lagoon list variables -p
+druxtjs-org --reveal`) and never written into the repository:
+
+```php
+$settings['wse_deploy.hash.key'] = 'the local key';
+$config['wse_deploy.settings']['export_plugin_configuration']['remote_endpoint'] = 'https://nuxt.staging-release.druxtjs-org.au2.amazee.io';
+```
+
+The import matches entities by UUID, so the two sides must share history.
+Every Lagoon environment is a copy of production, and a local backend starts
+from the same sanitised copy, which keeps every content UUID. A page the
+workspace creates arrives with the internal id it was given at its origin,
+and so does its alias, which names the page by that id. The target must not have used that id for something else in the meantime, so production creates
+no content of its own: everything new reaches it through the chain. A
+workspace deployed a second time, after a fix on staging, updates the one
+already on the target. Sanitising
+replaces the passwords, so an editor signs in to staging through a one-time
+login link (`drush user:login` over `lagoon ssh`) rather than with a
+production password, which never leaves production.
+
+### Patches to the module
 
 A token expires ten seconds after it is made, so the two clocks have to
-agree, which they do on one platform. The module's import controller is
-patched (`patches/wse-deploy-route-parameters.patch`) to read the upload
-type, the status and the workspace id from the route, where the HTTP export
-sends them. Without it the controller reads them from a request body that
-holds only the file, and every deploy fails with a 500 on the first upload.
+agree, which they do on one platform. Under `drupal/patches`:
+
+- `wse-deploy-route-parameters.patch`: the import controller reads the
+  upload type, the status and the workspace id from the route, where the
+  HTTP export sends them. Without it every deploy fails with a 500 on the
+  first upload.
+- `wse-deploy-key-signs-alone.patch`: a configured key signs on its own.
+  Unpatched, the module signs with the key and the hash salt together, so a
+  pair would share a salt, and a one-time login link made on a preview copy
+  would sign in on production. Every environment keeps its own salt.
+- `wse-deploy-accept-key.patch`: `wse_deploy.hash.accept_key` verifies a
+  deploy signed by the environment before this one. Unset, an environment
+  accepts what it signs itself, which is the single-key pair.
+
 The site also keeps paragraphs tracked by Workspaces
 (`WorkspaceEntityTypeHooks`), which Workspaces Extra would otherwise mark
 ignored. A deploy exports tracked entities alone, so an untracked paragraph
-never reaches the target and its page fails to import there. The import matches entities by UUID,
-so the two sides must share history: every Lagoon environment is a copy of
-production, and a local site needs a copy of a production database before
-it can deploy to one.
+never reaches the target and its page fails to import there.
 
 ## Section lists and next steps
 

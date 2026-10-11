@@ -164,7 +164,8 @@
             },
             "drupal/wse": {
                 "Workspaces Deploy: read the upload type, status and workspace id from the route, as the HTTP export sends them": "patches/wse-deploy-route-parameters.patch",
-                "Workspaces Deploy: a configured hash key signs alone, so a deploy pair keeps separate hash salts": "patches/wse-deploy-key-signs-alone.patch"
+                "Workspaces Deploy: a configured hash key signs alone, so a deploy pair keeps separate hash salts": "patches/wse-deploy-key-signs-alone.patch",
+                "Workspaces Deploy: an accept key verifies a deploy signed by the environment before this one": "patches/wse-deploy-accept-key.patch"
             }
         }
     }
