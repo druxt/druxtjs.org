@@ -1,0 +1,37 @@
+uuid: 077e0a64-1064-46e7-a1fe-8df1d65401f2
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.step
+    - field.field.node.doc_page.field_content
+    - field.field.node.doc_page.field_description
+    - field.field.node.doc_page.field_is_landing
+    - field.field.node.doc_page.field_next
+    - field.field.node.doc_page.field_section
+    - field.field.node.doc_page.field_topic
+    - field.field.node.doc_page.field_weight
+    - node.type.doc_page
+  module:
+    - user
+id: node.doc_page.step
+targetEntityType: node
+bundle: doc_page
+mode: step
+content:
+  field_description:
+    type: basic_string
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  content_moderation_control: true
+  field_content: true
+  field_is_landing: true
+  field_next: true
+  field_section: true
+  field_topic: true
+  field_weight: true
+  links: true

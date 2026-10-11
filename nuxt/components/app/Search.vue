@@ -397,7 +397,7 @@ export default {
 
 <style scoped>
 .fade-enter-active,
-.fade-leave-active { transition: opacity 120ms ease; }
+.fade-leave-active { transition: opacity var(--motion-fast) var(--motion-ease); }
 .fade-enter,
 .fade-leave-to { opacity: 0; }
 </style>

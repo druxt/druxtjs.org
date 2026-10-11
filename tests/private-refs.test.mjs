@@ -5,11 +5,16 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { findPrivateRefs, gitEnv, trackedFiles } from '../scripts/lint-private-refs.mjs'
+import {
+  findPrivateRefs,
+  gitEnv,
+  lintPrivateRefs,
+  trackedFiles,
+} from '../scripts/lint-private-refs.mjs'
 
 const hostsIn = (text) => findPrivateRefs(text).map((ref) => ref.host)
 
@@ -42,6 +47,8 @@ describe('findPrivateRefs', () => {
     assert.deepEqual(hostsIn('http://[2001:db8::1]/'), [])
     assert.deepEqual(hostsIn('http://[::ffff:8.8.8.8]/'), [])
     assert.deepEqual(hostsIn('http://[::ffff:0808:0808]/'), [])
+    // Too few groups to be an address at all.
+    assert.deepEqual(hostsIn('http://[1:2:3]/'), [])
   })
 
   test('leaves the local development hosts alone', () => {
@@ -151,6 +158,28 @@ describe('lint-private-refs.mjs', () => {
         process.env.GIT_DIR = before
       }
       rmSync(decoy, { recursive: true, force: true })
+    }
+  })
+})
+
+describe('lintPrivateRefs', () => {
+  test('skips its own source, binary files and files missing from disk', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'private-refs-'))
+    try {
+      execFileSync('git', ['init', '--quiet', root], { env: gitEnv() })
+      mkdirSync(path.join(root, 'scripts'))
+      writeFileSync(
+        path.join(root, 'scripts/lint-private-refs.mjs'),
+        'http://gitlab.example.local/\n'
+      )
+      writeFileSync(path.join(root, 'image.bin'), 'http://10.0.0.8/\0')
+      writeFileSync(path.join(root, 'gone.md'), 'http://10.0.0.8/\n')
+      writeFileSync(path.join(root, 'README.md'), 'http://192.168.1.1/\n')
+      execFileSync('git', ['-C', root, 'add', '.'], { env: gitEnv() })
+      unlinkSync(path.join(root, 'gone.md'))
+      assert.deepEqual(lintPrivateRefs(root), ['README.md:1: 192.168.1.1'])
+    } finally {
+      rmSync(root, { recursive: true, force: true })
     }
   })
 })

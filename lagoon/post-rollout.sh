@@ -7,17 +7,16 @@
 # updates and configuration are applied on top, so it holds real content on
 # new code before anything reads it.
 #
-# On Lagoon there is always a database to be had, because production's can
-# be copied, so seeding from the pinned corpus is the last resort and not
-# the routine. It happens only when the sync was turned off and nothing is
-# installed. A local checkout is the other way round: a contributor has no
-# production to copy, so `npm run setup` seeds from the pin, and this script
-# is not part of that path.
+# An environment with no database to copy or keep is installed from the
+# committed configuration and starts empty.
 #
 # DOCS_SKIP_SYNC=1 turns the sync off for an environment that wants to keep
-# the database it has.
+# the database it has. A staging environment, one built from a `staging/` or
+# a `release/` branch, takes its copy on its first rollout and keeps it from
+# then on: it holds a workspace deployed to it for review, or a release under
+# review, which a fresh copy would lose.
 #
-# Production syncs from nothing and seeds from nothing. It is the source.
+# Production syncs from nothing. It is the source.
 set -eu
 
 app=$(cd "$(dirname "$0")/.." && pwd)
@@ -26,6 +25,7 @@ cd "$app/drupal"
 
 environment_type="${LAGOON_ENVIRONMENT_TYPE:-}"
 environment_name="${LAGOON_ENVIRONMENT:-}"
+branch_name="${LAGOON_GIT_BRANCH:-}"
 production_alias="@lagoon.druxtjs-org-main"
 
 # Copied without their rows: what a request writes, and what production's
@@ -35,8 +35,8 @@ volatile_tables="cache,cache_*,cachetags,semaphore,sessions,watchdog,flood,key_v
 
 # While this exists Drupal answers every web request with a 503
 # (settings.replacing.php). A request that bootstraps Drupal against a
-# half-imported database writes into it, and the import then collides with
-# its own rows.
+# half-copied database writes into it, and the copy then collides with its
+# own rows.
 replacing="$app/drupal/web/sites/default/files/private/.replacing-database"
 
 # How often the marker says the rollout is still going, and the pid of the
@@ -53,10 +53,47 @@ is_production() {
   [ "$environment_type" = "production" ] || [ "$environment_name" = "main" ]
 }
 
+# Read from the branch, which Lagoon passes whole; the environment's name is
+# the branch with its slash replaced, so it is the fallback, not the source.
+is_staging() {
+  case "$branch_name" in
+    staging/?* | release/?*) return 0 ;;
+    "") case "$environment_name" in staging-?* | release-?*) return 0 ;; esac ;;
+  esac
+  return 1
+}
+
+# installed, empty or unknown: drush could not say. A staging environment
+# must not take "unknown" for "empty", since the copy begins by dropping
+# what is there.
+database_state() {
+  if ! bootstrap="$(drush status --field=bootstrap 2>/dev/null)"; then
+    echo unknown
+  elif printf '%s' "$bootstrap" | grep -q Successful; then
+    echo installed
+  else
+    echo empty
+  fi
+}
+
+has_database() {
+  [ "$(database_state)" = installed ]
+}
+
 may_sync() {
   if [ "${DOCS_SKIP_SYNC:-}" = "1" ]; then
     echo "DOCS_SKIP_SYNC is set; keeping the database this environment already has."
     return 1
+  fi
+  if is_staging; then
+    case "$(database_state)" in
+      installed)
+        echo "A staging environment keeps the database it already has; a review in progress would be lost with it."
+        return 1 ;;
+      unknown)
+        echo "Could not tell whether this staging environment has a database; refusing to replace what may be there."
+        exit 1 ;;
+    esac
   fi
   if [ -z "$environment_type" ] && [ -z "$environment_name" ]; then
     echo "This environment does not say what it is, so it will not be synced."
@@ -90,7 +127,7 @@ load_from_production() {
   # Each step is allowed to fail: `set -e` would otherwise abandon the trap
   # on the status a killed child returns, and leave the marker behind with
   # the site refusing every request.
-  trap 'kill "$heartbeat" 2>/dev/null || :; wait "$heartbeat" 2>/dev/null || :; rm -f "$replacing"' EXIT
+  trap 'kill "$heartbeat" 2>/dev/null || :; wait "$heartbeat" 2>/dev/null || :; rm -f "$replacing" "$kept_addresses"' EXIT
 
   dump="/tmp/production.sql.gz"
   rm -f "$dump" "${dump%.gz}"
@@ -108,12 +145,129 @@ load_from_production() {
   drush sql:sync "$production_alias" @self --yes --structure-tables-list="$volatile_tables"
 }
 
+# The public files the copied content refers to. Images and documents live in
+# production's files directory, not its database, so a copy of the one
+# without the other shows every image broken. Private files stay each
+# environment's own: its keys, the dump and the rollout's markers. Derived
+# files are left to Drupal, which makes them again on demand.
+copy_files_from_production() {
+  echo "Copying production's public files."
+  # The output is kept for the failure, which names its cause: an alias that
+  # does not resolve, a refused connection or a file that vanished mid-copy.
+  # The last is rsync's status 24 and costs one file on a live site, not the
+  # copy, so it is reported and taken.
+  set +e
+  output=$(drush rsync -y "${production_alias}:%files/" "$app/drupal/web/sites/default/files/" -- \
+    --exclude=/private --exclude=/php --exclude=/css --exclude=/js --exclude=/styles 2>&1)
+  status=$?
+  set -e
+  case "$status" in
+    0) echo "  copied." ;;
+    24) echo "  copied, except files that vanished on production while the copy ran:"; printf '%s\n' "$output" | sed 's/^/    /' ;;
+    *) echo "  could not copy production's files; images the content refers to may be missing here:"; printf '%s\n' "$output" | sed 's/^/    /' ;;
+  esac
+}
+
+# The addresses that survive the sanitise: this site's own maintainers, so
+# someone editing a non-production environment is the person they are in
+# production. Every other address is scrubbed.
+maintainer_domain="${DOCS_MAINTAINER_DOMAIN:-druxtjs.org}"
+# Production's addresses, briefly. mktemp makes the file private to this user
+# and unguessable, and the exit trap removes it however the rollout ends.
+kept_addresses="$(mktemp)"
+trap 'rm -f "$kept_addresses"' EXIT
+
+# The domain goes into the query that decides which addresses survive, so
+# only a hostname is accepted. A value carrying a quote would rewrite that
+# query, and `%@' OR 1=1 -- ` would hand production's whole address book
+# back to a non-production environment and print it into the rollout log.
+is_hostname() {
+  case "$1" in
+    '' | *[!a-zA-Z0-9.-]* | .* | *. | -* | *- | *..*) return 1 ;;
+    *.*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# Written back over the sanitised addresses. An address is Drupal's handle
+# on a person: it names them in the interface, it is who a mail would go to,
+# and a maintainer testing their own site is not user+2@localhost.
+restore_addresses() {
+  [ -s "$kept_addresses" ] || return 0
+  while IFS="$(printf '\t')" read -r uid mail; do
+    # The header row a client may print, and anything that is not a plain
+    # address, are skipped rather than built into SQL.
+    case "$uid" in '' | *[!0-9]*) continue ;; esac
+    case "$mail" in '' | *"'"* | *'\'*) continue ;; esac
+    drush sql:query "UPDATE users_field_data SET mail = '${mail}', init = '${mail}' WHERE uid = ${uid};"
+    echo "  kept the address of uid ${uid}."
+  done < "$kept_addresses"
+}
+
+# A password the sanitise would otherwise take with it. Every rollout
+# replaces this environment's database, so without this a maintainer is
+# locked out of their own environment until someone sets a password by hand.
+# It comes from a Lagoon variable rather than being generated, so it is the
+# same password after every rollout, and it is never printed.
+#
+# Drupal reads both the name and the password out of the environment rather
+# than taking them as arguments: an argument is in the process list for
+# anything else in the container to read, and the variables are there
+# already. The password and the unblock are one call, so an account cannot
+# be reported as usable while it is still blocked.
+#
+# It says what it did on its own output rather than in an exit status:
+# drush reports a PHP `exit()` as its own failure, so a missing account and
+# a broken bootstrap would look the same.
+restore_maintainer_login() {
+  [ -n "${DOCS_MAINTAINER_NAME:-}" ] || return 0
+  if [ -z "${DOCS_MAINTAINER_PASSWORD:-}" ]; then
+    echo "  DOCS_MAINTAINER_NAME is set without DOCS_MAINTAINER_PASSWORD; the account stays sanitised."
+    return 0
+  fi
+  restored=$(drush php:eval '
+    $accounts = \Drupal::entityTypeManager()->getStorage("user")
+      ->loadByProperties(["name" => getenv("DOCS_MAINTAINER_NAME")]);
+    $account = reset($accounts);
+    if (!$account) { print "no-account"; return; }
+    $account->setPassword(getenv("DOCS_MAINTAINER_PASSWORD"));
+    $account->activate();
+    $account->save();
+    print "login-restored";
+  ' 2>&1 || :)
+  case "$restored" in
+    *login-restored*) echo "  ${DOCS_MAINTAINER_NAME} can sign in again." ;;
+    *no-account*) echo "  no ${DOCS_MAINTAINER_NAME} account in this copy; nothing to restore." ;;
+    *)
+      # A copy nobody can sign in to is not a usable environment, and the
+      # reason is in what drush said, so it is shown rather than dropped.
+      echo "  could not restore ${DOCS_MAINTAINER_NAME}'s login; refusing to leave this environment usable."
+      printf '%s\n' "$restored" | sed 's/^/    /'
+      exit 1 ;;
+  esac
+}
+
 # Remove what a contributor should never be handed. `sql:sanitize` covers
 # the accounts; the rest is what this site carries beyond them. The consumer
 # rows stay, because the frontend authenticates against one, but their
 # secrets do not survive the copy.
 sanitise() {
   echo "Sanitising the copy."
+
+  # Read before sanitising: `sql:sanitize` overwrites every address, and
+  # what it replaced is not recoverable afterwards. Emptied, not removed: the
+  # file mktemp made is private, and one the redirect created would not be.
+  : > "$kept_addresses"
+  if is_hostname "$maintainer_domain"; then
+    # A failed read would let the sanitise take the addresses it was meant to keep.
+    if ! drush sql:query "SELECT uid, mail FROM users_field_data WHERE mail LIKE '%@${maintainer_domain}';" > "$kept_addresses" 2>/dev/null; then
+      echo "Could not read the maintainers' addresses; refusing to sanitise them away."
+      exit 1
+    fi
+  else
+    echo "  DOCS_MAINTAINER_DOMAIN is not a hostname, so no address is kept."
+  fi
+
   drush sql:sanitize --yes
 
   for table in sessions oauth2_token oauth2_token__scopes watchdog flood key_value_expire admin_audit_trail; do
@@ -158,6 +312,12 @@ sanitise() {
       exit 1
     fi
   done
+  # After the check, never before it: a sanitise that did not happen must
+  # not be handed an address or a password to put back.
+  restore_addresses
+  # The kept addresses are production's; nothing needs them after this.
+  rm -f "$kept_addresses"
+  restore_maintainer_login
   echo "Sanitised."
 }
 
@@ -166,28 +326,25 @@ if may_sync; then
   echo "  target: ${environment_name:-unnamed} (${environment_type:-untyped})"
   echo "  source: ${production_alias}"
   load_from_production
+  copy_files_from_production
   sanitise
 fi
 
-if drush status --field=bootstrap 2>/dev/null | grep -q Successful; then
+if has_database; then
   echo "Updating the site."
   drush deploy --yes
-  seed_needed=0
 else
   echo "No database to update. Installing the site from its committed configuration."
   # A password drush did not generate is one it does not print into the deploy log.
   drush site:install --existing-config --yes --account-pass="$(head -c 32 /dev/urandom | base64)"
-  # Without this, the first import on Lagoon found no migrations and the web found no field types.
+  # Without this, the web found no field types after the first install on Lagoon.
   drush cache:rebuild
-  # Nothing was synced and nothing was installed before this, so the pinned
-  # corpus is the only content there is.
-  seed_needed=1
 fi
 
-if [ "$seed_needed" = "1" ]; then
-  echo "Nothing was copied and nothing was installed before this, so the pinned source is the only content there is."
-  php .devtools/import
-fi
+# The frontend's consumer comes from production's database, where neither
+# this environment's callback nor the sign-in settings may be.
+echo "Allowing this environment's frontend to sign editors in."
+drush druxtjsorg:oauth-client
 
 keys="$app/drupal/web/sites/default/files/private/oauth"
 if [ ! -s "$keys/private.key" ] || [ ! -s "$keys/public.key" ]; then

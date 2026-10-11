@@ -1,5 +1,7 @@
 <template>
-  <DuiDiagram v-if="entity" :source="entity.attributes.field_diagram || ''" />
+  <div :data-druxt-entity="(entity || {}).id || false" :data-druxt-type="(entity || {}).type" data-druxt-field="field_diagram">
+    <DuiDiagram v-if="entity" :source="entity.attributes.field_diagram || ''" />
+  </div>
 </template>
 
 <script>

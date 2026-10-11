@@ -1,0 +1,28 @@
+uuid: 80068600-da71-4756-bc65-11c400f8d431
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.docs_section_list.field_section
+    - field.field.paragraph.docs_section_list.field_section_list_style
+    - paragraphs.paragraphs_type.docs_section_list
+id: paragraph.docs_section_list.default
+targetEntityType: paragraph
+bundle: docs_section_list
+mode: default
+content:
+  field_section:
+    type: options_select
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_section_list_style:
+    type: options_select
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

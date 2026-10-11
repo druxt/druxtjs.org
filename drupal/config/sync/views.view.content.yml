@@ -572,7 +572,7 @@ display:
               align: ''
               separator: ''
               empty_column: false
-              responsive: ''
+              responsive: priority-low
             name:
               sortable: false
               default_sort_order: asc
@@ -623,7 +623,7 @@ display:
               empty_column: false
               responsive: ''
           override: true
-          sticky: true
+          sticky: false
           summary: ''
           empty_table: true
           caption: ''

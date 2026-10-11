@@ -25,28 +25,39 @@ Nuxt application.
 - **Export configuration with the change that needed it.** Run
   `vendor/bin/drush config:export` in `drupal/` and commit
   `drupal/config/sync/`.
-- **The database holds the content.** `drupal/content/` is a Tome export kept
-  as a backup from before the database became canonical, and nothing writes to
-  it. A non-production environment takes a sanitised copy of production's
-  database on every rollout and applies the branch's updates to it, so it
-  holds real content on new code. The importer seeds from the commit pinned
-  in `docs-source.json` only when there is no database to start from.
+- **The database holds the content.** Markdown is never imported. A
+  non-production environment takes a sanitised copy of production's database
+  on every rollout and applies the branch's updates to it, so it holds real
+  content on new code. An environment with no database to copy starts empty.
   `DOCS_SKIP_SYNC=1` keeps the database an environment already has.
+- **A maintainer keeps their login through the sanitise.** An address at
+  `DOCS_MAINTAINER_DOMAIN` survives, and `DOCS_MAINTAINER_NAME` gets the
+  password in `DOCS_MAINTAINER_PASSWORD` back, both set as Lagoon variables.
+  A password that reaches a non-production environment this way is not one
+  to reuse anywhere else. [docs/hosting.md](docs/hosting.md) covers it.
 - **The pin is the API reference's version, not the site's content.** docgen
   reads the pinned `druxt.js` to generate the `api/`, `components/` and module
   pages, which have no Drupal representation. The authored pages come from the
   database, and the sitemap and the `llms` files describe both.
-- **Move the pin with its baseline.** A new `ref` in `docs-source.json` needs
-  `npm run survey:content` run again, and the two are committed together.
+  The footer badge names `druxt` at that pin, never the installed package,
+  which follows npm's `dev` tag until 0.25.0 is released.
 - **`github-slugger` stays at 1.5.0.** `druxt_docs` computes the table of
-  contents with a PHP port of that version, and the import fails when the two
-  disagree. Renovate is configured not to offer it.
+  contents with a PHP port of that version. Renovate is configured not to offer it.
 - **Patches are public upstream diffs.** `drupal/composer.json` points each one
   at a drupal.org merge request or GitHub pull request `.diff` URL, and installs
   the patched package from source (`preferred-install`), so a diff that touches
   files the dist archive leaves out still applies. Commit
   `drupal/patches.lock.json` with it. composer-patches prints every patch
   description during `composer install`, so a description is public text too.
+  A core patch is the exception: it is vendored into `drupal/patches/` with
+  the merge request and commit in its name, because the upstream branch moves
+  and a core change needs review before it changes under the site.
+  `docs/frontend-cache.md` records what each one is for, and
+  `lagoon/cli.dockerfile` copies `drupal/patches` in before `composer install`.
+- **Adding or changing a patch needs `composer patches-relock` and
+  `composer patches-repatch`.** `composer install` applies nothing to a
+  package it already has. Grep the patched file for something the patch adds
+  before committing.
 - **The coverage floor goes up, never down.** `npm run test:coverage` fails
   below 88% of lines, 87% of branches and 87% of functions in `scripts/`. It
   needs Node 22.8 or later, so CI runs it. `npm test` is the same suite on
@@ -59,51 +70,69 @@ lint:audit:nuxt` audits `nuxt/` with Yarn 4 in a scratch copy, because Yarn
 
 ## How Drupal serves the site
 
-Drupal renders only administration. `default_admin` is both the default theme
-and the admin theme. Druxt renders the public site.
+Drupal renders only administration. Gin, from contrib, is both the default
+theme and the admin theme, with Gin Login for the sign-in page and core
+Navigation for the sidebar. `druxtjsorg` adds a small stylesheet for phones
+(`css/admin.css`). Druxt renders the public site.
 
 The `druxtjs` theme holds only the frontend's regions and its 10 blocks, and
 Drupal renders it only in the block region demo. The frontend reads the
 theme's regions and settings from
 `/jsonapi/decoupled/settings?consumerId=druxtjs_org`. decoupled_settings is
-patched to expose the regions and to let a consumer select its theme, and the
-`docs_consumer` migration gives the `druxtjs_org` consumer the `druxtjs` theme.
+patched to expose the regions and to let a consumer select its theme, and
+`drush druxtjsorg:oauth-client` creates the `druxtjs_org` consumer with the
+`druxtjs` theme when a site has none.
+
+## Draft authoring
+
+`content_moderation` runs an editorial workflow on `doc_page`, so a page can
+carry a draft while its published revision stays live. A signed-in editor
+(the `editor` or `contributor` role, over `druxt-auth` PKCE against the
+`druxtjs_org` consumer) sees the draft on the page's own URL. JSON:API writes
+are enabled (`jsonapi.settings` `read_only: false`), so a signed-in client can
+write a page and its paragraphs as a draft on live or into a workspace. The
+site is a JSON:API client and doesn't carry a writer of its own. Content goes
+through a Druxt client. Workspaces stage a set of changes off live, chosen per
+request with the `X-Druxt-Workspace` header, which `druxtjsorg` honours only
+for a signed-in account that may view that workspace: the `editor` role has
+`view any workspace`, `contributor` does not, and a write naming a workspace
+the account cannot see is refused rather than sent to live.
+[docs/backend.md](docs/backend.md#staging-in-a-workspace) covers both.
 
 ## Layout
 
-| Path                                    | Purpose                                                                                |
-| --------------------------------------- | -------------------------------------------------------------------------------------- |
-| `nuxt/`                                 | The Nuxt 2 frontend on Yarn 3.8.7, copied from the docs app in druxt.js                |
-| `drupal/`                               | The Drupal codebase, configuration and importer                                        |
-| `drupal/.devtools/`                     | Provisioning scripts on PHP and SQLite, with no Docker                                 |
-| `drupal/config/sync/`                   | Exported site configuration                                                            |
-| `drupal/content/`                       | The Tome backup described above                                                        |
-| `drupal/web/modules/custom/druxt_docs/` | Migrate plugins, the table of contents, hooks and Drush commands for the content model |
-| `drupal/web/themes/custom/druxtjs/`     | The frontend's regions and blocks                                                      |
-| `docs-source.json`                      | The documentation repository and commit the content is seeded from                     |
-| `scripts/`                              | The IR builder, the corpus survey and its baseline, content validation, the host lint  |
-| `tests/`                                | Node tests, and bash guardrail tests for `.devtools` and the scripts                   |
-| `docs/`                                 | Notes on the backend: previews, configuration, the importer and page history           |
-| `.devcontainer/`                        | The dev container, for VS Code, Codespaces and DevPod                                  |
-| `.githooks/`                            | Committed hooks, enabled by `npm install`                                              |
-| `.gitlab/scripts/`                      | The attribution and prose checks, copied from the standard                             |
+| Path                                    | Purpose                                                                 |
+| --------------------------------------- | ----------------------------------------------------------------------- |
+| `nuxt/`                                 | The Nuxt 2 frontend on Yarn 3.8.7, copied from the docs app in druxt.js |
+| `drupal/`                               | The Drupal codebase and configuration                                   |
+| `drupal/.devtools/`                     | Provisioning scripts on PHP and SQLite, with no Docker                  |
+| `drupal/config/sync/`                   | Exported site configuration                                             |
+| `drupal/web/modules/custom/druxt_docs/` | The table of contents, previews and hooks for the content model         |
+| `drupal/web/themes/custom/druxtjs/`     | The frontend's regions and blocks                                       |
+| `docs-source.json`                      | The druxt.js commit docgen generates the API reference from             |
+| `scripts/`                              | The docs fetch and generation, the JS tables generator, the host lint   |
+| `tests/`                                | Node tests, and bash guardrail tests for `.devtools` and the scripts    |
+| `docs/`                                 | Notes on the backend: previews, configuration and page history          |
+| `.devcontainer/`                        | The dev container, for VS Code, Codespaces and DevPod                   |
+| `.githooks/`                            | Committed hooks, enabled by `npm install`                               |
+| `.gitlab/scripts/`                      | The attribution and prose checks, copied from the standard              |
 
 ## Commands
 
 ```bash
-npm install                   # tooling and the IR builder's dependency, and enables the git hooks
-npm run setup                 # assemble, provision, import the documentation, start Drupal
+npm install                   # tooling, and enables the git hooks
+npm run setup                 # assemble, provision, fetch the pinned druxt.js, start Drupal
 npm run dev                   # Nuxt dev server against that Drupal
 npm run login                 # one-time login link
 npm run docs:generate         # Modules, API and Components pages, built in .docs-source
 npm run lint                  # every linter except prose
 npm run lint:prose            # Vale, after `npm run lint:prose:install`
 npm test                      # node tests
-bash tests/start-guardrails.sh  # also import-, validate-, post-rollout- and replacing-guardrails.sh
+bash tests/start-guardrails.sh  # also post-rollout- and replacing-guardrails.sh
 cd drupal && .devtools/assemble && vendor/bin/phpunit
 ```
 
-`drupal/.devtools/README.md` covers provisioning, serving and importing.
+`drupal/.devtools/README.md` covers provisioning and serving.
 
 ## The frontend
 

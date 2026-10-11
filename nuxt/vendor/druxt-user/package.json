@@ -1,0 +1,41 @@
+{
+  "name": "@druxt-contrib/user",
+  "version": "0.0.0",
+  "description": "A Drupal user, rendered by Druxt: by uuid, by the number in a path, or whoever is signed in.",
+  "keywords": [
+    "druxt",
+    "drupal",
+    "nuxt",
+    "user",
+    "module"
+  ],
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "require": "./dist/index.ssr.js",
+      "import": "./dist/index.esm.js"
+    },
+    "./components/*": "./dist/components/*",
+    "./lib/*": "./dist/lib/*"
+  },
+  "main": "dist/index.ssr.js",
+  "module": "dist/index.esm.js",
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "dependencies": {
+    "drupal-jsonapi-params": "^2.3.1"
+  },
+  "packageManager": "npm@8.19.4",
+  "engines": {
+    "node": ">=16.20.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "jest-junit": {
+    "outputDirectory": "reports/junit",
+    "outputName": "junit.xml"
+  }
+}

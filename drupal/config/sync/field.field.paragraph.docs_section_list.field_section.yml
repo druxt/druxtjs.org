@@ -1,0 +1,29 @@
+uuid: 7a49bf3e-3502-482e-a0d9-4d9946b84c13
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_section
+    - paragraphs.paragraphs_type.docs_section_list
+    - taxonomy.vocabulary.documentation_section
+id: paragraph.docs_section_list.field_section
+field_name: field_section
+entity_type: paragraph
+bundle: docs_section_list
+label: Section
+description: 'The section whose pages are listed.'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      documentation_section: documentation_section
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

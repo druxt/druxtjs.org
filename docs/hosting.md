@@ -5,8 +5,9 @@ How druxtjs.org runs on [Lagoon](https://docs.lagoon.sh). The
 
 ## Status
 
-Lagoon builds `feature/lagoon` into a development environment and `main`
-into production. The checklist at the end is what the first production
+Lagoon builds `develop`, every `feature/`, `fix/`, `release/` and
+`staging/` branch into a development environment, and `main` into
+production. The checklist at the end is what the first production
 deployment needs.
 
 ## Services
@@ -51,12 +52,25 @@ subdomains, are set in `.lagoon.yml`.
    caches, sessions, logs and tokens are copied without their rows. It copies the dump production writes nightly
    (`lagoon/dump-for-environments.sh`, under the private files directory
    nginx does not serve) and falls back to reading production's live
-   database only when that file is not there. `DOCS_SKIP_SYNC=1` keeps the
-   database an environment already has. Production syncs from nothing. Either
+   database only when that file is not there. Production's public files
+   come with it, since the content's images live there and not in the
+   database; its private files (keys, the dump, the rollout's markers) stay
+   each environment's own. `DOCS_SKIP_SYNC=1` keeps the
+   database an environment already has. Production syncs from nothing.
+   Sanitising replaces every password and every address, so two things are
+   put back: an address at the maintainers' domain
+   (`DOCS_MAINTAINER_DOMAIN`, `druxtjs.org` by default, and a hostname or
+   nothing is kept), and the password of the account named by
+   `DOCS_MAINTAINER_NAME`, read from `DOCS_MAINTAINER_PASSWORD` by Drupal
+   itself rather than passed on a command line, which would put it in the
+   container's process list. A password that reaches a non-production
+   environment this way is not one to reuse anywhere else. Without them a rollout hands back an
+   environment nobody can sign in to. Both are restored after the check that
+   the sanitise happened, and never on production. Either
    way it then runs `drush deploy`, or installs from `drupal/config/sync`
-   when there is no database at all. It seeds from the pinned commit only
-   in that last case. It also creates
-   Simple OAuth's keys, once, on the files volume, and records the
+   when there is no database at all, which leaves the site empty. It
+   creates the frontend's OAuth consumer when there is none, and Simple
+   OAuth's keys, once, on the files volume, and records the
    revision it deployed.
 4. Once Drupal reports that revision, `nuxt` builds the app against it and
    starts serving. It then renders every page it can reach into its page
@@ -74,7 +88,7 @@ bar of three segments under it.
 
 | Phase      | What is happening                             |
 | ---------- | --------------------------------------------- |
-| `waiting`  | Drupal is still installing and importing      |
+| `waiting`  | Drupal is still installing or updating        |
 | `building` | The app is building against Drupal            |
 | `starting` | The build is done and the server is coming up |
 | `failed`   | The build failed, and the container restarts  |
@@ -162,6 +176,31 @@ environment variables. Nothing on your own machine reads that file.
 Lagoon, and `sqlite` for local sites and CI. Drupal refuses to uninstall the
 module that provides the database it runs on, so a configuration without
 the driver fails to install on that database.
+
+## Staging environments
+
+A staging environment is where content is reviewed before production. It is the
+branch `staging/<name>`, cut from `main` so its fields, paragraph types and
+view modes are production's: deploying a workspace moves its content, and
+nothing of the configuration. The project's branch rule builds every `staging/` branch, and
+deleting the branch removes the environment.
+
+Its first rollout copies production like any other environment's. After
+that it keeps its database: `lagoon/post-rollout.sh` sees the `staging/`
+branch and a database already in place, and leaves it, so a workspace
+deployed to it for review survives its own redeploys. A `release/` branch's
+environment keeps its database the same way, so a release is reviewed on a
+staging site of its own, with content staged on it, before it reaches
+production. A fresh copy of
+production is a deliberate step, between reviews: remove the environment
+and create it again.
+
+`scripts/staging.sh create <name>` does the rest: it pushes `main` to the
+branch, waits for the first build, sets the environment's deploy target and
+keys from the project's variables, and deploys it again so they take. The
+keys are described with the chain they form in
+[the backend guide](backend.md#the-chain). `scripts/staging.sh remove <name>`
+deletes the branch.
 
 ## Going to production
 

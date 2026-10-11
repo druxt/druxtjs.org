@@ -29,6 +29,7 @@
 import { seoHead } from '~/utils/seo'
 import { apiSourceUrl } from '~/utils/api-source'
 import { documentDescription } from '~/utils/content'
+import { releaseNotes } from '~/lib/release-notes'
 import { knowsComponent } from '~/utils/live-examples'
 import { isPackageRoot } from '~/components/app/icon/module'
 export default {
@@ -57,9 +58,12 @@ export default {
   },
 
   head() {
+    // A changelog is titled for its package; docgen titles them all alike.
+    // Its description leads with the newest version, read from the text.
+    const notes = releaseNotes(this.$route.path, this.document.text)
     return seoHead({
-      title: this.document.title,
-      description: documentDescription(this.document),
+      title: notes ? notes.title : this.document.title,
+      description: notes ? notes.description : documentDescription(this.document),
       path: this.$route.path,
     })
   },
@@ -74,7 +78,7 @@ export default {
      */
     inModuleHeader: ({ $route }) => isPackageRoot($route.path),
 
-    source: ({ document }) => apiSourceUrl(document.dir, document.slug),
+    source: ({ document, $config }) => apiSourceUrl(document.dir, document.slug, $config.druxtSourceRef),
 
     /** The component this page documents, when it has a live card. */
     example: ({ document }) => (/\/components$/.test(document.dir || '') && knowsComponent(document.slug) ? document.slug : null),

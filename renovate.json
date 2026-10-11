@@ -7,9 +7,25 @@
   "enabledManagers": ["composer", "npm"],
   "packageRules": [
     {
-      "description": "Frozen. druxt_docs computes the table of contents with a PHP port of github-slugger 1.5.0, and the import fails when the two disagree. Move both together, by hand.",
+      "description": "Frozen. druxt_docs computes the table of contents with a PHP port of github-slugger 1.5.0. Move both together, by hand.",
       "matchManagers": ["npm"],
       "matchPackageNames": ["github-slugger"],
+      "enabled": false
+    },
+    {
+      "description": "The Druxt packages follow npm's `dev` tag until 0.25.0 is released, and a tag is not a version to update. Move them by hand.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "druxt",
+        "druxt-blocks",
+        "druxt-breadcrumb",
+        "druxt-entity",
+        "druxt-menu",
+        "druxt-router",
+        "druxt-schema",
+        "druxt-site",
+        "druxt-views"
+      ],
       "enabled": false
     },
     {

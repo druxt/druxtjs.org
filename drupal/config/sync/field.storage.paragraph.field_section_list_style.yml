@@ -1,0 +1,27 @@
+uuid: af853056-b245-4c96-b136-8eabf46652dd
+langcode: en
+status: true
+dependencies:
+  module:
+    - options
+    - paragraphs
+id: paragraph.field_section_list_style
+field_name: field_section_list_style
+entity_type: paragraph
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: default
+      label: 'Cards, grouped by topic'
+    -
+      value: sequence
+      label: 'Numbered sequence'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

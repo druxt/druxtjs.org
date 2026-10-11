@@ -21,9 +21,44 @@ export default {
     state.toc = toc || []
   },
 
+  /** The revision the editor is viewing: 'published', 'working-copy' or 'id:<vid>'. */
+  setEditorVersion(state, version) {
+    state.editor = { ...state.editor, version: version || 'published' }
+  },
+
+  /** The current page's editor context: { uuid, nid, moderationState }. */
+  setEditorPage(state, page) {
+    state.editor = { ...state.editor, page: page || null }
+  },
+
+  /** The current page's revisions, from the backend's revision list. */
+  setEditorRevisions(state, revisions) {
+    state.editor = { ...state.editor, revisions: revisions || [] }
+  },
+
   addRecentSearch(state, query) {
     const value = (query || '').trim()
     if (!value) return
     state.searches = [value, ...state.searches.filter((o) => o !== value)].slice(0, SEARCH_LIMIT)
+  },
+
+  /** Opens or closes the sign-in dialog. */
+  setSignIn(state, open) {
+    state.signIn = Boolean(open)
+  },
+
+  /** Turns the page's diff against live on or off. */
+  setEditorCompare(state, on) {
+    state.editor = { ...state.editor, compare: Boolean(on) }
+  },
+
+  /** The workspace the editor reads the site in, or null for live. */
+  setEditorWorkspace(state, workspace) {
+    state.editor = { ...state.editor, workspace: workspace || null }
+  },
+
+  /** The page's normalised diff, or null. */
+  setEditorDiff(state, diff) {
+    state.editor = { ...state.editor, diff: diff || null }
   },
 }

@@ -8,16 +8,16 @@
  */
 
 const REPO = 'https://github.com/druxt/druxt.js'
-const BRANCH = 'develop'
 
 /**
  * The GitHub URL for an API page's source file.
  *
  * @param {string} dir - The document's directory, e.g. '/api/packages/entity/components'.
  * @param {string} slug - The document's slug, e.g. 'DruxtField'.
+ * @param {string} [ref] - The commit the reference was generated from; HEAD without one.
  * @returns {?string} The URL, or null for a page with no single source file.
  */
-export const apiSourceUrl = (dir, slug) => {
+export const apiSourceUrl = (dir, slug, ref = 'HEAD') => {
   if (!dir || !slug || !dir.startsWith('/api/packages/')) return null
 
   const [pkg, ...tail] = dir.replace('/api/packages/', '').split('/').filter(Boolean)
@@ -25,13 +25,13 @@ export const apiSourceUrl = (dir, slug) => {
 
   // The changelog is the one file that sits beside src/, not inside it.
   if (slug === 'CHANGELOG' && !tail.length) {
-    return `${REPO}/blob/${BRANCH}/packages/${pkg}/CHANGELOG.md`
+    return `${REPO}/blob/${ref}/packages/${pkg}/CHANGELOG.md`
   }
 
   // The components directory's own index page has no file of its own; the
   // other buckets keep an index.js.
-  if (slug === 'index' && tail[0] === 'components') return `${REPO}/tree/${BRANCH}/packages/${pkg}/src/${tail.join('/')}`
+  if (slug === 'index' && tail[0] === 'components') return `${REPO}/tree/${ref}/packages/${pkg}/src/${tail.join('/')}`
   const extension = tail[0] === 'components' ? '.vue' : '.js'
   const file = [...tail, slug].join('/') + extension
-  return `${REPO}/blob/${BRANCH}/packages/${pkg}/src/${file}`
+  return `${REPO}/blob/${ref}/packages/${pkg}/src/${file}`
 }

@@ -16,7 +16,7 @@
 
 const { buildSitemap } = require('../lib/sitemap')
 const { buildLlmsTxt } = require('../lib/llms-txt')
-const { buildLlmsFullTxt } = require('../lib/llms-full-txt')
+const { buildLlmsFullTxt, outlineProblems } = require('../lib/llms-full-txt')
 const { readContent } = require('../lib/content-index')
 const { fetchDrupalDocs, mergeCorpus } = require('../lib/drupal-corpus')
 
@@ -24,7 +24,7 @@ const { fetchDrupalDocs, mergeCorpus } = require('../lib/drupal-corpus')
 const ARTEFACTS = {
   '/sitemap.xml': { type: 'application/xml; charset=utf-8', build: buildSitemap },
   '/llms.txt': { type: 'text/plain; charset=utf-8', build: buildLlmsTxt },
-  '/llms-full.txt': { type: 'text/plain; charset=utf-8', build: buildLlmsFullTxt },
+  '/llms-full.txt': { type: 'text/plain; charset=utf-8', build: buildLlmsFullTxt, check: outlineProblems },
 }
 
 /** The paths this serves. Exported so the page cache can leave them alone. */
@@ -101,7 +101,12 @@ const createArtefacts = ({
       return fresh ? fresh.body : null
     }
 
-    const body = ARTEFACTS[pathname].build(docs, { origin })
+    const { build, check } = ARTEFACTS[pathname]
+    const body = build(docs, { origin })
+    // Logged, not refused: a page edited in Drupal can break the outline, and
+    // the file with one page misread still beats no file.
+    const problems = check ? check(docs, body) : []
+    if (problems.length) log(`artefacts: ${pathname} outline broken: ${problems.join('; ')}`)
     held.set(pathname, { body, at: Date.now() })
     return body
   }

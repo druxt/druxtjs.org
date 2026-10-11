@@ -79,6 +79,20 @@ const textValue = (field) => {
 }
 
 /**
+ * Fence code with more backticks than any run inside it, so a code sample
+ * that itself shows a fence cannot close this one early.
+ *
+ * @param {string} code - The code.
+ * @param {string} info - The language or syntax.
+ * @returns {string} The fenced block.
+ */
+const fenced = (code, info) => {
+  const longest = (code.match(/`+/g) || []).reduce((max, run) => Math.max(max, run.length), 0)
+  const fence = '`'.repeat(Math.max(3, longest + 1))
+  return fence + (info || '') + '\n' + code + '\n' + fence
+}
+
+/**
  * One paragraph as the markdown it was authored from.
  *
  * Markdown rather than the rendered HTML: the indexes have always carried
@@ -106,13 +120,13 @@ const paragraphMarkdown = (paragraph, byId = new Map()) => {
     case 'docs_code': {
       const code = textValue(attributes.field_code)
       if (!code) return ''
-      return '```' + (attributes.field_language || '') + '\n' + code + '\n```'
+      return fenced(code, attributes.field_language)
     }
 
     case 'docs_diagram': {
       const source = textValue(attributes.field_diagram)
       if (!source) return ''
-      return '```' + (attributes.field_syntax || '') + '\n' + source + '\n```'
+      return fenced(source, attributes.field_syntax)
     }
 
     // The alt text is the only part of an image that reads as text. It sits

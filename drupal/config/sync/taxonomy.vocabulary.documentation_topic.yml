@@ -1,0 +1,9 @@
+uuid: e6275427-910e-4fad-9b2a-c0a9bf7aae2b
+langcode: en
+status: true
+dependencies: {  }
+name: 'Documentation topic'
+vid: documentation_topic
+description: 'A heading a section landing groups its pages under. Terms are shared across sections and listed in their weight order.'
+weight: 0
+new_revision: false

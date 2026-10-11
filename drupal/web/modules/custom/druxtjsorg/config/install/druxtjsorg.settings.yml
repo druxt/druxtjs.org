@@ -1,0 +1,10 @@
+# Resources a consumer may read beyond the ones druxt.settings makes public,
+# keyed by the client id on the OAuth token.
+#
+# Empty by design. The mechanism is the point; the payload is a decision per
+# resource, and the obvious candidate is the wrong one. Deriving what a user
+# may do from user_role is not merely a disclosure, it is incorrect: an OAuth
+# token's scopes act as a ceiling on the account's permissions
+# (simple_oauth's Oauth2AccessPolicy intersects them), so the roles a person
+# holds overstate what their session may do.
+consumer_resources: {}

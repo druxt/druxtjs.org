@@ -7,6 +7,200 @@ and this project adheres to [Semantic Versioning](https://semver.org/). Versions
 count up from 0.9.0 toward 1.0.0, which is reserved for the launch of
 Druxt 1.0.0.
 
+## [Unreleased]
+
+## [0.11.0] - 2026-10-11
+
+### Added
+
+- Core Workspaces on the backend. A workspace holds changes to pages, their
+  paragraphs, media, menu links and paths off live, and publishing it moves
+  the whole set live at once, which is how a release or embargoed content
+  waits. An `X-Druxt-Workspace` header chooses the workspace for a signed-in
+  request that may view it. A reader's header is ignored, and a write naming
+  a workspace it cannot have is refused rather than saved to live.
+- Workspaces Extra on the backend, with its scheduler. A workspace can be
+  published at a set time, which is how a release waits for its date, and an
+  editor may schedule one. A published workspace is closed rather than left
+  open, and a closed one can be rolled back. Drupal's toolbar switcher lists
+  the recent workspaces only. The editor bar offers the open workspaces, and
+  a request that names a closed one is refused on a write and answered from
+  live on a read, as for a workspace the account cannot have. A new
+  workspace's id is the UUID Workspaces Extra gives it, and the header, the
+  cookie and the editor bar accept that form beside a machine name.
+- A workspace can be deployed to another environment. Workspaces Deploy, from
+  Workspaces Extra, exports a workspace's changed pages, paragraphs, media
+  and files and posts them to another environment's Drupal, where they land
+  in a workspace of the same name to be previewed and published there. The
+  site proxies the deploy endpoints to its Drupal, so a target is named by
+  its own URL in `WSE_DEPLOY_TARGET`, and the deploy pair shares
+  `WSE_DEPLOY_KEY`, which signs every request. A patch has that key sign
+  alone, so each environment keeps its own hash salt. Another patch makes the module's import read the upload type, the status and the
+  workspace id from the request path, where its own HTTP export puts them;
+  unpatched, every upload failed on a missing workspace id. Paragraphs are
+  tracked by Workspaces again. Workspaces Extra had marked them ignored,
+  which saved a paragraph edited in a workspace to live and left it out of
+  a deploy, so the page that referenced it could not be imported.
+- Staging environments, where content is reviewed before production. A `staging/`
+  branch cut from `main` builds an environment that copies production once
+  and then keeps its database, so a workspace deployed to it for review
+  survives its own redeploys. `scripts/staging.sh` creates and removes one.
+  A `release/` branch's environment keeps its database the same way, so a
+  release is reviewed on a staging site of its own before it reaches
+  production.
+  A deploy to it is signed with the key local machines hold, and it deploys
+  on to production with a key only the two of them hold: a patch lets an
+  environment accept a key other than the one it signs with, so nothing a
+  local machine holds reaches production directly.
+- The editor bar reads the site in a chosen workspace, names it on every
+  page, and the page diff compares it with live. Drupal's own screens follow
+  the same choice, and switching in Drupal's toolbar is shared back.
+- `/workspace` reviews the active workspace: a row per changed page, marked
+  new or changed, with who changed it and when, and its diff against live or
+  its form a click away. Search, status, section, author and order filters
+  are counted and kept in the address, so Edit returns to the same list.
+  Drupal's own overview of a workspace lists pages rather than every
+  paragraph.
+- A block's Edit opens that block's own dialog in the page's form. The bar
+  names each block by its heading or opening words, steps to the previous or
+  next block, and moves to another block on a click.
+- Drupal's Preview button shows the unsaved page as this site renders it,
+  through two modules this site runs ahead of their release.
+  `consumer_node_preview`, carried in `drupal/web/modules/custom` from its
+  commit `3c7ffcb`, is the preview screen with its Frontend, Drupal and
+  JSON:API tabs, the width presets and a per-environment target, which
+  `druxt_docs` provided until now. `@druxt-contrib/node-preview`, carried in
+  `nuxt/vendor/druxt-node-preview` from its commit `349e45a`, adds
+  `/druxt/node/preview`, which reads the preview document's path from the
+  URL fragment, fetches it through the Druxt client with the editor's
+  session and workspace, and renders the node through a site wrapper that
+  gives it the page header and prose shell a saved page has. Each Lagoon
+  environment points the tab at its own frontend, and the preview screen
+  reaches Drupal through the site like the other editing screens.
+- A section landing lists its pages from Drupal, not from its text: the
+  `docs_section` view, read through JSON:API Views with the section as its
+  argument, holds the published pages in weight then title order, so a new
+  page appears as soon as it is published with a section. "Where to go next"
+  at the end of a page is the page's own link field, in the editor's order: a
+  page on this site is shown as it is now, title and description included,
+  a generated page by its path and text, and a link off the site opens in a
+  new tab. The first link is the page's Next, drawn large, the rest follow
+  under "Also", and a page without links takes the next page in the docs
+  menu. A deploy hook moved the hand-written lists of 35 pages and 4
+  landings across once.
+- A section landing lists its pages where the editor puts the "Pages in
+  this section" block, in one of the view's two displays. Cards, grouped
+  under the pages' topic headings, each page in its teaser view mode; or a
+  numbered sequence, each page in its step view mode, which the tutorials
+  use. The topic is a term on the page, and a deploy hook gave the how-to
+  guides and the concepts theirs.
+- The Nuxt server keeps the JSON:API index and the menus between server
+  renders for as long as Drupal's page `max_age` allows, now set to 300
+  seconds. A warm render of a documentation page no longer asks Drupal for
+  the index and the three menus, four of its backend calls. The path lookup,
+  the page and its blocks are still fetched per render. A request with an
+  Authorization header or a session cookie never reads or writes that cache.
+- A change to a display in Drupal shows without a rebuild. After a cache
+  clear the Nuxt server regenerates a schema the first time a page needs it
+  (`druxt.schema.refresh`), and the page cache leaves Druxt's own `/_druxt/`
+  routes to Nuxt instead of storing them as pages.
+- Purge clears that cache when content changes: `purge_queuer_coretags`
+  queues the tags a save invalidates, the bundled HTTP purger sends one
+  `POST /_druxt/cache/clear` per batch with the shared secret, and the
+  late-runtime processor sends it after the response. The purger is exported
+  with an empty secret and Lagoon's service address; `settings.lagoon.php`
+  completes both from the environment.
+- Drupal reads the cached normalizations of a JSON:API response in one query
+  instead of one per resource, the change proposed in Drupal core issue
+  3626255, carried as a vendored copy of its merge request plus the one-line
+  service argument Drupal 11 needs for it. The collection behind the sitemap
+  and `llms.txt` drops from 1250 queries to 77.
+- A package's release notes page shares as its newest version. The share
+  card leads with the version, dated and counted, and the first change of
+  that release, and the page's description does the same, where both read
+  "Release notes" alike before. A preview environment with its own name
+  under the site's domain, `dev.druxtjs.org`, now advertises that name in
+  its links and cards rather than its autogenerated route.
+- Every response names the llms.txt that describes it, the way llmstxt.org
+  v2 discovers one: a `Link` header with `rel="describedby"`, and the same
+  link in each page's head.
+- While a rollout replaces the database, the Drupal host answers with the
+  same page the frontend shows as it starts, with the brand, a progress bar
+  and a refresh every 15 seconds, instead of one line of text. The response
+  is still a 503 with `Retry-After: 30`.
+
+### Changed
+
+- The Druxt packages follow npm's `dev` tag, the development release the
+  druxt.js README describes, so the 0.25.0 work runs here before it is
+  released. The footer badge names the version the documentation describes,
+  `druxt` at the pinned commit, so a development release never shows there.
+- The site no longer registers Druxt's components as synchronous imports
+  itself. The modules register them that way now, so the hook that worked
+  around the first-load refetch is gone.
+- Drupal core 11.4.8, the security release. The two JSON:API patches apply
+  to it unchanged.
+- The admin theme is contrib Gin, replacing core's experimental Default
+  Admin, with Gin Login for the sign-in page. On a phone the page form's top
+  bar stacks the breadcrumb, the title and the actions instead of laying Save
+  over the title, and the content listings no longer draw their header twice.
+- The JSON:API tab on a page's edit screen opens through the site again, and
+  its preview fills the screen: the iframe is pinned to the viewport inside
+  the admin toolbar's edges, following the toolbar when it collapses or
+  stands at the side, instead of sitting in a 600px box on the page.
+- An API options table, Param, Type, Default and Description, re-flows from
+  640px up: each row shows its three short facts on one line and the
+  description on its own line beneath, so nothing leaves the page and a long
+  default wraps in its column. The stacked layout below 640px stays. The
+  content column is 46rem at most, so such a table used to scroll at every
+  width with the whole Description column off to the right.
+
+### Removed
+
+- The markdown import. Production's database is the only copy of the
+  content, so the importer, its migrations and the migrate modules, the IR
+  builder and the content baseline and validation are gone, and the page type
+  no longer carries `field_source_path`. A site with no database to copy
+  starts empty, and `drush druxtjsorg:oauth-client` creates the frontend's consumer
+  when there is none. `npm run docs:fetch` checks out the pinned druxt.js for
+  the API reference. The migrate packages stay in `composer.json` until every
+  database has imported their uninstall, since Drupal needs a module's code
+  to uninstall it. A later change removes them.
+- The Tome backup under `drupal/content` and `drupal/files`, an export of the
+  content from before the database was its only copy, which nothing read.
+
+### Fixed
+
+- A database copied from before paragraphs were tracked by Workspaces gets
+  the Workspace field installed on them by a deploy hook. Without it every
+  revision query on a paragraph, which every page read makes, failed with
+  "'workspace' not found", so a non-production environment answered 500 on
+  every page. The site's hook that keeps paragraphs tracked now runs before
+  core's, which reads the handler once and remembers the answer.
+- Inside a workspace, JSON:API answered from live for a bearer token, served
+  cached normalizations across workspaces, refused a second write to the same
+  page, and on live showed editors a workspace's revision as the page's draft.
+- The Operations button on Drupal's listings is drawn at one size. Claro
+  renders it as its small dropbutton while Gin sizes the toggle and the
+  label for its large one, so "Edit" sank to the bottom of the button, the
+  toggle's edge hung below it, and a hover filled a box of the wrong shape.
+  The button takes Gin's size, and a hover fills it to its rounded corners.
+- A callout no longer draws a quote inside its box. The 67 callouts came
+  from markdown pages, where a callout was a blockquote, and kept the
+  marker, so the callout's green rule and tint held a second rule and a
+  quote. A deploy hook took the marker out of each one, once, with its bold
+  "Before you start" kept. On the site, that quote was the callout's only
+  box, so the callout now draws the same box itself, with or without a
+  quote inside. Drupal's own render of a callout no longer prints the
+  type's label above the text either, as the site never did.
+- Tab moves from the username field to the password field on the sign-in
+  form. The "Forgot password?" link follows the password field in the page
+  so a keyboard reaches it after the field it belongs to.
+- `llms-full.txt` keeps its outline when a page shows a code fence. A Drupal
+  code paragraph is fenced longer than any fence it contains, and the build
+  refuses to write the file when a fence or raw-text element is left open,
+  checked with the parser the site renders with.
+
 ## [0.10.0] - 2026-09-27
 
 ### Changed

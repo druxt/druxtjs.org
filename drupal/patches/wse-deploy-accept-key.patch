@@ -1,0 +1,15 @@
+--- a/modules/wse_deploy/src/EncryptionHandler.php
++++ b/modules/wse_deploy/src/EncryptionHandler.php
+@@ -69,6 +69,12 @@
+    *   TRUE if the hash is valid, FALSE otherwise.
+    */
+   public function validateHash(string $data, string $hash): bool {
++    // A deploy is checked with the key its sender signs with, which in a
++    // chain of environments is not this one's own: the environment before
++    // this one holds a key the one after it never sees.
++    if ($key = Settings::get('wse_deploy.hash.accept_key')) {
++      return hash_equals(Crypt::hmacBase64($data, $key), $hash);
++    }
+     return hash_equals($this->getHash($data), $hash);
+   }
+ 

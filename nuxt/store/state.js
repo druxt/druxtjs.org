@@ -84,4 +84,23 @@ export default () => ({
 
   // Recent search queries, read by components/app/Search.vue.
   searches: [],
+
+  // The editor's view of the current page. `version` selects which revision
+  // the frontend requests: the published default, the latest working copy
+  // (draft), or a specific revision as `id:<vid>`.
+  editor: {
+    version: 'working-copy',
+    revisions: [],
+    page: null,
+    // Whether the page shows its diff against live, and that diff, from
+    // jsonapi_diff through @druxt-contrib/diff's normaliseDiff().
+    compare: false,
+    diff: null,
+    // The Drupal workspace the editor reads the site in, or null for live.
+    // Kept in a cookie by plugins/workspace.js.
+    workspace: null,
+  },
+
+  // The sign-in dialog, opened from the header and by the auth middleware.
+  signIn: false,
 })

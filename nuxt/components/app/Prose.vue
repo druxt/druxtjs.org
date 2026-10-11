@@ -204,6 +204,18 @@ export default {
         const wrapper = document.createElement('div')
         wrapper.className = 'docs-table'
         if (headings.length) wrapper.setAttribute('data-stack', '')
+        // An options table, Param, Type, Default and Description, re-flows in
+        // two tiers above the stacked layout; app.css puts the description on
+        // its own line. The roles keep it a table to assistive tech once its
+        // rows are laid out as grids.
+        if (headings.length === 4 && /^description$/i.test(headings[3])) {
+          wrapper.setAttribute('data-tiers', '')
+          table.setAttribute('role', 'table')
+          table.querySelectorAll('thead, tbody').forEach((group) => group.setAttribute('role', 'rowgroup'))
+          table.querySelectorAll('tr').forEach((row) => row.setAttribute('role', 'row'))
+          table.querySelectorAll('thead th').forEach((th) => th.setAttribute('role', 'columnheader'))
+          table.querySelectorAll('tbody td').forEach((td) => td.setAttribute('role', 'cell'))
+        }
 
         const scroller = document.createElement('div')
         scroller.className = 'docs-table-scroll'

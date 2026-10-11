@@ -2,7 +2,6 @@
 // Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
 const { serviceRoute } = require('./server/backend')
-const { syncDruxtComponents } = require('./lib/sync-druxt-components')
 
 // The id is interpolated into an inline script, so check its shape first.
 if (!/^G-[A-Z0-9]+$/.test(GA_MEASUREMENT_ID)) {
@@ -19,13 +18,71 @@ const failedRoutes = []
 import { SITE_NAME, SITE_DESCRIPTION, SITE_ORIGIN, docTypeExpression } from './lib/site'
 import { isTrackableHostname } from './lib/analytics'
 
-/** The installed `druxt` version, shown in the header badge. Read from disk: its `exports` hides package.json. */
-const druxtVersion = JSON.parse(
-  require('fs').readFileSync(require('path').join(__dirname, 'node_modules', 'druxt', 'package.json'), 'utf8'),
-).version
+/**
+ * The version the badge names: `druxt` at the documentation's pinned commit,
+ * from the checkout locally and from the file the image copies out of it.
+ * The installed packages may be a development release, which the badge never
+ * says. Hidden when neither is here.
+ */
+// The druxt.js checkout the API reference comes from. The container holds a
+// copy beside /app; a tree without one links the source at HEAD.
+const docsSource = (() => {
+  try {
+    return require('../docs-source.json')
+  } catch (e) {
+    return {}
+  }
+})()
+const druxtVersion = ['.pinned-druxt.json', '../.docs-source/packages/druxt/package.json'].reduce(
+  (found, file) => {
+    if (found) return found
+    try {
+      return (
+        JSON.parse(require('fs').readFileSync(require('path').join(__dirname, file), 'utf8'))
+          .version || null
+      )
+    } catch (e) {
+      return null
+    }
+  },
+  null
+)
 
 /** The Drupal backend Druxt reads, and proxies onto this origin. */
 const DRUXT_BASE_URL = process.env.DRUXT_BASE_URL || 'http://127.0.0.1:8899'
+
+/** The consumer this site is to Drupal: its decoupled settings and its OAuth client. */
+const CONSUMER_ID = process.env.DRUXT_CONSUMER_ID || 'druxtjs_org'
+
+/**
+ * Editor sign-in: druxt-auth's password grant, with a Drupal session opened
+ * alongside it. A session left open in the browser is ended through
+ * drupal/logout_token's route. The scopes are every role an editor might
+ * hold: a token carries only those the account also has.
+ */
+// `druxt.proxy.api` below is what turns the module's own proxy entries on: it
+// takes `/user/login`, `/user/logout` and `/user/password` for POST alone, and
+// `/oauth/authorize` and `/oauth/userinfo` whole, so the site lists none of
+// them itself.
+const OAUTH_CLIENT = {
+  clientId: CONSUMER_ID,
+  scope: ['editor', 'contributor', 'administrator'],
+  // Not the module's own sign-in page: `/user/login` is Drupal's, proxied
+  // whole below, and this site signs in at `/login`.
+  login: false,
+  // The password grant issues a token and nothing else, and this site's
+  // editing is Drupal's own forms proxied onto this origin, which need a
+  // Drupal session. With this on, the credentials open one through the
+  // proxied login before the grant, and signing out ends both.
+  passwordSession: true,
+}
+const OAUTH_STRATEGY = { endpoints: { logoutToken: '/session/logout/token' } }
+
+// Drupal's login, its editing screens and their assets, served on this origin
+// so an editor's session is first party. The same test tells the page cache
+// in server/start.js which requests are Drupal's, so none of them is stored.
+const { shouldProxy } = require('./modules/druxt-admin/proxy')
+const { PROFILE_PATH, isProfilePath } = require('./lib/profile-path')
 
 export default {
   // Pages render live from Drupal. In production, server/start.js serves
@@ -34,10 +91,16 @@ export default {
 
   publicRuntimeConfig: {
     druxtVersion,
+    // The druxt.js commit the API reference is generated from: where its
+    // source links point, so they never depend on a branch name.
+    druxtSourceRef: docsSource.docgenRef || docsSource.ref || 'HEAD',
     // "markdown" reads the authored pages from content/ instead of Drupal.
     docsSource: process.env.DOCS_SOURCE || 'drupal',
     // The environment's Storybook, when it has one: linked from the footer and the playground.
-    storybookUrl: serviceRoute(process.env.LAGOON_ROUTES, 'storybook') || process.env.STORYBOOK_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3030'),
+    storybookUrl:
+      serviceRoute(process.env.LAGOON_ROUTES, 'storybook') ||
+      process.env.STORYBOOK_URL ||
+      (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3030'),
   },
 
   head: {
@@ -52,26 +115,38 @@ export default {
     // static/ ships icon.png, from which @nuxtjs/pwa generates the rest of
     // the icon set, and favicon.ico for the consumers that ask for one by
     // name.
-    link: [{ rel: 'icon', type: 'image/png', href: '/icon.png' }],
+    // llmstxt.org v2 discovery: the llms.txt that describes this page. The
+    // server sends the same link as a header on every response.
+    link: [
+      { rel: 'icon', type: 'image/png', href: '/icon.png' },
+      { hid: 'llms', rel: 'describedby', type: 'text/plain', href: '/llms.txt' },
+    ],
     script: [
       // Sets data-theme before first paint, from the stored or OS preference.
       // plugins/color-mode-theme.client.js keeps it in sync after that.
       {
         hid: 'druxt-theme-init',
-        innerHTML: "(function(){try{var k='druxt-color-mode';var p=localStorage.getItem(k)||'system';var v=p==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;document.documentElement.setAttribute('data-theme',v)}catch(e){}})()",
+        innerHTML:
+          "(function(){try{var k='druxt-color-mode';var p=localStorage.getItem(k)||'system';var v=p==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;document.documentElement.setAttribute('data-theme',v)}catch(e){}})()",
         pbody: true,
       },
       // vue-meta re-runs this script on every client-side navigation, so each
       // page re-fires gtag('config'); adding a page_view plugin double-counts.
       // The hostname gate keeps Lagoon's own routes out of the property: they
       // pass the environment check, but they are not the site.
-      ...(isProduction ? [
-        { hid: 'ga-src', src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`, async: true },
-        {
-          hid: 'ga-init',
-          innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());if((${isTrackableHostname})(location.hostname)){gtag('config','${GA_MEASUREMENT_ID}',{doc_type:${docTypeExpression()}});}`,
-        },
-      ] : []),
+      ...(isProduction
+        ? [
+            {
+              hid: 'ga-src',
+              src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`,
+              async: true,
+            },
+            {
+              hid: 'ga-init',
+              innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());if((${isTrackableHostname})(location.hostname)){gtag('config','${GA_MEASUREMENT_ID}',{doc_type:${docTypeExpression()}});}`,
+            },
+          ]
+        : []),
     ],
     __dangerouslyDisableSanitizersByTagID: {
       'druxt-theme-init': ['innerHTML'],
@@ -80,12 +155,29 @@ export default {
   },
 
   css: ['~/assets/css/app.css', '~/assets/css/code.css'],
+  // Read by server/start.js: a request Drupal answers is never stored. A
+  // profile is this site's page and still never stored, because what it shows
+  // depends on who is reading it.
+  docsPassThrough: (path) => shouldProxy(path) || isProfilePath(path),
+
   plugins: [
+    // The site's own token recovery is gone: druxt-auth ships one, and it is
+    // the better of the two. It runs on the server render as well, where this
+    // one never did, and it refuses to replay a request bound for another
+    // host, where this one would have resent the Drupal token. Running both
+    // meant two interceptors retried the same failure, which was measurable:
+    // a foreign 401 was replayed twice with the token attached, and once with
+    // only the module's.
+    '~/plugins/entity-operations.js',
     '~/plugins/color-mode-theme.client.js',
     '~/plugins/analytics.client.js',
     '~/plugins/chunk-reload.client.js',
     '~/plugins/content-links.client.js',
     '~/plugins/mermaid.client.js',
+    // After the Druxt and auth plugins the modules add: it wraps the client.
+    '~/plugins/working-copy.js',
+    // Also after the Druxt and auth plugins: it adds to the client they share.
+    '~/plugins/workspace.js',
   ],
   components: true,
   // Mirrors the SITE_ORIGIN override into the client bundle so hydration
@@ -151,16 +243,27 @@ export default {
     'druxt-blocks',
     'druxt-views',
     'druxt-breadcrumb',
+    // Drupal's Preview button renders the unsaved page here, at
+    // /druxt/node/preview, from the JSON:API Node Preview document it is
+    // handed in the URL fragment.
+    '@druxt-contrib/node-preview',
     // Every core module, so the playground can render every component. Its
     // layout is only added to a site without one.
     'druxt-site',
+    // Editor sign-in.
+    ['druxt-auth', OAUTH_CLIENT],
+    // The revision diff: registers `v-diff`, which marks a changed field in place.
+    '@druxt-contrib/diff',
+    // A Drupal user, by uuid, by the number a path carries, or whoever is
+    // signed in. The profile pages use it.
+    '@druxt-contrib/user',
     // The consumer's decoupled settings and theme manifest, baked in at build.
     // A copy of the unreleased @druxt-contrib/decoupled-settings module.
     '~/modules/decoupled-settings',
   ],
 
   decoupledSettings: {
-    consumerId: process.env.DRUXT_CONSUMER_ID || 'druxtjs_org',
+    consumerId: CONSUMER_ID,
     // Each page sets its own title and description.
     applyHead: false,
   },
@@ -178,19 +281,82 @@ export default {
     // asked for the fields its display renders, from the generated schema.
     entity: { components: { fields: false }, query: { schema: true } },
     // Display schemas, view and form, for what this site renders. Generated
-    // from Drupal's display configuration when the app builds.
+    // when the app builds, then again on the server after each cache clear.
     schema: {
       filter: ['node--doc_page--.*', 'paragraph--docs_.*', 'media--image--.*'],
+      refresh: true,
+    },
+    // The JSON:API index and the menus are the same for every anonymous reader,
+    // so they are held between server requests rather than fetched per render.
+    // Drupal's Cache-Control decides how long, which is why system.performance
+    // sets a page max_age: at 0 it answers "no-cache, private" and nothing is
+    // stored. A request carrying an Authorization header or a session cookie
+    // never reads or writes this cache, so an editor's page is never shared.
+    //
+    // The secret turns on POST /_druxt/cache/clear, which Drupal calls when
+    // content changes so a publish does not wait out the max_age. Each Nuxt
+    // process keeps its own cache, so every process has to be told.
+    //
+    // sessionCookie is stated rather than left to the default because the
+    // default fails open: a session cookie whose name it does not match is read
+    // as anonymous, and the response is then cached for everyone. Axios forwards
+    // the visitor's headers on a server render, so whatever cookie the backend
+    // authenticates with arrives here and has to be recognised. If anything in
+    // front of Drupal ever renames it, this pattern is what has to change.
+    cache: {
+      secret: process.env.DRUXT_CACHE_SECRET,
+      sessionCookie: 'S?SESS[0-9a-f]+',
     },
   },
 
+  // @nuxtjs/auth-next: a signed-in editor is sent back to the page they
+  // started from, or home; the callback page is the site's own.
+  auth: {
+    redirect: { login: '/login', logout: '/', home: '/', callback: '/callback' },
+    strategies: { 'drupal-password': OAUTH_STRATEGY },
+  },
+
   // changeOrigin: false keeps the browser's host, so Drupal's JSON:API links
-  // point at this origin. Registered before Druxt's own proxy entries.
+  // point at this origin. Registered before Druxt's own proxy entries. The
+  // two OAuth endpoints the browser calls are here too: the proxy module
+  // reads this list before druxt-auth adds its own entry.
   proxy: [
-    ...['/jsonapi', '/router/translate-path', '/sites/default/files'].map((context) => [
+    ...[
+      '/jsonapi',
+      '/router/translate-path',
+      '/sites/default/files',
+      // druxt-auth registers these itself from `druxt.proxy.api`, but its
+      // entries do not survive in this app's module order: `/oauth/authorize`
+      // answered 404 here while its own token middleware worked. Listed until
+      // that is understood, because a missing userinfo proxy fails the
+      // sign-in after the token is already issued.
+      '/oauth/authorize',
+      '/oauth/userinfo',
+      '/oauth/token',
+      '/oauth/revoke',
+      '/druxt-docs',
+    ].map((context) => [
       context,
       { target: DRUXT_BASE_URL, changeOrigin: false },
     ]),
+    // Drupal's login and editing screens, for an editor. The Host is kept, so
+    // Drupal builds its links and redirects for this origin, and its session
+    // cookie is made this origin's: no Domain, and Secure only over HTTPS,
+    // where a browser will store it.
+    [
+      (pathname) => shouldProxy(pathname, { except: [PROFILE_PATH] }),
+      {
+        target: DRUXT_BASE_URL,
+        changeOrigin: false,
+        cookieDomainRewrite: '',
+        onProxyRes: (proxyRes, req) => {
+          const https = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https' || req.socket.encrypted
+          const cookies = proxyRes.headers['set-cookie']
+          if (https || !cookies) return
+          proxyRes.headers['set-cookie'] = cookies.map((cookie) => cookie.replace(/;\s*secure/gi, ''))
+        },
+      },
+    ],
     // The Umami demo backend, for the live component examples. Proxied so the
     // browser stays on this origin and Umami's CORS allowlist never applies.
     [
@@ -204,6 +370,7 @@ export default {
         onProxyReq: (proxyReq) => {
           proxyReq.removeHeader('cookie')
           proxyReq.removeHeader('authorization')
+          proxyReq.removeHeader('x-druxt-workspace')
         },
       },
     ],
@@ -214,6 +381,8 @@ export default {
       // Anchors are what components/app/Toc.vue scroll-spies against.
       // Token colours come from assets/css/code.css, not a Prism theme.
       prism: { theme: false },
+      // The release notes name `druxt@0.24.0`, which GFM would link as mail.
+      remarkPlugins: ['~/lib/remark-package-versions.js'],
     },
   },
 
@@ -233,9 +402,6 @@ export default {
   },
 
   hooks: {
-    // Druxt's own components load with the page: see lib/sync-druxt-components.js.
-    'components:extend': (components) => syncDruxtComponents(components),
-
     /**
      * Collects routes whose generation failed, so the build can refuse to ship them.
      *
@@ -261,7 +427,10 @@ export default {
       const failed = [...new Set([...failedRoutes, ...handled])]
       if (failed.length) {
         throw new Error(
-          'Refusing to ship ' + failed.length + ' route(s) that failed to generate: ' + failed.join(', '),
+          'Refusing to ship ' +
+            failed.length +
+            ' route(s) that failed to generate: ' +
+            failed.join(', ')
         )
       }
 
@@ -271,25 +440,45 @@ export default {
       const { readContent } = require('./lib/content-index')
       const { buildLlmsTxt } = require('./lib/llms-txt')
       const { buildSitemap } = require('./lib/sitemap')
-      const { buildLlmsFullTxt } = require('./lib/llms-full-txt')
+      const { buildLlmsFullTxt, outlineProblems } = require('./lib/llms-full-txt')
 
       const { srcDir, generate } = generator.nuxt.options
       const docs = readContent(path.join(srcDir, 'content'))
 
+      // Readers split this file by heading, so a page that leaves a fence
+      // open would mis-attribute every section after it.
+      const llmsFullTxt = buildLlmsFullTxt(docs)
+      const problems = outlineProblems(docs, llmsFullTxt)
+      if (problems.length) {
+        throw new Error('Refusing to ship llms-full.txt with a broken outline: ' + problems.join('; '))
+      }
+
       await fs.promises.writeFile(path.join(generate.dir, 'llms.txt'), buildLlmsTxt(docs))
-      await fs.promises.writeFile(path.join(generate.dir, 'llms-full.txt'), buildLlmsFullTxt(docs))
+      await fs.promises.writeFile(path.join(generate.dir, 'llms-full.txt'), llmsFullTxt)
       await fs.promises.writeFile(path.join(generate.dir, 'sitemap.xml'), buildSitemap(docs))
 
       // A child process, not a require: satori and resvg crash under the esm
       // config loader's patched module system.
-      const cards = execFileSync(process.execPath, [
-        path.join(srcDir, 'scripts', 'og-render.js'),
-        path.join(srcDir, 'content'),
-        path.join(srcDir, 'assets', 'fonts'),
-        path.join(generate.dir, 'og'),
-      ], { stdio: ['ignore', 'pipe', 'inherit'] }).toString().trim()
+      const cards = execFileSync(
+        process.execPath,
+        [
+          path.join(srcDir, 'scripts', 'og-render.js'),
+          path.join(srcDir, 'content'),
+          path.join(srcDir, 'assets', 'fonts'),
+          path.join(generate.dir, 'og'),
+        ],
+        { stdio: ['ignore', 'pipe', 'inherit'] }
+      )
+        .toString()
+        .trim()
 
-      console.log('SEO: wrote llms.txt, llms-full.txt, sitemap.xml and ' + cards + ' share cards for ' + docs.length + ' documents')
+      console.log(
+        'SEO: wrote llms.txt, llms-full.txt, sitemap.xml and ' +
+          cards +
+          ' share cards for ' +
+          docs.length +
+          ' documents'
+      )
     },
   },
 

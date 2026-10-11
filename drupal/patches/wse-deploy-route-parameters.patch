@@ -1,0 +1,35 @@
+--- a/modules/wse_deploy/src/Controller/WseDeployController.php
++++ b/modules/wse_deploy/src/Controller/WseDeployController.php
+@@ -50,11 +50,14 @@
+    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+    *   Thrown when file system errors occur.
+    */
+-  public function upload(Request $request) {
+-    // Get the uploaded file directly from the request.
++  public function upload(Request $request, string $upload_type, string $workspace_id) {
++    // Get the uploaded file directly from the request. The upload type and
++    // the workspace id come from the route: the HTTP export plugin puts them
++    // in the path and sends nothing else beside the file and the token.
+     $upload = $request->files->get('upload');
+-    $upload_type = $request->request->get('upload_type');
+-    $workspace_id = $request->request->get('workspace_id');
++    if (!$upload) {
++      throw new AccessDeniedHttpException();
++    }
+     $filename = $upload->getClientOriginalName();
+ 
+     $token = $request->query->get('token');
+@@ -106,9 +109,10 @@
+    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+    *   Thrown when the workspace can't be imported, published or reverted.
+    */
+-  public function status(Request $request) {
+-    $status_type = $request->request->get('status');
+-    $workspace_id = $request->request->get('workspace_id');
++  public function status(Request $request, string $status, string $workspace_id) {
++    // The status and the workspace id come from the route, as the HTTP
++    // export plugin sends them: in the path, with the token in the query.
++    $status_type = $status;
+ 
+     $token = $request->query->get('token');
+     $verified = $this->encryptionHandler->validateExpirableToken($token, $workspace_id, $status_type);

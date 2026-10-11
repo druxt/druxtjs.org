@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest something the site, the content model or the importer should do
+about: Suggest something the site or the content model should do
 title: ''
 labels: enhancement
 assignees: ''

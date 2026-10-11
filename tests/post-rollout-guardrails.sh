@@ -38,7 +38,7 @@ trap 'rm -rf "$scratch"' EXIT
 build_app() {
   local bootstrap="$1" sessions="${2:-0}" tokens="${3:-0}"
   local app="$scratch/app-$RANDOM"
-  mkdir -p "$app/lagoon" "$app/drupal/vendor/bin" "$app/drupal/.devtools"
+  mkdir -p "$app/lagoon" "$app/drupal/vendor/bin"
   cp "$ROLLOUT" "$app/lagoon/post-rollout.sh"
 
   # Keys already in place: generating them is a real drush call this stub
@@ -61,20 +61,24 @@ case "\$*" in
       [ -e "\$marker" ] && expr "\$(date +%s)" - "\$(date -r "\$marker" +%s)" > "$app/marker-age.log"
     fi
     [ "\${STUB_SYNC_FAILS:-}" = "1" ] && exit 1 ;;
-  *"status --field=bootstrap"*) [ "$bootstrap" = "yes" ] && echo "Successful" ;;
+  *"status --field=bootstrap"*)
+    [ "\${STUB_STATUS_FAILS:-}" = "1" ] && exit 1
+    [ "$bootstrap" = "yes" ] && echo "Successful" ;;
   *"SELECT COUNT(*) FROM sessions"*) echo "$sessions" ;;
   *"SELECT COUNT(*) FROM oauth2_token"*) echo "$tokens" ;;
+  *"mail LIKE"*)
+    # The file the addresses are written into, as the shell opened it: this
+    # process's own stdout, not that of the substitution below.
+    echo "kept file mode \$(stat -L -c %a /proc/\$\$/fd/1 2>/dev/null)" >> "$app/calls.log"
+    [ "\${STUB_MAIL_FAILS:-}" = "1" ] && exit 1
+    [ -n "\${STUB_KEPT_ADDRESSES:-}" ] && printf '%b\n' "\${STUB_KEPT_ADDRESSES}" ;;
+  *"php:eval"*)
+    [ "\${STUB_EVAL_FAILS:-}" = "1" ] && exit 1
+    if [ "\${STUB_NO_SUCH_USER:-}" = "1" ]; then printf 'no-account'; else printf 'login-restored'; fi ;;
 esac
 exit 0
 EOF
   chmod +x "$app/drupal/vendor/bin/drush"
-
-  cat > "$app/drupal/vendor/bin/php" <<EOF
-#!/usr/bin/env bash
-printf 'php %s\n' "\$*" >> "$app/calls.log"
-exit 0
-EOF
-  chmod +x "$app/drupal/vendor/bin/php"
 
   printf '%s' "$app"
 }
@@ -232,31 +236,15 @@ else
 fi
 
 # --------------------------------------------------------------------------
-# Seeding is the last resort, not the routine.
+# An environment with nothing to copy or keep is installed, not seeded.
 # --------------------------------------------------------------------------
-
-app="$(build_app yes)"
-run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
-if called "$app" ".devtools/import"; then
-  no "a synced environment: seeded from the pin anyway"
-else
-  ok "a synced environment: took its content from the sync, not the pin"
-fi
-
-app="$(build_app yes)"
-run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=production LAGOON_ENVIRONMENT=main > /dev/null
-if called "$app" ".devtools/import"; then
-  no "production: seeded from the pin"
-else
-  ok "production: never seeded"
-fi
 
 app="$(build_app no)"
 run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
-if called "$app" ".devtools/import"; then
-  ok "no database to start from: seeded from the pin, because nothing else has the content"
+if called "$app" "site:install --existing-config"; then
+  ok "no database to start from: installed from the committed configuration"
 else
-  no "no database to start from: nothing installed the content"
+  no "no database to start from: nothing installed the site"
 fi
 
 app="$(build_app yes)"
@@ -269,12 +257,72 @@ else
   no "DOCS_SKIP_SYNC=1: skipped the sync without saying why"
 fi
 
-# Skipping the sync must not start seeding from the pin over a database that
-# is already there.
-if called "$app" ".devtools/import"; then
-  no "DOCS_SKIP_SYNC=1: seeded over the database it was told to keep"
+# A staging environment copies production once. With a database in place it
+# keeps it, whatever the branch's name looks like once Lagoon has flattened
+# it; without one it takes the copy like any other environment.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=staging-release LAGOON_GIT_BRANCH=staging/release)"
+if called "$app" "sql:sync" || called "$app" "rsync"; then
+  no "staging with a database: replaced it"
+elif printf '%s' "$output" | grep -q "staging environment keeps the database"; then
+  ok "staging with a database: kept it, and said why"
 else
-  ok "DOCS_SKIP_SYNC=1: left the content alone"
+  no "staging with a database: skipped the sync without saying why"
+fi
+if called "$app" "deploy --yes"; then
+  ok "staging with a database: still updated the site"
+else
+  no "staging with a database: did not update the site"
+fi
+
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=staging-release > /dev/null
+if called "$app" "sql:sync" || called "$app" "rsync"; then
+  no "staging named only by its environment: replaced the database"
+else
+  ok "staging named only by its environment: kept the database"
+fi
+
+app="$(build_app no)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=staging-release LAGOON_GIT_BRANCH=staging/release > /dev/null
+if called "$app" "sql:sync" || called "$app" "rsync"; then
+  ok "staging without a database: took the copy of production"
+else
+  no "staging without a database: had nothing and copied nothing"
+fi
+
+# When drush cannot say whether staging has a database, nothing is dropped.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=staging-release LAGOON_GIT_BRANCH=staging/release STUB_STATUS_FAILS=1)"
+if called "$app" "sql:sync" || called "$app" "rsync"; then
+  no "staging with an unreadable database: replaced it"
+elif printf '%s' "$output" | grep -q "refusing to replace what may be there"; then
+  ok "staging with an unreadable database: stopped, and said why"
+else
+  no "staging with an unreadable database: went on without saying why"
+fi
+if called "$app" "deploy --yes"; then
+  no "staging with an unreadable database: ran the deploy anyway"
+else
+  ok "staging with an unreadable database: ran nothing further"
+fi
+
+# A release branch is a staging site for the release: it keeps its database too.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=release-0-11-0 LAGOON_GIT_BRANCH=release/0.11.0 > /dev/null
+if called "$app" "sql:sync" || called "$app" "rsync"; then
+  no "a release branch with a database: replaced it"
+else
+  ok "a release branch with a database: kept it"
+fi
+
+# A branch that only resembles a staging one is synced like any other.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-staging-page LAGOON_GIT_BRANCH=feature/staging-page > /dev/null
+if called "$app" "sql:sync" || called "$app" "rsync"; then
+  ok "a feature branch about staging: synced like any other"
+else
+  no "a feature branch about staging: kept its database as if it were staging"
 fi
 
 # Production's scheduled dump is preferred over reading its live database.
@@ -284,6 +332,33 @@ if called "$app" "rsync"; then
   ok "tries production's scheduled dump before its live database"
 else
   no "went straight to the live database without trying the scheduled dump"
+fi
+
+# Production's public files come with its database, after it and before the
+# sanitise; its private files and Drupal's derived directories do not.
+files_line=$(grep -n 'rsync -y .*:%files/ .*sites/default/files/' "$app/calls.log" | head -1 | cut -d: -f1)
+database_line=$(grep -n 'sql:query --file=\|sql:sync' "$app/calls.log" | head -1 | cut -d: -f1)
+sanitise_line=$(grep -n 'sql:sanitize' "$app/calls.log" | head -1 | cut -d: -f1)
+if [ -n "$files_line" ] && [ -n "$database_line" ] && [ "$files_line" -gt "$database_line" ]; then
+  ok "copies production's public files after its database"
+else
+  no "left production's public files behind, or copied them before the database (files ${files_line:-none}, database ${database_line:-none})"
+fi
+if [ -n "$files_line" ] && [ -n "$sanitise_line" ] && [ "$files_line" -lt "$sanitise_line" ]; then
+  ok "copies the files before the sanitise, inside the same window"
+else
+  no "copied the files outside the replacing window (files ${files_line:-none}, sanitise ${sanitise_line:-none})"
+fi
+files_call=$(grep 'rsync -y .*:%files/ ' "$app/calls.log" | head -1)
+if printf '%s' "$files_call" | grep -q -- '--exclude=/private'; then
+  ok "leaves production's private files where they are"
+else
+  no "copied production's private files: keys, dumps and markers"
+fi
+if printf '%s' "$files_call" | grep -q -- '--exclude=/php .*--exclude=/css .*--exclude=/js .*--exclude=/styles'; then
+  ok "leaves Drupal's derived directories for it to make again"
+else
+  no "copied Drupal's derived directories"
 fi
 
 # --------------------------------------------------------------------------
@@ -313,7 +388,7 @@ fi
 
 # --------------------------------------------------------------------------
 # Drupal refuses web requests while its database is replaced, so nothing
-# writes into a half-imported database, and the copy leaves out what a
+# writes into a half-copied database, and the copy leaves out what a
 # request would write.
 # --------------------------------------------------------------------------
 
@@ -378,6 +453,232 @@ for table in 'cache' 'cache_*' 'cachetags' 'sessions' 'watchdog'; do
     no "copied with its rows: ${table}"
   fi
 done
+
+# --------------------------------------------------------------------------
+# The frontend's consumer is set up after the updates, on every rollout,
+# copied database or installed site alike.
+# --------------------------------------------------------------------------
+
+line_of() { grep -n -F -- "$2" "$1/calls.log" | head -1 | cut -d: -f1; }
+
+for bootstrap in yes no; do
+  app="$(build_app "$bootstrap")"
+  run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
+  step="$( [ "$bootstrap" = yes ] && echo deploy || echo site:install )"
+  client="$(line_of "$app" 'druxtjsorg:oauth-client')"
+  update="$(line_of "$app" "$step")"
+  if [ -n "$client" ] && [ -n "$update" ] && [ "$client" -gt "$update" ]; then
+    ok "sets up the sign-in consumer after ${step}"
+  else
+    no "did not set up the sign-in consumer after ${step} (client line: ${client:-none}, ${step} line: ${update:-none})"
+  fi
+done
+
+# --------------------------------------------------------------------------
+# A maintainer keeps their address and their password through the sanitise.
+# Without this, every rollout hands back an environment nobody can sign in
+# to, and an account named user+2@localhost.
+# --------------------------------------------------------------------------
+
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  STUB_KEPT_ADDRESSES='2\tmaintainer@druxtjs.org' > /dev/null
+if called "$app" "UPDATE users_field_data SET mail = 'maintainer@druxtjs.org', init = 'maintainer@druxtjs.org' WHERE uid = 2;"; then
+  ok "a maintainer's address is written back after the sanitise"
+else
+  no "a maintainer's address was not written back"
+  sed 's/^/       /' "$app/calls.log"
+fi
+
+# The negative control: with no maintainer address in the copy, nothing is
+# written back, so the assertion above is about the address and not about a
+# script that updates rows regardless.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
+if called "$app" "UPDATE users_field_data SET mail"; then
+  no "no maintainer address: a row was written back anyway"
+else
+  ok "no maintainer address: nothing was written back"
+fi
+
+# A row that is not a plain address is skipped rather than built into SQL.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  STUB_KEPT_ADDRESSES="2\tno'quote@druxtjs.org" > /dev/null
+if called "$app" "UPDATE users_field_data SET mail"; then
+  no "an address with a quote in it was built into SQL"
+else
+  ok "an address with a quote in it is skipped"
+fi
+
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password)"
+if called "$app" "setPassword" && called "$app" "activate()" &&
+  printf '%s' "$output" | grep -q "A Maintainer can sign in again"; then
+  ok "the maintainer's password is set again, and the account activated with it"
+else
+  no "the maintainer's password was not set again"
+  sed 's/^/       /' "$app/calls.log"
+fi
+
+# The rollout says an account can sign in only when Drupal says it changed
+# one. Reading drush's exit status instead would call a broken bootstrap a
+# restored login, because drush reports a PHP exit() as its own failure.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
+  STUB_NO_SUCH_USER=1)"
+if printf '%s' "$output" | grep -q "can sign in again"; then
+  no "an account Drupal did not find: the rollout said it can sign in"
+else
+  ok "an account Drupal did not find: the rollout did not claim a login"
+fi
+
+# The password is read from the environment inside Drupal, so it is never in
+# a command line that anything else in the container can read.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password > /dev/null
+if grep -qF "not-a-real-password" "$app/calls.log"; then
+  no "the password was passed as an argument"
+else
+  ok "the password is never passed as an argument"
+fi
+
+# A drush that fails for any other reason is reported as a failure, not as
+# an account the copy does not have.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
+  STUB_EVAL_FAILS=1)"
+status=$?
+if printf '%s' "$output" | grep -q "could not restore" && [ "$status" -ne 0 ]; then
+  ok "a drush that fails another way: the rollout says the login was not restored, and fails"
+else
+  no "a drush that fails another way: reported as a missing account, or the rollout succeeded (exit $status)"
+fi
+if printf '%s' "$output" | grep -q "refusing to leave this environment usable"; then
+  ok "a drush that fails another way: the rollout refuses to hand over the environment"
+else
+  no "a drush that fails another way: the rollout was reported green"
+fi
+
+# A failed read of the maintainers' addresses stops the rollout before the
+# sanitise can take them.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x STUB_MAIL_FAILS=1)"
+status=$?
+if [ "$status" -ne 0 ] && printf '%s' "$output" | grep -q "Could not read the maintainers' addresses" && ! called "$app" "sql:sanitize"; then
+  ok "a failed address read: the rollout stops before sanitising"
+else
+  no "a failed address read: the rollout went on (exit $status)"
+fi
+
+# Production addresses are read to be put back, and nothing needs the file
+# after that: it must not outlive the rollout.
+app="$(build_app yes)"
+mkdir -p "$app/tmp"
+# Under the usual umask, where a file the shell creates is readable by all.
+(umask 022 && run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_DOMAIN=example.com STUB_KEPT_ADDRESSES='2\tsomeone@example.com' TMPDIR="$app/tmp") > /dev/null
+# The address was read and put back, so the file existed; now it must be gone.
+if ! called "$app" "someone@example.com"; then
+  no "the kept address was never restored, so the file check proves nothing"
+elif [ -n "$(ls -A "$app/tmp")" ]; then
+  no "the kept addresses file outlived the rollout"
+else
+  ok "the kept addresses file does not outlive the rollout"
+fi
+# Written while the file still holds production's addresses, so only the
+# rollout's own user may read it.
+if called "$app" "kept file mode 600"; then
+  ok "the kept addresses file is private while it holds addresses"
+else
+  no "the kept addresses file was readable beyond the rollout's user ($(grep 'kept file mode' "$app/calls.log"))"
+fi
+
+# The domain decides a SQL predicate, so a value that is not a hostname is
+# refused rather than interpolated.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_DOMAIN="x' OR 1=1 -- " STUB_KEPT_ADDRESSES='2\tsomeone@example.com')"
+if called "$app" "OR 1=1"; then
+  no "a domain that is not a hostname: it reached the query"
+elif printf '%s' "$output" | grep -q "not a hostname"; then
+  ok "a domain that is not a hostname: no address is kept, and it says why"
+else
+  no "a domain that is not a hostname: nothing was kept, and nothing said why"
+fi
+
+# The negative control for the check above: a hostname is used.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_DOMAIN="example.org" STUB_KEPT_ADDRESSES='2\tsomeone@example.org' > /dev/null
+if called "$app" "mail LIKE '%@example.org'"; then
+  ok "a hostname: it is the domain the query asks for"
+else
+  no "a hostname: the query did not ask for it"
+  sed 's/^/       /' "$app/calls.log"
+fi
+
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
+if called "$app" "setPassword"; then
+  no "no maintainer configured: a password was set anyway"
+else
+  ok "no maintainer configured: no password was set"
+fi
+
+# A name without a password says so rather than setting an empty one.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer")"
+if called "$app" "setPassword"; then
+  no "a name without a password: a password was set"
+elif printf '%s' "$output" | grep -q "without DOCS_MAINTAINER_PASSWORD"; then
+  ok "a name without a password: nothing was set, and it said why"
+else
+  no "a name without a password: nothing was set, and nothing said why"
+fi
+
+# An account the copy does not have is not a reason to fail the rollout.
+app="$(build_app yes)"
+output="$(run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
+  STUB_NO_SUCH_USER=1)"
+status=$?
+if [ "$status" -ne 0 ]; then
+  no "an account that is not in the copy: the rollout failed"
+elif printf '%s' "$output" | grep -q "nothing to restore"; then
+  ok "an account that is not in the copy: the rollout carried on, and said so"
+else
+  no "an account that is not in the copy: the rollout carried on without saying so"
+fi
+
+# Nothing is restored into a copy that was not sanitised: a sanitise that
+# left the sessions behind stops the rollout before this point.
+app="$(build_app yes 12)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
+  STUB_KEPT_ADDRESSES='2\tmaintainer@druxtjs.org' > /dev/null
+if called "$app" "setPassword" || called "$app" "UPDATE users_field_data SET mail"; then
+  no "a failed sanitisation: an address or a password was restored anyway"
+else
+  ok "a failed sanitisation: nothing was restored"
+fi
+
+# Production is never sanitised, so it is never restored either, however the
+# variables are set.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=production LAGOON_ENVIRONMENT=main \
+  DOCS_MAINTAINER_NAME="A Maintainer" DOCS_MAINTAINER_PASSWORD=not-a-real-password \
+  STUB_KEPT_ADDRESSES='2\tmaintainer@druxtjs.org' > /dev/null
+if called "$app" "setPassword" || called "$app" "UPDATE users_field_data SET mail"; then
+  no "production: an account was rewritten"
+else
+  ok "production: no account was touched"
+fi
 
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]

@@ -1,19 +1,23 @@
 <template>
   <article>
-    <AppPageHeader :title="document.title" :description="document.description" />
+    <AppPageHeader :title="document.title" :description="document.description" :entity="operationsEntity" />
     <AppProse v-if="!drupal" :document="document" />
     <!-- Keyed so each page gets a fresh AppProse, whose enhance() runs on mount. -->
     <AppProse v-else :key="document.path" :title="document.title">
-      <DruxtEntity :type="document.type" :uuid="document.uuid" mode="full" />
+      <!-- A section landing lists its pages through its "Pages in this
+           section" paragraph, which renders the docs_section view. -->
+      <DruxtEntity :key="druxtKey" :type="document.type" :uuid="document.uuid" mode="full" />
     </AppProse>
-    <AppDocFooter :prev="prev" :next="next" />
+    <AppNextSteps v-if="drupal && !document.isLanding" :next="nextSteps" :sibling="next" :prev="prev" />
+    <AppDocFooter v-else :prev="prev" :next="next" />
   </article>
 </template>
 
 <script>
 import { seoHead } from '~/utils/seo'
 import { documentDescription } from '~/utils/content'
-import { fetchDrupalPage, sectionOf } from '~/lib/drupal-document'
+import { fetchDrupalPage, nextSteps, sectionOf } from '~/lib/drupal-document'
+import { versionFromQuery } from '~/lib/revisions'
 
 /** Pages docgen writes into the authored sections; they come from its corpus, not Drupal. */
 const GENERATED = ['/how-to/contributing']
@@ -31,6 +35,13 @@ export default {
     const path = route.path.replace(/\/$/, '') || '/'
 
     if ($config.docsSource !== 'markdown' && !GENERATED.includes(path)) {
+      // A shared URL carries the revision and whether its diff is on, so the
+      // page a reader was sent is the page they are sent to.
+      if (store.$auth && store.$auth.loggedIn) {
+        const asked = versionFromQuery(route.query)
+        if (asked) store.commit('setEditorVersion', asked)
+        store.commit('setEditorCompare', Boolean(route.query.diff))
+      }
       const document = await fetchDrupalPage(store, path)
       if (!document) return error({ statusCode: 404, message: 'Document not found' })
       // Drupal matches aliases in any case; one spelling is the page.
@@ -45,7 +56,9 @@ export default {
         : []
       store.commit('addRecent', { text: document.title, to: route.path })
       store.commit('setToc', document.toc)
-      return { document, drupal: true, section, siblings, current: path }
+      // The editor's "Where to go next" pages, as they are now.
+      const next = document.isLanding ? [] : await nextSteps(store, document.next)
+      return { document, drupal: true, section, siblings, current: path, nextSteps: next }
     }
 
     const slug = params.pathMatch || 'README'
@@ -65,6 +78,7 @@ export default {
       section,
       siblings: index.map((item) => ({ text: item.title, to: to(item) })),
       current: to(document),
+      nextSteps: [],
     }
   },
   head() {
@@ -74,7 +88,31 @@ export default {
       path: this.$route.path,
     })
   },
+  watch: {
+    // The URL is the view's record. A navigation on the same page that drops
+    // `revision` or `diff` from it puts the store back to what the URL says;
+    // a change the pill made and wrote to the URL comes through unchanged.
+    '$route.query'(query) {
+      if (!this.drupal || !(this.$auth && this.$auth.loggedIn)) return
+      const editor = this.$store.state.editor
+      const version = versionFromQuery(query) || 'working-copy'
+      if (version !== editor.version) this.$store.commit('setEditorVersion', version)
+      const compare = Boolean(query.diff)
+      if (compare !== editor.compare) this.$store.commit('setEditorCompare', compare)
+    },
+  },
+
   computed: {
+    /** The page's Drupal node, for an editor's operations; none for markdown. */
+    operationsEntity() {
+      if (!this.drupal || !this.document.uuid) return null
+      return { type: this.document.type, id: this.document.uuid, attributes: { title: this.document.title }, state: this.document.moderationState }
+    },
+    /** Re-mounts DruxtEntity when the editor switches revision, so it re-fetches. */
+    druxtKey() {
+      const version = this.$auth && this.$auth.loggedIn ? this.$store.state.editor.version : 'published'
+      return `${(this.document || {}).uuid}@${version}`
+    },
     position: ({ siblings, current }) => siblings.findIndex((o) => o.to === current),
     prev: ({ siblings, position }) => (position > 0 ? siblings[position - 1] : null),
     next: ({ siblings, position }) => (position > -1 && position < siblings.length - 1 ? siblings[position + 1] : null),

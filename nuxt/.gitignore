@@ -115,3 +115,6 @@ styles/
 /static/sitemap.xml
 /static/llms.txt
 /static/llms-full.txt
+
+# Written by the Lagoon image: druxt's manifest at the documentation's pin.
+/.pinned-druxt.json

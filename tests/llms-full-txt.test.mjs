@@ -7,7 +7,7 @@
 import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
 
-const { buildLlmsFullTxt, toAbsoluteUrls, isChangelog } = await import(
+const { buildLlmsFullTxt, outlineProblems, toAbsoluteUrls, isChangelog } = await import(
   '../nuxt/lib/llms-full-txt.js'
 )
 
@@ -135,6 +135,89 @@ describe('buildLlmsFullTxt', () => {
     const out = buildLlmsFullTxt([doc({ title: 'Empty', content: '   ' })], options)
 
     assert.ok(!out.includes('## Empty'))
+  })
+})
+
+describe('outlineProblems', () => {
+  const shell = '```sh\n# .env\nBASE_URL=https://cms.example.com\n# NUXT_TARGET=static\n```'
+  const problems = (docs) => outlineProblems(docs, buildLlmsFullTxt(docs, options))
+  const outline = (content) => problems([doc({ content })])
+
+  test('accepts the title and section headings, with shell comments inside fences', () => {
+    assert.deepEqual(outline(shell), [])
+  })
+
+  test('accepts every section heading the builder can emit', () => {
+    const sections = ['tutorials', 'how-to', 'explanation', 'modules', 'api']
+    const docs = sections.map((section) => doc({ route: '/' + section + '/page', section }))
+
+    assert.deepEqual(problems(docs), [])
+  })
+
+  test('reports a fence that never closes, which hides the rest of the file', () => {
+    const found = outline('```sh\n# .env\nBASE_URL=x')
+
+    assert.equal(found.length, 2)
+    assert.match(found[0], /^\/how-to\/theming line 1: code fence never closes/)
+    assert.match(found[1], /^line \d+: code fence never closes/)
+  })
+
+  test('names the page whose fence the next page closes, which the file alone hides', () => {
+    const found = problems([
+      doc({ route: '/how-to/a', weight: 1, content: '```sh\n# .env' }),
+      doc({ route: '/how-to/b', weight: 2, content: '```sh\nls\n```' }),
+    ])
+
+    assert.deepEqual(found, ['/how-to/a line 1: code fence never closes'])
+  })
+
+  test('reports a heading in a body, which claims the sections after it', () => {
+    assert.deepEqual(outline('# NUXT_TARGET=static'), [
+      '/how-to/theming line 1: top-level heading "NUXT_TARGET=static" in a page body',
+    ])
+  })
+
+  test('reports a body heading that reads like a section heading, which the file alone accepts', () => {
+    assert.deepEqual(outline('Intro.\n\n# Tutorials\n\nMore.'), [
+      '/how-to/theming line 3: top-level heading "Tutorials" in a page body',
+    ])
+  })
+
+  test('reads the body as the site renders it: setext headings, fences in list items, HTML blocks', () => {
+    assert.deepEqual(outline('Overview\n========\n\nText.'), [
+      '/how-to/theming line 1: top-level heading "Overview" in a page body',
+    ])
+    assert.deepEqual(outline('````md\n```js\n# inner\n```\n````'), [])
+    assert.deepEqual(outline('~~~\n```\n# inner\n~~~'), [])
+    assert.deepEqual(outline('```inline``` then prose'), [])
+    assert.deepEqual(
+      outline('- Set the file:\n\n  ```sh\n  # .env\n  BASE_URL=x\n  ```\n- Then run it.'),
+      []
+    )
+    assert.deepEqual(outline('*   ```sh\n    # .env\n    ```\n\nText.'), [])
+    assert.deepEqual(outline('<!--\n# not a heading\n-->\n\nText.'), [])
+    assert.deepEqual(outline('<pre>\n# not a heading\n\n```\n# nor this\n</pre>\n\nText.'), [])
+    assert.deepEqual(outline('<div>\n# raw\n</div>\n\n# After'), [
+      '/how-to/theming line 5: top-level heading "After" in a page body',
+    ])
+  })
+
+  test('reports a raw-text element that never closes, which would swallow the rest', () => {
+    const found = outline('<pre>\n# swallowed\n\nText.')
+
+    assert.equal(found.length, 2)
+    assert.equal(found[0], '/how-to/theming line 1: <pre> never closes')
+    assert.match(found[1], /<pre> never closes$/)
+  })
+
+  test('ignores a page the file drops, such as a changelog with a fence left open', () => {
+    const found = problems([
+      doc(),
+      doc({ route: '/api/packages/druxt/CHANGELOG', section: 'api', content: '```sh\n# .env' }),
+      doc({ route: '/playground', section: 'playground', content: '```sh\n# .env' }),
+    ])
+
+    assert.deepEqual(found, [])
   })
 })
 

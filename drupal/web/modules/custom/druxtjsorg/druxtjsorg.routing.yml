@@ -1,0 +1,2 @@
+route_callbacks:
+  - '\Drupal\druxtjsorg\Routing\WorkspaceRoutes::routes'

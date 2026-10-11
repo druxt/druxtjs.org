@@ -9,11 +9,9 @@ use Drupal\Component\Utility\Html;
 /**
  * The headings a page renders, with the ids the site gives them.
  *
- * A port of buildToc() in scripts/build-ir.mjs, which the import checks it
- * against. Markdown is read line by line with the same regex, inline code is
- * unwrapped, and one Slugger per page numbers repeated ids. Rich text adds
- * the h1 to h6 elements of its HTML; the corpus is markdown, so the IR
- * builder never sees any.
+ * A port of the markdown site's buildToc(). Markdown is read line by line
+ * with its regex, inline code is unwrapped, and one Slugger per page numbers
+ * repeated ids. Rich text adds the h1 to h6 elements of its HTML.
  */
 final class TableOfContents {
 

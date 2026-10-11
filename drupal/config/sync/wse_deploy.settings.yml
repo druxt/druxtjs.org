@@ -1,0 +1,6 @@
+_core:
+  default_config_hash: FzEkdPbi3j-_ESEkPiwQ6cfT_PN1uW_6k5p5BGobbgI
+deploy_path: 'private://workspaces'
+export_plugin: http
+export_plugin_configuration:
+  remote_endpoint: ''

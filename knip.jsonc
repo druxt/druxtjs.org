@@ -4,8 +4,20 @@
   // drupal/ are applications with their own manifests.
   "entry": ["scripts/*.mjs", "tests/*.mjs"],
   "project": ["scripts/**/*.mjs", "tests/**/*.mjs"],
-  "ignore": ["nuxt/**", "drupal/**", ".docs-source/**", ".docs-ir/**"],
+  "ignore": ["nuxt/**", "drupal/**", ".docs-source/**"],
   // node --test's built-in reporters, which knip reads as packages in the
-  // test:coverage script.
-  "ignoreDependencies": ["junit", "spec"]
+  // test:coverage script, and nuxt/'s packages the tests reach through
+  // nuxt/: the diff package through nuxt/lib/diff.js, druxt-auth through
+  // nuxt/server/page-cache.js and the remark parser through
+  // nuxt/lib/llms-full-txt.js. All belong to nuxt/'s manifest.
+  "ignoreDependencies": [
+    "junit",
+    "spec",
+    "@druxt-contrib/diff",
+    "druxt-auth",
+    "unified",
+    "remark-parse",
+    "unist-util-visit",
+    "mdast-util-to-string"
+  ]
 }

@@ -33,10 +33,9 @@ node_modules/
 # PHPUnit.
 /drupal/.phpunit.cache/
 
-# Written by .devtools. Never committed.
+# Written by .devtools and scripts/docs-fetch.sh. Never committed.
 /.env
 /.docs-source/
-/.docs-ir/
 
 # Vale and its styles, installed by .gitlab/scripts/install-vale.sh.
 /.vale/

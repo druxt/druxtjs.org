@@ -1,6 +1,28 @@
 {
-    "_hash": "de4f7c66907b8b386b72079ec97aa968f9f2c896659c0e39b99eace23db5ff14",
+    "_hash": "212152985982cf516f23bafe9074c4e9666a5038a97f5b60dde0f35373b83a7d",
     "patches": {
+        "drupal/core": [
+            {
+                "package": "drupal/core",
+                "description": "Issue #3626255: prefetch JSON:API resource object normalizations (MR 17265 at a9227f7b, vendored)",
+                "url": "patches/drupal-core-3626255-prefetch-normalizations-mr17265-a9227f7b.patch",
+                "sha256": "a9b87aff390c5ab00c16a0bf421e31c17e4642a1de2cf6f268ba28411c8147a8",
+                "depth": 2,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/core",
+                "description": "Issue #3626255: inject the normalization cacher, which 11.x does not autowire",
+                "url": "patches/jsonapi-3626255-data-normalizer-argument.patch",
+                "sha256": "578caf52d23e10cedc67480d62204ed45f794883d07e1fdef26c7918996bf26c",
+                "depth": 2,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
         "drupal/decoupled_settings": [
             {
                 "package": "drupal/decoupled_settings",
@@ -19,6 +41,50 @@
                 "description": "Issue #3367724: resolve includes from the previewed entity",
                 "url": "https://git.drupalcode.org/project/jsonapi_node_preview/-/merge_requests/4.diff",
                 "sha256": "cb4051a1c809d67a58024e35805b9b5bd7dcc9c8d5e23ec9686f729dbc1fa665",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/druxt": [
+            {
+                "package": "drupal/druxt",
+                "description": "Stand aside for a path the wildcard resolver cannot rebuild, so the entity resolver answers it",
+                "url": "patches/druxt-wildcard-stands-aside.patch",
+                "sha256": "96515a192dcd64a8e98acdd1d9b1b4f38ff529eb488df5272efab7edc657b8f1",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/wse": [
+            {
+                "package": "drupal/wse",
+                "description": "Workspaces Deploy: read the upload type, status and workspace id from the route, as the HTTP export sends them",
+                "url": "patches/wse-deploy-route-parameters.patch",
+                "sha256": "0e8ef3c985ac061a503d6ddef6966e6537116af58ee908652094fee8bd7d1b29",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/wse",
+                "description": "Workspaces Deploy: a configured hash key signs alone, so a deploy pair keeps separate hash salts",
+                "url": "patches/wse-deploy-key-signs-alone.patch",
+                "sha256": "ddc3898b2d72491392f4ea66bc314d25e40f581b88fc761932b06822c61797ba",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/wse",
+                "description": "Workspaces Deploy: an accept key verifies a deploy signed by the environment before this one",
+                "url": "patches/wse-deploy-accept-key.patch",
+                "sha256": "00e87b43ed9541556ef8a2cb9d6ce48ec0df92c1212526235550400410f2479e",
                 "depth": 1,
                 "extra": {
                     "provenance": "root"

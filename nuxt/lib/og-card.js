@@ -178,6 +178,18 @@ function ogCard(page) {
   ]
 
   // API pages carry no frontmatter description, so the kind fills that line.
+  // A page with both, the release notes, gets the kind as a small line and
+  // the description beneath it.
+  const both = Boolean(page.description && page.kind)
+  if (both) {
+    block.push(
+      el(
+        'div',
+        { display: 'flex', fontFamily: SANS, fontSize: 26, fontWeight: 600, letterSpacing: '0.02em', color: INK_70, marginTop: 20 },
+        page.kind
+      )
+    )
+  }
   const sub = page.description || page.kind
   if (sub) {
     block.push(
@@ -189,7 +201,7 @@ function ogCard(page) {
           fontSize: 30,
           lineHeight: 1.4,
           color: INK_70,
-          marginTop: 22,
+          marginTop: both ? 12 : 22,
           ...(page.description ? { maxWidth: 920 } : {}),
         },
         sub

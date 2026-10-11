@@ -17,9 +17,12 @@ const STEPS = ['waiting', 'building', 'starting']
  * Serve the starting page, and the phase it polls for.
  *
  * @param {object} state - `{ phase, since }`, updated as the start proceeds.
+ * @param {object} [options] - Options.
+ * @param {object} [options.headers] - Headers every response carries, such as
+ *   the site's describedby link, which the app sends once it has the port.
  * @returns {Function} A request listener.
  */
-const createStartingHandler = (state) => (req, res) => {
+const createStartingHandler = (state, { headers = {} } = {}) => (req, res) => {
   const pathname = String(req.url || '/').split('?')[0]
 
   if (pathname === '/__status') {
@@ -30,6 +33,7 @@ const createStartingHandler = (state) => (req, res) => {
       since: state.since,
     })
     res.writeHead(200, {
+      ...headers,
       'Content-Type': 'application/json; charset=utf-8',
       'Cache-Control': 'no-store',
     })
@@ -37,6 +41,7 @@ const createStartingHandler = (state) => (req, res) => {
   }
 
   res.writeHead(503, {
+    ...headers,
     'Content-Type': 'text/html; charset=utf-8',
     'Retry-After': '15',
     'Cache-Control': 'no-store',

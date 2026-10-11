@@ -1,0 +1,11 @@
+uuid: 9c601182-a047-4879-a575-35bb4bac5d18
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.step
+label: Step
+description: 'A page as one numbered step in its section, on the section landing.'
+targetEntityType: node
+cache: true

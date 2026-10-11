@@ -2,7 +2,11 @@ uuid: d2510326-8ea3-4963-87f7-d352d0b2ceca
 langcode: en
 status: true
 dependencies:
+  config:
+    - field.field.user.user.user_picture
+    - image.style.thumbnail
   module:
+    - image
     - user
 id: user.user.default
 targetEntityType: user
@@ -13,5 +17,16 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 5
+    region: content
+  user_picture:
+    type: image
+    label: hidden
+    settings:
+      image_link: ''
+      image_style: thumbnail
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 0
     region: content
 hidden: {  }

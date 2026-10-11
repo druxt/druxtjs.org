@@ -14,6 +14,7 @@ import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
 const {
+  LLMS_LINK,
   SECURITY_HEADERS,
   createHandler,
   createPageCache,
@@ -21,6 +22,7 @@ const {
   isPage,
 } = require('../nuxt/server/page-cache.js')
 const {
+  backendOrigin,
   backendReady,
   deployedRevision,
   deploymentReady,
@@ -29,6 +31,7 @@ const {
   waitForBackend,
 } = require('../nuxt/server/backend.js')
 const { PAGE, createStartingHandler } = require('../nuxt/server/starting.js')
+const { HINT } = require('../nuxt/lib/entity-operations.js')
 
 // Serve a request listener on a free port for the length of one callback.
 const withServer = async (listener, callback) => {
@@ -85,7 +88,10 @@ describe('isPage', () => {
     for (const pathname of [
       ...others,
       '/router/translate-path',
+      // Druxt's schema refresh answers JSON at a path with no extension.
+      '/_druxt/schema/node--doc_page--default--view',
       '/sites/default/files/a.png',
+      '/oauth/userinfo',
       '/icon.png',
       '/sitemap.xml',
     ]) {
@@ -238,6 +244,78 @@ describe('createHandler', () => {
     })
   })
 
+  test('renders a signed-in editor live, never from the store and never into it', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'docs-cache-'))
+    let renders = 0
+    const cache = createPageCache({
+      dir,
+      ttl: 60000,
+      render: async () => ({ html: `<p>live ${++renders}</p>` }),
+    })
+    await cache.store('/how-to')
+    const stored = await cache.read('/how-to')
+    const live = (req, res) => res.end('<p>rendered for the request</p>')
+    try {
+      await withServer(createHandler({ cache, live }), async (base) => {
+        const editor = await request(`${base}/how-to`, {
+          headers: {
+            cookie: 'auth.strategy=drupal-password; auth._token.drupal-password=Bearer%20abc',
+          },
+        })
+        assert.equal(editor.body, '<p>rendered for the request</p>')
+        assert.equal(editor.headers['x-docs-cache'], 'BYPASS')
+        assert.equal(editor.headers['cache-control'], 'no-store')
+        // A Drupal session alone, which Drupal marks with its editor hint.
+        const drupalOnly = await request(`${base}/how-to`, { headers: { cookie: `${HINT}=1` } })
+        assert.equal(drupalOnly.body, '<p>rendered for the request</p>')
+        assert.equal(drupalOnly.headers['x-docs-cache'], 'BYPASS')
+        // The store is untouched: the next anonymous reader gets the copy from before.
+        const reader = await request(`${base}/how-to`)
+        assert.equal(reader.headers['x-docs-cache'], 'HIT')
+        assert.equal(reader.body, stored.body.toString())
+        // A cookie that is not the token, or a signed-out one, is an anonymous reader.
+        for (const cookie of [
+          'auth.strategy=drupal-password',
+          'auth._token.drupal-password=false',
+        ]) {
+          const other = await request(`${base}/how-to`, { headers: { cookie } })
+          assert.equal(other.headers['x-docs-cache'], 'HIT', cookie)
+        }
+      })
+      assert.equal(renders, 1)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  test('renders an editor reading a workspace live, and gives a reader with the cookie the stored page', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'docs-cache-'))
+    const cache = createPageCache({
+      dir,
+      ttl: 60000,
+      render: async () => ({ html: '<p>live</p>' }),
+    })
+    await cache.store('/how-to')
+    const live = (req, res) => res.end('<p>rendered in the workspace</p>')
+    try {
+      await withServer(createHandler({ cache, live }), async (base) => {
+        const editor = await request(`${base}/how-to`, {
+          headers: { cookie: 'druxt-workspace=stage; auth._token.drupal-password=Bearer%20abc' },
+        })
+        assert.equal(editor.headers['x-docs-cache'], 'BYPASS')
+        assert.equal(editor.headers['cache-control'], 'no-store')
+        // The choice alone is not a sign-in: Drupal answers that reader from live.
+        const reader = await request(`${base}/how-to`, {
+          headers: { cookie: 'druxt-workspace=stage' },
+        })
+        assert.equal(reader.headers['x-docs-cache'], 'HIT')
+        assert.equal(reader.body, '<p>live</p>')
+      })
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
   test('bypasses the store for live=1 only, not for any query string', async () => {
     const dir = tempDir()
     try {
@@ -256,6 +334,32 @@ describe('createHandler', () => {
         assert.equal(fresh.body, 'live')
         const both = await request(`${base}/page?a=1&live=1`)
         assert.equal(both.body, 'live')
+      })
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  test("hands Drupal's own paths to the live app and never stores them", async () => {
+    const dir = tempDir()
+    try {
+      const cache = createPageCache({
+        dir,
+        ttl: 60000,
+        render: async () => ({ html: '<p>stored</p>' }),
+      })
+      await cache.store('/user/login')
+      await cache.store('/page')
+      const passThrough = (pathname) => pathname.startsWith('/user')
+      await withServer(createHandler({ cache, live: live(), passThrough }), async (base) => {
+        const login = await request(`${base}/user/login`)
+        assert.equal(login.body, 'live')
+        assert.equal(login.headers['x-docs-cache'], undefined)
+        assert.equal(login.headers['cache-control'], 'no-store')
+        const trailing = await request(`${base}/user/`)
+        assert.equal(trailing.status, 200, 'not redirected to drop the slash')
+        const page = await request(`${base}/page`)
+        assert.equal(page.headers['x-docs-cache'], 'HIT')
       })
     } finally {
       rmSync(dir, { recursive: true, force: true })
@@ -330,6 +434,32 @@ describe('createHandler', () => {
       const tls = await request(`${base}/`, { headers: { 'X-Forwarded-Proto': 'https,http' } })
       assert.equal(tls.headers['strict-transport-security'], 'max-age=31536000')
     })
+  })
+
+  test('points the starting page and its status at llms.txt too, when told the link', async () => {
+    const state = { phase: 'waiting', since: Date.now() }
+    await withServer(
+      createStartingHandler(state, { headers: { Link: LLMS_LINK } }),
+      async (base) => {
+        for (const path of ['/__status', '/']) {
+          const res = await request(`${base}${path}`)
+          assert.equal(res.headers.link, LLMS_LINK, `Link on ${path}`)
+        }
+      }
+    )
+    await withServer(createStartingHandler(state), async (base) => {
+      assert.equal((await request(`${base}/`)).headers.link, undefined, 'no link unless told one')
+    })
+  })
+
+  test('points every response at llms.txt with a describedby link', async () => {
+    await withServer(createHandler({ cache: null, live: live() }), async (base) => {
+      for (const target of [`${base}/`, `${base}/how-to/proxy`, `${base}/jsonapi/x`]) {
+        const res = await request(target)
+        assert.equal(res.headers.link, LLMS_LINK, `Link on ${target}`)
+      }
+    })
+    assert.equal(LLMS_LINK, '</llms.txt>; rel="describedby"; type="text/plain"')
   })
 
   test('never stores a page that did not answer 200', async () => {
@@ -542,23 +672,79 @@ describe('backend', () => {
     )
   })
 
+  test('resolveOrigin takes a custom name under the site domain on a preview, never a sibling service', () => {
+    // dev.druxtjs.org is the dev snapshot's own domain, beside its autogenerated route.
+    assert.equal(
+      resolveOrigin({
+        LAGOON_ROUTES:
+          'https://nuxt.dev-snapshot.druxtjs-org.au2.amazee.io,https://dev.druxtjs.org,https://storybook.dev-snapshot.druxtjs-org.au2.amazee.io',
+        LAGOON_ENVIRONMENT_TYPE: 'development',
+      }),
+      'https://dev.druxtjs.org'
+    )
+    // Storybook's custom domain is not the frontend's.
+    assert.equal(
+      resolveOrigin({
+        LAGOON_ROUTES: 'https://nuxt.main.druxtjs-org.au2.amazee.io,https://storybook.druxtjs.org',
+        LAGOON_ENVIRONMENT_TYPE: 'development',
+      }),
+      'https://nuxt.main.druxtjs-org.au2.amazee.io'
+    )
+  })
+
   test('resolveOrigin leaves an environment without routes alone', () => {
     assert.equal(resolveOrigin({}), undefined)
   })
 
-  test('is ready once the footer menu has items', async () => {
+  test('backendOrigin keeps an explicit public URL, without its trailing slash', () => {
+    assert.equal(
+      backendOrigin({
+        DRUXT_PUBLIC_URL: 'https://cms.example.com/',
+        LAGOON_ROUTES: 'https://cms.druxtjs.org',
+      }),
+      'https://cms.example.com'
+    )
+  })
+
+  test('backendOrigin names the cms route in production, never the internal service', () => {
+    const routes =
+      'https://druxtjs.org,https://nginx.main.druxtjs-org.au2.amazee.io,https://cms.druxtjs.org'
+    assert.equal(
+      backendOrigin({ LAGOON_ROUTES: routes, DRUXT_BASE_URL: 'http://nginx:8080' }),
+      'https://cms.druxtjs.org'
+    )
+  })
+
+  test('backendOrigin uses the nginx route on a preview', () => {
+    const routes =
+      'https://nuxt.feature.druxtjs-org.au2.amazee.io,https://nginx.feature.druxtjs-org.au2.amazee.io'
+    assert.equal(
+      backendOrigin({ LAGOON_ROUTES: routes, DRUXT_BASE_URL: 'http://nginx:8080' }),
+      'https://nginx.feature.druxtjs-org.au2.amazee.io'
+    )
+  })
+
+  test('backendOrigin shares the base URL locally, and has a default', () => {
+    assert.equal(
+      backendOrigin({ DRUXT_BASE_URL: 'http://127.0.0.1:8888' }),
+      'http://127.0.0.1:8888'
+    )
+    assert.equal(backendOrigin({}), 'http://127.0.0.1:8899')
+  })
+
+  test('is ready once the JSON:API index answers', async () => {
     let answer
     const drupal = (req, res) => {
-      const [status, body] = req.url === '/jsonapi/menu_items/footer' ? answer : [404, '{}']
+      const [status, body] = req.url === '/jsonapi' ? answer : [404, '{}']
       res.writeHead(status, { 'Content-Type': 'application/vnd.api+json' })
       res.end(body)
     }
     await withServer(drupal, async (base) => {
       for (const [status, body, expected] of [
-        [200, '{"data":[{"id":"a"}]}', true],
+        [200, '{"jsonapi":{"version":"1.0"},"links":{"self":{"href":"/jsonapi"}}}', true],
         [200, '{"data":[]}', false],
         [200, '<html>', false],
-        [404, '{"data":[{"id":"a"}]}', false],
+        [404, '{"links":{}}', false],
       ]) {
         answer = [status, body]
         assert.equal(await backendReady(base), expected, `${status} ${body}`)
@@ -592,13 +778,13 @@ describe('backend', () => {
 
   test('is ready once Drupal reports the revision this build is from', async () => {
     let deployment
-    let footer = [200, '{"data":[{"id":"a"}]}']
+    let index = [200, '{"links":{}}']
     const drupal = (req, res) => {
       const [status, body] =
         req.url === '/druxt-docs/deployment'
           ? deployment
-          : req.url === '/jsonapi/menu_items/footer'
-            ? footer
+          : req.url === '/jsonapi'
+            ? index
             : [404, '{}']
       res.writeHead(status, { 'Content-Type': 'application/json' })
       res.end(body)
@@ -608,8 +794,8 @@ describe('backend', () => {
       deployment = [200, '{"revision":"abc123"}']
       assert.equal(await deploymentReady(base, { revision: 'abc123' }), true, 'matching revision')
 
-      // An older revision keeps it waiting, even though the footer menu
-      // has items, which is exactly the case the old probe passed.
+      // An older revision keeps it waiting, even though the index answers,
+      // which is exactly the case the fallback probe passes.
       deployment = [200, '{"revision":"older"}']
       assert.equal(await deploymentReady(base, { revision: 'abc123' }), false, 'older revision')
 
@@ -622,23 +808,23 @@ describe('backend', () => {
       )
 
       // No endpoint means a backend deployed before this existed, so the
-      // footer-menu probe decides, in both directions.
+      // index probe decides, in both directions.
       deployment = [404, '{}']
       assert.equal(
         await deploymentReady(base, { revision: 'abc123' }),
         true,
-        'no endpoint, menu has items'
+        'no endpoint, index answers'
       )
-      footer = [200, '{"data":[]}']
+      index = [503, '{}']
       assert.equal(
         await deploymentReady(base, { revision: 'abc123' }),
         false,
-        'no endpoint, menu empty'
+        'no endpoint, index down'
       )
 
       // Without a revision of its own there is nothing to compare, so the
       // gate does not apply and the fallback decides.
-      footer = [200, '{"data":[{"id":"a"}]}']
+      index = [200, '{"links":{}}']
       deployment = [200, '{"revision":"anything"}']
       assert.equal(await deploymentReady(base, {}), true, 'no local revision')
     })

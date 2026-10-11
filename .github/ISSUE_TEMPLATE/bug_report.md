@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: The site, the content model or the importer does not work as documented
+about: The site or the content model does not work as documented
 title: ''
 labels: bug
 assignees: ''

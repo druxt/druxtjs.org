@@ -7,14 +7,18 @@ dependencies:
     - filter.format.docs_markdown
     - media.type.image
     - node.type.doc_page
+    - workflows.workflow.editorial
   module:
     - coffee
+    - content_moderation
     - environment_indicator
     - filter
     - jsonapi_node_preview_tab
     - media
     - navigation
     - node
+    - path
+    - simple_oauth
     - system
 id: contributor
 label: Contributor
@@ -30,11 +34,15 @@ permissions:
   - 'access navigation'
   - 'create doc_page content'
   - 'create image media'
+  - 'create url aliases'
   - 'edit own doc_page content'
   - 'edit own image media'
+  - 'grant simple_oauth codes'
+  - 'use editorial transition create_new_draft'
   - 'use text format basic_html'
   - 'use text format docs_markdown'
   - 'view doc_page revisions'
+  - 'view latest version'
   - 'view media'
   - 'view own unpublished content'
   - 'view the administration theme'

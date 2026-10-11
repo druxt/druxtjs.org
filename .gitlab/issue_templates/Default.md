@@ -1,7 +1,6 @@
 <!--
-A mistake in the text of a documentation page belongs in the druxt.js
-repository, where the pages are written. This tracker is for the site: its
-frontend, its Drupal backend, the content model and the importer.
+This tracker is for the site: its frontend, its Drupal backend, the content
+model and the text of its pages, which editors change in Drupal.
 -->
 
 ## What happened

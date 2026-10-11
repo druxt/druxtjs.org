@@ -1,3 +1,5 @@
+import { packageName } from '../../../../lib/site'
+
 import Blocks from './Blocks.vue'
 import Breadcrumb from './Breadcrumb.vue'
 import Druxt from './Druxt.vue'
@@ -24,13 +26,8 @@ export const moduleIcons = {
 /** The package directory names that count as modules. */
 export const modulePkgs = Object.keys(moduleIcons)
 
-/**
- * The npm package name for a module directory.
- *
- * @param {string} pkg - The package directory name, e.g. 'entity'.
- * @returns {string} The npm name; the core package is plain `druxt`.
- */
-export const moduleName = (pkg) => (pkg === 'druxt' ? 'druxt' : 'druxt-' + pkg)
+/** The npm package name for a module directory: the one rule, in lib/site. */
+export const moduleName = packageName
 
 /** Filenames whose route is their containing directory, per lib/content-index. */
 const INDEX_SEGMENTS = ['index', 'README']

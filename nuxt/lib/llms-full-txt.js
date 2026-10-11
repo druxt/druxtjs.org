@@ -19,6 +19,11 @@
  * Pure and side-effect free, so it can be unit tested without a build.
  */
 
+const unified = require('unified')
+const remarkParse = require('remark-parse')
+const visit = require('unist-util-visit')
+const toString = require('mdast-util-to-string')
+
 const { SITE_ORIGIN, SITE_NAME, SITE_DESCRIPTION, SECTIONS } = require('./site')
 
 /**
@@ -46,6 +51,10 @@ const SECTION_ORDER = ['tutorials', 'how-to', 'explanation', 'modules', 'api']
  * information is a git log away.
  */
 const isChangelog = (route) => route.endsWith('/CHANGELOG')
+
+/** Whether a document goes into the file: a guide or reference page with a body. */
+const included = (doc) =>
+  SECTION_ORDER.includes(doc.section) && (doc.content || '').trim() && !isChangelog(doc.route)
 
 /**
  * Rewrite root-relative links to absolute ones.
@@ -91,7 +100,7 @@ const buildLlmsFullTxt = (docs, options) => {
 
   SECTION_ORDER.forEach((section) => {
     const entries = docs
-      .filter((doc) => doc.section === section && (doc.content || '').trim() && !isChangelog(doc.route))
+      .filter((doc) => doc.section === section && included(doc))
       .sort((a, b) => (a.weight - b.weight) || a.route.localeCompare(b.route))
 
     if (!entries.length) return
@@ -122,4 +131,107 @@ const buildLlmsFullTxt = (docs, options) => {
   return lines.join('\n')
 }
 
-module.exports = { buildLlmsFullTxt, toAbsoluteUrls, isChangelog, SECTION_ORDER }
+/**
+ * The top-level headings a markdown reader finds, by the parser the site
+ * renders with, so the outline checked is the outline a reader gets.
+ */
+const parser = unified().use(remarkParse)
+
+/** A heading no page carries, appended to see whether a body swallows what follows it. */
+const SENTINEL = 'druxtjs-outline-sentinel'
+
+/**
+ * The level-one headings of some markdown, with their lines.
+ *
+ * @param {string} markdown - The text.
+ * @returns {{ tree: object, headings: Array<{ line: number, text: string }> }} The tree and its H1s.
+ */
+const topHeadings = (markdown) => {
+  const tree = parser.parse(markdown)
+  const headings = []
+  visit(tree, 'heading', (node) => {
+    if (node.depth === 1) headings.push({ line: node.position.start.line, text: toString(node) })
+  })
+  return { tree, headings }
+}
+
+/**
+ * Problems a markdown reader would have with this text's outline.
+ *
+ * A fence or a raw HTML element left open swallows everything after it, so
+ * a sentinel heading is appended: if the reader does not find it, the last
+ * node is what swallowed it. Every other H1 is reported as the caller asks.
+ *
+ * @param {string} markdown - The text.
+ * @param {{ open: Function, heading: Function }} report - Formats one problem: (line, text) for a heading, (line, what) for a node left open.
+ * @param {Function} [acceptable] - Whether an H1 is expected where it is.
+ * @returns {Array<string>} The problems.
+ */
+const problemsIn = (markdown, report, acceptable = () => false) => {
+  const { tree, headings } = topHeadings(markdown + '\n\n# ' + SENTINEL)
+  const problems = []
+  if (!headings.some((heading) => heading.text === SENTINEL)) {
+    const last = tree.children[tree.children.length - 1]
+    const what =
+      last.type === 'code'
+        ? 'code fence'
+        : last.type === 'html'
+          ? '<' + (/^\s*<([a-zA-Z][\w-]*)/.exec(last.value) || ['', 'html'])[1] + '>'
+          : last.type
+    problems.push(report.open(last.position.start.line, what))
+  }
+  headings
+    .filter((heading) => heading.text !== SENTINEL && !acceptable(heading.text))
+    .forEach((heading) => problems.push(report.heading(heading.line, heading.text)))
+  return problems
+}
+
+/**
+ * Problems with the outline a reader of `/llms-full.txt` would parse.
+ *
+ * Bodies pass through untouched, so `# .env` inside a shell fence stays a
+ * comment. That holds only while every fence closes: one left open swallows
+ * what follows, and an H1 in a body claims the sections after it. Either
+ * mis-attributes pages for anything splitting the file by heading. Each body is
+ * checked on its own as well, because a fence left open mid-file pairs with the
+ * next one and can leave the file as a whole looking balanced, and because a
+ * body's own H1 is reported with its page whatever its text.
+ *
+ * @param {Array<object>} docs - Documents the file was built from.
+ * @param {string} text - The rendered file.
+ * @returns {Array<string>} Problems found, empty when the outline is sound.
+ */
+const outlineProblems = (docs, text) => {
+  const expected = [SITE_NAME, ...SECTION_ORDER.map((section) => SECTIONS[section].label)]
+  const inBodies = new Set()
+  const problems = []
+
+  // Only the pages the file carries: a fence left open in a changelog, which
+  // the file drops, breaks nothing.
+  docs.filter(included).forEach((doc) => {
+    problems.push(
+      ...problemsIn(doc.content, {
+        open: (line, what) => doc.route + ' line ' + line + ': ' + what + ' never closes',
+        heading: (line, heading) => {
+          inBodies.add(heading)
+          return doc.route + ' line ' + line + ': top-level heading "' + heading + '" in a page body'
+        },
+      })
+    )
+  })
+
+  problems.push(
+    ...problemsIn(
+      text,
+      {
+        open: (line, what) => 'line ' + line + ': ' + what + ' never closes',
+        heading: (line, heading) => 'line ' + line + ': unexpected top-level heading "' + heading + '"',
+      },
+      (heading) => expected.includes(heading) || inBodies.has(heading)
+    )
+  )
+
+  return problems
+}
+
+module.exports = { buildLlmsFullTxt, outlineProblems, toAbsoluteUrls, isChangelog, SECTION_ORDER }

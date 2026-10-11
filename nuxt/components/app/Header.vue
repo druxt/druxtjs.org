@@ -18,9 +18,9 @@
       <!-- The version links to its release notes, the generated page from the package's changelog. -->
       <NuxtLink
         v-if="version"
-        class="badge badge-sm badge-outline min-h-[24px] hidden sm:inline-flex hover:border-primary hover:text-primary-focus"
+        class="badge badge-sm badge-outline min-h-[24px] hidden sm:inline-flex xl:hidden 2xl:inline-flex hover:border-primary hover:text-primary-focus"
         to="/api/packages/druxt/CHANGELOG"
-        :title="'Druxt ' + version + ' release notes'"
+        :title="'Druxt ' + (versionTitle || version) + ' release notes'"
       >{{ version }}</NuxtLink>
 
       <div class="flex-1" />
@@ -58,7 +58,9 @@
           <component :is="iconFor(link)" class="w-5 h-5" />
         </a>
 
-        <AppColorModeToggle />
+        <!-- A signed-in editor finds the colour mode in the account menu. -->
+        <AppColorModeToggle v-if="!($auth && $auth.loggedIn)" />
+        <AppAccountMenu />
       </div>
     </div>
   </header>
@@ -70,6 +72,8 @@ import { MAC_SHORTCUT, searchShortcut } from '~/utils/platform'
 export default {
   props: {
     version: { type: String, default: null },
+    /** The full version for the badge's title, when the badge shows a shorter one. */
+    versionTitle: { type: String, default: null },
     /** True on documentation pages, which keep a sidebar from `lg`. */
     docs: { type: Boolean, default: true },
   },

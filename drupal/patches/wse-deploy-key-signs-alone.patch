@@ -1,0 +1,15 @@
+--- a/modules/wse_deploy/src/EncryptionHandler.php
++++ b/modules/wse_deploy/src/EncryptionHandler.php
+@@ -48,6 +48,12 @@ class EncryptionHandler {
+    *   A base64-encoded HMAC hash.
+    */
+   public function getHash(string $data): string {
++    // A configured deploy key is shared by both ends and signs on its own,
++    // so a deploy pair keeps separate hash salts: the salt also signs
++    // one-time login links, which must not work across environments.
++    if ($key = Settings::get('wse_deploy.hash.key')) {
++      return Crypt::hmacBase64($data, $key);
++    }
+     return Crypt::hmacBase64($data, $this->getKey() . Settings::getHashSalt());
+   }
+ 
