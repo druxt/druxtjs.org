@@ -157,8 +157,11 @@ create() {
     [ -n "$staging_key" ] || fail "No key for staging to sign with: set WSE_DEPLOY_STAGING_KEY for a target other than $production."
   fi
 
-  echo "Pushing $from to $branch on $remote."
-  git push "$remote" "$from:refs/heads/$branch"
+  # The remote's own ref, not a local branch of the same name, which may
+  # be behind or ahead of what Lagoon builds from.
+  echo "Pushing $remote's $from to $branch."
+  git fetch --no-tags "$remote" "$from" || fail "Could not fetch $from from $remote."
+  git push "$remote" "FETCH_HEAD:refs/heads/$branch"
 
   echo "Waiting for Lagoon to notice the branch."
   attempts=0
