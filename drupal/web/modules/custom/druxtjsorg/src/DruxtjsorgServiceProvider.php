@@ -72,11 +72,34 @@ final class DruxtjsorgServiceProvider extends ServiceProviderBase {
       $container->getDefinition('jsonapi.entity_resource')->setClass(WorkspaceEntityResource::class);
       $container->getDefinition('jsonapi.version_negotiator')->setClass(WorkspaceVersionNegotiator::class);
     }
+    $this->swapFieldItemNormalizer($container);
     if (!$container->hasParameter('simple_oauth.openid.claims')) {
       return;
     }
     $claims = $container->getParameter('simple_oauth.openid.claims');
     $container->setParameter('simple_oauth.openid.claims', array_values(array_unique([...$claims, ...self::CLAIMS])));
+  }
+
+  /**
+   * Swaps JSON:API's field item normalizer for the serialized-aware subclass.
+   *
+   * The serializer accepts only classes from JSON:API's own namespace, so the
+   * subclass is lent one under src-impostor-normalizers, the pattern JSON:API
+   * Resources and jsonapi_diff use.
+   */
+  private function swapFieldItemNormalizer(ContainerBuilder $container): void {
+    $namespaces = $container->getParameter('container.namespaces');
+    $modules = $container->getParameter('container.modules');
+    $app_root = $container->getParameter('app.root');
+    if (!is_array($namespaces) || !is_array($modules) || !is_string($app_root) || !isset($modules['druxtjsorg']['pathname']) || !$container->hasDefinition('serializer.normalizer.field_item.jsonapi')) {
+      return;
+    }
+    $path = $app_root . '/' . dirname((string) $modules['druxtjsorg']['pathname']) . '/src-impostor-normalizers';
+    $namespaces['Drupal\\jsonapi\\Normalizer\\ImpostorFrom\\druxtjsorg'][] = $path;
+    $container->setParameter('container.namespaces', $namespaces);
+    $container->getDefinition('serializer.normalizer.field_item.jsonapi')
+      ->setClass('Drupal\\jsonapi\\Normalizer\\ImpostorFrom\\druxtjsorg\\SerializedFieldItemNormalizerImpostor')
+      ->setFile($path . '/SerializedFieldItemNormalizerImpostor.php');
   }
 
 }
