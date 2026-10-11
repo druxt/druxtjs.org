@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\druxtjsorg\Hook;
 
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Order\OrderBefore;
 use Drupal\workspaces\Entity\Handler\DefaultWorkspaceHandler;
 
 /**
@@ -21,8 +22,13 @@ class WorkspaceEntityTypeHooks {
 
   /**
    * Implements hook_entity_type_alter().
+   *
+   * Before core's alter, which reads the handler to set the workspace
+   * revision key and remembers the answer, so the handler must be in place
+   * by then; the alphabetical order that gave that on the site is not kept
+   * everywhere.
    */
-  #[Hook('entity_type_alter')]
+  #[Hook('entity_type_alter', order: new OrderBefore(modules: ['workspaces']))]
   public function entityTypeAlter(array &$entity_types): void {
     // After Workspaces Extra's build hook, which sets the ignored handler.
     // Its alter hook gives every supported type a constraint against edits
