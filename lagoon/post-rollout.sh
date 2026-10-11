@@ -11,9 +11,10 @@
 # committed configuration and starts empty.
 #
 # DOCS_SKIP_SYNC=1 turns the sync off for an environment that wants to keep
-# the database it has. A staging environment, one built from a `staging/`
-# branch, takes its copy on its first rollout and keeps it from then on: it
-# holds a workspace deployed to it for review, which a fresh copy would lose.
+# the database it has. A staging environment, one built from a `staging/` or
+# a `release/` branch, takes its copy on its first rollout and keeps it from
+# then on: it holds a workspace deployed to it for review, or a release under
+# review, which a fresh copy would lose.
 #
 # Production syncs from nothing. It is the source.
 set -eu
@@ -56,8 +57,8 @@ is_production() {
 # the branch with its slash replaced, so it is the fallback, not the source.
 is_staging() {
   case "$branch_name" in
-    staging/?*) return 0 ;;
-    "") case "$environment_name" in staging-?*) return 0 ;; esac ;;
+    staging/?* | release/?*) return 0 ;;
+    "") case "$environment_name" in staging-?* | release-?*) return 0 ;; esac ;;
   esac
   return 1
 }
