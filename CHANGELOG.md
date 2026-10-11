@@ -45,6 +45,9 @@ Druxt 1.0.0.
   branch cut from `main` builds an environment that copies production once
   and then keeps its database, so a workspace deployed to it for review
   survives its own redeploys. `scripts/staging.sh` creates and removes one.
+  A `release/` branch's environment keeps its database the same way, so a
+  release is reviewed on a staging site of its own before it reaches
+  production.
   A deploy to it is signed with the key local machines hold, and it deploys
   on to production with a key only the two of them hold: a patch lets an
   environment accept a key other than the one it signs with, so nothing a

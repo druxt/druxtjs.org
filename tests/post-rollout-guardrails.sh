@@ -307,6 +307,15 @@ else
   ok "staging with an unreadable database: ran nothing further"
 fi
 
+# A release branch is a staging site for the release: it keeps its database too.
+app="$(build_app yes)"
+run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=release-0-11-0 LAGOON_GIT_BRANCH=release/0.11.0 > /dev/null
+if called "$app" "sql:sync" || called "$app" "rsync"; then
+  no "a release branch with a database: replaced it"
+else
+  ok "a release branch with a database: kept it"
+fi
+
 # A branch that only resembles a staging one is synced like any other.
 app="$(build_app yes)"
 run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-staging-page LAGOON_GIT_BRANCH=feature/staging-page > /dev/null

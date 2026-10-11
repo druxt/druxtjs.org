@@ -188,7 +188,10 @@ deleting the branch removes the environment.
 Its first rollout copies production like any other environment's. After
 that it keeps its database: `lagoon/post-rollout.sh` sees the `staging/`
 branch and a database already in place, and leaves it, so a workspace
-deployed to it for review survives its own redeploys. A fresh copy of
+deployed to it for review survives its own redeploys. A `release/` branch's
+environment keeps its database the same way, so a release is reviewed on a
+staging site of its own, with content staged on it, before it reaches
+production. A fresh copy of
 production is a deliberate step, between reviews: remove the environment
 and create it again.
 
