@@ -4,16 +4,19 @@
     <AppProse v-if="!drupal" :document="document" />
     <!-- Keyed so each page gets a fresh AppProse, whose enhance() runs on mount. -->
     <AppProse v-else :key="document.path" :title="document.title">
+      <!-- A section landing lists its pages through its "Pages in this
+           section" paragraph, which renders the docs_section view. -->
       <DruxtEntity :key="druxtKey" :type="document.type" :uuid="document.uuid" mode="full" />
     </AppProse>
-    <AppDocFooter :prev="prev" :next="next" />
+    <AppNextSteps v-if="drupal && !document.isLanding" :next="nextSteps" :sibling="next" :prev="prev" />
+    <AppDocFooter v-else :prev="prev" :next="next" />
   </article>
 </template>
 
 <script>
 import { seoHead } from '~/utils/seo'
 import { documentDescription } from '~/utils/content'
-import { fetchDrupalPage, sectionOf } from '~/lib/drupal-document'
+import { fetchDrupalPage, nextSteps, sectionOf } from '~/lib/drupal-document'
 import { versionFromQuery } from '~/lib/revisions'
 
 /** Pages docgen writes into the authored sections; they come from its corpus, not Drupal. */
@@ -53,7 +56,9 @@ export default {
         : []
       store.commit('addRecent', { text: document.title, to: route.path })
       store.commit('setToc', document.toc)
-      return { document, drupal: true, section, siblings, current: path }
+      // The editor's "Where to go next" pages, as they are now.
+      const next = document.isLanding ? [] : await nextSteps(store, document.next)
+      return { document, drupal: true, section, siblings, current: path, nextSteps: next }
     }
 
     const slug = params.pathMatch || 'README'
@@ -73,6 +78,7 @@ export default {
       section,
       siblings: index.map((item) => ({ text: item.title, to: to(item) })),
       current: to(document),
+      nextSteps: [],
     }
   },
   head() {

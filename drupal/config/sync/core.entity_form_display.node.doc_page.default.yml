@@ -6,12 +6,15 @@ dependencies:
     - field.field.node.doc_page.field_content
     - field.field.node.doc_page.field_description
     - field.field.node.doc_page.field_is_landing
+    - field.field.node.doc_page.field_next
     - field.field.node.doc_page.field_section
+    - field.field.node.doc_page.field_topic
     - field.field.node.doc_page.field_weight
     - node.type.doc_page
   module:
     - field_group
     - layout_paragraphs
+    - link
     - path
 third_party_settings:
   field_group:
@@ -21,6 +24,7 @@ third_party_settings:
         - field_section
         - field_weight
         - field_is_landing
+        - field_next
       label: Page
       region: content
       parent_name: ''
@@ -75,9 +79,23 @@ content:
     settings:
       display_label: true
     third_party_settings: {  }
+  field_next:
+    type: link_default
+    weight: 5
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
   field_section:
     type: options_select
     weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_topic:
+    type: options_select
+    weight: 6
     region: content
     settings: {  }
     third_party_settings: {  }

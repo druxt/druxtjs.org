@@ -1,0 +1,10 @@
+uuid: c15352d6-de86-4b3e-b13f-31e330cf3a1d
+langcode: en
+status: true
+dependencies: {  }
+id: docs_section_list
+label: 'Pages in this section'
+icon_uuid: null
+icon_default: null
+description: "The section's published pages, from the docs_section view, where this block sits in the page: grouped cards or a numbered sequence."
+behavior_plugins: {  }

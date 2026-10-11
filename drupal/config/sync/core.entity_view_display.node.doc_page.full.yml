@@ -7,7 +7,9 @@ dependencies:
     - field.field.node.doc_page.field_content
     - field.field.node.doc_page.field_description
     - field.field.node.doc_page.field_is_landing
+    - field.field.node.doc_page.field_next
     - field.field.node.doc_page.field_section
+    - field.field.node.doc_page.field_topic
     - field.field.node.doc_page.field_weight
     - node.type.doc_page
   module:
@@ -40,6 +42,8 @@ content:
     region: content
 hidden:
   field_is_landing: true
+  field_next: true
   field_section: true
+  field_topic: true
   field_weight: true
   links: true

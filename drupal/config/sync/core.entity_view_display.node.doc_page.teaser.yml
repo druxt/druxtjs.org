@@ -1,8 +1,9 @@
-uuid: d7052a70-6faa-4f91-b32a-79396b0582c4
+uuid: 63b93661-9a94-40be-b3c7-425b9660e44f
 langcode: en
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.node.teaser
     - field.field.node.doc_page.field_content
     - field.field.node.doc_page.field_description
     - field.field.node.doc_page.field_is_landing
@@ -12,36 +13,32 @@ dependencies:
     - field.field.node.doc_page.field_weight
     - node.type.doc_page
   module:
-    - layout_paragraphs
     - user
-id: node.doc_page.default
+id: node.doc_page.teaser
 targetEntityType: node
 bundle: doc_page
-mode: default
+mode: teaser
 content:
-  content_moderation_control:
-    settings: {  }
-    third_party_settings: {  }
-    weight: -20
-    region: content
-  field_content:
-    type: layout_paragraphs
+  field_description:
+    type: basic_string
     label: hidden
-    settings:
-      view_mode: default
-      link: ''
+    settings: {  }
     third_party_settings: {  }
     weight: 0
     region: content
-  links:
-    settings: {  }
+  field_topic:
+    type: entity_reference_label
+    label: hidden
+    settings:
+      link: false
     third_party_settings: {  }
-    weight: 100
+    weight: 1
     region: content
 hidden:
-  field_description: true
+  content_moderation_control: true
+  field_content: true
   field_is_landing: true
   field_next: true
   field_section: true
-  field_topic: true
   field_weight: true
+  links: true

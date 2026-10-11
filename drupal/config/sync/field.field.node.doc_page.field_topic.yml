@@ -1,0 +1,29 @@
+uuid: b8f0414d-59e5-4763-a496-92fb04db878e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_topic
+    - node.type.doc_page
+    - taxonomy.vocabulary.documentation_topic
+id: node.doc_page.field_topic
+field_name: field_topic
+entity_type: node
+bundle: doc_page
+label: Topic
+description: 'The heading this page sits under on its section landing. A section shown as a sequence ignores it.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      documentation_topic: documentation_topic
+    sort:
+      field: weight
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

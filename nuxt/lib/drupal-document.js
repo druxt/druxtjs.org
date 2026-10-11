@@ -2,13 +2,53 @@
 export const sectionOf = (path) => path.split('/').filter(Boolean)[0] || ''
 
 /** The paragraph types a documentation page is built from. */
-export const PARAGRAPH_TYPES = ['docs_callout', 'docs_code', 'docs_diagram', 'docs_image', 'docs_layout_section', 'docs_rich_text', 'docs_text']
+export const PARAGRAPH_TYPES = ['docs_callout', 'docs_code', 'docs_diagram', 'docs_image', 'docs_layout_section', 'docs_rich_text', 'docs_section_list', 'docs_text']
 
 /** Everything the page's body renders, fetched with the page in one request. */
 const INCLUDE = ['field_content', 'field_content.field_media', 'field_content.field_media.field_media_image']
 
 /** What this module reads from the page itself, beyond its display. */
-const PAGE_FIELDS = ['title', 'field_toc', 'moderation_state', 'drupal_internal__nid']
+const PAGE_FIELDS = ['title', 'field_toc', 'moderation_state', 'drupal_internal__nid', 'field_next', 'field_section', 'field_is_landing']
+
+/**
+ * The pages to read after this one, from the page's `field_next` links.
+ *
+ * A link to a page on this site (`entity:node/N`) is resolved to that page as
+ * it is now, title and description included, so a rename or a move follows.
+ * Any other link, a generated API page say, is shown with the text the editor
+ * gave it. The order is the editor's.
+ *
+ * @param {object} store - The Vuex store with the Druxt modules.
+ * @param {object[]} links - The `field_next` value: `{ uri, title, resolvable_uri }` each.
+ * @returns {Promise<{ text: string, to: string, description: string }[]>} The next steps.
+ */
+export const nextSteps = async (store, links) => {
+  const items = (links || []).map((link) => {
+    const nid = /^entity:node\/(\d+)$/.exec(link.uri || '')
+    return { text: link.title || '', to: link.resolvable_uri || '', description: '', nid: nid ? Number(nid[1]) : null }
+  })
+  const nids = items.map((item) => item.nid).filter(Boolean)
+  if (nids.length) {
+    const query = {
+      'filter[nid][condition][path]': 'drupal_internal__nid',
+      'filter[nid][condition][operator]': 'IN',
+      'fields[node--doc_page]': 'title,field_description,path,drupal_internal__nid',
+    }
+    nids.forEach((nid, index) => (query[`filter[nid][condition][value][${index}]`] = nid))
+    // A lookup that fails leaves the links as the editor stored them, title
+    // and path, rather than failing the page.
+    const collection = await store.dispatch('druxt/getCollection', { type: 'node--doc_page', query }).catch(() => null)
+    const pages = new Map(((collection && collection.data) || []).map((page) => [page.attributes.drupal_internal__nid, page.attributes]))
+    for (const item of items) {
+      const page = item.nid && pages.get(item.nid)
+      if (!page) continue
+      item.text = page.title
+      item.description = page.field_description || ''
+      if (page.path && page.path.alias) item.to = page.path.alias
+    }
+  }
+  return items.filter((item) => item.to).map(({ text, to, description }) => ({ text, to, description }))
+}
 
 /** What Layout Paragraphs reads from every paragraph, whatever its display. */
 const PARAGRAPH_FIELDS = ['behavior_settings']
@@ -148,5 +188,11 @@ export const fetchDrupalPage = async (store, path) => {
     description: data.attributes.field_description || '',
     toc: data.attributes.field_toc || [],
     moderationState: data.attributes.moderation_state || null,
+    // The editor's "Where to go next" links, as Drupal holds them; the page
+    // resolves them with nextSteps().
+    next: data.attributes.field_next || [],
+    // The section's term id, which the landing's list of pages is filtered on.
+    sectionId: (((data.relationships || {}).field_section || {}).data || {}).meta?.drupal_internal__target_id || null,
+    isLanding: Boolean(data.attributes.field_is_landing),
   }
 }

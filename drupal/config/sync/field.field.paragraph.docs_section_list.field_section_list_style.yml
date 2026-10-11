@@ -1,0 +1,23 @@
+uuid: a7cf3af3-8f7d-40f9-aa20-d9aa59892f32
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_section_list_style
+    - paragraphs.paragraphs_type.docs_section_list
+  module:
+    - options
+id: paragraph.docs_section_list.field_section_list_style
+field_name: field_section_list_style
+entity_type: paragraph
+bundle: docs_section_list
+label: Style
+description: "How the pages are listed: cards under their topic headings, or one numbered step each in their order. The two are the view's displays, and each renders its pages in a view mode of its own."
+required: true
+translatable: true
+default_value:
+  -
+    value: default
+default_value_callback: ''
+settings: {  }
+field_type: list_string
