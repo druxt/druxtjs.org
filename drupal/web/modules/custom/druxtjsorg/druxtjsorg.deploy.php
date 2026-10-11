@@ -7,8 +7,10 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Cache\Cache;
 use Drupal\druxtjsorg\CalloutText;
 use Drupal\druxtjsorg\NextSteps;
+use Drupal\druxtjsorg\TopicUuid;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\paragraphs\Entity\Paragraph;
@@ -159,7 +161,12 @@ function druxtjsorg_deploy_topics(array &$sandbox): string {
     $existing = $terms->loadByProperties(['vid' => 'documentation_topic', 'name' => $name]);
     $term = $existing ? reset($existing) : NULL;
     if (!$term) {
-      $term = Term::create(['vid' => 'documentation_topic', 'name' => $name, 'weight' => $weight]);
+      $term = Term::create([
+        'vid' => 'documentation_topic',
+        'name' => $name,
+        'weight' => $weight,
+        'uuid' => TopicUuid::for($name),
+      ]);
       $term->save();
       $created++;
     }
@@ -178,6 +185,35 @@ function druxtjsorg_deploy_topics(array &$sandbox): string {
     }
   }
   return "Created $created topics and gave $assigned pages theirs.";
+}
+
+/**
+ * Gives every documentation topic its UUID, the same on every site.
+ *
+ * The topics were created by name, so each environment had its own random
+ * UUIDs and a page deployed between sites named a topic the target lacked.
+ * The UUID field is read-only on the entity, so the row is updated directly
+ * and the term's caches cleared. Runs again without change.
+ */
+function druxtjsorg_deploy_topic_uuids(): string {
+  $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  $changed = 0;
+  foreach ($storage->loadByProperties(['vid' => 'documentation_topic']) as $term) {
+    $uuid = TopicUuid::for($term->label());
+    if ($term->uuid() === $uuid) {
+      continue;
+    }
+    \Drupal::database()->update('taxonomy_term_data')
+      ->fields(['uuid' => $uuid])
+      ->condition('tid', $term->id())
+      ->execute();
+    $changed++;
+  }
+  if ($changed) {
+    $storage->resetCache();
+    Cache::invalidateTags(['taxonomy_term_list', 'taxonomy_term_values']);
+  }
+  return "Re-keyed $changed topics.";
 }
 
 /**

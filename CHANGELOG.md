@@ -15,6 +15,11 @@ Druxt 1.0.0.
   shape on import as unknown properties, so every paragraph in a layout was
   rejected. A site normalizer wraps the settings in their property again
   before core serializes them.
+- Every documentation topic has the same UUID on every site, derived
+  from its name as the section terms already were. The deploy hook created
+  the topics by name, so each environment minted its own random UUID, and a
+  page deployed from one site to another named a topic the target did not
+  have. A deploy hook re-keys the existing terms once.
 
 - A database copied from before paragraphs were tracked by Workspaces gets
   the Workspace field installed on them by a deploy hook. Without it every
