@@ -1,5 +1,5 @@
 {
-    "_hash": "789213a3933020bd378073baa6c9222ce8cba752cda90b37a0d884e653ae0ea3",
+    "_hash": "b50532603417492ed54a34fa8eb7ef941acda74e9d66d6c2110e6255c26b6152",
     "patches": {
         "drupal/core": [
             {
@@ -245,6 +245,16 @@
                 "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
                 "url": "patches/jsonapi_hypermedia-drupal-12-core-version-requirement.patch",
                 "sha256": "c24b5470d1d41417ba823ddaeda5e917cba21cdc3394ac4a2e63bfa4a527dc27",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/jsonapi_hypermedia",
+                "description": "PHP 8.5: explicit nullable parameter types, the implicit form is deprecated",
+                "url": "patches/jsonapi_hypermedia-php-8-5-explicit-nullable-parameters.patch",
+                "sha256": "506c1402d8e5a5fcfcfe60ff7cc7ae39a5a6133a492a13f709532a5d993be555",
                 "depth": 1,
                 "extra": {
                     "provenance": "root"

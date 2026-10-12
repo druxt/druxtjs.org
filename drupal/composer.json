@@ -79,7 +79,8 @@
         "preferred-install": {
             "drupal/decoupled_settings": "source",
             "drupal/jsonapi_node_preview": "source",
-            "*": "dist"
+            "*": "dist",
+            "drupal/core": "source"
         }
     },
     "repositories": [
@@ -194,7 +195,8 @@
             },
             "drupal/jsonapi_hypermedia": {
                 "Drupal 12: attribute discovery beside the annotation on every plugin manager": "patches/jsonapi_hypermedia-drupal-12-attribute-discovery.patch",
-                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/jsonapi_hypermedia-drupal-12-core-version-requirement.patch"
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/jsonapi_hypermedia-drupal-12-core-version-requirement.patch",
+                "PHP 8.5: explicit nullable parameter types, the implicit form is deprecated": "patches/jsonapi_hypermedia-php-8-5-explicit-nullable-parameters.patch"
             },
             "drupal/simple_oauth": {
                 "Drupal 12: attribute discovery beside the annotation on every plugin manager": "patches/simple_oauth-drupal-12-attribute-discovery.patch",
