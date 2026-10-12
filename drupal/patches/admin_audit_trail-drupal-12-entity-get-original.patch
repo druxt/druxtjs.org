@@ -1,0 +1,37 @@
+diff -ruN a/admin_audit_trail_user/src/Hook/AdminAuditTrailUserHooks.php b/admin_audit_trail_user/src/Hook/AdminAuditTrailUserHooks.php
+--- a/admin_audit_trail_user/src/Hook/AdminAuditTrailUserHooks.php	2026-09-25 15:06:09.000000000 +0000
++++ b/admin_audit_trail_user/src/Hook/AdminAuditTrailUserHooks.php	2026-10-12 02:14:46.814801013 +0000
+@@ -47,14 +47,16 @@
+    */
+   #[Hook('user_update')]
+   public function userUpdate($account) {
++    // Drupal 12 removed the magic original property.
++    $original = method_exists($account, 'getOriginal') ? $account->getOriginal() : $account->original;
+     $log = [
+       'type' => 'user',
+       'operation' => 'update',
+       'description' => $this->t('%name (uid %uid)', [
+-        '%name' => $account->original->getDisplayName(),
+-        '%uid' => $account->original->id(),
++        '%name' => $original->getDisplayName(),
++        '%uid' => $original->id(),
+       ]),
+-      'ref_numeric' => $account->original->id(),
++      'ref_numeric' => $original->id(),
+       'ref_char' => $account->getDisplayName(),
+     ];
+     admin_audit_trail_insert($log);
+diff -ruN a/admin_audit_trail_user_roles/src/Hook/AdminAuditTrailUserRolesHooks.php b/admin_audit_trail_user_roles/src/Hook/AdminAuditTrailUserRolesHooks.php
+--- a/admin_audit_trail_user_roles/src/Hook/AdminAuditTrailUserRolesHooks.php	2026-09-25 15:06:09.000000000 +0000
++++ b/admin_audit_trail_user_roles/src/Hook/AdminAuditTrailUserRolesHooks.php	2026-10-12 02:14:46.814801013 +0000
+@@ -40,7 +40,9 @@
+    */
+   #[Hook('user_update')]
+   public function userUpdate($account) {
+-    $original_roles = $account->original->getRoles();
++    // Drupal 12 removed the magic original property.
++    $original = method_exists($account, 'getOriginal') ? $account->getOriginal() : $account->original;
++    $original_roles = $original->getRoles();
+     $current_roles = $account->getRoles();
+     $role_operations = [
+       'role_added' => array_diff($current_roles, $original_roles),

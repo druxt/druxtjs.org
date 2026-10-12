@@ -276,6 +276,9 @@
             },
             "drupal/custom_formatters": {
                 "Drupal 12: _contextual_links_to_id() became ContextualLinksSerializer::linksToId()": "patches/custom_formatters-drupal-12-contextual-links-serializer.patch"
+            },
+            "drupal/admin_audit_trail": {
+                "Drupal 12: read the original user through getOriginal(), the magic property is gone": "patches/admin_audit_trail-drupal-12-entity-get-original.patch"
             }
         },
         "drupal-lenient": {

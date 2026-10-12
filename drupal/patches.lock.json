@@ -1,5 +1,5 @@
 {
-    "_hash": "c2b6ae24efb12796520c18db7e0124103137ddd1dee81fddcd4df219affd912b",
+    "_hash": "789213a3933020bd378073baa6c9222ce8cba752cda90b37a0d884e653ae0ea3",
     "patches": {
         "drupal/core": [
             {
@@ -605,6 +605,18 @@
                 "description": "Drupal 12: _contextual_links_to_id() became ContextualLinksSerializer::linksToId()",
                 "url": "patches/custom_formatters-drupal-12-contextual-links-serializer.patch",
                 "sha256": "fdce06fe1c9215a9757ba4b7eea1fa6173698809e98af3d53f67f7a115dfe6f6",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/admin_audit_trail": [
+            {
+                "package": "drupal/admin_audit_trail",
+                "description": "Drupal 12: read the original user through getOriginal(), the magic property is gone",
+                "url": "patches/admin_audit_trail-drupal-12-entity-get-original.patch",
+                "sha256": "8f2a1041eaf96146e473d29cfbbf54a190239ac6915c0d4000d96badb36ba561",
                 "depth": 1,
                 "extra": {
                     "provenance": "root"
