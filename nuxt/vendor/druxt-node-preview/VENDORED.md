@@ -5,6 +5,6 @@ package replaces this directory.
 
 | | |
 | --- | --- |
-| Commit | `349e45a` (branch `feature/1-themeable-preview`) |
+| Commit | `6598392` (branch `feature/1-preview-fixes`) |
 | Built with | `npm ci && npm run build`, the `dist` committed past the site's `dist` ignore |
 | Changed | Nothing |

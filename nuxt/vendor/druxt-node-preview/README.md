@@ -30,6 +30,9 @@ data renders through the same components as the live site.
 npm install @druxt-contrib/node-preview
 ```
 
+It needs Druxt 0.25 and Druxt Entity 0.29 or later. Until they are released,
+install their builds from the `dev` tag, for example `npm install druxt-site@dev`.
+
 ```js
 // nuxt.config.js
 export default {
@@ -42,8 +45,9 @@ export default {
     nodePreview: {
       // The preview page's path. This is the default.
       path: '/druxt/node/preview',
-      // Relationships to include, when the endpoint has no include of its
-      // own. Consumer Node Preview already includes a node's paragraphs.
+      // Relationships to add to the endpoint's own include. Consumer Node
+      // Preview already includes a node's paragraphs, so add what they
+      // reference, for example 'field_content.field_media'.
       include: [],
     },
   },
@@ -113,14 +117,22 @@ preview is active:
 if ((this.$store.state.druxtNodePreview || {}).active) return
 ```
 
+The flag does not leak into other pages. Leaving the preview route flushes
+every resource the preview seeded from the Druxt store and clears the flag,
+before the next page loads. That page then fetches and renders the saved
+content.
+
+This needs Druxt 0.25 or later, for the `druxt/flushResource` mutation.
+
 ## The request
 
 The page fetches through the Druxt client, `$druxt.axios`, with credentials.
 So the site's own request interceptors apply, such as a workspace header, and
 the editor's session cookie goes with the request.
 
-An endpoint given as a path is resolved against the frontend's own origin.
-That suits a frontend that proxies Drupal on its own origin: no CORS, and the
+An endpoint given as a path stays a path. The Druxt client resolves it against
+its own base URL, and interceptors that decide by path still match it. That
+suits a frontend that proxies Drupal on its own origin: no CORS, and the
 session cookie stays first party. With an absolute endpoint on another origin,
 Drupal needs CORS with `supportsCredentials: true` for the frontend origin,
 and a `SameSite=None` session cookie.

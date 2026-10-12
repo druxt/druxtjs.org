@@ -5,11 +5,17 @@
  * and seeds the Druxt store with it so DruxtEntity renders the unsaved data.
  *
  * It also registers the `druxtNodePreview` store module. Its `active` state is
- * true once a preview is seeded, so a site component that refetches its data
+ * true while a preview is seeded, so a site component that refetches its data
  * (for example paragraphs at a revision) can skip that and read the store.
+ *
+ * Leaving the preview route flushes the seeded resources from the Druxt store
+ * and clears `active`, so the next page renders the saved content.
  */
 export default ({ app, store }, inject) => {
   const include = JSON.parse('<%= JSON.stringify(options.include) %>')
+
+  // The type and id of every resource the preview put in the Druxt store.
+  const seeded = []
 
   if (!store.hasModule('druxtNodePreview')) {
     store.registerModule('druxtNodePreview', {
@@ -20,22 +26,48 @@ export default ({ app, store }, inject) => {
           state.active = true
           state.uuid = uuid
         },
+        stop(state) {
+          state.active = false
+          state.uuid = null
+        },
       },
     }, { preserveState: !!(store.state || {}).druxtNodePreview })
   }
 
+  // Before the next route loads, so none of its components read a seeded
+  // resource. Druxt then fetches the saved one.
+  if (app.router) {
+    app.router.beforeEach((to, from, next) => {
+      if (from.name === 'druxt-node-preview' && to.name !== 'druxt-node-preview' && seeded.length) {
+        for (const { type, id } of seeded.splice(0)) {
+          store.commit('druxt/flushResource', { type, id })
+        }
+        store.commit('druxtNodePreview/stop')
+      }
+      next()
+    })
+  }
+
   /**
-   * Adds the configured includes, unless the URL already has an include.
+   * Adds the configured includes to the include the URL already has.
    *
-   * Consumer Node Preview already includes a node's paragraphs.
+   * Consumer Node Preview already includes a node's paragraphs. A site adds
+   * what those paragraphs reference, such as their media.
    *
    * @param {string} url - The endpoint.
    *
    * @returns {string} The URL to request.
    */
   const withInclude = (url) => {
-    if (!include.length || /[?&]include=/.test(url)) return url
-    return url + (url.includes('?') ? '&' : '?') + 'include=' + include.join(',')
+    if (!include.length) return url
+    const [base, query = ''] = url.split('?')
+    const params = query.split('&').filter((param) => param && !param.startsWith('include='))
+    const current = (query.split('&').find((param) => param.startsWith('include=')) || 'include=')
+      .slice('include='.length)
+      .split(',')
+      .filter(Boolean)
+    const merged = [...new Set([...current, ...include])]
+    return base + '?' + [...params, 'include=' + merged.join(',')].join('&')
   }
 
   /**
@@ -73,15 +105,15 @@ export default ({ app, store }, inject) => {
      *
      * The request goes through the Druxt client, so the site's request
      * interceptors apply, with credentials, so the session cookie goes too.
-     * A path is resolved against the frontend's own origin, which suits a
-     * site that proxies Drupal.
+     * A path stays a path. The client resolves it against its own base URL,
+     * and interceptors that decide by path still see it.
      *
      * @param {string} endpoint - The JSON:API Node Preview endpoint.
      *
      * @returns {object} The JSON:API document.
      */
     fetch: async (endpoint) => {
-      const url = new URL(withInclude(endpoint), window.location.origin).href
+      const url = withInclude(endpoint)
       const headers = { Accept: 'application/vnd.api+json' }
       const client = (app.$druxt || {}).axios
       if (client) {
@@ -115,9 +147,9 @@ export default ({ app, store }, inject) => {
      * @returns {object} The type and id of the previewed resource.
      */
     seed: (doc) => {
-      store.commit('druxt/addResource', { resource: { data: doc.data } })
-      for (const included of doc.included || []) {
-        store.commit('druxt/addResource', { resource: { data: included } })
+      for (const data of [doc.data, ...(doc.included || [])]) {
+        store.commit('druxt/addResource', { resource: { data } })
+        seeded.push({ type: data.type, id: data.id })
       }
       store.commit('druxtNodePreview/start', doc.data.id)
       return { type: doc.data.type, id: doc.data.id }
