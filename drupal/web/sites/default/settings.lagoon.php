@@ -104,8 +104,9 @@ if ($frontend) {
           : (getenv('LAGOON_GIT_BRANCH') ?: getenv('LAGOON_ENVIRONMENT') ?: 'Frontend'),
         'url' => rtrim($frontend, '/') . '/druxt/node/preview?vm=[view_mode]&layout=[layout]#[jsonapi_node_preview_path]',
         // The Nuxt layouts the preview's Layout select offers, as listed in
-        // nuxt.config.js under druxt.nodePreview.layouts.
-        'layouts' => ['default', 'preview'],
+        // nuxt.config.js under druxt.nodePreview.layouts. A preview opens on
+        // the first one: the page alone, with the site's layout one pick away.
+        'layouts' => ['preview', 'default'],
       ],
     ],
     'default' => 'settings:frontend',

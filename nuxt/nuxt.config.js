@@ -277,10 +277,11 @@ export default {
     // A preview document carries the page's paragraphs; the include adds the
     // media an image paragraph refers to and its file, so the preview renders
     // them from the one request. The layouts are the ones a preview's Layout
-    // picker may switch the frame to: the site's own, or the page alone.
+    // picker may switch the frame to: the page alone, which a preview opens
+    // on, or the site's own.
     nodePreview: {
       include: ['field_content.field_media', 'field_content.field_media.field_media_image'],
-      layouts: ['default', 'preview'],
+      layouts: ['preview', 'default'],
     },
     // Menus ask for the fields a menu needs, not every attribute of a link.
     menu: { jsonApiMenuItems: true, query: { requiredOnly: true } },
