@@ -9,6 +9,7 @@ use Drupal\node\Entity\NodeType;
 use Drupal\paragraphs\Entity\ParagraphsType;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -18,6 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  *
  * @group druxt_docs
  */
+#[RunTestsInSeparateProcesses]
 final class ParagraphCreateAccessTest extends KernelTestBase {
 
   /**

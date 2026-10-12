@@ -10,12 +10,14 @@ use Drupal\workspaces\Entity\Handler\DefaultWorkspaceHandler;
 use Drupal\workspaces\WorkspaceInformation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Paragraphs stay tracked by Workspaces beside Workspaces Extra.
  */
 #[CoversClass(WorkspaceEntityTypeHooks::class)]
 #[Group('druxtjsorg')]
+#[RunTestsInSeparateProcesses]
 final class ParagraphWorkspaceSupportTest extends KernelTestBase {
 
   /**
