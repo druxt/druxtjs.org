@@ -1,7 +1,7 @@
 /**
  * @file
- * Tabs, view mode, frontend targets, widths and the JSON:API document on the
- * preview.
+ * Tabs, view mode, frontend targets, layouts, widths and the JSON:API
+ * document on the preview.
  */
 ((Drupal, drupalSettings, once) => {
   const key = (name) => `consumer_node_preview.${name}`;
@@ -64,9 +64,14 @@
   function init(preview) {
     const settings = drupalSettings.consumerNodePreview || {};
     const targetSettings = settings.targets || {};
-    const fill = (template, viewMode) =>
-      template.split(settings.placeholder).join(encodeURIComponent(viewMode));
+    const fill = (template, viewMode, layout = '') =>
+      template
+        .split(settings.placeholder)
+        .join(encodeURIComponent(viewMode))
+        .split(settings.layoutPlaceholder)
+        .join(encodeURIComponent(layout));
     let viewMode = settings.viewMode || 'full';
+    let layout = settings.layout || '';
 
     const tabs = Array.from(preview.querySelectorAll('[role="tab"]'));
     const output = preview.querySelector(
@@ -142,20 +147,52 @@
       false,
     );
 
-    // Switching frontend or view mode reloads only the frame and the new tab
-    // link. A target in the URL wins over the remembered one.
+    // Switching frontend, layout or view mode reloads only the frame and the
+    // new tab link. A target or layout in the URL wins over the remembered
+    // one. Each target remembers its own layout.
     const frame = preview.querySelector('[data-consumer-node-preview-frame]');
     const open = preview.querySelector('[data-consumer-node-preview-open]');
     const targets = preview.querySelector(
       '[data-consumer-node-preview-target]',
     );
+    const layouts = preview.querySelector(
+      '[data-consumer-node-preview-layout]',
+    );
+    const query = new URLSearchParams(window.location.search);
     let active = settings.active;
+
+    const layoutsOf = (targetKey) =>
+      (targetSettings[targetKey] || {}).layouts || [];
+    const pickLayout = (targetKey, candidates) => {
+      const names = layoutsOf(targetKey).map((each) => each.name);
+      return candidates.find((name) => names.includes(name)) || names[0] || '';
+    };
+    // The picker lists the framed target's layouts, and hides without any.
+    const listLayouts = () => {
+      if (!layouts) {
+        return;
+      }
+      const options = layoutsOf(active);
+      layouts.replaceChildren(
+        ...options.map(
+          (each) =>
+            new Option(each.label, each.name, false, each.name === layout),
+        ),
+      );
+      (layouts.closest('.js-form-item') || layouts.parentElement).hidden =
+        !options.length;
+    };
+
     const show = (targetKey) => {
       if (!frame || !targetSettings[targetKey]) {
         return;
       }
-      active = targetKey;
-      const url = fill(targetSettings[targetKey].url, viewMode);
+      if (targetKey !== active) {
+        active = targetKey;
+        layout = pickLayout(active, [recall(`layout.${active}`)]);
+        listLayouts();
+      }
+      const url = fill(targetSettings[targetKey].url, viewMode, layout);
       if (frame.getAttribute('src') !== url) {
         frame.setAttribute('src', url);
       }
@@ -166,13 +203,22 @@
         show(targets.value);
         remember('target', targets.value);
       });
-      const requested = new URLSearchParams(window.location.search).has(
-        'frontend',
-      );
       const remembered = recall('target');
-      if (!requested && remembered && targetSettings[remembered]) {
+      if (!query.has('frontend') && remembered && targetSettings[remembered]) {
         targets.value = remembered;
         show(remembered);
+      }
+    }
+    if (layouts) {
+      layouts.addEventListener('change', () => {
+        layout = layouts.value;
+        remember(`layout.${active}`, layout);
+        show(active);
+      });
+      if (!query.has('layout')) {
+        layout = pickLayout(active, [recall(`layout.${active}`), layout]);
+        listLayouts();
+        show(active);
       }
     }
 

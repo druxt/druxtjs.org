@@ -199,6 +199,69 @@ class PreviewTargetsFieldTest extends KernelTestBase {
   }
 
   /**
+   * Tests that a consumer's layouts reach each of its targets.
+   */
+  public function testConsumerLayoutsReachItsTargets(): void {
+    $consumer = Consumer::create([
+      'client_id' => 'app',
+      'label' => 'App',
+      'preview_targets' => [
+        ['label' => 'Local', 'url' => 'http://localhost:3000/p?layout=[layout]'],
+        ['label' => 'Live', 'url' => 'https://example.com/p?layout=[layout]'],
+      ],
+      'preview_layouts' => ['default', 'preview'],
+    ]);
+    $consumer->save();
+
+    $reloaded = Consumer::load($consumer->id());
+    $this->assertSame(['default', 'preview'], $this->provider->getLayouts($reloaded));
+    $this->assertSame(['default', 'preview'], $this->provider->getAllTargets()[$consumer->id() . ':1']['layouts']);
+    $this->assertSame(['default', 'preview'], $this->provider->getTargetByKey($consumer->id() . ':0')['layouts']);
+  }
+
+  /**
+   * Tests that a site target lists its own layouts, and only valid names.
+   */
+  public function testSiteTargetLayouts(): void {
+    $this->setSetting('consumer_node_preview', [
+      'targets' => [
+        'site' => ['label' => 'Site', 'url' => '/p', 'layouts' => ['default', 'not a name', 'preview']],
+        'plain' => ['label' => 'Plain', 'url' => '/q'],
+      ],
+    ]);
+
+    $targets = $this->provider->getAllTargets();
+    $this->assertSame(['default', 'preview'], $targets['settings:site']['layouts']);
+    $this->assertSame([], $targets['settings:plain']['layouts']);
+  }
+
+  /**
+   * Tests that a layout name is a Nuxt-style name, in the form and the API.
+   */
+  public function testLayoutNamesAreValidated(): void {
+    $consumer = Consumer::create([
+      'client_id' => 'app',
+      'label' => 'App',
+      'preview_layouts' => ['preview-2', 'not a name'],
+    ]);
+    $violations = $consumer->validate()->getByField('preview_layouts');
+    $this->assertCount(1, $violations);
+    $this->assertSame('preview_layouts.1.value', $violations[0]->getPropertyPath());
+  }
+
+  /**
+   * Tests that the layout token takes the chosen layout, or nothing.
+   */
+  public function testResolveUrlFillsTheLayout(): void {
+    $node = Node::create(['type' => 'article', 'title' => 'Test']);
+    $node->save();
+
+    $url = 'http://localhost:3000/p?vm=[view_mode]&layout=[layout]';
+    $this->assertSame('http://localhost:3000/p?vm=full&layout=preview', $this->provider->resolveUrl($url, $node, 'full', 'preview'));
+    $this->assertSame('http://localhost:3000/p?vm=full&layout=', $this->provider->resolveUrl($url, $node, 'full'));
+  }
+
+  /**
    * Returns the preview_targets violations of a consumer with one target.
    *
    * @param array{label: string, url: string} $target

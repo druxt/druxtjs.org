@@ -50,6 +50,18 @@
   margin-block-end: var(--admin-space-s, var(--space-s, 0.75rem));
 }
 
+.consumer-node-preview__pickers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--admin-space-s, var(--space-s, 0.75rem)) var(--admin-space-l, var(--space-l, 1.5rem));
+}
+
+/* The layout picker stays hidden while the framed target has no layouts. */
+.consumer-node-preview__pickers [hidden] {
+  display: none;
+}
+
 .consumer-node-preview__actions {
   display: flex;
   flex-wrap: wrap;

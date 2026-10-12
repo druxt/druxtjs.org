@@ -22,7 +22,8 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  *   'targets' => [
  *     'frontend' => [
  *       'label' => 'Frontend',
- *       'url' => '/node/preview?vm=[view_mode]#[jsonapi_node_preview_path]',
+ *       'url' => '/node/preview?vm=[view_mode]&layout=[layout]#[jsonapi_node_preview_path]',
+ *       'layouts' => ['default', 'preview'],
  *     ],
  *   ],
  *   'default' => 'settings:frontend',
@@ -53,6 +54,17 @@ class PreviewTargetsProvider implements PreviewTargetsProviderInterface {
   /**
    * {@inheritdoc}
    */
+  public function getLayouts(ConsumerInterface $consumer): array {
+    $layouts = [];
+    foreach ($consumer->get('preview_layouts') as $item) {
+      $layouts[] = (string) $item->get('value')->getValue();
+    }
+    return $layouts;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getAllTargets(): array {
     $targets = [];
     foreach ($this->getSiteTargets() as $name => $target) {
@@ -66,10 +78,12 @@ class PreviewTargetsProvider implements PreviewTargetsProviderInterface {
       ->execute();
     /** @var \Drupal\consumers\Entity\ConsumerInterface $consumer */
     foreach ($storage->loadMultiple($ids) as $consumer) {
+      $layouts = $this->getLayouts($consumer);
       foreach ($this->getTargets($consumer) as $delta => $target) {
         $targets[$consumer->id() . ':' . $delta] = [
           'label' => $consumer->label() . ': ' . $target['label'],
           'url' => $target['url'],
+          'layouts' => $layouts,
         ];
       }
     }
@@ -98,7 +112,8 @@ class PreviewTargetsProvider implements PreviewTargetsProviderInterface {
     if (!$consumer instanceof ConsumerInterface || !$consumer->get('status')->value) {
       return NULL;
     }
-    return $this->getTargets($consumer)[(int) $matches[2]] ?? NULL;
+    $target = $this->getTargets($consumer)[(int) $matches[2]] ?? NULL;
+    return $target === NULL ? NULL : $target + ['layouts' => $this->getLayouts($consumer)];
   }
 
   /**
@@ -146,10 +161,11 @@ class PreviewTargetsProvider implements PreviewTargetsProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function resolveUrl(string $url, NodeInterface $node_preview, string $view_mode_id): string {
+  public function resolveUrl(string $url, NodeInterface $node_preview, string $view_mode_id, string $layout = ''): string {
     $replacements = [
       '[uuid]' => rawurlencode((string) $node_preview->uuid()),
       '[view_mode]' => rawurlencode($view_mode_id),
+      '[layout]' => rawurlencode($layout),
     ];
     // Without an endpoint, the endpoint tokens stay as they are. A visible
     // token is easier to debug than an empty fragment.
@@ -164,17 +180,23 @@ class PreviewTargetsProvider implements PreviewTargetsProviderInterface {
   /**
    * Returns the site's targets from settings.php.
    *
-   * @return array<string, array{label: string, url: string}>
-   *   The targets that have a URL, keyed by name.
+   * @return array<string, array{label: string, url: string, layouts: list<string>}>
+   *   The targets that have a URL, keyed by name. A layout with a name
+   *   that does not match the pattern is left out.
    */
   protected function getSiteTargets(): array {
     $targets = [];
     foreach (Settings::get('consumer_node_preview', [])['targets'] ?? [] as $name => $target) {
       $url = trim((string) ($target['url'] ?? ''));
       if ($url !== '') {
+        $layouts = array_filter(
+          (array) ($target['layouts'] ?? []),
+          fn(mixed $layout): bool => is_string($layout) && preg_match(self::LAYOUT_PATTERN, $layout) === 1,
+        );
         $targets[(string) $name] = [
           'label' => (string) ($target['label'] ?? $name),
           'url' => $url,
+          'layouts' => array_values($layouts),
         ];
       }
     }
