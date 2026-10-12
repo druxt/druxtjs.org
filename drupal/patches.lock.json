@@ -1,12 +1,12 @@
 {
-    "_hash": "212152985982cf516f23bafe9074c4e9666a5038a97f5b60dde0f35373b83a7d",
+    "_hash": "a252e80a9d83d621dc85b4fe5d50023e666027fffa3c16163925d20625063f9d",
     "patches": {
         "drupal/core": [
             {
                 "package": "drupal/core",
-                "description": "Issue #3626255: prefetch JSON:API resource object normalizations (MR 17265 at a9227f7b, vendored)",
-                "url": "patches/drupal-core-3626255-prefetch-normalizations-mr17265-a9227f7b.patch",
-                "sha256": "a9b87aff390c5ab00c16a0bf421e31c17e4642a1de2cf6f268ba28411c8147a8",
+                "description": "Issue #3626255: prefetch JSON:API normalizations (MR 17265 at a9227f7b, test hunk dropped: the core 12 package ships no tests)",
+                "url": "patches/drupal-core-3626255-prefetch-normalizations-mr17265-a9227f7b-drupal-12.patch",
+                "sha256": "6a6ea90e964bfec85421bdf1f46982ff3ea9e7eec77097e5215e3c91045e6ea3",
                 "depth": 2,
                 "extra": {
                     "provenance": "root"
@@ -14,9 +14,9 @@
             },
             {
                 "package": "drupal/core",
-                "description": "Issue #3626255: inject the normalization cacher, which 11.x does not autowire",
-                "url": "patches/jsonapi-3626255-data-normalizer-argument.patch",
-                "sha256": "578caf52d23e10cedc67480d62204ed45f794883d07e1fdef26c7918996bf26c",
+                "description": "Drupal 12: DependencySerializationTrait::__sleep() skips hooked virtual properties (Layout Paragraphs tempstore corrupt)",
+                "url": "patches/drupal-core-dependency-serialization-trait-skips-hooked-properties.patch",
+                "sha256": "ee968d008b2e3389de564c79b2f023b220842d9dd0405a1c17cd7951805dfd05",
                 "depth": 2,
                 "extra": {
                     "provenance": "root"
@@ -33,6 +33,16 @@
                 "extra": {
                     "provenance": "root"
                 }
+            },
+            {
+                "package": "drupal/decoupled_settings",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/decoupled_settings-drupal-12-core-version-requirement.patch",
+                "sha256": "0594d1986044c569f23bb8e99c73938f7c6ee6e9ba165ddc6ad8d7fc503655e7",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
             }
         ],
         "drupal/jsonapi_node_preview": [
@@ -41,6 +51,16 @@
                 "description": "Issue #3367724: resolve includes from the previewed entity",
                 "url": "https://git.drupalcode.org/project/jsonapi_node_preview/-/merge_requests/4.diff",
                 "sha256": "cb4051a1c809d67a58024e35805b9b5bd7dcc9c8d5e23ec9686f729dbc1fa665",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/jsonapi_node_preview",
+                "description": "Drupal 12: inherit the typed includeResolver property instead of redeclaring it untyped",
+                "url": "patches/jsonapi_node_preview-drupal-12-typed-include-resolver.patch",
+                "sha256": "cb8df6611d106df89f9f4a0fcc6041985a81393c9574da6f004295ad3ff8ccff",
                 "depth": 1,
                 "extra": {
                     "provenance": "root"
@@ -85,6 +105,538 @@
                 "description": "Workspaces Deploy: an accept key verifies a deploy signed by the environment before this one",
                 "url": "patches/wse-deploy-accept-key.patch",
                 "sha256": "00e87b43ed9541556ef8a2cb9d6ce48ec0df92c1212526235550400410f2479e",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/wse",
+                "description": "Drupal 12: attribute discovery beside the annotation on every plugin manager",
+                "url": "patches/wse-drupal-12-attribute-discovery.patch",
+                "sha256": "ad4558c67ae1a2efd15455d4d7036c2174f3cea4eb4e430f5a0d2f05616ac185",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/purge": [
+            {
+                "package": "drupal/purge",
+                "description": "Symfony 8: declare getSubscribedEvents(): array (2 subscribers)",
+                "url": "patches/purge-symfony-8-subscriber-return-type.patch",
+                "sha256": "c49f9f1884fd16fc7196004aceac1ae9ad9c69ee6c463c016edb237cd3d54251",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/purge",
+                "description": "Drupal 12: the diagnostic severity map no longer reads the removed REQUIREMENT_* constants",
+                "url": "patches/purge-drupal-12-requirement-severity.patch",
+                "sha256": "ea0d6a9d0c6bb36134b7f84ded7b2c214c5deffd6088235c6d7e421a7181f17f",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/purge",
+                "description": "Drupal 12: attribute discovery beside the annotation on every plugin manager",
+                "url": "patches/purge-drupal-12-attribute-discovery.patch",
+                "sha256": "d4110fe3c0f74105c3d1cfa2dbe04dbdceb65c6da573f5a292b4de51faf4289c",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/purge",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/purge-drupal-12-core-version-requirement.patch",
+                "sha256": "88b084fb9d107ab267dcf5a866d9a2596b4689bd6327586cfa7194c08edb7192",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/gin_toolbar": [
+            {
+                "package": "drupal/gin_toolbar",
+                "description": "Issue #3598602: Drupal 12 compatibility (bot MR 70)",
+                "url": "https://git.drupalcode.org/project/gin_toolbar/-/merge_requests/70.diff",
+                "sha256": "6e6603e5f60a5e6a3265781ebb4ffb1850e5f106805a4803bdec91189b56b1a7",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/gin_toolbar",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/gin_toolbar-drupal-12-core-version-requirement.patch",
+                "sha256": "f4b94e1b5d1ba58ddcc220e89715ba36cca31aafdcbbc9c62764e2bbc271411f",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/codemirror_editor": [
+            {
+                "package": "drupal/codemirror_editor",
+                "description": "Issue #3609844: Drupal 12 compatibility (bot MR 18)",
+                "url": "https://git.drupalcode.org/project/codemirror_editor/-/merge_requests/18.diff",
+                "sha256": "c2bbc56b12290ccc1178de72e93a7d36a0ab7fc3af66f4c88e63802d8ec06c9b",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/codemirror_editor",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/codemirror_editor-drupal-12-core-version-requirement.patch",
+                "sha256": "e2e55856ae4cfb497db2fe6263e30ca59dee67f63b2d3de61ef50fcc9a16cef6",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/markdown_easy": [
+            {
+                "package": "drupal/markdown_easy",
+                "description": "Drupal 12: the runtime requirement severity no longer reads the removed REQUIREMENT_WARNING constant",
+                "url": "patches/markdown_easy-drupal-12-requirement-severity.patch",
+                "sha256": "a3c923951234ebbecd0ab56a40135683a2e74c4587f55592be7065a316aa6068",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/markdown_easy",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/markdown_easy-drupal-12-core-version-requirement.patch",
+                "sha256": "ad79aa73425323078bfa7a944130fbf55af1594037f2d9572068590ead630a0c",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/jsonapi_hypermedia": [
+            {
+                "package": "drupal/jsonapi_hypermedia",
+                "description": "Drupal 12: attribute discovery beside the annotation on every plugin manager",
+                "url": "patches/jsonapi_hypermedia-drupal-12-attribute-discovery.patch",
+                "sha256": "e166a54e6875e1107655a1fa5d22ed6464c0c2adbbe28b7f13bf545f695ec3f3",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/jsonapi_hypermedia",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/jsonapi_hypermedia-drupal-12-core-version-requirement.patch",
+                "sha256": "c24b5470d1d41417ba823ddaeda5e917cba21cdc3394ac4a2e63bfa4a527dc27",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/jsonapi_hypermedia",
+                "description": "PHP 8.5: explicit nullable parameter types, the implicit form is deprecated",
+                "url": "patches/jsonapi_hypermedia-php-8-5-explicit-nullable-parameters.patch",
+                "sha256": "506c1402d8e5a5fcfcfe60ff7cc7ae39a5a6133a492a13f709532a5d993be555",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/simple_oauth": [
+            {
+                "package": "drupal/simple_oauth",
+                "description": "Drupal 12: attribute discovery beside the annotation on every plugin manager",
+                "url": "patches/simple_oauth-drupal-12-attribute-discovery.patch",
+                "sha256": "a47dd875f7532285f41810dadd32761a41191e58b094dc75c17899054e96628c",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/simple_oauth",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/simple_oauth-drupal-12-core-version-requirement.patch",
+                "sha256": "85fb9e3d163375bd26e6f3ab087e3c019d13bc5c1333b1ba2242c7639e3755de",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/field_group": [
+            {
+                "package": "drupal/field_group",
+                "description": "Drupal 12: attribute discovery beside the annotation on every plugin manager",
+                "url": "patches/field_group-drupal-12-attribute-discovery.patch",
+                "sha256": "cda2114fa957281abda17f7f808fac7d5cb5fb6333555834dd3136afc82edbca",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/field_group",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/field_group-drupal-12-core-version-requirement.patch",
+                "sha256": "481a33b1ffe168284ec304305bbaa9ff9986b2ec7c85423eaec3486ea2adf207",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/ctools": [
+            {
+                "package": "drupal/ctools",
+                "description": "Issue #3629656: Drupal 12 compatibility (MR 106 without its info.yml hunks: they lack trailing context and reject the packaged files)",
+                "url": "patches/ctools-drupal-12-mr106-without-info-files.patch",
+                "sha256": "1631aff63e2b1c0cbe66fd3f6a93cd710daa858bf6bc40b37c4f4ff0101c83a6",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/ctools",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/ctools-drupal-12-core-version-requirement.patch",
+                "sha256": "d80463fdb884d96812dd3f24f5c7de0facc2347d8f45181ba54cac724b9c92e0",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/consumers": [
+            {
+                "package": "drupal/consumers",
+                "description": "Drupal 12: list builder operations take the optional cacheability parameter",
+                "url": "patches/consumers-drupal-12-list-builder-cacheability.patch",
+                "sha256": "23d725a48e5ce1f10450d465b33be896ba609b1e1d341fdfadd45291a67dce71",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/consumers",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/consumers-drupal-12-core-version-requirement.patch",
+                "sha256": "14506ef11e0ab2ce5bbb77fdbc3a226969f619e51852ed46d640cd5ac769865a",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/migrate_tools": [
+            {
+                "package": "drupal/migrate_tools",
+                "description": "Drupal 12: list builder operations take the optional cacheability parameter",
+                "url": "patches/migrate_tools-drupal-12-list-builder-cacheability.patch",
+                "sha256": "22b6693837d39e33d074ca917c68b0070ca628fa10d77c721b4e943a21e98953",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/migrate_tools",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/migrate_tools-drupal-12-core-version-requirement.patch",
+                "sha256": "3ca1be77cc233d6d14e4ff367e19ecae2130b5490763a664135449f3c8eb5236",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/coffee": [
+            {
+                "package": "drupal/coffee",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/coffee-drupal-12-core-version-requirement.patch",
+                "sha256": "56f7d746a0918e1a8531191349807417166c659e08e88b83d4f8e1070691a7f7",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/decoupled_router": [
+            {
+                "package": "drupal/decoupled_router",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/decoupled_router-drupal-12-core-version-requirement.patch",
+                "sha256": "b8de137554023f3779ea4db0304a4feff29b2cc4444455506d69b00aca67ec53",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/environment_indicator": [
+            {
+                "package": "drupal/environment_indicator",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/environment_indicator-drupal-12-core-version-requirement.patch",
+                "sha256": "156cdd834985857f04c95d423e6ba610c9c8f4c065542c22d96fd6f9efca18c1",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/field_tokens": [
+            {
+                "package": "drupal/field_tokens",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/field_tokens-drupal-12-core-version-requirement.patch",
+                "sha256": "e1c70175161999235bd277764b7733e6b62ba697b6e00909e7884b10d39e70ef",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/gin": [
+            {
+                "package": "drupal/gin",
+                "description": "Drupal 12: inline the include files, which core 12 no longer scans for theme hooks (gin.theme and src/Hook only)",
+                "url": "patches/gin-drupal-12-inline-theme-includes.patch",
+                "sha256": "ca7e2b2f37f0d453ad33bd16404755422344b9a7e9e5e914a02c260260f645e5",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/gin",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/gin-drupal-12-core-version-requirement.patch",
+                "sha256": "ded45307134503020985f86e26c3997b57769795353c104c9f8ceb78953a448f",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/gin_login": [
+            {
+                "package": "drupal/gin_login",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/gin_login-drupal-12-core-version-requirement.patch",
+                "sha256": "17599244b00218c28ed51f5e5634ea80194960303ca813d2f5548225dcf6aaad",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/js_cookie": [
+            {
+                "package": "drupal/js_cookie",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/js_cookie-drupal-12-core-version-requirement.patch",
+                "sha256": "97914673f4da97bdf1cfeacce9ec993229b0555e8583cdbc89a63a23a5dbdbca",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/jsonapi_menu_items": [
+            {
+                "package": "drupal/jsonapi_menu_items",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/jsonapi_menu_items-drupal-12-core-version-requirement.patch",
+                "sha256": "d1e3251f91ca4b712eea5c05214511ced6c3804a22ac6639e3fbfe42f784182c",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/jsonapi_node_preview_tab": [
+            {
+                "package": "drupal/jsonapi_node_preview_tab",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/jsonapi_node_preview_tab-drupal-12-core-version-requirement.patch",
+                "sha256": "2715bd7fa93d5e152df1625f93ceeffe05ea75c276661c62a6c4d92fa24b74ec",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/jsonapi_resources": [
+            {
+                "package": "drupal/jsonapi_resources",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/jsonapi_resources-drupal-12-core-version-requirement.patch",
+                "sha256": "3a2c7fa9b5a7866fd5027962709574757bf4abea267792c14c4db05c5787960a",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/layout_paragraphs": [
+            {
+                "package": "drupal/layout_paragraphs",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/layout_paragraphs-drupal-12-core-version-requirement.patch",
+                "sha256": "5e704ce8b42c92e79dc8941f4144c44f4195ffaa089f664d0ccb0c9cc0f082c0",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/logout_token": [
+            {
+                "package": "drupal/logout_token",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/logout_token-drupal-12-core-version-requirement.patch",
+                "sha256": "694e5df4d8d585b00d20ccc3ce0220970f7abc9d8df9f6688dc08e22393d477c",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/maxlength": [
+            {
+                "package": "drupal/maxlength",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/maxlength-drupal-12-core-version-requirement.patch",
+                "sha256": "b5881d6b901483a6fd9b06986c3e406c8317a87786e1b4998444419e632ced9f",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/migrate_plus": [
+            {
+                "package": "drupal/migrate_plus",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/migrate_plus-drupal-12-core-version-requirement.patch",
+                "sha256": "99376bf452a143bed84ad3c548882867c153078acb4c7a35c323c204e10389bb",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/node_edit_protection": [
+            {
+                "package": "drupal/node_edit_protection",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/node_edit_protection-drupal-12-core-version-requirement.patch",
+                "sha256": "5a149035f01739676be149185b220d80b3dc97ccc448451be2f58e752bbcb609",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/paragraphs": [
+            {
+                "package": "drupal/paragraphs",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/paragraphs-drupal-12-core-version-requirement.patch",
+                "sha256": "1e2ece4c5e7c69db362ad77230917650a418ab86bb561681b10869490254d020",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/purge_purger_http": [
+            {
+                "package": "drupal/purge_purger_http",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/purge_purger_http-drupal-12-core-version-requirement.patch",
+                "sha256": "e6eee19250334639f5303f6c93a5a4f991ccbdf2a11c2eb71baa41fc04a0b4e7",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/simple_oauth_password_grant": [
+            {
+                "package": "drupal/simple_oauth_password_grant",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/simple_oauth_password_grant-drupal-12-core-version-requirement.patch",
+                "sha256": "3dd7a25805556995c9b4d16ad27fc43086096470f6ece9d8f742d13344e7baf0",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/simple_oauth_password_grant",
+                "description": "Drupal 12: user.auth implements UserAuthenticationInterface only, so authenticate through it",
+                "url": "patches/simple_oauth_password_grant-drupal-12-user-authentication-interface.patch",
+                "sha256": "beab7739502eed1720dac975561f0ed4db15f3ae7b0db3e725dc0cd986913cee",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/simple_oauth_revoke": [
+            {
+                "package": "drupal/simple_oauth_revoke",
+                "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
+                "url": "patches/simple_oauth_revoke-drupal-12-core-version-requirement.patch",
+                "sha256": "a69eaebe5ead1538b82b577807fd767ee70b42f99d58f459614a1713a09d8565",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/custom_formatters": [
+            {
+                "package": "drupal/custom_formatters",
+                "description": "Drupal 12: _contextual_links_to_id() became ContextualLinksSerializer::linksToId()",
+                "url": "patches/custom_formatters-drupal-12-contextual-links-serializer.patch",
+                "sha256": "fdce06fe1c9215a9757ba4b7eea1fa6173698809e98af3d53f67f7a115dfe6f6",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/admin_audit_trail": [
+            {
+                "package": "drupal/admin_audit_trail",
+                "description": "Drupal 12: getOriginal() in the user hooks, and hook_modules_installed moved out of the .install file that 12 never loads at run time",
+                "url": "patches/admin_audit_trail-drupal-12-entity-get-original.patch",
+                "sha256": "906057aace160e952f70a2ce12c8f42336ff9ae3ee5a3e40660a229b89cc0e09",
                 "depth": 1,
                 "extra": {
                     "provenance": "root"

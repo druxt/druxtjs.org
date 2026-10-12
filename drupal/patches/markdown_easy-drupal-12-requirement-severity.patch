@@ -1,0 +1,20 @@
+--- a/markdown_easy.install
++++ b/markdown_easy.install
+@@ -39,7 +39,7 @@
+               'title' => t('Markdown Easy'),
+               'value' => t('Using deprecated configuration.'),
+               'description' => t('The text format %format is potentially configured incorrectly. The "Convert line breaks into HTML" filter is not recommended when using Markdown Easy filter.', ['%format' => $format->get('name')]),
+-              'severity' => REQUIREMENT_WARNING,
++              'severity' => 1,
+             ];
+           }
+ 
+@@ -48,7 +48,7 @@
+               'title' => t('Markdown Easy'),
+               'value' => t('Text format configured insecurely.'),
+               'description' => t('The text format %format is potentially configured insecurely. The "Limit allowed HTML tags and correct faulty HTML" filter is required and should be configured to run after the Markdown Easy filter.', ['%format' => $format->get('name')]),
+-              'severity' => REQUIREMENT_WARNING,
++              'severity' => 1,
+             ];
+           }
+         }

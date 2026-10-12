@@ -1,0 +1,46 @@
+diff -ruN a/modules/paragraphs_demo/paragraphs_demo.info.yml b/modules/paragraphs_demo/paragraphs_demo.info.yml
+--- a/modules/paragraphs_demo/paragraphs_demo.info.yml	2026-10-12 01:13:44.215274012 +0000
++++ b/modules/paragraphs_demo/paragraphs_demo.info.yml	2026-10-12 01:13:44.215274012 +0000
+@@ -1,5 +1,5 @@
+ description: 'Provides multilingual demo Paragraphs types.'
+-core_version_requirement: ^10.3 || ^11
++core_version_requirement: '^10.3 || ^11 || ^12'
+ dependencies:
+   - paragraphs:paragraphs
+   - drupal:field
+diff -ruN a/modules/paragraphs_library/paragraphs_library.info.yml b/modules/paragraphs_library/paragraphs_library.info.yml
+--- a/modules/paragraphs_library/paragraphs_library.info.yml	2026-10-12 01:13:44.215274012 +0000
++++ b/modules/paragraphs_library/paragraphs_library.info.yml	2026-10-12 01:13:44.215274012 +0000
+@@ -1,7 +1,7 @@
+ name: Paragraphs Library
+ type: module
+ description: 'Provides a library for reusing paragraphs.'
+-core_version_requirement: ^10.3 || ^11
++core_version_requirement: '^10.3 || ^11 || ^12'
+ package: Paragraphs
+ configure: paragraphs_library_item.settings
+ dependencies:
+diff -ruN a/modules/paragraphs_type_permissions/paragraphs_type_permissions.info.yml b/modules/paragraphs_type_permissions/paragraphs_type_permissions.info.yml
+--- a/modules/paragraphs_type_permissions/paragraphs_type_permissions.info.yml	2026-10-12 01:13:44.216274012 +0000
++++ b/modules/paragraphs_type_permissions/paragraphs_type_permissions.info.yml	2026-10-12 01:13:44.216274012 +0000
+@@ -1,7 +1,7 @@
+ name: Paragraphs Type Permissions
+ type: module
+ description: 'Allows users to configure permissions for individual Paragraphs types.'
+-core_version_requirement: ^10.3 || ^11
++core_version_requirement: '^10.3 || ^11 || ^12'
+ package: Paragraphs
+ 
+ dependencies:
+diff -ruN a/paragraphs.info.yml b/paragraphs.info.yml
+--- a/paragraphs.info.yml	2026-10-12 01:13:44.215274012 +0000
++++ b/paragraphs.info.yml	2026-10-12 01:13:44.215274012 +0000
+@@ -1,7 +1,7 @@
+ name: Paragraphs
+ type: module
+ description: 'Enables the creation of paragraphs entities.'
+-core_version_requirement: ^10.3 || ^11
++core_version_requirement: '^10.3 || ^11 || ^12'
+ package: Paragraphs
+ configure: entity.paragraphs_type.collection
+ 

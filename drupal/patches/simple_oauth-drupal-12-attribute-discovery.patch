@@ -1,0 +1,84 @@
+diff -ruN a/src/Attribute/Oauth2Grant.php b/src/Attribute/Oauth2Grant.php
+--- a/src/Attribute/Oauth2Grant.php	1970-01-01 00:00:00.000000000 +0000
++++ b/src/Attribute/Oauth2Grant.php	2026-10-12 01:03:15.665630013 +0000
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\simple_oauth\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++
++/**
++ * Attribute discovery for Oauth2Grant plugins.
++ *
++ * Drupal 12 requires an attribute class on every plugin manager; the plugins
++ * themselves still use the Oauth2Grant annotation, which core keeps discovering
++ * beside the attribute until Drupal 13.
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class Oauth2Grant extends Plugin {
++}
+diff -ruN a/src/Attribute/ScopeProvider.php b/src/Attribute/ScopeProvider.php
+--- a/src/Attribute/ScopeProvider.php	1970-01-01 00:00:00.000000000 +0000
++++ b/src/Attribute/ScopeProvider.php	2026-10-12 01:03:15.665630013 +0000
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\simple_oauth\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++
++/**
++ * Attribute discovery for ScopeProvider plugins.
++ *
++ * Drupal 12 requires an attribute class on every plugin manager; the plugins
++ * themselves still use the ScopeProvider annotation, which core keeps discovering
++ * beside the attribute until Drupal 13.
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class ScopeProvider extends Plugin {
++}
+diff -ruN a/src/Plugin/Oauth2GrantManager.php b/src/Plugin/Oauth2GrantManager.php
+--- a/src/Plugin/Oauth2GrantManager.php	2026-10-12 01:03:15.664630013 +0000
++++ b/src/Plugin/Oauth2GrantManager.php	2026-10-12 01:03:15.665630013 +0000
+@@ -6,6 +6,7 @@
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Plugin\DefaultPluginManager;
+ 
++use Drupal\simple_oauth\Attribute\Oauth2Grant as Oauth2GrantAttribute;
+ /**
+  * Provides the OAuth2 Grant plugin manager.
+  */
+@@ -32,7 +33,7 @@
+    * @throws \Exception
+    */
+   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+-    parent::__construct('Plugin/Oauth2Grant', $namespaces, $module_handler, 'Drupal\simple_oauth\Plugin\Oauth2GrantInterface', 'Drupal\simple_oauth\Annotation\Oauth2Grant');
++    parent::__construct('Plugin/Oauth2Grant', $namespaces, $module_handler, 'Drupal\simple_oauth\Plugin\Oauth2GrantInterface', Oauth2GrantAttribute::class, 'Drupal\simple_oauth\Annotation\Oauth2Grant');
+ 
+     $this->alterInfo('simple_oauth_oauth2_grant_info');
+     $this->setCacheBackend($cache_backend, 'simple_oauth_oauth2_grant_plugins');
+diff -ruN a/src/Plugin/ScopeProviderManager.php b/src/Plugin/ScopeProviderManager.php
+--- a/src/Plugin/ScopeProviderManager.php	2026-10-12 01:03:15.665630013 +0000
++++ b/src/Plugin/ScopeProviderManager.php	2026-10-12 01:03:15.665630013 +0000
+@@ -6,6 +6,7 @@
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Plugin\DefaultPluginManager;
+ 
++use Drupal\simple_oauth\Attribute\ScopeProvider as ScopeProviderAttribute;
+ /**
+  * Provides the Scope Provider plugin manager.
+  */
+@@ -36,7 +37,7 @@
+       'Plugin/ScopeProvider',
+       $namespaces, $module_handler,
+       'Drupal\simple_oauth\Plugin\ScopeProviderInterface',
+-      'Drupal\simple_oauth\Annotation\ScopeProvider'
++      ScopeProviderAttribute::class, 'Drupal\simple_oauth\Annotation\ScopeProvider'
+     );
+ 
+     $this->alterInfo('simple_oauth_scope_provider_info');

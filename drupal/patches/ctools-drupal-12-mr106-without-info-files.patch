@@ -1,0 +1,85 @@
+diff --git a/modules/ctools_entity_mask/tests/modules/entity_mask_test/src/EventSubscriber/ConfigUpdateSubscriber.php b/modules/ctools_entity_mask/tests/modules/entity_mask_test/src/EventSubscriber/ConfigUpdateSubscriber.php
+index 5546162eb09f3c16fcd3fba251ae4fdefea37251..66fef83bbfc7f1954cefcf7368618ad1e5fd57e2 100644
+--- a/modules/ctools_entity_mask/tests/modules/entity_mask_test/src/EventSubscriber/ConfigUpdateSubscriber.php
++++ b/modules/ctools_entity_mask/tests/modules/entity_mask_test/src/EventSubscriber/ConfigUpdateSubscriber.php
+@@ -39,7 +39,7 @@ class ConfigUpdateSubscriber implements EventSubscriberInterface {
+   /**
+    * {@inheritdoc}
+    */
+-  public static function getSubscribedEvents() {
++  public static function getSubscribedEvents(): array {
+     // The priority is set as 256, so that this event is called before the
+     // `ConfigSchemaChecker` event.
+     // @see \Drupal\Core\Config\Development\ConfigSchemaChecker
+diff --git a/src/Attribute/Relationship.php b/src/Attribute/Relationship.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..7a359661ba3b0d18070534a39dc14aeab947c2d8
+--- /dev/null
++++ b/src/Attribute/Relationship.php
+@@ -0,0 +1,45 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\ctools\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++use Drupal\Core\StringTranslation\TranslatableMarkup;
++
++/**
++ * Defines a Relationship plugin attribute object.
++ *
++ * @see \Drupal\ctools\Plugin\RelationshipManager
++ * @see plugin_api
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class Relationship extends Plugin {
++
++  /**
++   * Constructs a Relationship attribute.
++   *
++   * @param string $id
++   *   The plugin ID.
++   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $label
++   *   The label of the plugin.
++   * @param string|null $data_type
++   *   (optional) The returned data type of this relationship.
++   * @param string|null $property_name
++   *   (optional) The name of the property from which this relationship is
++   *   derived.
++   * @param array $context
++   *   (optional) The array of contexts required or optional for this plugin.
++   * @param class-string|null $deriver
++   *   (optional) The deriver class.
++   */
++  public function __construct(
++    public readonly string $id,
++    public readonly TranslatableMarkup $label,
++    public readonly ?string $data_type = NULL,
++    public readonly ?string $property_name = NULL,
++    public readonly array $context = [],
++    public readonly ?string $deriver = NULL,
++  ) {}
++
++}
+diff --git a/src/Plugin/RelationshipManager.php b/src/Plugin/RelationshipManager.php
+index b60462f3a97edb949ca5327506bea104cc257325..80881757d4885bf2bb204070523cbe394549e899 100644
+--- a/src/Plugin/RelationshipManager.php
++++ b/src/Plugin/RelationshipManager.php
+@@ -6,6 +6,7 @@ use Drupal\Core\Plugin\Context\ContextAwarePluginManagerTrait;
+ use Drupal\Core\Plugin\DefaultPluginManager;
+ use Drupal\Core\Cache\CacheBackendInterface;
+ use Drupal\Core\Extension\ModuleHandlerInterface;
++use Drupal\ctools\Attribute\Relationship as RelationshipAttribute;
+ 
+ /**
+  * Provides the Relationship plugin manager.
+@@ -26,7 +27,7 @@ class RelationshipManager extends DefaultPluginManager implements RelationshipMa
+    *   The module handler to invoke the alter hook with.
+    */
+   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+-    parent::__construct('Plugin/Relationship', $namespaces, $module_handler, 'Drupal\ctools\Plugin\RelationshipInterface', 'Drupal\ctools\Annotation\Relationship');
++    parent::__construct('Plugin/Relationship', $namespaces, $module_handler, 'Drupal\ctools\Plugin\RelationshipInterface', RelationshipAttribute::class, 'Drupal\ctools\Annotation\Relationship');
+ 
+     $this->alterInfo('ctools_relationship_info');
+     $this->setCacheBackend($cache_backend, 'ctools_relationship_plugins');

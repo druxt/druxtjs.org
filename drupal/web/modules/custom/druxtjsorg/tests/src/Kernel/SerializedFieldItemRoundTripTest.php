@@ -13,6 +13,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\paragraphs\Entity\ParagraphsType;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * A paragraph's behavior settings survive a JSON:API export and import.
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\Group;
  * serializer, and the site stores Layout Paragraphs' placement there.
  */
 #[Group('druxtjsorg')]
+#[RunTestsInSeparateProcesses]
 final class SerializedFieldItemRoundTripTest extends KernelTestBase {
 
   /**

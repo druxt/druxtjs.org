@@ -1,0 +1,294 @@
+diff -ruN a/src/Attribute/PurgeDiagnosticCheck.php b/src/Attribute/PurgeDiagnosticCheck.php
+--- a/src/Attribute/PurgeDiagnosticCheck.php	1970-01-01 00:00:00.000000000 +0000
++++ b/src/Attribute/PurgeDiagnosticCheck.php	2026-10-12 01:01:09.499984010 +0000
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\purge\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++
++/**
++ * Attribute discovery for PurgeDiagnosticCheck plugins.
++ *
++ * Drupal 12 requires an attribute class on every plugin manager; the plugins
++ * themselves still use the PurgeDiagnosticCheck annotation, which core keeps discovering
++ * beside the attribute until Drupal 13.
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class PurgeDiagnosticCheck extends Plugin {
++}
+diff -ruN a/src/Attribute/PurgeInvalidation.php b/src/Attribute/PurgeInvalidation.php
+--- a/src/Attribute/PurgeInvalidation.php	1970-01-01 00:00:00.000000000 +0000
++++ b/src/Attribute/PurgeInvalidation.php	2026-10-12 01:01:09.499984010 +0000
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\purge\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++
++/**
++ * Attribute discovery for PurgeInvalidation plugins.
++ *
++ * Drupal 12 requires an attribute class on every plugin manager; the plugins
++ * themselves still use the PurgeInvalidation annotation, which core keeps discovering
++ * beside the attribute until Drupal 13.
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class PurgeInvalidation extends Plugin {
++}
+diff -ruN a/src/Attribute/PurgeProcessor.php b/src/Attribute/PurgeProcessor.php
+--- a/src/Attribute/PurgeProcessor.php	1970-01-01 00:00:00.000000000 +0000
++++ b/src/Attribute/PurgeProcessor.php	2026-10-12 01:01:09.499984010 +0000
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\purge\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++
++/**
++ * Attribute discovery for PurgeProcessor plugins.
++ *
++ * Drupal 12 requires an attribute class on every plugin manager; the plugins
++ * themselves still use the PurgeProcessor annotation, which core keeps discovering
++ * beside the attribute until Drupal 13.
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class PurgeProcessor extends Plugin {
++}
+diff -ruN a/src/Attribute/PurgePurger.php b/src/Attribute/PurgePurger.php
+--- a/src/Attribute/PurgePurger.php	1970-01-01 00:00:00.000000000 +0000
++++ b/src/Attribute/PurgePurger.php	2026-10-12 01:01:09.500984010 +0000
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\purge\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++
++/**
++ * Attribute discovery for PurgePurger plugins.
++ *
++ * Drupal 12 requires an attribute class on every plugin manager; the plugins
++ * themselves still use the PurgePurger annotation, which core keeps discovering
++ * beside the attribute until Drupal 13.
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class PurgePurger extends Plugin {
++}
+diff -ruN a/src/Attribute/PurgeQueue.php b/src/Attribute/PurgeQueue.php
+--- a/src/Attribute/PurgeQueue.php	1970-01-01 00:00:00.000000000 +0000
++++ b/src/Attribute/PurgeQueue.php	2026-10-12 01:01:09.500984010 +0000
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\purge\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++
++/**
++ * Attribute discovery for PurgeQueue plugins.
++ *
++ * Drupal 12 requires an attribute class on every plugin manager; the plugins
++ * themselves still use the PurgeQueue annotation, which core keeps discovering
++ * beside the attribute until Drupal 13.
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class PurgeQueue extends Plugin {
++}
+diff -ruN a/src/Attribute/PurgeQueuer.php b/src/Attribute/PurgeQueuer.php
+--- a/src/Attribute/PurgeQueuer.php	1970-01-01 00:00:00.000000000 +0000
++++ b/src/Attribute/PurgeQueuer.php	2026-10-12 01:01:09.499984010 +0000
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\purge\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++
++/**
++ * Attribute discovery for PurgeQueuer plugins.
++ *
++ * Drupal 12 requires an attribute class on every plugin manager; the plugins
++ * themselves still use the PurgeQueuer annotation, which core keeps discovering
++ * beside the attribute until Drupal 13.
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class PurgeQueuer extends Plugin {
++}
+diff -ruN a/src/Attribute/PurgeTagsHeader.php b/src/Attribute/PurgeTagsHeader.php
+--- a/src/Attribute/PurgeTagsHeader.php	1970-01-01 00:00:00.000000000 +0000
++++ b/src/Attribute/PurgeTagsHeader.php	2026-10-12 01:01:09.500984010 +0000
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\purge\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++
++/**
++ * Attribute discovery for PurgeTagsHeader plugins.
++ *
++ * Drupal 12 requires an attribute class on every plugin manager; the plugins
++ * themselves still use the PurgeTagsHeader annotation, which core keeps discovering
++ * beside the attribute until Drupal 13.
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class PurgeTagsHeader extends Plugin {
++}
+diff -ruN a/src/Plugin/Purge/DiagnosticCheck/PluginManager.php b/src/Plugin/Purge/DiagnosticCheck/PluginManager.php
+--- a/src/Plugin/Purge/DiagnosticCheck/PluginManager.php	2026-10-12 01:01:09.499984010 +0000
++++ b/src/Plugin/Purge/DiagnosticCheck/PluginManager.php	2026-10-12 01:01:09.499984010 +0000
+@@ -6,6 +6,7 @@
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Plugin\DefaultPluginManager;
+ 
++use Drupal\purge\Attribute\PurgeDiagnosticCheck as PurgeDiagnosticCheckAttribute;
+ /**
+  * The diagnostic checks plugin manager.
+  */
+@@ -28,7 +29,7 @@
+       $namespaces,
+       $module_handler,
+       'Drupal\purge\Plugin\Purge\DiagnosticCheck\DiagnosticCheckInterface',
+-      'Drupal\purge\Annotation\PurgeDiagnosticCheck');
++      PurgeDiagnosticCheckAttribute::class, 'Drupal\purge\Annotation\PurgeDiagnosticCheck');
+     $this->alterInfo('purge_diagnostic');
+     $this->setCacheBackend($cache_backend, 'purge_diagnosticcheck_plugins');
+   }
+diff -ruN a/src/Plugin/Purge/Invalidation/PluginManager.php b/src/Plugin/Purge/Invalidation/PluginManager.php
+--- a/src/Plugin/Purge/Invalidation/PluginManager.php	2026-10-12 01:01:09.499984010 +0000
++++ b/src/Plugin/Purge/Invalidation/PluginManager.php	2026-10-12 01:01:09.499984010 +0000
+@@ -6,6 +6,7 @@
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Plugin\DefaultPluginManager;
+ 
++use Drupal\purge\Attribute\PurgeInvalidation as PurgeInvalidationAttribute;
+ /**
+  * The invalidation type plugin manager.
+  */
+@@ -28,7 +29,7 @@
+       $namespaces,
+       $module_handler,
+       'Drupal\purge\Plugin\Purge\Invalidation\InvalidationInterface',
+-      'Drupal\purge\Annotation\PurgeInvalidation');
++      PurgeInvalidationAttribute::class, 'Drupal\purge\Annotation\PurgeInvalidation');
+     $this->alterInfo('purge_invalidation');
+     $this->setCacheBackend($cache_backend, 'purge_invalidation_plugins');
+   }
+diff -ruN a/src/Plugin/Purge/Processor/PluginManager.php b/src/Plugin/Purge/Processor/PluginManager.php
+--- a/src/Plugin/Purge/Processor/PluginManager.php	2026-10-12 01:01:09.499984010 +0000
++++ b/src/Plugin/Purge/Processor/PluginManager.php	2026-10-12 01:01:09.499984010 +0000
+@@ -6,6 +6,7 @@
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Plugin\DefaultPluginManager;
+ 
++use Drupal\purge\Attribute\PurgeProcessor as PurgeProcessorAttribute;
+ /**
+  * The processors plugin manager.
+  */
+@@ -28,7 +29,7 @@
+       $namespaces,
+       $module_handler,
+       'Drupal\purge\Plugin\Purge\Processor\ProcessorInterface',
+-      'Drupal\purge\Annotation\PurgeProcessor');
++      PurgeProcessorAttribute::class, 'Drupal\purge\Annotation\PurgeProcessor');
+     $this->alterInfo('purge_processor');
+     $this->setCacheBackend($cache_backend, 'purge_processor_plugins');
+   }
+diff -ruN a/src/Plugin/Purge/Purger/PluginManager.php b/src/Plugin/Purge/Purger/PluginManager.php
+--- a/src/Plugin/Purge/Purger/PluginManager.php	2026-10-12 01:01:09.500984010 +0000
++++ b/src/Plugin/Purge/Purger/PluginManager.php	2026-10-12 01:01:09.500984010 +0000
+@@ -6,6 +6,7 @@
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Plugin\DefaultPluginManager;
+ 
++use Drupal\purge\Attribute\PurgePurger as PurgePurgerAttribute;
+ /**
+  * The purger plugin manager.
+  */
+@@ -28,7 +29,7 @@
+       $namespaces,
+       $module_handler,
+       'Drupal\purge\Plugin\Purge\Purger\PurgerInterface',
+-      'Drupal\purge\Annotation\PurgePurger');
++      PurgePurgerAttribute::class, 'Drupal\purge\Annotation\PurgePurger');
+     $this->alterInfo('purge_purgers');
+     $this->setCacheBackend($cache_backend, 'purge_purger_plugins');
+   }
+diff -ruN a/src/Plugin/Purge/Queue/PluginManager.php b/src/Plugin/Purge/Queue/PluginManager.php
+--- a/src/Plugin/Purge/Queue/PluginManager.php	2026-10-12 01:01:09.500984010 +0000
++++ b/src/Plugin/Purge/Queue/PluginManager.php	2026-10-12 01:01:09.500984010 +0000
+@@ -6,6 +6,7 @@
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Plugin\DefaultPluginManager;
+ 
++use Drupal\purge\Attribute\PurgeQueue as PurgeQueueAttribute;
+ /**
+  * The queue plugin manager.
+  */
+@@ -28,7 +29,7 @@
+       $namespaces,
+       $module_handler,
+       'Drupal\purge\Plugin\Purge\Queue\QueueInterface',
+-      'Drupal\purge\Annotation\PurgeQueue');
++      PurgeQueueAttribute::class, 'Drupal\purge\Annotation\PurgeQueue');
+     $this->alterInfo('purge_queues');
+     $this->setCacheBackend($cache_backend, 'purge_queue_plugins');
+   }
+diff -ruN a/src/Plugin/Purge/Queuer/PluginManager.php b/src/Plugin/Purge/Queuer/PluginManager.php
+--- a/src/Plugin/Purge/Queuer/PluginManager.php	2026-10-12 01:01:09.499984010 +0000
++++ b/src/Plugin/Purge/Queuer/PluginManager.php	2026-10-12 01:01:09.499984010 +0000
+@@ -6,6 +6,7 @@
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Plugin\DefaultPluginManager;
+ 
++use Drupal\purge\Attribute\PurgeQueuer as PurgeQueuerAttribute;
+ /**
+  * The queuer plugin manager.
+  */
+@@ -28,7 +29,7 @@
+       $namespaces,
+       $module_handler,
+       'Drupal\purge\Plugin\Purge\Queuer\QueuerInterface',
+-      'Drupal\purge\Annotation\PurgeQueuer');
++      PurgeQueuerAttribute::class, 'Drupal\purge\Annotation\PurgeQueuer');
+     $this->alterInfo('purge_queuers');
+     $this->setCacheBackend($cache_backend, 'purge_queuer_plugins');
+   }
+diff -ruN a/src/Plugin/Purge/TagsHeader/PluginManager.php b/src/Plugin/Purge/TagsHeader/PluginManager.php
+--- a/src/Plugin/Purge/TagsHeader/PluginManager.php	2026-10-12 01:01:09.499984010 +0000
++++ b/src/Plugin/Purge/TagsHeader/PluginManager.php	2026-10-12 01:01:09.500984010 +0000
+@@ -6,6 +6,7 @@
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Plugin\DefaultPluginManager;
+ 
++use Drupal\purge\Attribute\PurgeTagsHeader as PurgeTagsHeaderAttribute;
+ /**
+  * The tagsheader plugin manager.
+  */
+@@ -28,7 +29,7 @@
+       $namespaces,
+       $module_handler,
+       'Drupal\purge\Plugin\Purge\TagsHeader\TagsHeaderInterface',
+-      'Drupal\purge\Annotation\PurgeTagsHeader');
++      PurgeTagsHeaderAttribute::class, 'Drupal\purge\Annotation\PurgeTagsHeader');
+     $this->alterInfo('purge_tagsheader');
+     $this->setCacheBackend($cache_backend, 'purge_tagsheader_plugins');
+   }

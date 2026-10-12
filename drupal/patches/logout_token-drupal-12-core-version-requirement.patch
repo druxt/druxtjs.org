@@ -1,0 +1,12 @@
+diff -ruN a/logout_token.info.yml b/logout_token.info.yml
+--- a/logout_token.info.yml	2026-10-12 01:13:44.208274012 +0000
++++ b/logout_token.info.yml	2026-10-12 01:13:44.208274012 +0000
+@@ -1,7 +1,7 @@
+ name: 'Logout Token'
+ type: module
+ description: 'Provides an endpoint to retrieve the logout token during user sessions.'
+-core_version_requirement: ^10 || ^11
++core_version_requirement: '^10 || ^11 || ^12'
+ package: Custom
+ 
+ # Information added by Drupal.org packaging script on 2026-03-18

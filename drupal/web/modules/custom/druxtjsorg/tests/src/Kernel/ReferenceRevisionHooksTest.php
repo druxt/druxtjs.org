@@ -13,11 +13,13 @@ use Drupal\node\Entity\NodeType;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\paragraphs\Entity\ParagraphsType;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * A reference to another site's revision id lands on the target's own.
  */
 #[Group('druxtjsorg')]
+#[RunTestsInSeparateProcesses]
 final class ReferenceRevisionHooksTest extends KernelTestBase {
 
   /**

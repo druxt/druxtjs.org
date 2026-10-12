@@ -1,0 +1,12 @@
+diff -ruN a/field_tokens.info.yml b/field_tokens.info.yml
+--- a/field_tokens.info.yml	2026-10-12 01:13:44.197274012 +0000
++++ b/field_tokens.info.yml	2026-10-12 01:13:44.197274012 +0000
+@@ -1,7 +1,7 @@
+ name: Field Tokens
+ description: Adds formatted field and field property tokens.
+ type: module
+-core_version_requirement: ^10.1 || ^11
++core_version_requirement: '^10.1 || ^11 || ^12'
+ dependencies:
+   - token:token
+ 

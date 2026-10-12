@@ -1,0 +1,23 @@
+diff -ruN a/decoupled_settings.info.yml b/decoupled_settings.info.yml
+--- a/decoupled_settings.info.yml	2026-10-12 01:13:44.193274012 +0000
++++ b/decoupled_settings.info.yml	2026-10-12 01:13:44.193274012 +0000
+@@ -2,7 +2,7 @@
+ type: module
+ description: 'Exposes allowlisted simple config over JSON:API, with global values and per-consumer overrides.'
+ package: 'Web services'
+-core_version_requirement: ^10.3 || ^11
++core_version_requirement: '^10.3 || ^11 || ^12'
+ dependencies:
+   - drupal:jsonapi
+   - consumers:consumers
+diff -ruN a/tests/modules/decoupled_settings_test/decoupled_settings_test.info.yml b/tests/modules/decoupled_settings_test/decoupled_settings_test.info.yml
+--- a/tests/modules/decoupled_settings_test/decoupled_settings_test.info.yml	2026-10-12 01:13:44.193274012 +0000
++++ b/tests/modules/decoupled_settings_test/decoupled_settings_test.info.yml	2026-10-12 01:13:44.193274012 +0000
+@@ -2,6 +2,6 @@
+ type: module
+ description: 'Contributes settings through the alter hook, for testing.'
+ package: Testing
+-core_version_requirement: ^10.3 || ^11
++core_version_requirement: '^10.3 || ^11 || ^12'
+ dependencies:
+   - decoupled_settings:decoupled_settings

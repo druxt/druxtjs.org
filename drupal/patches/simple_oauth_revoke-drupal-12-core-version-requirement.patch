@@ -1,0 +1,12 @@
+diff -ruN a/simple_oauth_revoke.info.yml b/simple_oauth_revoke.info.yml
+--- a/simple_oauth_revoke.info.yml	2026-10-12 01:13:44.224274012 +0000
++++ b/simple_oauth_revoke.info.yml	2026-10-12 01:13:44.224274012 +0000
+@@ -3,7 +3,7 @@
+ description: "Adds a '/oauth/revoke' endpoint to revoke token previously obtained via simple_oauth"
+ dependencies:
+   - simple_oauth:simple_oauth
+-core_version_requirement: ^10 || ^11
++core_version_requirement: '^10 || ^11 || ^12'
+ 
+ # Information added by Drupal.org packaging script on 2025-08-22
+ version: '3.0.0'

@@ -10,11 +10,13 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * The deploy hook gives the topics the UUID every site derives from the name.
  */
 #[Group('druxtjsorg')]
+#[RunTestsInSeparateProcesses]
 final class TopicUuidDeployTest extends KernelTestBase {
 
   /**

@@ -1,0 +1,134 @@
+diff --git a/core/modules/jsonapi/src/EventSubscriber/ResourceObjectNormalizationCacher.php b/core/modules/jsonapi/src/EventSubscriber/ResourceObjectNormalizationCacher.php
+index 12fe154294db305121ec8291401695098f478b26..ce3d02d6e4514640df7f2468f3a4e716a0e1f5e9 100644
+--- a/core/modules/jsonapi/src/EventSubscriber/ResourceObjectNormalizationCacher.php
++++ b/core/modules/jsonapi/src/EventSubscriber/ResourceObjectNormalizationCacher.php
+@@ -7,6 +7,7 @@
+ use Drupal\jsonapi\JsonApiResource\ResourceObject;
+ use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
+ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
++use Symfony\Component\HttpFoundation\Request;
+ use Symfony\Component\HttpFoundation\RequestStack;
+ use Symfony\Component\HttpKernel\Event\TerminateEvent;
+ use Symfony\Component\HttpKernel\KernelEvents;
+@@ -61,6 +62,20 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
+    */
+   protected $toCache = [];
+ 
++  /**
++   * Cache items read by ::prefetch(), keyed by joined cache keys.
++   *
++   * FALSE indicates a cache miss. Items are removed when read by ::get().
++   *
++   * @var array<string, object|false>
++   */
++  protected array $prefetched = [];
++
++  /**
++   * The request for which the items in ::$prefetched were read.
++   */
++  protected ?Request $prefetchedRequest = NULL;
++
+   /**
+    * Sets the variation cache.
+    *
+@@ -106,7 +121,15 @@ public function get(ResourceObject $object) {
+       return FALSE;
+     }
+ 
+-    $cached = $this->variationCache->get($this->generateCacheKeys($object), new CacheableMetadata());
++    $keys = $this->generateCacheKeys($object);
++    $prefetch_key = implode(':', $keys);
++    if ($this->prefetchedRequest === $this->requestStack->getCurrentRequest() && array_key_exists($prefetch_key, $this->prefetched)) {
++      $cached = $this->prefetched[$prefetch_key];
++      unset($this->prefetched[$prefetch_key]);
++    }
++    else {
++      $cached = $this->variationCache->get($keys, new CacheableMetadata());
++    }
+     if (!$cached) {
+       return FALSE;
+     }
+@@ -142,6 +165,47 @@ public function get(ResourceObject $object) {
+     return $normalizer_values;
+   }
+ 
++  /**
++   * Reads the cached normalizations of multiple resource objects in bulk.
++   *
++   * Later calls to ::get() for these objects during the same request use the
++   * prefetched items instead of reading from the cache individually.
++   *
++   * @param array $objects
++   *   The objects to prefetch. Anything not a resource object is ignored.
++   */
++  public function prefetch(array $objects): void {
++    $request = $this->requestStack->getCurrentRequest();
++    // Prefetched items are only valid for the request that read them.
++    if ($this->prefetchedRequest !== $request) {
++      $this->prefetched = [];
++      $this->prefetchedRequest = $request;
++    }
++
++    // @todo Investigate whether to cache POST and PATCH requests.
++    // @todo Follow up on https://www.drupal.org/project/drupal/issues/3381898.
++    if (!$request->isMethodCacheable()) {
++      return;
++    }
++
++    $items = [];
++    foreach ($objects as $object) {
++      if (!$object instanceof ResourceObject || $object->getCacheMaxAge() === 0) {
++        continue;
++      }
++      $keys = $this->generateCacheKeys($object);
++      $items[implode(':', $keys)] = [$keys, new CacheableMetadata()];
++    }
++    if (empty($items)) {
++      return;
++    }
++
++    $cached = $this->variationCache->getMultiple($items);
++    foreach (array_keys($items) as $prefetch_key) {
++      $this->prefetched[$prefetch_key] = $cached[$prefetch_key] ?? FALSE;
++    }
++  }
++
+   /**
+    * Adds a normalization to be cached after the response has been sent.
+    *
+diff --git a/core/modules/jsonapi/src/Normalizer/DataNormalizer.php b/core/modules/jsonapi/src/Normalizer/DataNormalizer.php
+index 9ecd03dce0074afecc862a28ee6267ba332a5ae8..2f179b6593d6a6836cedfe4fb8c09d4ec1c680b4 100644
+--- a/core/modules/jsonapi/src/Normalizer/DataNormalizer.php
++++ b/core/modules/jsonapi/src/Normalizer/DataNormalizer.php
+@@ -2,8 +2,10 @@
+ 
+ namespace Drupal\jsonapi\Normalizer;
+ 
++use Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher;
+ use Drupal\jsonapi\JsonApiResource\Data;
+ use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
++use Symfony\Component\DependencyInjection\Attribute\Autowire;
+ 
+ /**
+  * Normalizes JSON:API Data objects.
+@@ -12,6 +14,11 @@
+  */
+ class DataNormalizer extends NormalizerBase {
+ 
++  public function __construct(
++    #[Autowire(service: 'jsonapi.normalization_cacher')]
++    protected ResourceObjectNormalizationCacher $cacher,
++  ) {}
++
+   /**
+    * Normalizes data into a set of arrays/scalars.
+    *
+@@ -28,6 +35,8 @@ class DataNormalizer extends NormalizerBase {
+    */
+   public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
+     assert($object instanceof Data);
++    // Read the cached normalizations of all resource objects in one batch.
++    $this->cacher->prefetch($object->toArray());
+     $cacheable_normalizations = array_map(function ($resource) use ($format, $context) {
+       return $this->serializer->normalize($resource, $format, $context);
+     }, $object->toArray());

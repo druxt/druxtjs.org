@@ -16,12 +16,14 @@ use Drupal\paragraphs\Entity\ParagraphsType;
 use Drupal\paragraphs\ParagraphInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * The computed field_toc on a page built from real paragraphs.
  */
 #[CoversClass(TableOfContentsItemList::class)]
 #[Group('druxt_docs')]
+#[RunTestsInSeparateProcesses]
 final class TableOfContentsFieldTest extends KernelTestBase {
 
   /**

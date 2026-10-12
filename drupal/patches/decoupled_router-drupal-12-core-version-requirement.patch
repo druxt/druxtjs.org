@@ -1,0 +1,12 @@
+diff -ruN a/decoupled_router.info.yml b/decoupled_router.info.yml
+--- a/decoupled_router.info.yml	2026-10-12 01:13:44.193274012 +0000
++++ b/decoupled_router.info.yml	2026-10-12 01:13:44.193274012 +0000
+@@ -2,7 +2,7 @@
+ type: module
+ description: 'Handles the awkwardness of routing in decoupled architectures.'
+ package: Web services
+-core_version_requirement: ^10.1 || ^11
++core_version_requirement: '^10.1 || ^11 || ^12'
+ dependencies:
+   - drupal:path_alias
+ test_dependencies:

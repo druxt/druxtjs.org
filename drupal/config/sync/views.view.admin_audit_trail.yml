@@ -742,6 +742,8 @@ display:
             min_placeholder: ''
             max_placeholder: ''
             placeholder: ''
+            min_label: Min
+            max_label: Max
           is_grouped: false
           group_info:
             label: ''

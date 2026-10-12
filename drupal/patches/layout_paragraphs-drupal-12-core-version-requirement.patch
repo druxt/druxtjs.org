@@ -1,0 +1,169 @@
+diff -ruN a/layout_paragraphs.info.yml b/layout_paragraphs.info.yml
+--- a/layout_paragraphs.info.yml	2026-10-12 01:13:44.205274012 +0000
++++ b/layout_paragraphs.info.yml	2026-10-12 01:13:44.205274012 +0000
+@@ -1,7 +1,7 @@
+ name: 'Layout Paragraphs'
+ type: module
+ description: 'Field widget and formatter for using layouts with paragraph fields.'
+-core_version_requirement: ^10 || ^11
++core_version_requirement: '^10 || ^11 || ^12'
+ package: 'Paragraphs'
+ configure: layout_paragraphs.label_settings
+ dependencies:
+diff -ruN a/modules/layout_paragraphs_library/layout_paragraphs_library.info.yml b/modules/layout_paragraphs_library/layout_paragraphs_library.info.yml
+--- a/modules/layout_paragraphs_library/layout_paragraphs_library.info.yml	2026-10-12 01:13:44.207274012 +0000
++++ b/modules/layout_paragraphs_library/layout_paragraphs_library.info.yml	2026-10-12 01:13:44.207274012 +0000
+@@ -1,6 +1,6 @@
+ name: Layout Paragraphs Library
+ description: Provides integration between Layout Paragraphs and Paragraphs Library
+-core_version_requirement: ^9.2 || ^10 || ^11
++core_version_requirement: '^9.2 || ^10 || ^11 || ^12'
+ type: module
+ package: 'Paragraphs'
+ dependencies:
+diff -ruN a/modules/layout_paragraphs_permissions/layout_paragraphs_permissions.info.yml b/modules/layout_paragraphs_permissions/layout_paragraphs_permissions.info.yml
+--- a/modules/layout_paragraphs_permissions/layout_paragraphs_permissions.info.yml	2026-10-12 01:13:44.207274012 +0000
++++ b/modules/layout_paragraphs_permissions/layout_paragraphs_permissions.info.yml	2026-10-12 01:13:44.207274012 +0000
+@@ -1,6 +1,6 @@
+ name: Layout Paragraphs Permissions
+ description: Provides a drag and drop permission for Layout Paragraphs components.
+-core_version_requirement: ^9.2 || ^10 || ^11
++core_version_requirement: '^9.2 || ^10 || ^11 || ^12'
+ type: module
+ package: 'Paragraphs'
+ dependencies:
+diff -ruN a/tests/modules/layout_paragraphs_alter_controls_test/layout_paragraphs_alter_controls_test.info.yml b/tests/modules/layout_paragraphs_alter_controls_test/layout_paragraphs_alter_controls_test.info.yml
+--- a/tests/modules/layout_paragraphs_alter_controls_test/layout_paragraphs_alter_controls_test.info.yml	2026-10-12 01:13:44.207274012 +0000
++++ b/tests/modules/layout_paragraphs_alter_controls_test/layout_paragraphs_alter_controls_test.info.yml	2026-10-12 01:13:44.207274012 +0000
+@@ -1,6 +1,6 @@
+ name: Layout Paragraphs Alter Controls Test
+ description: Tests that the controls UI element can be altered by third party modules.
+-core_version_requirement: ^9.2 || ^10 || ^11
++core_version_requirement: '^9.2 || ^10 || ^11 || ^12'
+ package: Layout Paragraphs
+ type: module
+ dependencies:
+diff -ruN a/tests/modules/layout_paragraphs_altered_template_test/layout_paragraphs_altered_template_test.info.yml b/tests/modules/layout_paragraphs_altered_template_test/layout_paragraphs_altered_template_test.info.yml
+--- a/tests/modules/layout_paragraphs_altered_template_test/layout_paragraphs_altered_template_test.info.yml	2026-10-12 01:13:44.206274012 +0000
++++ b/tests/modules/layout_paragraphs_altered_template_test/layout_paragraphs_altered_template_test.info.yml	2026-10-12 01:13:44.206274012 +0000
+@@ -1,6 +1,6 @@
+ name: "Layout Paragraphs Test of Altered Paragraph Templates"
+ description: "Controls should render correctly even when paragraph templates are customized."
+-core_version_requirement: ^9.2 || ^10 || ^11
++core_version_requirement: '^9.2 || ^10 || ^11 || ^12'
+ package: Layout Paragraphs
+ type: module
+ dependencies:
+diff -ruN a/tests/modules/layout_paragraphs_complex_permissions_test/layout_paragraphs_complex_permissions_test.info.yml b/tests/modules/layout_paragraphs_complex_permissions_test/layout_paragraphs_complex_permissions_test.info.yml
+--- a/tests/modules/layout_paragraphs_complex_permissions_test/layout_paragraphs_complex_permissions_test.info.yml	2026-10-12 01:13:44.206274012 +0000
++++ b/tests/modules/layout_paragraphs_complex_permissions_test/layout_paragraphs_complex_permissions_test.info.yml	2026-10-12 01:13:44.206274012 +0000
+@@ -1,6 +1,6 @@
+ name: Layout Paragraphs Complex Permissions Test
+ description: Tests more complex layout permissions setup
+-core_version_requirement: ^9.2 || ^10 || ^11
++core_version_requirement: '^9.2 || ^10 || ^11 || ^12'
+ type: module
+ package: Layout Paragraphs
+ dependencies:
+diff -ruN a/tests/modules/layout_paragraphs_correct_region_test/layout_paragraphs_correct_region_test.info.yml b/tests/modules/layout_paragraphs_correct_region_test/layout_paragraphs_correct_region_test.info.yml
+--- a/tests/modules/layout_paragraphs_correct_region_test/layout_paragraphs_correct_region_test.info.yml	2026-10-12 01:13:44.205274012 +0000
++++ b/tests/modules/layout_paragraphs_correct_region_test/layout_paragraphs_correct_region_test.info.yml	2026-10-12 01:13:44.205274012 +0000
+@@ -1,6 +1,6 @@
+ name: Layout Paragraphs Correct Region Test
+ description: Tests that components are added to correct region after being moved
+-core_version_requirement: ^9.2 || ^10 || ^11
++core_version_requirement: '^9.2 || ^10 || ^11 || ^12'
+ type: module
+ package: Layout Paragraphs
+ dependencies:
+diff -ruN a/tests/modules/layout_paragraphs_empty_component_list_test/layout_paragraphs_empty_component_list_test.info.yml b/tests/modules/layout_paragraphs_empty_component_list_test/layout_paragraphs_empty_component_list_test.info.yml
+--- a/tests/modules/layout_paragraphs_empty_component_list_test/layout_paragraphs_empty_component_list_test.info.yml	2026-10-12 01:13:44.205274012 +0000
++++ b/tests/modules/layout_paragraphs_empty_component_list_test/layout_paragraphs_empty_component_list_test.info.yml	2026-10-12 01:13:44.205274012 +0000
+@@ -1,6 +1,6 @@
+ name: Layout Paragraphs Empty Component List Test
+ description: Tests that the correct message is displayed when the component list is empty.
+-core_version_requirement: ^9.2 || ^10 || ^11
++core_version_requirement: '^9.2 || ^10 || ^11 || ^12'
+ type: module
+ package: Layout Paragraphs
+ dependencies:
+diff -ruN a/tests/modules/layout_paragraphs_entity_validator_test/layout_paragraphs_entity_validator_test.info.yml b/tests/modules/layout_paragraphs_entity_validator_test/layout_paragraphs_entity_validator_test.info.yml
+--- a/tests/modules/layout_paragraphs_entity_validator_test/layout_paragraphs_entity_validator_test.info.yml	2026-10-12 01:13:44.205274012 +0000
++++ b/tests/modules/layout_paragraphs_entity_validator_test/layout_paragraphs_entity_validator_test.info.yml	2026-10-12 01:13:44.205274012 +0000
+@@ -2,7 +2,7 @@
+ description: Helps test custom entity validators on paragraphs
+ package: Testing
+ type: module
+-core_version_requirement: ^9.2 || ^10 || ^11
++core_version_requirement: '^9.2 || ^10 || ^11 || ^12'
+ dependencies:
+   - paragraphs:paragraphs
+ 
+diff -ruN a/tests/modules/layout_paragraphs_form_rendering_test/layout_paragraphs_form_rendering_test.info.yml b/tests/modules/layout_paragraphs_form_rendering_test/layout_paragraphs_form_rendering_test.info.yml
+--- a/tests/modules/layout_paragraphs_form_rendering_test/layout_paragraphs_form_rendering_test.info.yml	2026-10-12 01:13:44.206274012 +0000
++++ b/tests/modules/layout_paragraphs_form_rendering_test/layout_paragraphs_form_rendering_test.info.yml	2026-10-12 01:13:44.206274012 +0000
+@@ -1,6 +1,6 @@
+ name: Layout Paragraphs Form Rendering Permissions Test
+ description: Tests rendering forms in builder components
+-core_version_requirement: ^9.2 || ^10 || ^11
++core_version_requirement: '^9.2 || ^10 || ^11 || ^12'
+ type: module
+ package: Layout Paragraphs
+ dependencies:
+diff -ruN a/tests/modules/layout_paragraphs_preprocess_layout_test/layout_paragraphs_preprocess_layout_test.info.yml b/tests/modules/layout_paragraphs_preprocess_layout_test/layout_paragraphs_preprocess_layout_test.info.yml
+--- a/tests/modules/layout_paragraphs_preprocess_layout_test/layout_paragraphs_preprocess_layout_test.info.yml	2026-10-12 01:13:44.206274012 +0000
++++ b/tests/modules/layout_paragraphs_preprocess_layout_test/layout_paragraphs_preprocess_layout_test.info.yml	2026-10-12 01:13:44.206274012 +0000
+@@ -1,6 +1,6 @@
+ name: Layout Paragraphs Preprocess Layout Test
+ description: Tests that the layout is available in preprocess variables
+-core_version_requirement: ^9.2 || ^10 || ^11
++core_version_requirement: '^9.2 || ^10 || ^11 || ^12'
+ type: module
+ package: Layout Paragraphs
+ dependencies:
+diff -ruN a/tests/modules/layout_paragraphs_setup_test/layout_paragraphs_setup_test.info.yml b/tests/modules/layout_paragraphs_setup_test/layout_paragraphs_setup_test.info.yml
+--- a/tests/modules/layout_paragraphs_setup_test/layout_paragraphs_setup_test.info.yml	2026-10-12 01:13:44.207274012 +0000
++++ b/tests/modules/layout_paragraphs_setup_test/layout_paragraphs_setup_test.info.yml	2026-10-12 01:13:44.207274012 +0000
+@@ -2,7 +2,7 @@
+ description: 'Test module for Layout Paragraphs setup and configuration.'
+ package: 'Testing'
+ type: module
+-core_version_requirement: ^9 || ^10 || ^11
++core_version_requirement: '^9 || ^10 || ^11 || ^12'
+ dependencies:
+   - drupal:node
+   - drupal:field
+diff -ruN a/tests/modules/layout_paragraphs_translation_access_test/layout_paragraphs_translation_access_test.info.yml b/tests/modules/layout_paragraphs_translation_access_test/layout_paragraphs_translation_access_test.info.yml
+--- a/tests/modules/layout_paragraphs_translation_access_test/layout_paragraphs_translation_access_test.info.yml	2026-10-12 01:13:44.206274012 +0000
++++ b/tests/modules/layout_paragraphs_translation_access_test/layout_paragraphs_translation_access_test.info.yml	2026-10-12 01:13:44.206274012 +0000
+@@ -1,6 +1,6 @@
+ name: Layout Paragraphs Translation Access Test
+ description: Helper module that forbids updating selected node translations
+-core_version_requirement: ^10 || ^11
++core_version_requirement: '^10 || ^11 || ^12'
+ type: module
+ package: Layout Paragraphs
+ dependencies:
+diff -ruN a/tests/modules/layout_paragraphs_translations_test/layout_paragraphs_translations_test.info.yml b/tests/modules/layout_paragraphs_translations_test/layout_paragraphs_translations_test.info.yml
+--- a/tests/modules/layout_paragraphs_translations_test/layout_paragraphs_translations_test.info.yml	2026-10-12 01:13:44.206274012 +0000
++++ b/tests/modules/layout_paragraphs_translations_test/layout_paragraphs_translations_test.info.yml	2026-10-12 01:13:44.206274012 +0000
+@@ -1,6 +1,6 @@
+ name: Layout Paragraphs Translations Test
+ description: Helper module for testing Layout Paragraphs translations
+-core_version_requirement: ^9.2 || ^10 || ^11
++core_version_requirement: '^9.2 || ^10 || ^11 || ^12'
+ type: module
+ package: Layout Paragraphs
+ dependencies:
+diff -ruN a/tests/modules/test_layout_paragraphs_libraries/test_layout_paragraphs_libraries.info.yml b/tests/modules/test_layout_paragraphs_libraries/test_layout_paragraphs_libraries.info.yml
+--- a/tests/modules/test_layout_paragraphs_libraries/test_layout_paragraphs_libraries.info.yml	2026-10-12 01:13:44.206274012 +0000
++++ b/tests/modules/test_layout_paragraphs_libraries/test_layout_paragraphs_libraries.info.yml	2026-10-12 01:13:44.206274012 +0000
+@@ -2,7 +2,7 @@
+ type: module
+ description: 'Support testing of Layout Paragraphs libraries.'
+ package: Testing
+-core_version_requirement: ^9.2 || ^10 || ^11
++core_version_requirement: '^9.2 || ^10 || ^11 || ^12'
+ 
+ # Information added by Drupal.org packaging script on 2026-10-09
+ version: '2.1.5'

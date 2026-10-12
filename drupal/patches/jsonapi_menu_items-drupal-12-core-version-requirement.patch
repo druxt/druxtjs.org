@@ -1,0 +1,24 @@
+diff -ruN a/jsonapi_menu_items.info.yml b/jsonapi_menu_items.info.yml
+--- a/jsonapi_menu_items.info.yml	2026-10-12 01:13:44.202274012 +0000
++++ b/jsonapi_menu_items.info.yml	2026-10-12 01:13:44.202274012 +0000
+@@ -1,7 +1,7 @@
+ name: 'JSON:API Menu items'
+ description: Adds a JSON API resource for menu items.
+ type: module
+-core_version_requirement: ^9.5 || ^10 || ^11
++core_version_requirement: '^9.5 || ^10 || ^11 || ^12'
+ dependencies:
+   - drupal:menu_link_content
+   - jsonapi_resources:jsonapi_resources
+diff -ruN a/modules/jsonapi_menu_items_hypermedia/jsonapi_menu_items_hypermedia.info.yml b/modules/jsonapi_menu_items_hypermedia/jsonapi_menu_items_hypermedia.info.yml
+--- a/modules/jsonapi_menu_items_hypermedia/jsonapi_menu_items_hypermedia.info.yml	2026-10-12 01:13:44.202274012 +0000
++++ b/modules/jsonapi_menu_items_hypermedia/jsonapi_menu_items_hypermedia.info.yml	2026-10-12 01:13:44.202274012 +0000
+@@ -1,7 +1,7 @@
+ name: 'JSON:API Menu items Hypermedia'
+ description: Integrates jsonapi_menu_items and jsonapi_hypermedia.
+ type: module
+-core_version_requirement: ^9.5 || ^10 || ^11
++core_version_requirement: '^9.5 || ^10 || ^11 || ^12'
+ dependencies:
+   - jsonapi_menu_items:jsonapi_menu_items
+   - jsonapi_hypermedia:jsonapi_hypermedia

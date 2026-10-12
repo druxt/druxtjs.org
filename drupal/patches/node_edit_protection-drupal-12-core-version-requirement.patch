@@ -1,0 +1,12 @@
+diff -ruN a/node_edit_protection.info.yml b/node_edit_protection.info.yml
+--- a/node_edit_protection.info.yml	2026-10-12 01:13:44.214274012 +0000
++++ b/node_edit_protection.info.yml	2026-10-12 01:13:44.214274012 +0000
+@@ -1,7 +1,7 @@
+ name: Node Edit Protection
+ description: 'Protect the user against navigating away from a node edit form before saving their changes.'
+ core: 8.x
+-core_version_requirement: ^8 || ^9 || ^10 || ^11
++core_version_requirement: '^8 || ^9 || ^10 || ^11 || ^12'
+ type: module
+ 
+ # Information added by Drupal.org packaging script on 2025-01-22

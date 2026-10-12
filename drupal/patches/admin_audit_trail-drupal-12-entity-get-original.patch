@@ -1,0 +1,86 @@
+diff -ruN a/admin_audit_trail.install b/admin_audit_trail.install
+--- a/admin_audit_trail.install	2026-09-25 15:06:09.000000000 +0000
++++ b/admin_audit_trail.install	2026-10-12 02:28:40.535514010 +0000
+@@ -110,17 +110,6 @@
+ }
+ 
+ /**
+- * Implements hook_modules_installed().
+- *
+- * Creates the report view when Views is enabled after this module.
+- */
+-function admin_audit_trail_modules_installed(array $modules, $is_syncing) {
+-  if (!$is_syncing && in_array('views', $modules, TRUE)) {
+-    AdminAuditTrailReportView::ensure();
+-  }
+-}
+-
+-/**
+  * Install the Admin Audit Trail view.
+  */
+ function admin_audit_trail_update_10002() {
+diff -ruN a/admin_audit_trail.module b/admin_audit_trail.module
+--- a/admin_audit_trail.module	2026-09-25 15:06:09.000000000 +0000
++++ b/admin_audit_trail.module	2026-10-12 02:28:40.535514010 +0000
+@@ -7,6 +7,7 @@
+ 
+ use Drupal\Core\Hook\Attribute\LegacyHook;
+ use Drupal\admin_audit_trail\AdminAuditTrailLogger;
++use Drupal\admin_audit_trail\AdminAuditTrailReportView;
+ use Drupal\admin_audit_trail\Hook\AdminAuditTrailHooks;
+ use Drupal\admin_audit_trail\Hook\AdminAuditTrailViewsHooks;
+ use Drupal\Core\Form\FormStateInterface;
+@@ -138,3 +139,16 @@
+ function admin_audit_trail_views_pre_render(ViewExecutable $view) {
+   \Drupal::service(AdminAuditTrailHooks::class)->viewsPreRender($view);
+ }
++
++/**
++ * Implements hook_modules_installed().
++ *
++ * Creates the report view when Views is enabled after this module. Kept in
++ * the .module file: Drupal 12 registers hooks found in .install files but
++ * only loads those files during updates.
++ */
++function admin_audit_trail_modules_installed(array $modules, $is_syncing) {
++  if (!$is_syncing && in_array('views', $modules, TRUE)) {
++    AdminAuditTrailReportView::ensure();
++  }
++}
+diff -ruN a/admin_audit_trail_user/src/Hook/AdminAuditTrailUserHooks.php b/admin_audit_trail_user/src/Hook/AdminAuditTrailUserHooks.php
+--- a/admin_audit_trail_user/src/Hook/AdminAuditTrailUserHooks.php	2026-09-25 15:06:09.000000000 +0000
++++ b/admin_audit_trail_user/src/Hook/AdminAuditTrailUserHooks.php	2026-10-12 02:28:40.535514010 +0000
+@@ -47,14 +47,16 @@
+    */
+   #[Hook('user_update')]
+   public function userUpdate($account) {
++    // Drupal 12 removed the magic original property.
++    $original = method_exists($account, 'getOriginal') ? $account->getOriginal() : $account->original;
+     $log = [
+       'type' => 'user',
+       'operation' => 'update',
+       'description' => $this->t('%name (uid %uid)', [
+-        '%name' => $account->original->getDisplayName(),
+-        '%uid' => $account->original->id(),
++        '%name' => $original->getDisplayName(),
++        '%uid' => $original->id(),
+       ]),
+-      'ref_numeric' => $account->original->id(),
++      'ref_numeric' => $original->id(),
+       'ref_char' => $account->getDisplayName(),
+     ];
+     admin_audit_trail_insert($log);
+diff -ruN a/admin_audit_trail_user_roles/src/Hook/AdminAuditTrailUserRolesHooks.php b/admin_audit_trail_user_roles/src/Hook/AdminAuditTrailUserRolesHooks.php
+--- a/admin_audit_trail_user_roles/src/Hook/AdminAuditTrailUserRolesHooks.php	2026-09-25 15:06:09.000000000 +0000
++++ b/admin_audit_trail_user_roles/src/Hook/AdminAuditTrailUserRolesHooks.php	2026-10-12 02:28:40.535514010 +0000
+@@ -40,7 +40,9 @@
+    */
+   #[Hook('user_update')]
+   public function userUpdate($account) {
+-    $original_roles = $account->original->getRoles();
++    // Drupal 12 removed the magic original property.
++    $original = method_exists($account, 'getOriginal') ? $account->getOriginal() : $account->original;
++    $original_roles = $original->getRoles();
+     $current_roles = $account->getRoles();
+     $role_operations = [
+       'role_added' => array_diff($current_roles, $original_roles),

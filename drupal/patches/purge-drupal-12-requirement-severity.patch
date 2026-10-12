@@ -1,0 +1,34 @@
+--- a/src/Plugin/Purge/DiagnosticCheck/DiagnosticCheckBase.php
++++ b/src/Plugin/Purge/DiagnosticCheck/DiagnosticCheckBase.php
+@@ -5,6 +5,7 @@
+ use Drupal\Core\Plugin\PluginBase;
+ use Drupal\purge\Plugin\Purge\DiagnosticCheck\Exception\CheckNotImplementedCorrectly;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
++use Drupal\Core\Extension\Requirement\RequirementSeverity;
+ 
+ /**
+  * Describes a diagnostic check that tests a specific purging requirement.
+@@ -167,17 +168,13 @@
+     static $mapping;
+     $this->runCheck();
+     if (is_null($mapping)) {
+-      include_once DRUPAL_ROOT . '/core/includes/install.inc';
+-
+-      // Currently, our constants hold the exact same values as core's
+-      // requirement constants. However, as our diagnostic checks API is more
+-      // than just a objectification of hook_requirements we need to assure
+-      // that this lasts over time, and thus map the constants.
++      // Core's REQUIREMENT_* constants are gone in Drupal 12; the status
++      // report expects RequirementSeverity cases.
+       $mapping = [
+-        self::SEVERITY_INFO      => REQUIREMENT_INFO,
+-        self::SEVERITY_OK        => REQUIREMENT_OK,
+-        self::SEVERITY_WARNING   => REQUIREMENT_WARNING,
+-        self::SEVERITY_ERROR     => REQUIREMENT_ERROR,
++        self::SEVERITY_INFO      => RequirementSeverity::Info,
++        self::SEVERITY_OK        => RequirementSeverity::OK,
++        self::SEVERITY_WARNING   => RequirementSeverity::Warning,
++        self::SEVERITY_ERROR     => RequirementSeverity::Error,
+       ];
+     }
+     return $mapping[$this->getSeverity()];

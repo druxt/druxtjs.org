@@ -1,0 +1,21 @@
+diff -ruN a/src/AccessRestrictedLink.php b/src/AccessRestrictedLink.php
+--- a/src/AccessRestrictedLink.php	2024-07-27 02:56:02.000000000 +0000
++++ b/src/AccessRestrictedLink.php	2026-10-12 02:22:29.034880005 +0000
+@@ -50,7 +50,7 @@
+    *   (optional) The link's context. NULL if the default context shouldn't be
+    *   overridden.
+    */
+-  protected function __construct(AccessResultInterface $access_result, CacheableDependencyInterface $link_cacheability = NULL, Url $target = NULL, $link_relation_type = '', array $target_attributes = [], $context = NULL) {
++  protected function __construct(AccessResultInterface $access_result, ?CacheableDependencyInterface $link_cacheability = NULL, ?Url $target = NULL, $link_relation_type = '', array $target_attributes = [], $context = NULL) {
+     // Most arguments can be omitted if the link is inaccessible.
+     assert(!$access_result->isAllowed() || ($link_cacheability && $target && !empty($link_relation_type)));
+     assert(is_null($context) || $context instanceof Url);
+@@ -103,7 +103,7 @@
+    *
+    * @see \Drupal\jsonapi_hypermedia\AccessRestrictedLink::createInaccessibleLink()
+    */
+-  public static function createLink(AccessResultInterface $access_result, CacheableDependencyInterface $link_cacheability, Url $url, $link_relation_type, array $target_attributes = [], Url $context = NULL) {
++  public static function createLink(AccessResultInterface $access_result, CacheableDependencyInterface $link_cacheability, Url $url, $link_relation_type, array $target_attributes = [], ?Url $context = NULL) {
+     return new static($access_result, $link_cacheability, $url, $link_relation_type, $target_attributes, $context);
+   }
+ 
