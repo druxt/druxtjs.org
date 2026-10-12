@@ -271,7 +271,8 @@
                 "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/purge_purger_http-drupal-12-core-version-requirement.patch"
             },
             "drupal/simple_oauth_password_grant": {
-                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/simple_oauth_password_grant-drupal-12-core-version-requirement.patch"
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/simple_oauth_password_grant-drupal-12-core-version-requirement.patch",
+                "Drupal 12: user.auth implements UserAuthenticationInterface only, so authenticate through it": "patches/simple_oauth_password_grant-drupal-12-user-authentication-interface.patch"
             },
             "drupal/simple_oauth_revoke": {
                 "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/simple_oauth_revoke-drupal-12-core-version-requirement.patch"

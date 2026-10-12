@@ -1,5 +1,5 @@
 {
-    "_hash": "05478ff6dbe192c0c80ff47b420a70fa48d3f0e97d25b53e4867ee99884c6f3c",
+    "_hash": "a252e80a9d83d621dc85b4fe5d50023e666027fffa3c16163925d20625063f9d",
     "patches": {
         "drupal/core": [
             {
@@ -591,6 +591,16 @@
                 "description": "Drupal 12: declare core 12 in every info.yml, as the bot merge request does",
                 "url": "patches/simple_oauth_password_grant-drupal-12-core-version-requirement.patch",
                 "sha256": "3dd7a25805556995c9b4d16ad27fc43086096470f6ece9d8f742d13344e7baf0",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            },
+            {
+                "package": "drupal/simple_oauth_password_grant",
+                "description": "Drupal 12: user.auth implements UserAuthenticationInterface only, so authenticate through it",
+                "url": "patches/simple_oauth_password_grant-drupal-12-user-authentication-interface.patch",
+                "sha256": "beab7739502eed1720dac975561f0ed4db15f3ae7b0db3e725dc0cd986913cee",
                 "depth": 1,
                 "extra": {
                     "provenance": "root"
