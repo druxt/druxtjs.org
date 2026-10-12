@@ -5,14 +5,9 @@ dependencies:
   config:
     - core.entity_view_mode.node.step
     - core.entity_view_mode.node.teaser
-    - field.storage.node.field_description
-    - field.storage.node.field_section
-    - field.storage.node.field_weight
     - node.type.doc_page
-    - taxonomy.vocabulary.documentation_section
   module:
     - node
-    - taxonomy
     - user
 id: docs_section
 label: 'Documentation section'
@@ -247,6 +242,7 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
+        - 'user.node_grants:view'
         - user.permissions
       tags: {  }
   sequence:
@@ -270,5 +266,6 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
+        - 'user.node_grants:view'
         - user.permissions
       tags: {  }

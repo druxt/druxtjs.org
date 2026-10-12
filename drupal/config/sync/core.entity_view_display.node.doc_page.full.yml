@@ -14,6 +14,7 @@ dependencies:
     - node.type.doc_page
   module:
     - layout_paragraphs
+    - user
 id: node.doc_page.full
 targetEntityType: node
 bundle: doc_page

@@ -7,7 +7,6 @@ dependencies:
     - field.field.paragraph.docs_callout.field_callout_type
     - paragraphs.paragraphs_type.docs_callout
   module:
-    - options
     - text
 id: paragraph.docs_callout.default
 targetEntityType: paragraph
