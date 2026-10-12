@@ -40,7 +40,7 @@ final class DruxtjsorgCommands extends DrushCommands {
     }
     $consumer->save();
 
-    $this->logger()->success(sprintf('%s signs in to %s.', OAuthClient::CLIENT_ID, implode(', ', array_column($consumer->get('redirect')->getValue(), 'value'))));
+    $this->io()->success(sprintf('%s signs in to %s.', OAuthClient::CLIENT_ID, implode(', ', array_column($consumer->get('redirect')->getValue(), 'value'))));
     return self::EXIT_SUCCESS;
   }
 
