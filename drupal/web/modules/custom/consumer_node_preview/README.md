@@ -32,18 +32,27 @@ for further information.
 ## Features
 
 - **A tabbed preview screen.** Core's Preview button opens three tabs:
-  - **Frontend** frames the unsaved node in a frontend, with Phone, Tablet
-    and Full widths, a picker when there is more than one target, and an
-    "Open in new tab" link. It fills the space below the admin toolbar.
+  - **Frontend** frames the unsaved node in a frontend, with a Frontend
+    picker, Phone, Tablet and Full widths, and an "Open in new tab" link.
+    It fills the space below the admin toolbar.
   - **Drupal** shows core's own preview.
   - **JSON:API** shows the preview document the frontend reads.
 
+  Core's View mode select sits at the end of the tab row. Changing it does
+  not reload the page: the frame loads the new view mode, and the Drupal tab
+  fetches it over AJAX. Core's preview bar keeps its link back to the edit
+  form.
+
   The screen remembers the editor's last tab, width and frontend. The preview
   route becomes a node operation, so it uses the admin theme when "Use the
-  administration theme when editing or creating content" is on.
+  administration theme when editing or creating content" is on. The screen
+  uses core's form elements, buttons and tab markup, so the admin theme
+  styles it.
 - **Targets per consumer.** Every consumer gets a **Preview targets** field:
   a list of label and URL pairs, for example local, staging and production.
   A frontend can also register its own targets over the API (see below).
+  A consumer's target URL must be absolute and use http or https. The form
+  and the API check the same rule.
 - **Targets per environment.** settings.php can list targets too, which suits
   a URL that differs per environment and should not travel with a database
   copy:
@@ -60,6 +69,10 @@ for further information.
     'default' => 'settings:frontend',
   ];
   ```
+
+  A site target can be a path from the site root, such as `/node/preview`.
+  It loads on the same host as Drupal, for a frontend served there through
+  a proxy. Consumer targets cannot, because that depends on the environment.
 
   Site targets come first in the picker. A `?frontend=<key>` query parameter
   on the preview URL picks a target, where the key is `settings:<name>` or

@@ -6,6 +6,6 @@ this directory.
 
 | | |
 | --- | --- |
-| Commit | `3c7ffcb` (branch `feature/1-tabbed-preview`) |
+| Commit | `390278c` (branch `feature/1-preview-toolbar`) |
 | Taken | What `git archive 3c7ffcb` exports, which the module's `.gitattributes` keeps to the distributed set, without the three files that still slip through it (`.gitlab-ci.yml`, `CONTRIBUTING.md`, `phpunit.gitlab-ci.xml`), plus its tests, which the export leaves out and the site's suite runs |
-| Changed | Nothing |
+| Changed | The browser tests under `tests/src/FunctionalJavascript` are left out: the site's suite runs without a WebDriver |
