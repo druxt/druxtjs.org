@@ -49,6 +49,9 @@ export default {
       // Preview already includes a node's paragraphs, so add what they
       // reference, for example 'field_content.field_media'.
       include: [],
+      // Nuxt layouts the preview may render in, picked with ?layout=.
+      // List the same names on the consumer in Drupal.
+      layouts: [],
     },
   },
 }
@@ -60,10 +63,17 @@ can hook the route.
 In Drupal, add a Consumer Node Preview target that points at the page:
 
 ```text
-https://frontend.example.com/druxt/node/preview?vm=[view_mode]#[jsonapi_node_preview_path]
+https://frontend.example.com/druxt/node/preview?vm=[view_mode]&layout=[layout]#[jsonapi_node_preview_path]
 ```
 
-`vm` carries the view mode. The fragment carries the endpoint.
+`vm` carries the view mode, and `layout` the layout picked in the preview's
+Layout select. The fragment carries the endpoint.
+
+The page renders in the layout `layout` names, but only when `layouts` lists
+it. Any other name, or none, gives the default layout. So a preview URL
+cannot put the page in another of the site's layouts. A bare layout, with the
+site's type and spacing but no header or footer, suits a preview of content
+that sits inside other pages.
 
 ## Theming the preview
 

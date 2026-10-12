@@ -7,6 +7,7 @@ const NuxtModule = function(moduleOptions = {}) {
   const options = {
     path: "/druxt/node/preview",
     include: [],
+    layouts: [],
     ...((_a = (this.options || {}).druxt) == null ? void 0 : _a.nodePreview) || {},
     ...moduleOptions
   };
@@ -30,7 +31,8 @@ const NuxtModule = function(moduleOptions = {}) {
     src: path.resolve(__dirname, "../templates/plugin.js"),
     fileName: "druxt-node-preview.js",
     options: {
-      include: options.include
+      include: options.include,
+      layouts: options.layouts
     }
   });
 };

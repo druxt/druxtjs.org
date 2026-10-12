@@ -41,6 +41,15 @@ export default {
 
   components: { DruxtNodePreview },
 
+  /**
+   * The layout named by `?layout=`, when the `layouts` option lists it.
+   *
+   * @param {object} context - The Nuxt context.
+   *
+   * @returns {string|undefined} The layout, or undefined for the default.
+   */
+  layout: ({ $druxtNodePreview, route }) => $druxtNodePreview.layout(route.query.layout),
+
   data: () => ({
     document: null,
     entity: null,
