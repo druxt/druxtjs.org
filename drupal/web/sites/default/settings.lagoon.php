@@ -94,10 +94,14 @@ if ($frontend) {
   // this site's preview page, handed the JSON:API Node Preview document's
   // path in the fragment. The path is relative, so the page fetches it on
   // its own origin, through the proxy, with the editor's session.
+  // The picker names the frontend by where it runs: the site on production,
+  // the environment anywhere else.
   $settings['consumer_node_preview'] = [
     'targets' => [
       'frontend' => [
-        'label' => 'Frontend',
+        'label' => getenv('LAGOON_ENVIRONMENT_TYPE') === 'production'
+          ? parse_url($frontend, PHP_URL_HOST)
+          : (getenv('LAGOON_GIT_BRANCH') ?: getenv('LAGOON_ENVIRONMENT') ?: 'Frontend'),
         'url' => rtrim($frontend, '/') . '/druxt/node/preview?vm=[view_mode]#[jsonapi_node_preview_path]',
       ],
     ],
