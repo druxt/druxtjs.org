@@ -103,6 +103,9 @@ if ($frontend) {
           ? parse_url($frontend, PHP_URL_HOST)
           : (getenv('LAGOON_GIT_BRANCH') ?: getenv('LAGOON_ENVIRONMENT') ?: 'Frontend'),
         'url' => rtrim($frontend, '/') . '/druxt/node/preview?vm=[view_mode]&layout=[layout]#[jsonapi_node_preview_path]',
+        // The Nuxt layouts the preview's Layout select offers, as listed in
+        // nuxt.config.js under druxt.nodePreview.layouts.
+        'layouts' => ['default', 'preview'],
       ],
     ],
     'default' => 'settings:frontend',
