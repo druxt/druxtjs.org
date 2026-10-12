@@ -97,9 +97,13 @@ final class DruxtjsorgServiceProvider extends ServiceProviderBase {
     $path = $app_root . '/' . dirname((string) $modules['druxtjsorg']['pathname']) . '/src-impostor-normalizers';
     $namespaces['Drupal\\jsonapi\\Normalizer\\ImpostorFrom\\druxtjsorg'][] = $path;
     $container->setParameter('container.namespaces', $namespaces);
+    // The argument is set here rather than left to autowiring: Drupal 12
+    // autowires this definition, and the impostor class is not resolvable
+    // when that pass runs, so the normalizer was built with no arguments.
     $container->getDefinition('serializer.normalizer.field_item.jsonapi')
       ->setClass('Drupal\\jsonapi\\Normalizer\\ImpostorFrom\\druxtjsorg\\SerializedFieldItemNormalizerImpostor')
-      ->setFile($path . '/SerializedFieldItemNormalizerImpostor.php');
+      ->setFile($path . '/SerializedFieldItemNormalizerImpostor.php')
+      ->setArguments([new Reference('entity_type.manager')]);
   }
 
 }

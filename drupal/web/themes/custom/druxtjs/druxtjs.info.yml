@@ -2,7 +2,7 @@ name: DruxtJS
 type: theme
 description: 'The regions and blocks of the druxtjs.org frontend, which Druxt renders. Drupal renders only its block region demo in this theme.'
 package: Custom
-core_version_requirement: ^11
+core_version_requirement: ^11 || ^12
 base theme: false
 libraries:
   - druxtjs/global
