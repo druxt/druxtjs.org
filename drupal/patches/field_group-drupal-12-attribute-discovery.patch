@@ -1,0 +1,42 @@
+diff -ruN a/src/Attribute/FieldGroupFormatter.php b/src/Attribute/FieldGroupFormatter.php
+--- a/src/Attribute/FieldGroupFormatter.php	1970-01-01 00:00:00.000000000 +0000
++++ b/src/Attribute/FieldGroupFormatter.php	2026-10-12 01:01:36.362105008 +0000
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\field_group\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++
++/**
++ * Attribute discovery for FieldGroupFormatter plugins.
++ *
++ * Drupal 12 requires an attribute class on every plugin manager; the plugins
++ * themselves still use the FieldGroupFormatter annotation, which core keeps discovering
++ * beside the attribute until Drupal 13.
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class FieldGroupFormatter extends Plugin {
++}
+diff -ruN a/src/FieldGroupFormatterPluginManager.php b/src/FieldGroupFormatterPluginManager.php
+--- a/src/FieldGroupFormatterPluginManager.php	2026-10-12 01:01:36.362105008 +0000
++++ b/src/FieldGroupFormatterPluginManager.php	2026-10-12 01:01:36.362105008 +0000
+@@ -9,6 +9,7 @@
+ use Drupal\Core\Plugin\DefaultPluginManager;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+ 
++use Drupal\field_group\Attribute\FieldGroupFormatter as FieldGroupFormatterAttribute;
+ /**
+  * Plugin type manager for all fieldgroup formatters.
+  */
+@@ -45,7 +46,7 @@
+       $namespaces,
+       $module_handler,
+       FieldGroupFormatterInterface::class,
+-      'Drupal\field_group\Annotation\FieldGroupFormatter'
++      FieldGroupFormatterAttribute::class, 'Drupal\field_group\Annotation\FieldGroupFormatter'
+     );
+ 
+     $this->alterInfo('field_group_formatter_info');

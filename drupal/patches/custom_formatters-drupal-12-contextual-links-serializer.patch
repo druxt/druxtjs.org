@@ -1,0 +1,12 @@
+--- a/src/Plugin/CustomFormatters/FormatterExtras/Contextual.php
++++ b/src/Plugin/CustomFormatters/FormatterExtras/Contextual.php
+@@ -98,7 +98,8 @@
+       $element[0] = ['markup' => $element[0]];
+       $element[0]['contextual_links'] = [
+         '#type' => 'contextual_links_placeholder',
+-        '#id'   => _contextual_links_to_id([
++        // Drupal 12 moved _contextual_links_to_id() into a service.
++        '#id'   => \Drupal::service(\Drupal\contextual\ContextualLinksSerializer::class)->linksToId([
+           'custom_formatters' => [
+             'route_parameters' => ['formatter' => $this->entity->id()],
+           ],

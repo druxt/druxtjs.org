@@ -1,0 +1,42 @@
+diff -ruN a/src/Attribute/JsonapiHypermediaLinkProvider.php b/src/Attribute/JsonapiHypermediaLinkProvider.php
+--- a/src/Attribute/JsonapiHypermediaLinkProvider.php	1970-01-01 00:00:00.000000000 +0000
++++ b/src/Attribute/JsonapiHypermediaLinkProvider.php	2026-10-12 01:01:36.311105008 +0000
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\jsonapi_hypermedia\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++
++/**
++ * Attribute discovery for JsonapiHypermediaLinkProvider plugins.
++ *
++ * Drupal 12 requires an attribute class on every plugin manager; the plugins
++ * themselves still use the JsonapiHypermediaLinkProvider annotation, which core keeps discovering
++ * beside the attribute until Drupal 13.
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class JsonapiHypermediaLinkProvider extends Plugin {
++}
+diff -ruN a/src/Plugin/LinkProviderManager.php b/src/Plugin/LinkProviderManager.php
+--- a/src/Plugin/LinkProviderManager.php	2026-10-12 01:01:36.310105008 +0000
++++ b/src/Plugin/LinkProviderManager.php	2026-10-12 01:01:36.310105008 +0000
+@@ -23,6 +23,7 @@
+ use Drupal\jsonapi_hypermedia\Annotation\JsonapiHypermediaLinkProvider;
+ use Drupal\jsonapi_hypermedia\LinkProviderInterface;
+ 
++use Drupal\jsonapi_hypermedia\Attribute\JsonapiHypermediaLinkProvider as JsonapiHypermediaLinkProviderAttribute;
+ /**
+  * Manages discovery and instantiation of resourceFieldEnhancer plugins.
+  *
+@@ -79,7 +80,7 @@
+       $namespaces,
+       $module_handler,
+       LinkProviderInterface::class,
+-      JsonapiHypermediaLinkProvider::class
++      JsonapiHypermediaLinkProviderAttribute::class, JsonapiHypermediaLinkProvider::class
+     );
+     $this->alterInfo('jsonapi_hypermedia_provider_info');
+     $this->setCacheBackend($cache_backend, 'jsonapi_hypermedia_provider_plugins');

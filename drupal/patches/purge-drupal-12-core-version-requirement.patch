@@ -1,0 +1,84 @@
+diff -ruN a/modules/purge_drush/purge_drush.info.yml b/modules/purge_drush/purge_drush.info.yml
+--- a/modules/purge_drush/purge_drush.info.yml	2026-10-12 01:13:44.218274012 +0000
++++ b/modules/purge_drush/purge_drush.info.yml	2026-10-12 01:13:44.218274012 +0000
+@@ -5,7 +5,7 @@
+ hidden: true
+ dependencies:
+   - purge:purge
+-core_version_requirement: '^9.5 || ^10 || ^11'
++core_version_requirement: '^9.5 || ^10 || ^11 || ^12'
+ 
+ # Information added by Drupal.org packaging script on 2026-07-21
+ version: '8.x-3.7'
+diff -ruN a/modules/purge_processor_cron/purge_processor_cron.info.yml b/modules/purge_processor_cron/purge_processor_cron.info.yml
+--- a/modules/purge_processor_cron/purge_processor_cron.info.yml	2026-10-12 01:13:44.217274012 +0000
++++ b/modules/purge_processor_cron/purge_processor_cron.info.yml	2026-10-12 01:13:44.218274012 +0000
+@@ -4,7 +4,7 @@
+ package: "Purge - processors"
+ dependencies:
+   - purge:purge
+-core_version_requirement: '^9.5 || ^10 || ^11'
++core_version_requirement: '^9.5 || ^10 || ^11 || ^12'
+ 
+ # Information added by Drupal.org packaging script on 2026-07-21
+ version: '8.x-3.7'
+diff -ruN a/modules/purge_processor_lateruntime/purge_processor_lateruntime.info.yml b/modules/purge_processor_lateruntime/purge_processor_lateruntime.info.yml
+--- a/modules/purge_processor_lateruntime/purge_processor_lateruntime.info.yml	2026-10-12 01:13:44.218274012 +0000
++++ b/modules/purge_processor_lateruntime/purge_processor_lateruntime.info.yml	2026-10-12 01:13:44.218274012 +0000
+@@ -4,7 +4,7 @@
+ package: "Purge - processors"
+ dependencies:
+   - purge:purge
+-core_version_requirement: '^9.5 || ^10 || ^11'
++core_version_requirement: '^9.5 || ^10 || ^11 || ^12'
+ 
+ # Information added by Drupal.org packaging script on 2026-07-21
+ version: '8.x-3.7'
+diff -ruN a/modules/purge_queuer_coretags/purge_queuer_coretags.info.yml b/modules/purge_queuer_coretags/purge_queuer_coretags.info.yml
+--- a/modules/purge_queuer_coretags/purge_queuer_coretags.info.yml	2026-10-12 01:13:44.218274012 +0000
++++ b/modules/purge_queuer_coretags/purge_queuer_coretags.info.yml	2026-10-12 01:13:44.218274012 +0000
+@@ -4,7 +4,7 @@
+ package: "Purge - queuers"
+ dependencies:
+   - purge:purge
+-core_version_requirement: '^9.5 || ^10 || ^11'
++core_version_requirement: '^9.5 || ^10 || ^11 || ^12'
+ 
+ # Information added by Drupal.org packaging script on 2026-07-21
+ version: '8.x-3.7'
+diff -ruN a/modules/purge_tokens/purge_tokens.info.yml b/modules/purge_tokens/purge_tokens.info.yml
+--- a/modules/purge_tokens/purge_tokens.info.yml	2026-10-12 01:13:44.217274012 +0000
++++ b/modules/purge_tokens/purge_tokens.info.yml	2026-10-12 01:13:44.217274012 +0000
+@@ -4,7 +4,7 @@
+ package: Purge
+ dependencies:
+   - purge:purge
+-core_version_requirement: '^9.5 || ^10 || ^11'
++core_version_requirement: '^9.5 || ^10 || ^11 || ^12'
+ 
+ # Information added by Drupal.org packaging script on 2026-07-21
+ version: '8.x-3.7'
+diff -ruN a/modules/purge_ui/purge_ui.info.yml b/modules/purge_ui/purge_ui.info.yml
+--- a/modules/purge_ui/purge_ui.info.yml	2026-10-12 01:13:44.218274012 +0000
++++ b/modules/purge_ui/purge_ui.info.yml	2026-10-12 01:13:44.218274012 +0000
+@@ -5,7 +5,7 @@
+ configure: purge_ui.dashboard
+ dependencies:
+   - purge:purge
+-core_version_requirement: '^9.5 || ^10 || ^11'
++core_version_requirement: '^9.5 || ^10 || ^11 || ^12'
+ 
+ # Information added by Drupal.org packaging script on 2026-07-21
+ version: '8.x-3.7'
+diff -ruN a/purge.info.yml b/purge.info.yml
+--- a/purge.info.yml	2026-10-12 01:13:44.217274012 +0000
++++ b/purge.info.yml	2026-10-12 01:13:44.217274012 +0000
+@@ -2,7 +2,7 @@
+ type: module
+ description: 'Provides a generic external cache invalidation API and queue service.'
+ package: Purge
+-core_version_requirement: '^9.5 || ^10 || ^11'
++core_version_requirement: '^9.5 || ^10 || ^11 || ^12'
+ 
+ # Information added by Drupal.org packaging script on 2026-07-21
+ version: '8.x-3.7'

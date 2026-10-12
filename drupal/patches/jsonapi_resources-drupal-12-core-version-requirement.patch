@@ -1,0 +1,35 @@
+diff -ruN a/jsonapi_resources.info.yml b/jsonapi_resources.info.yml
+--- a/jsonapi_resources.info.yml	2026-10-12 01:13:44.204274012 +0000
++++ b/jsonapi_resources.info.yml	2026-10-12 01:13:44.204274012 +0000
+@@ -1,6 +1,6 @@
+ name: 'JSON:API Resources'
+ description: "This module lets you define custom resources at routes of your choice that use existing resource types."
+-core_version_requirement: ^9.1 || ^10 || ^11
++core_version_requirement: '^9.1 || ^10 || ^11 || ^12'
+ type: module
+ dependencies:
+   - drupal:jsonapi
+diff -ruN a/tests/modules/jsonapi_resources_meta_test/jsonapi_resources_meta_test.info.yml b/tests/modules/jsonapi_resources_meta_test/jsonapi_resources_meta_test.info.yml
+--- a/tests/modules/jsonapi_resources_meta_test/jsonapi_resources_meta_test.info.yml	2026-10-12 01:13:44.204274012 +0000
++++ b/tests/modules/jsonapi_resources_meta_test/jsonapi_resources_meta_test.info.yml	2026-10-12 01:13:44.204274012 +0000
+@@ -2,7 +2,7 @@
+ description: "Mimics a second decorator (like commerce_api) that adds resource meta."
+ type: module
+ package: Testing
+-core_version_requirement: ^9.1 || ^10 || ^11
++core_version_requirement: '^9.1 || ^10 || ^11 || ^12'
+ dependencies:
+   - jsonapi_resources:jsonapi_resources
+ 
+diff -ruN a/tests/modules/jsonapi_resources_test/jsonapi_resources_test.info.yml b/tests/modules/jsonapi_resources_test/jsonapi_resources_test.info.yml
+--- a/tests/modules/jsonapi_resources_test/jsonapi_resources_test.info.yml	2026-10-12 01:13:44.204274012 +0000
++++ b/tests/modules/jsonapi_resources_test/jsonapi_resources_test.info.yml	2026-10-12 01:13:44.204274012 +0000
+@@ -2,7 +2,7 @@
+ description: "Tests for JSON:API Resources."
+ type: module
+ package: Testing
+-core_version_requirement: ^9.1 || ^10 || ^11
++core_version_requirement: '^9.1 || ^10 || ^11 || ^12'
+ dependencies:
+   - drupal:node
+   - jsonapi_resources:jsonapi_resources

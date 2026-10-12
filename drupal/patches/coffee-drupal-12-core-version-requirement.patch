@@ -1,0 +1,11 @@
+diff -ruN a/coffee.info.yml b/coffee.info.yml
+--- a/coffee.info.yml	2026-10-12 01:13:44.189274012 +0000
++++ b/coffee.info.yml	2026-10-12 01:13:44.189274012 +0000
+@@ -1,6 +1,6 @@
+ name: Coffee
+ description: Provides an Alfred like search box to navigate within your site.
+-core_version_requirement: ^10.2 || ^11.0
++core_version_requirement: '^10.2 || ^11.0 || ^12'
+ type: module
+ configure: coffee.configuration
+ 

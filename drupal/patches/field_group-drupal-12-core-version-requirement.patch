@@ -1,0 +1,36 @@
+diff -ruN a/contrib/field_group_migrate/field_group_migrate.info.yml b/contrib/field_group_migrate/field_group_migrate.info.yml
+--- a/contrib/field_group_migrate/field_group_migrate.info.yml	2026-10-12 01:13:44.196274012 +0000
++++ b/contrib/field_group_migrate/field_group_migrate.info.yml	2026-10-12 01:13:44.196274012 +0000
+@@ -2,7 +2,7 @@
+ type: module
+ description: 'Provides the ability to migrate field groups from D6/D7 to D8.'
+ package: Migration
+-core_version_requirement: ^10.3 || ^11
++core_version_requirement: '^10.3 || ^11 || ^12'
+ dependencies:
+   - field_group:field_group
+ 
+diff -ruN a/field_group.info.yml b/field_group.info.yml
+--- a/field_group.info.yml	2026-10-12 01:13:44.196274012 +0000
++++ b/field_group.info.yml	2026-10-12 01:13:44.196274012 +0000
+@@ -2,7 +2,7 @@
+ type: module
+ description: 'Provides the ability to group your fields on both form and display.'
+ package : Fields
+-core_version_requirement: ^10.3 || ^11
++core_version_requirement: '^10.3 || ^11 || ^12'
+ dependencies:
+   - drupal:field
+ 
+diff -ruN a/modules/field_group_accordion/field_group_accordion.info.yml b/modules/field_group_accordion/field_group_accordion.info.yml
+--- a/modules/field_group_accordion/field_group_accordion.info.yml	2026-10-12 01:13:44.196274012 +0000
++++ b/modules/field_group_accordion/field_group_accordion.info.yml	2026-10-12 01:13:44.196274012 +0000
+@@ -2,7 +2,7 @@
+ type: module
+ description: 'Provides the option to render groups as accordion. This module is deprecated as Jquery UI is EOL.'
+ package : Fields
+-core_version_requirement: ^10.3 || ^11
++core_version_requirement: '^10.3 || ^11 || ^12'
+ lifecycle: deprecated
+ lifecycle_link: https://www.drupal.org/project/field_group/issues/3363859
+ dependencies:

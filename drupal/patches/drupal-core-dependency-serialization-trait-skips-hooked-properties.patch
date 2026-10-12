@@ -1,0 +1,18 @@
+--- a/core/lib/Drupal/Core/DependencyInjection/DependencySerializationTrait.php
++++ b/core/lib/Drupal/Core/DependencyInjection/DependencySerializationTrait.php
+@@ -32,6 +32,15 @@
+    */
+   public function __sleep(): array {
+     $vars = get_object_vars($this);
++    // get_object_vars() lists virtual hooked properties, which have no value
++    // to serialize: serialize() runs their get hook, then skips them with a
++    // warning, and a hook that creates objects on the way corrupts the
++    // back-references that follow.
++    foreach (array_keys($vars) as $key) {
++      if ((new \ReflectionProperty($this, $key))->isVirtual()) {
++        unset($vars[$key]);
++      }
++    }
+     try {
+       $container = \Drupal::getContainer();
+       $reverse_container = $container->get(ReverseContainer::class);

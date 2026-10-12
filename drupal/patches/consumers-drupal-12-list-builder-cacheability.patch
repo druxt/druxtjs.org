@@ -1,0 +1,22 @@
+diff -ruN a/src/ConsumerListBuilder.php b/src/ConsumerListBuilder.php
+--- a/src/ConsumerListBuilder.php	2026-10-12 01:09:16.335656013 +0000
++++ b/src/ConsumerListBuilder.php	2026-10-12 01:09:16.335656013 +0000
+@@ -4,6 +4,7 @@
+ 
+ use Drupal\Core\Entity\EntityInterface;
+ use Drupal\Core\Entity\EntityListBuilder;
++use Drupal\Core\Cache\CacheableMetadata;
+ 
+ /**
+  * Defines a class to build a listing of Access Token entities.
+@@ -58,8 +59,8 @@
+   /**
+    * {@inheritdoc}
+    */
+-  public function getOperations(EntityInterface $entity) {
+-    $operations = parent::getOperations($entity);
++  public function getOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL) {
++    $operations = parent::getOperations($entity, $cacheability);
+     if (
+       $entity->access('update') &&
+       $entity->hasLinkTemplate('make-default-form') &&

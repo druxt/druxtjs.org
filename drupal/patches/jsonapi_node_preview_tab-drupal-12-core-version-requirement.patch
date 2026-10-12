@@ -1,0 +1,12 @@
+diff -ruN a/jsonapi_node_preview_tab.info.yml b/jsonapi_node_preview_tab.info.yml
+--- a/jsonapi_node_preview_tab.info.yml	2026-10-12 01:13:44.203274012 +0000
++++ b/jsonapi_node_preview_tab.info.yml	2026-10-12 01:13:44.203274012 +0000
+@@ -2,7 +2,7 @@
+ type: module
+ description: Adds a tab to nodes to allow easy preview of the node&#039;s JSON:API structure.
+ package: Web services
+-core_version_requirement: ^8 || ^9 || ^10 || ^11
++core_version_requirement: '^8 || ^9 || ^10 || ^11 || ^12'
+ dependencies:
+   - drupal:node
+   - drupal:jsonapi

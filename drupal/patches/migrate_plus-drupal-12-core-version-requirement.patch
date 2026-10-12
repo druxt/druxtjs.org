@@ -1,0 +1,96 @@
+diff -ruN a/migrate_example/migrate_example.info.yml b/migrate_example/migrate_example.info.yml
+--- a/migrate_example/migrate_example.info.yml	2026-10-12 01:13:44.212274012 +0000
++++ b/migrate_example/migrate_example.info.yml	2026-10-12 01:13:44.212274012 +0000
+@@ -2,7 +2,7 @@
+ name: Migrate Example
+ description: 'Examples of how Drupal 8+ migration compares to previous versions.'
+ package: Examples
+-core_version_requirement: '^10.5 || ^11'
++core_version_requirement: '^10.5 || ^11 || ^12'
+ dependencies:
+   - drupal:migrate
+   - migrate_plus:migrate_example_setup
+diff -ruN a/migrate_example/migrate_example_setup/migrate_example_setup.info.yml b/migrate_example/migrate_example_setup/migrate_example_setup.info.yml
+--- a/migrate_example/migrate_example_setup/migrate_example_setup.info.yml	2026-10-12 01:13:44.212274012 +0000
++++ b/migrate_example/migrate_example_setup/migrate_example_setup.info.yml	2026-10-12 01:13:44.212274012 +0000
+@@ -2,7 +2,7 @@
+ name: Migrate Example Setup
+ description: 'Separate site configuration for the example from the actual migration.'
+ package: Migration
+-core_version_requirement: '^10.5 || ^11'
++core_version_requirement: '^10.5 || ^11 || ^12'
+ hidden: true
+ dependencies:
+   - drupal:comment
+diff -ruN a/migrate_example_advanced/migrate_example_advanced.info.yml b/migrate_example_advanced/migrate_example_advanced.info.yml
+--- a/migrate_example_advanced/migrate_example_advanced.info.yml	2026-10-12 01:13:44.212274012 +0000
++++ b/migrate_example_advanced/migrate_example_advanced.info.yml	2026-10-12 01:13:44.212274012 +0000
+@@ -2,7 +2,7 @@
+ name: Migrate Example (Advanced)
+ description: 'Specialized examples of Drupal 8+ migration.'
+ package: Examples
+-core_version_requirement: '^10.5 || ^11'
++core_version_requirement: '^10.5 || ^11 || ^12'
+ dependencies:
+   - drupal:migrate
+   - migrate_plus:migrate_example_advanced_setup
+diff -ruN a/migrate_example_advanced/migrate_example_advanced_setup/migrate_example_advanced_setup.info.yml b/migrate_example_advanced/migrate_example_advanced_setup/migrate_example_advanced_setup.info.yml
+--- a/migrate_example_advanced/migrate_example_advanced_setup/migrate_example_advanced_setup.info.yml	2026-10-12 01:13:44.212274012 +0000
++++ b/migrate_example_advanced/migrate_example_advanced_setup/migrate_example_advanced_setup.info.yml	2026-10-12 01:13:44.212274012 +0000
+@@ -2,7 +2,7 @@
+ name: Migrate Advanced Example Setup
+ description: 'Separate site configuration for the example from the actual migration.'
+ package: Migration
+-core_version_requirement: '^10.5 || ^11'
++core_version_requirement: '^10.5 || ^11 || ^12'
+ hidden: true
+ dependencies:
+   - drupal:comment
+diff -ruN a/migrate_json_example/migrate_json_example.info.yml b/migrate_json_example/migrate_json_example.info.yml
+--- a/migrate_json_example/migrate_json_example.info.yml	2026-10-12 01:13:44.212274012 +0000
++++ b/migrate_json_example/migrate_json_example.info.yml	2026-10-12 01:13:44.212274012 +0000
+@@ -2,7 +2,7 @@
+ name: Migrate JSON Example
+ description: 'Simple JSON Migration example'
+ package: Examples
+-core_version_requirement: '^10.5 || ^11'
++core_version_requirement: '^10.5 || ^11 || ^12'
+ dependencies:
+   - drupal:migrate
+   - migrate_plus:migrate_plus
+diff -ruN a/migrate_plus.info.yml b/migrate_plus.info.yml
+--- a/migrate_plus.info.yml	2026-10-12 01:13:44.211274012 +0000
++++ b/migrate_plus.info.yml	2026-10-12 01:13:44.211274012 +0000
+@@ -2,7 +2,7 @@
+ name: Migrate Plus
+ description: 'Enhancements to core migration support'
+ package: Migration
+-core_version_requirement: '^10.5 || ^11'
++core_version_requirement: '^10.5 || ^11 || ^12'
+ php: 8.2
+ dependencies:
+   - drupal:migrate
+diff -ruN a/tests/modules/migrate_plus_http_test/migrate_plus_http_test.info.yml b/tests/modules/migrate_plus_http_test/migrate_plus_http_test.info.yml
+--- a/tests/modules/migrate_plus_http_test/migrate_plus_http_test.info.yml	2026-10-12 01:13:44.211274012 +0000
++++ b/tests/modules/migrate_plus_http_test/migrate_plus_http_test.info.yml	2026-10-12 01:13:44.211274012 +0000
+@@ -2,7 +2,7 @@
+ name: Migrate Plus Http Test
+ description: 'Test module to test Migrate Plus Http data_source.'
+ package: Testing
+-core_version_requirement: '^10.5 || ^11'
++core_version_requirement: '^10.5 || ^11 || ^12'
+ dependencies:
+   - drupal:migrate
+   - migrate_plus:migrate_plus
+diff -ruN a/tests/modules/migrate_plus_test/migrate_plus_test.info.yml b/tests/modules/migrate_plus_test/migrate_plus_test.info.yml
+--- a/tests/modules/migrate_plus_test/migrate_plus_test.info.yml	2026-10-12 01:13:44.211274012 +0000
++++ b/tests/modules/migrate_plus_test/migrate_plus_test.info.yml	2026-10-12 01:13:44.212274012 +0000
+@@ -2,7 +2,7 @@
+ name: Migrate Plus Test
+ description: 'Test module to test Migrate Plus.'
+ package: Testing
+-core_version_requirement: '^10.5 || ^11'
++core_version_requirement: '^10.5 || ^11 || ^12'
+ dependencies:
+   - drupal:migrate
+   - migrate_plus:migrate_plus

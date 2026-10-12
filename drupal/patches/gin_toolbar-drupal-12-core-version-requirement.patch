@@ -1,0 +1,12 @@
+diff -ruN a/gin_toolbar.info.yml b/gin_toolbar.info.yml
+--- a/gin_toolbar.info.yml	2026-10-12 01:13:44.199274012 +0000
++++ b/gin_toolbar.info.yml	2026-10-12 01:13:44.199274012 +0000
+@@ -1,7 +1,7 @@
+ type: module
+ name: Gin Toolbar
+ description: Gin Toolbar for Gin Theme
+-core_version_requirement: ^11.2
++core_version_requirement: '^11.2 || ^12'
+ 
+ # Information added by Drupal.org packaging script on 2026-01-16
+ version: '3.0.3'

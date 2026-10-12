@@ -1,0 +1,36 @@
+diff -ruN a/markdown_easy.info.yml b/markdown_easy.info.yml
+--- a/markdown_easy.info.yml	2026-10-12 01:13:44.209274012 +0000
++++ b/markdown_easy.info.yml	2026-10-12 01:13:44.209274012 +0000
+@@ -2,7 +2,7 @@
+ type: module
+ description: 'A simple Markdown text filter for Drupal'
+ package: Field
+-core_version_requirement: ^9 || ^10 || ^11
++core_version_requirement: '^9 || ^10 || ^11 || ^12'
+ dependencies:
+   - drupal:filter
+ 
+diff -ruN a/tests/modules/markdown_easy_hook_test/markdown_easy_hook_test.info.yml b/tests/modules/markdown_easy_hook_test/markdown_easy_hook_test.info.yml
+--- a/tests/modules/markdown_easy_hook_test/markdown_easy_hook_test.info.yml	2026-10-12 01:13:44.209274012 +0000
++++ b/tests/modules/markdown_easy_hook_test/markdown_easy_hook_test.info.yml	2026-10-12 01:13:44.209274012 +0000
+@@ -1,7 +1,7 @@
+ name: Markdown Easy hook test
+ type: module
+ description: Test module for Markdown Easy hooks.
+-core_version_requirement: ^9 || ^10 || ^11
++core_version_requirement: '^9 || ^10 || ^11 || ^12'
+ dependencies:
+   - markdown_easy:markdown_easy
+ 
+diff -ruN a/tests/modules/markdown_easy_test/markdown_easy_test.info.yml b/tests/modules/markdown_easy_test/markdown_easy_test.info.yml
+--- a/tests/modules/markdown_easy_test/markdown_easy_test.info.yml	2026-10-12 01:13:44.209274012 +0000
++++ b/tests/modules/markdown_easy_test/markdown_easy_test.info.yml	2026-10-12 01:13:44.209274012 +0000
+@@ -2,7 +2,7 @@
+ type: module
+ description: 'Used to test various API options of the Markdown Easy module.'
+ package: Custom
+-core_version_requirement: ^9 || ^10 || ^11
++core_version_requirement: '^9 || ^10 || ^11 || ^12'
+ dependencies:
+   - markdown_easy:markdown_easy
+ 

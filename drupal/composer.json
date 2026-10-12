@@ -4,21 +4,23 @@
     "type": "project",
     "license": "MIT",
     "require": {
-        "php": ">=8.3",
+        "php": ">=8.5",
         "codemirror/codemirror": "5.51.0",
         "composer/installers": "^2.3",
         "cweagans/composer-patches": "^2",
         "drupal/admin_audit_trail": "^1.0.12",
+        "drupal/claro": "^3.0",
         "drupal/codemirror_editor": "^2.0",
         "drupal/coffee": "^2.0",
         "drupal/consumers": "^1.24",
-        "drupal/core-composer-scaffold": "^11",
-        "drupal/core-project-message": "^11",
-        "drupal/core-recommended": "^11",
-        "drupal/custom_formatters": "^4.1",
+        "drupal/core-composer-scaffold": "^12@beta",
+        "drupal/core-project-message": "^12@beta",
+        "drupal/core-recommended": "^12@beta",
+        "drupal/custom_formatters": "^4.2",
         "drupal/decoupled_settings": "^1.0@beta",
         "drupal/diff": "^2.1",
         "drupal/druxt": "^1.3.1",
+        "drupal/entity_reference_revisions": "1.x-dev",
         "drupal/environment_indicator": "^4.0",
         "drupal/field_group": "^4.0",
         "drupal/field_tokens": "^2.0",
@@ -37,20 +39,21 @@
         "drupal/migrate_tools": "^6.1",
         "drupal/node_edit_protection": "^1.2",
         "drupal/paragraphs": "^1.23",
-        "drupal/pathauto": "^1.15",
+        "drupal/pathauto": "1.x-dev",
         "drupal/purge": "^3.7",
         "drupal/purge_purger_http": "^1.3",
-        "drupal/redirect": "^1.13",
+        "drupal/redirect": "1.x-dev",
         "drupal/simple_oauth": "^6.1",
         "drupal/simple_oauth_password_grant": "^2.1",
         "drupal/simple_oauth_revoke": "^3.0",
-        "drupal/token": "^1.17",
+        "drupal/token": "1.x-dev",
         "drupal/wse": "3.0.x-dev#532aca3b",
-        "drush/drush": "^13",
-        "js-cookie/js-cookie": "3.0.5"
+        "drush/drush": "14.x-dev",
+        "js-cookie/js-cookie": "3.0.5",
+        "mglaman/composer-drupal-lenient": "^1.0"
     },
     "require-dev": {
-        "drupal/core-dev": "^11"
+        "drupal/core-dev": "^12@beta"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -66,11 +69,12 @@
             "php-http/discovery": true,
             "phpstan/extension-installer": true,
             "symfony/runtime": true,
-            "cweagans/composer-patches": true
+            "cweagans/composer-patches": true,
+            "mglaman/composer-drupal-lenient": true
         },
         "sort-packages": true,
         "platform": {
-            "php": "8.3.0"
+            "php": "8.5.0"
         },
         "preferred-install": {
             "drupal/decoupled_settings": "source",
@@ -150,14 +154,16 @@
         },
         "patches": {
             "drupal/core": {
-                "Issue #3626255: prefetch JSON:API resource object normalizations (MR 17265 at a9227f7b, vendored)": "patches/drupal-core-3626255-prefetch-normalizations-mr17265-a9227f7b.patch",
-                "Issue #3626255: inject the normalization cacher, which 11.x does not autowire": "patches/jsonapi-3626255-data-normalizer-argument.patch"
+                "Issue #3626255: prefetch JSON:API normalizations (MR 17265 at a9227f7b, test hunk dropped: the core 12 package ships no tests)": "patches/drupal-core-3626255-prefetch-normalizations-mr17265-a9227f7b-drupal-12.patch",
+                "Drupal 12: DependencySerializationTrait::__sleep() skips hooked virtual properties (Layout Paragraphs tempstore corrupt)": "patches/drupal-core-dependency-serialization-trait-skips-hooked-properties.patch"
             },
             "drupal/decoupled_settings": {
-                "Expose the theme's regions, and let a consumer select its theme": "https://github.com/Decipher/decoupled_settings/pull/15.diff"
+                "Expose the theme's regions, and let a consumer select its theme": "https://github.com/Decipher/decoupled_settings/pull/15.diff",
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/decoupled_settings-drupal-12-core-version-requirement.patch"
             },
             "drupal/jsonapi_node_preview": {
-                "Issue #3367724: resolve includes from the previewed entity": "https://git.drupalcode.org/project/jsonapi_node_preview/-/merge_requests/4.diff"
+                "Issue #3367724: resolve includes from the previewed entity": "https://git.drupalcode.org/project/jsonapi_node_preview/-/merge_requests/4.diff",
+                "Drupal 12: inherit the typed includeResolver property instead of redeclaring it untyped": "patches/jsonapi_node_preview-drupal-12-typed-include-resolver.patch"
             },
             "drupal/druxt": {
                 "Stand aside for a path the wildcard resolver cannot rebuild, so the entity resolver answers it": "patches/druxt-wildcard-stands-aside.patch"
@@ -165,8 +171,155 @@
             "drupal/wse": {
                 "Workspaces Deploy: read the upload type, status and workspace id from the route, as the HTTP export sends them": "patches/wse-deploy-route-parameters.patch",
                 "Workspaces Deploy: a configured hash key signs alone, so a deploy pair keeps separate hash salts": "patches/wse-deploy-key-signs-alone.patch",
-                "Workspaces Deploy: an accept key verifies a deploy signed by the environment before this one": "patches/wse-deploy-accept-key.patch"
+                "Workspaces Deploy: an accept key verifies a deploy signed by the environment before this one": "patches/wse-deploy-accept-key.patch",
+                "Drupal 12: attribute discovery beside the annotation on every plugin manager": "patches/wse-drupal-12-attribute-discovery.patch"
+            },
+            "drupal/purge": {
+                "Symfony 8: declare getSubscribedEvents(): array (2 subscribers)": "patches/purge-symfony-8-subscriber-return-type.patch",
+                "Drupal 12: the diagnostic severity map no longer reads the removed REQUIREMENT_* constants": "patches/purge-drupal-12-requirement-severity.patch",
+                "Drupal 12: attribute discovery beside the annotation on every plugin manager": "patches/purge-drupal-12-attribute-discovery.patch",
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/purge-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/gin_toolbar": {
+                "Issue #3598602: Drupal 12 compatibility (bot MR 70)": "https://git.drupalcode.org/project/gin_toolbar/-/merge_requests/70.diff",
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/gin_toolbar-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/codemirror_editor": {
+                "Issue #3609844: Drupal 12 compatibility (bot MR 18)": "https://git.drupalcode.org/project/codemirror_editor/-/merge_requests/18.diff",
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/codemirror_editor-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/markdown_easy": {
+                "Drupal 12: the runtime requirement severity no longer reads the removed REQUIREMENT_WARNING constant": "patches/markdown_easy-drupal-12-requirement-severity.patch",
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/markdown_easy-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/jsonapi_hypermedia": {
+                "Drupal 12: attribute discovery beside the annotation on every plugin manager": "patches/jsonapi_hypermedia-drupal-12-attribute-discovery.patch",
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/jsonapi_hypermedia-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/simple_oauth": {
+                "Drupal 12: attribute discovery beside the annotation on every plugin manager": "patches/simple_oauth-drupal-12-attribute-discovery.patch",
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/simple_oauth-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/field_group": {
+                "Drupal 12: attribute discovery beside the annotation on every plugin manager": "patches/field_group-drupal-12-attribute-discovery.patch",
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/field_group-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/ctools": {
+                "Issue #3629656: Drupal 12 compatibility (MR 106 without its info.yml hunks: they lack trailing context and reject the packaged files)": "patches/ctools-drupal-12-mr106-without-info-files.patch",
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/ctools-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/consumers": {
+                "Drupal 12: list builder operations take the optional cacheability parameter": "patches/consumers-drupal-12-list-builder-cacheability.patch",
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/consumers-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/migrate_tools": {
+                "Drupal 12: list builder operations take the optional cacheability parameter": "patches/migrate_tools-drupal-12-list-builder-cacheability.patch",
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/migrate_tools-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/coffee": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/coffee-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/decoupled_router": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/decoupled_router-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/environment_indicator": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/environment_indicator-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/field_tokens": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/field_tokens-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/gin": {
+                "Drupal 12: inline the include files, which core 12 no longer scans for theme hooks (gin.theme and src/Hook only)": "patches/gin-drupal-12-inline-theme-includes.patch",
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/gin-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/gin_login": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/gin_login-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/js_cookie": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/js_cookie-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/jsonapi_menu_items": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/jsonapi_menu_items-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/jsonapi_node_preview_tab": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/jsonapi_node_preview_tab-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/jsonapi_resources": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/jsonapi_resources-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/layout_paragraphs": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/layout_paragraphs-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/logout_token": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/logout_token-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/maxlength": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/maxlength-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/migrate_plus": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/migrate_plus-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/node_edit_protection": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/node_edit_protection-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/paragraphs": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/paragraphs-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/purge_purger_http": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/purge_purger_http-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/simple_oauth_password_grant": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/simple_oauth_password_grant-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/simple_oauth_revoke": {
+                "Drupal 12: declare core 12 in every info.yml, as the bot merge request does": "patches/simple_oauth_revoke-drupal-12-core-version-requirement.patch"
+            },
+            "drupal/custom_formatters": {
+                "Drupal 12: _contextual_links_to_id() became ContextualLinksSerializer::linksToId()": "patches/custom_formatters-drupal-12-contextual-links-serializer.patch"
             }
+        },
+        "drupal-lenient": {
+            "allowed-list": [
+                "drupal/codemirror_editor",
+                "drupal/coffee",
+                "drupal/consumers",
+                "drupal/ctools",
+                "drupal/custom_formatters",
+                "drupal/decoupled_router",
+                "drupal/decoupled_settings",
+                "drupal/entity_reference_revisions",
+                "drupal/environment_indicator",
+                "drupal/field_group",
+                "drupal/field_tokens",
+                "drupal/gin",
+                "drupal/gin_login",
+                "drupal/gin_toolbar",
+                "drupal/js_cookie",
+                "drupal/jsonapi_hypermedia",
+                "drupal/jsonapi_menu_items",
+                "drupal/jsonapi_node_preview",
+                "drupal/jsonapi_node_preview_tab",
+                "drupal/jsonapi_resources",
+                "drupal/jsonapi_views",
+                "drupal/layout_paragraphs",
+                "drupal/linkit",
+                "drupal/logout_token",
+                "drupal/markdown_easy",
+                "drupal/maxlength",
+                "drupal/migrate_plus",
+                "drupal/migrate_tools",
+                "drupal/node_edit_protection",
+                "drupal/paragraphs",
+                "drupal/pathauto",
+                "drupal/purge",
+                "drupal/purge_purger_http",
+                "drupal/purge_tokens",
+                "drupal/redirect",
+                "drupal/simple_oauth",
+                "drupal/simple_oauth_password_grant",
+                "drupal/simple_oauth_revoke",
+                "drupal/token"
+            ]
         }
     }
 }

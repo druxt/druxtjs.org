@@ -1,0 +1,15 @@
+--- a/src/Controller/EntityResource.php
++++ b/src/Controller/EntityResource.php
+@@ -18,12 +18,6 @@
+  */
+ class EntityResource extends BaseEntityResource {
+ 
+-  /**
+-   * The include resolver.
+-   *
+-   * @var \Drupal\jsonapi_node_preview\IncludeResolver
+-   */
+-  protected $includeResolver;
+ 
+   /**
+    * Gets the preview of a node.

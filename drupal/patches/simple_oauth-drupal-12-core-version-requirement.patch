@@ -1,0 +1,36 @@
+diff -ruN a/modules/simple_oauth_static_scope/modules/simple_oauth_static_scope_example/simple_oauth_static_scope_example.info.yml b/modules/simple_oauth_static_scope/modules/simple_oauth_static_scope_example/simple_oauth_static_scope_example.info.yml
+--- a/modules/simple_oauth_static_scope/modules/simple_oauth_static_scope_example/simple_oauth_static_scope_example.info.yml	2026-10-12 01:13:44.222274012 +0000
++++ b/modules/simple_oauth_static_scope/modules/simple_oauth_static_scope_example/simple_oauth_static_scope_example.info.yml	2026-10-12 01:13:44.222274012 +0000
+@@ -1,7 +1,7 @@
+ name: Simple OAuth static scope example
+ type: module
+ description: Provides example static scopes.
+-core_version_requirement: ^10.2 || ^11
++core_version_requirement: '^10.2 || ^11 || ^12'
+ package: Examples
+ dependencies:
+   - simple_oauth:simple_oauth_static_scope
+diff -ruN a/modules/simple_oauth_static_scope/simple_oauth_static_scope.info.yml b/modules/simple_oauth_static_scope/simple_oauth_static_scope.info.yml
+--- a/modules/simple_oauth_static_scope/simple_oauth_static_scope.info.yml	2026-10-12 01:13:44.222274012 +0000
++++ b/modules/simple_oauth_static_scope/simple_oauth_static_scope.info.yml	2026-10-12 01:13:44.222274012 +0000
+@@ -1,7 +1,7 @@
+ name: Simple OAuth static scope
+ type: module
+ description: 'Makes static (YAML) defined scopes available.'
+-core_version_requirement: ^10.3 || ^11
++core_version_requirement: '^10.3 || ^11 || ^12'
+ package: Authentication
+ dependencies:
+   - simple_oauth:simple_oauth
+diff -ruN a/simple_oauth.info.yml b/simple_oauth.info.yml
+--- a/simple_oauth.info.yml	2026-10-12 01:13:44.221274012 +0000
++++ b/simple_oauth.info.yml	2026-10-12 01:13:44.221274012 +0000
+@@ -1,7 +1,7 @@
+ name: Simple OAuth & OpenID Connect
+ type: module
+ description: 'The OAuth 2.0 Authorization Framework'
+-core_version_requirement: ^10.3 || ^11
++core_version_requirement: '^10.3 || ^11 || ^12'
+ package: Authentication
+ configure: oauth2_token.settings
+ dependencies:

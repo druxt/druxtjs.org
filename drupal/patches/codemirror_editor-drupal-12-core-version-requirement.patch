@@ -1,0 +1,24 @@
+diff -ruN a/codemirror_editor.info.yml b/codemirror_editor.info.yml
+--- a/codemirror_editor.info.yml	2026-10-12 01:13:44.188274012 +0000
++++ b/codemirror_editor.info.yml	2026-10-12 01:13:44.188274012 +0000
+@@ -2,7 +2,7 @@
+ type: module
+ description: This module integrates the CodeMirror editor library into Drupal.
+ configure: codemirror_editor.settings
+-core_version_requirement: ^10.3 || ^11
++core_version_requirement: '^10.3 || ^11 || ^12'
+ dependencies:
+   - drupal:editor
+   - js_cookie:js_cookie
+diff -ruN a/tests/codemirror_editor_test/codemirror_editor_test.info.yml b/tests/codemirror_editor_test/codemirror_editor_test.info.yml
+--- a/tests/codemirror_editor_test/codemirror_editor_test.info.yml	2026-10-12 01:13:44.188274012 +0000
++++ b/tests/codemirror_editor_test/codemirror_editor_test.info.yml	2026-10-12 01:13:44.188274012 +0000
+@@ -1,7 +1,7 @@
+ name: CodeMirror editor test
+ type: module
+ description: Helper module for testing CodeMirror editor.
+-core_version_requirement: ^9.3 || ^10 || ^11
++core_version_requirement: '^9.3 || ^10 || ^11 || ^12'
+ dependencies:
+   - codemirror_editor:codemirror_editor
+   - drupal:node

@@ -1,0 +1,24 @@
+diff -ruN a/maxlength.info.yml b/maxlength.info.yml
+--- a/maxlength.info.yml	2026-10-12 01:13:44.210274012 +0000
++++ b/maxlength.info.yml	2026-10-12 01:13:44.210274012 +0000
+@@ -1,7 +1,7 @@
+ name: MaxLength
+ type: module
+ description: 'Sets a character limit and shows a character count on titles and text fields.'
+-core_version_requirement: ^10 || ^11
++core_version_requirement: '^10 || ^11 || ^12'
+ package: Fields
+ 
+ # Information added by Drupal.org packaging script on 2026-08-03
+diff -ruN a/tests/modules/maxlength_custom_widget_test/maxlength_custom_widget_test.info.yml b/tests/modules/maxlength_custom_widget_test/maxlength_custom_widget_test.info.yml
+--- a/tests/modules/maxlength_custom_widget_test/maxlength_custom_widget_test.info.yml	2026-10-12 01:13:44.210274012 +0000
++++ b/tests/modules/maxlength_custom_widget_test/maxlength_custom_widget_test.info.yml	2026-10-12 01:13:44.210274012 +0000
+@@ -5,7 +5,7 @@
+ dependencies:
+   - maxlength:maxlength
+   - drupal:node
+-core_version_requirement: ^10 || ^11
++core_version_requirement: '^10 || ^11 || ^12'
+ hidden: true
+ 
+ # Information added by Drupal.org packaging script on 2026-08-03

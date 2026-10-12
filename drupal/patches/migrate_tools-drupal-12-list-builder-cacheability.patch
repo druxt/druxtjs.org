@@ -1,0 +1,44 @@
+diff -ruN a/src/Controller/MigrationGroupListBuilder.php b/src/Controller/MigrationGroupListBuilder.php
+--- a/src/Controller/MigrationGroupListBuilder.php	2026-10-12 01:09:16.336656013 +0000
++++ b/src/Controller/MigrationGroupListBuilder.php	2026-10-12 01:09:16.336656013 +0000
+@@ -7,6 +7,7 @@
+ use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
+ use Drupal\Core\Entity\EntityInterface;
+ use Drupal\Core\Url;
++use Drupal\Core\Cache\CacheableMetadata;
+ 
+ /**
+  * Provides a listing of migration group entities.
+@@ -58,8 +59,8 @@
+   /**
+    * {@inheritdoc}
+    */
+-  public function getDefaultOperations(EntityInterface $entity): array {
+-    $operations = parent::getDefaultOperations($entity);
++  public function getDefaultOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL): array {
++    $operations = parent::getDefaultOperations($entity, $cacheability);
+     $operations['list'] = [
+       'title' => $this->t('List migrations'),
+       'weight' => 0,
+diff -ruN a/src/Controller/MigrationListBuilder.php b/src/Controller/MigrationListBuilder.php
+--- a/src/Controller/MigrationListBuilder.php	2026-10-12 01:09:16.336656013 +0000
++++ b/src/Controller/MigrationListBuilder.php	2026-10-12 01:09:16.336656013 +0000
+@@ -17,6 +17,7 @@
+ use Drupal\migrate_plus\Entity\MigrationGroup;
+ use Psr\Log\LoggerInterface;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
++use Drupal\Core\Cache\CacheableMetadata;
+ 
+ /**
+  * Provides a listing of migration entities in a given group.
+@@ -194,8 +195,8 @@
+   /**
+    * {@inheritdoc}
+    */
+-  public function getDefaultOperations(EntityInterface $entity) {
+-    $operations = parent::getDefaultOperations($entity);
++  public function getDefaultOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL) {
++    $operations = parent::getDefaultOperations($entity, $cacheability);
+     $migration_group = $entity->get('migration_group');
+     if (!$migration_group) {
+       $migration_group = 'default';

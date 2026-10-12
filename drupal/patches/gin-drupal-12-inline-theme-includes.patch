@@ -1,0 +1,2489 @@
+diff -ruN a/gin.theme b/gin.theme
+--- a/gin.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/gin.theme	2026-10-12 01:39:47.747019014 +0000
+@@ -27,9 +27,6 @@
+     $loader = new ClassLoader();
+     $loader->addPsr4("Drupal\\gin\\", __DIR__ . "/src");
+     $loader->register();
+-    foreach (glob(__DIR__ . '/includes/*.theme') as $file) {
+-      include_once $file;
+-    }
+   }
+ }
+ 
+@@ -52,3 +49,1174 @@
+     $css[$custom_css]['group'] = 201;
+   }
+ }
++
++// Inlined from includes/breadcrumb.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++use Drupal\Core\Cache\CacheableMetadata;
++use Drupal\Core\Entity\ContentEntityInterface;
++use Drupal\Core\Entity\EntityInterface;
++use Drupal\Core\Url;
++use Drupal\node\NodeInterface;
++
++/**
++ * Breadcrumb.
++ */
++function gin_preprocess_breadcrumb(&$variables) {
++  if (empty($variables['breadcrumb'])) {
++    return;
++  }
++
++  $cacheability = new CacheableMetadata();
++  $cacheability->addCacheContexts(['route']);
++
++  $entity = _gin_get_route_entity();
++  $route_name = \Drupal::routeMatch()->getRouteName();
++
++  if ($entity !== NULL) {
++    $url = $entity->toUrl();
++    $entity_type_id = $entity->getEntityTypeId();
++    $operation_label = _gin_get_route_entity_operation_label($route_name, $entity);
++
++    $url_access = $url->access(NULL, TRUE);
++    $cacheability->addCacheableDependency($url_access);
++
++    // Media handling.
++    if ($entity_type_id === 'media') {
++      $media_config = \Drupal::config('media.settings');
++      $cacheability->addCacheableDependency($media_config);
++
++      if (!$media_config->get('standalone_url')) {
++        $url = Url::fromRoute('<front>');
++      }
++    }
++
++    // Custom block handling (a custom block cannot be viewed standalone).
++    if ($entity_type_id === 'block_content') {
++      $url = Url::fromRoute('<front>');
++    }
++  }
++
++  // Back to site item.
++  foreach ($variables['breadcrumb'] as $key => $item) {
++    if ($key === 0) {
++      $variables['breadcrumb'][$key]['text'] = t('Back to site');
++      $variables['breadcrumb'][$key]['attributes']['title'] = t('Return to site content');
++
++      if (isset($url, $url_access) && $url_access->isAllowed()) {
++        // Link to the canonical route of the entity.
++        $variables['breadcrumb'][$key]['url'] = $url;
++      }
++      else {
++        // Let escapeAdmin override the return URL.
++        $variables['breadcrumb'][$key]['attributes']['data'] = 'data-gin-toolbar-escape-admin';
++      }
++    }
++    elseif (isset($url) && $item['url'] === $url->setAbsolute(FALSE)->toString()) {
++      // Remove as we already have the back to site link set.
++      unset($variables['breadcrumb'][$key]);
++    }
++  }
++
++  // Adjust breadcrumb for nodes: unset all items, except home link.
++  if ($entity instanceof NodeInterface) {
++    foreach ($variables['breadcrumb'] as $key => $item) {
++      if ($key > 0) {
++        unset($variables['breadcrumb'][$key]);
++      }
++    }
++  }
++
++  // Adjust breadcrumb for entities.
++  if (isset($operation_label)) {
++    // Add bundle info.
++    $variables['breadcrumb'][] = [
++      'text' => $operation_label,
++      'url' => '',
++    ];
++  }
++
++  // Node add: Fix Drupal 9 issue.
++  if ($route_name === 'node.add') {
++    foreach ($variables['breadcrumb'] as $key => $item) {
++      if ($variables['breadcrumb'][$key]['text'] == '') {
++        unset($variables['breadcrumb'][$key]);
++      }
++    }
++  }
++
++  $cacheability->applyTo($variables);
++}
++
++/**
++ * Helper function to extract the entity for the supplied route.
++ *
++ * @return null|\Drupal\Core\Entity\ContentEntityInterface
++ *   Returns the content entity.
++ */
++function _gin_get_route_entity() {
++  $route_match = \Drupal::routeMatch();
++  // Entity will be found in the route parameters.
++  if (($route = $route_match->getRouteObject()) && ($parameters = $route->getOption('parameters'))) {
++    // Determine if the current route represents an entity.
++    foreach ($parameters as $name => $options) {
++      if (isset($options['type']) && strpos($options['type'], 'entity:') === 0) {
++        $entity = $route_match->getParameter($name);
++        if ($entity instanceof ContentEntityInterface && $entity->hasLinkTemplate('canonical')) {
++          return $entity;
++        }
++
++        // Since entity was found, no need to iterate further.
++        return NULL;
++      }
++    }
++  }
++}
++
++/**
++ * Helper function to extract the entity operation label for the supplied route.
++ *
++ * @return null|string
++ *   Returns the label.
++ */
++function _gin_get_route_entity_operation_label(string $route_name, EntityInterface $entity) {
++  $entity_type = $entity->getEntityType();
++  $type_label = $entity_type->getSingularLabel();
++  $bundle_key = $entity_type->getKey('bundle');
++
++  if ($bundle_key && $bundle_entity = $entity->get($bundle_key)->entity) {
++    $type_label = $bundle_entity->label();
++  }
++
++  if ($entity_type->id() === 'user') {
++    $type_label = 'account';
++  }
++
++  $operation_labels = [
++    '#entity.(?<entityTypeId>.+).canonical#' => t('View @bundle', ['@bundle' => $type_label]),
++    '#entity.(?<entityTypeId>.+).delete_form#' => t('Delete @bundle', ['@bundle' => $type_label]),
++    '#entity.(?<entityTypeId>.+).delete_multiple_form#' => t('Delete @bundle', ['@bundle' => $type_label]),
++    '#entity.(?<entityTypeId>.+).edit_form#' => t('Edit @bundle', ['@bundle' => $type_label]),
++    '#entity.(?<entityTypeId>.+).add_form#' => t('Add @bundle', ['@bundle' => $type_label]),
++    '#entity.(?<entityTypeId>.+).add_page#' => t('Add @bundle', ['@bundle' => $type_label]),
++    '#entity.(?<entityTypeId>.+).reset_form#' => t('Reset @bundle', ['@bundle' => $type_label]),
++    '#entity.(?<entityTypeId>.+).cancel_form#' => t('Cancel @bundle', ['@bundle' => $type_label]),
++    '#entity.(?<entityTypeId>.+).clone_form#' => t('Clone @bundle', ['@bundle' => $type_label]),
++  ];
++
++  foreach ($operation_labels as $regex => $label) {
++    if (preg_match($regex, $route_name)) {
++      return $label;
++    }
++  }
++
++  return NULL;
++}
++
++// Inlined from includes/form.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++use Drupal\Core\Form\FormStateInterface;
++use Drupal\gin\GinContentFormHelper;
++use Drupal\gin\GinDescriptionToggle;
++use Drupal\gin\GinPreRender;
++use Drupal\gin\GinSettings;
++
++/**
++ * Implements form_alter_HOOK() for some major form changes.
++ */
++function gin_form_alter(&$form, $form_state, $form_id) {
++  \Drupal::classResolver(GinContentFormHelper::class)->formAlter($form, $form_state, $form_id);
++
++  // User form (Login, Register or Forgot password).
++  if (strpos($form_id, 'user_login') !== FALSE || strpos($form_id, 'user_register') !== FALSE || strpos($form_id, 'user_pass') !== FALSE) {
++    $form['actions']['submit']['#attributes']['class'][] = 'button--primary';
++  }
++
++  // Bulk forms: update action & actions to small variants.
++  if (strpos($form_id, 'views_form') !== FALSE) {
++    if (isset($form['header'])) {
++      $bulk_form = current(preg_grep('/_bulk_form/', array_keys($form['header'])));
++
++      if (isset($form['header'][$bulk_form])) {
++        $form['header'][$bulk_form]['action']['#attributes']['class'][] = 'form-element--type-select--small';
++        $form['header'][$bulk_form]['actions']['submit']['#attributes']['class'][] = 'button--small';
++
++        // Remove double entry of submit button.
++        unset($form['actions']['submit']);
++      }
++    }
++  }
++
++  // Delete forms: alter buttons.
++  if (strpos($form_id, 'delete_form') !== FALSE) {
++    $form['actions']['submit']['#attributes']['class'][] = 'button--danger';
++    $form['actions']['cancel']['#attributes']['class'][] = 'button--secondary';
++  }
++}
++
++/**
++ * Implements form_user_form_alter().
++ */
++function gin_form_user_form_alter(&$form, FormStateInterface $form_state) {
++  // If new user account, don't show settings yet.
++  if ($form_state->getFormObject()->getEntity()->isNew()) {
++    return;
++  }
++
++  /** @var \Drupal\gin\GinSettings $settings */
++  $settings = \Drupal::classResolver(GinSettings::class);
++
++  if ($settings->allowUserOverrides()) {
++    // Inject the settings for the dark mode feature.
++    $form['gin_theme_settings'] = [
++      '#type' => 'details',
++      '#title' => t('Admin theme settings'),
++      '#open' => TRUE,
++      '#weight' => 90,
++    ];
++
++    /** @var \Drupal\Core\Session\AccountInterface $account */
++    $account = $form_state->getBuildInfo()['callback_object']->getEntity();
++    $form['gin_theme_settings']['enable_user_settings'] = [
++      '#type' => 'checkbox',
++      '#title' => t('Enable overrides'),
++      '#description' => t("Enables default admin theme overrides."),
++      '#default_value' => $settings->userOverrideEnabled($account),
++      '#weight' => 0,
++    ];
++
++    $form['gin_theme_settings']['user_settings'] = [
++      '#type' => 'container',
++      '#states' => [
++        // Show if met.
++        'visible' => [
++          ':input[name="enable_user_settings"]' => ['checked' => TRUE],
++        ],
++      ],
++    ] + $settings->getSettingsForm($account);
++
++    // Attach custom library.
++    $form['#attached']['library'][] = 'gin/settings';
++
++    array_unshift($form['actions']['submit']['#submit'], '_gin_user_form_submit');
++  }
++}
++
++/**
++ * Implements template_preprocess_HOOK() for select.
++ */
++function gin_preprocess_select(&$variables) {
++  if (in_array('block-weight', $variables['attributes']['class'], TRUE)) {
++    $variables['attributes']['class'][] = 'form-element--extrasmall';
++  }
++}
++
++/**
++ * Implements template_preprocess_HOOK() for form_element.
++ */
++function gin_preprocess_form_element(&$variables) {
++  \Drupal::classResolver(GinDescriptionToggle::class)->preprocess($variables);
++}
++
++/**
++ * Implements template_preprocess_HOOK() for datetime_wrapper.
++ */
++function gin_preprocess_datetime_wrapper(&$variables) {
++  \Drupal::classResolver(GinDescriptionToggle::class)->preprocess($variables);
++}
++
++/**
++ * Implements template_preprocess_HOOK() for details.
++ */
++function gin_preprocess_details(&$variables) {
++  \Drupal::classResolver(GinDescriptionToggle::class)->preprocess($variables);
++}
++
++/**
++ * Implements template_preprocess_HOOK() for fieldset.
++ */
++function gin_preprocess_fieldset(&$variables) {
++  \Drupal::classResolver(GinDescriptionToggle::class)->preprocess($variables);
++}
++
++/**
++ * Implements hook_element_info_alter().
++ */
++function gin_element_info_alter(&$info) {
++  if (array_key_exists('text_format', $info)) {
++    $info['text_format']['#pre_render'][] = [
++      GinPreRender::class,
++      'textFormat',
++    ];
++  }
++}
++
++/**
++ * Implements template_preprocess_HOOK() for text_format_wrapper.
++ */
++function gin_preprocess_text_format_wrapper(&$variables) {
++  /** @var \Drupal\gin\GinSettings $settings */
++  $settings = \Drupal::classResolver(GinSettings::class);
++  if ($settings->get('show_description_toggle') && !empty($variables['description'])) {
++    $variables['description_display'] = 'invisible';
++    $variables['description_toggle'] = TRUE;
++  }
++}
++
++/**
++ * Implements template_preprocess_inline_entity_form_entity_table() for forms.
++ */
++function gin_preprocess_inline_entity_form_entity_table(array &$variables) {
++  $variables['table']['#attached']['library'][] = 'gin/inline_entity_form';
++}
++
++/**
++ * Set and get the form actions of the current request.
++ *
++ * @param array|null $actions
++ *   If not NULL, the given actions will be remembered for the current request
++ *   so that they can be retrieved later when processing the page.
++ *
++ * @return array|null
++ *   If set, the previously stored actions, NULL otherwise.
++ */
++function _gin_form_actions(?array $actions = NULL): ?array {
++  static $preparedActions;
++  if ($actions !== NULL) {
++    $preparedActions = $actions;
++  }
++  return $preparedActions;
++}
++
++/**
++ * Implements hook_preprocess_HOOK() for checkbox_tree.
++ */
++function gin_preprocess_checkbox_tree(array &$variables) {
++  $variables['#attached']['library'][] = 'gin/term_reference_tree';
++}
++
++// Inlined from includes/helper.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++/**
++ * Accent color element.
++ */
++function _gin_accent_radios($element) {
++  $options = array_keys($element['#options']);
++
++  foreach ($options as $values) {
++    $element[$values]['#attributes']['data-gin-accent'] = $element[$values]['#return_value'];
++  }
++
++  return $element;
++}
++
++/**
++ * Toolbar element.
++ */
++function _gin_toolbar_radios($element) {
++  $options = array_keys($element['#options']);
++
++  $element['#attributes']['class'][] = 'toolbar-option';
++
++  foreach ($options as $values) {
++    $element[$values]['#attributes']['class'][] = 'toolbar-option__' . $element[$values]['#return_value'];
++    $element[$values]['#attributes']['data-gin-toolbar'] = $element[$values]['#return_value'];
++  }
++
++  return $element;
++}
++
++/**
++ * Implements helper function _gin_user_form_submit().
++ */
++function _gin_user_form_submit(&$form, FormStateInterface $form_state) {
++  /** @var \Drupal\Core\Session\AccountInterface $account */
++  $account = $form_state->getBuildInfo()['callback_object']->getEntity();
++
++  $enabledUserOverrides = $form_state->getValue('enable_user_settings');
++  /** @var \Drupal\gin\GinSettings $settings */
++  $settings = \Drupal::classResolver(GinSettings::class);
++  if ($enabledUserOverrides) {
++    $user_settings = [
++      'enable_darkmode' => $form_state->getValue('enable_darkmode'),
++      'preset_accent_color' => $form_state->getValue('preset_accent_color'),
++      'accent_color' => $form_state->getValue('accent_color'),
++      'classic_toolbar' => $form_state->getValue('classic_toolbar'),
++      'preset_focus_color' => $form_state->getValue('preset_focus_color'),
++      'focus_color' => $form_state->getValue('focus_color'),
++      'high_contrast_mode' => (bool) $form_state->getValue('high_contrast_mode'),
++      'layout_density' => $form_state->getValue('layout_density'),
++      'show_description_toggle' => $form_state->getValue('show_description_toggle'),
++      'sticky_action_buttons' => $form_state->getValue('sticky_action_buttons'),
++    ];
++    $settings->setAll($user_settings, $account);
++  }
++  else {
++    $settings->clear($account);
++  }
++
++  // Clear render cache to ensure the correct
++  // templates are loaded for our toolbar options.
++  \Drupal::service('cache.render')->deleteAll();
++}
++
++/**
++ * Helper function for check if Gin is active.
++ */
++function _gin_is_active() {
++  $theme_handler = \Drupal::service('theme_handler')->listInfo();
++
++  // Check if set as frontend theme.
++  $frontend_theme_name = \Drupal::config('system.theme')->get('default');
++
++  // Check if base themes are set.
++  if (isset($theme_handler[$frontend_theme_name]->base_themes)) {
++    $frontend_base_themes = $theme_handler[$frontend_theme_name]->base_themes;
++  }
++
++  // Add theme name to base theme array.
++  $frontend_base_themes[$frontend_theme_name] = $frontend_theme_name;
++
++  // Check if set as admin theme.
++  $admin_theme_name = \Drupal::config('system.theme')->get('admin');
++
++  // Admin theme will have no value if it is set to use the default theme.
++  if ($admin_theme_name && isset($theme_handler[$admin_theme_name]->base_themes)) {
++    $admin_base_themes = $theme_handler[$admin_theme_name]->base_themes;
++    $admin_base_themes[$admin_theme_name] = $admin_theme_name;
++  }
++  else {
++    $admin_base_themes = $frontend_base_themes;
++  }
++
++  $base_themes = array_merge($admin_base_themes, $frontend_base_themes);
++  $gin_activated = array_key_exists('gin', $base_themes);
++
++  return $gin_activated;
++}
++
++/**
++ * Helper function for check if a module is active.
++ */
++function _gin_module_is_active($module) {
++  $module_handler = \Drupal::service('module_handler');
++
++  // Check if Navigation module is active.
++  $check_module = $module_handler->moduleExists($module);
++
++  if ($check_module) {
++    return TRUE;
++  }
++
++  return FALSE;
++}
++
++/**
++ * Helper function for check for the module version installed.
++ */
++function _gin_module_version($module) {
++  $extensionList = \Drupal::service('extension.list.module');
++  $extension_info = $extensionList->getExtensionInfo($module);
++
++  if (!empty($extension_info['version'])) {
++    return $extension_info['version'];
++  }
++
++  // Module not found or version unavailable.
++  return FALSE;
++}
++
++// Inlined from includes/html.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++use Drupal\gin\GinNavigation;
++
++/**
++ * Implements hook_preprocess_HOOK() for html.
++ */
++function gin_preprocess_html(&$variables) {
++  // Are we relevant?
++  $gin_activated = _gin_is_active();
++
++  if ($gin_activated) {
++    // Check if IMCE is active.
++    if (isset($variables['attributes']['class']) && in_array('imce-page', $variables['attributes']['class'])) {
++      return;
++    }
++
++    // Get theme settings.
++    /** @var \Drupal\gin\GinSettings $settings */
++    $settings = \Drupal::classResolver(GinSettings::class);
++    $toolbar = $settings->get('classic_toolbar');
++
++    // Set accent color.
++    $variables['attributes']['data-gin-accent'] = $settings->get('preset_accent_color');
++
++    // Set focus color.
++    $variables['attributes']['data-gin-focus'] = $settings->get('preset_focus_color');
++
++    // High contrast mode.
++    if ($settings->get('high_contrast_mode')) {
++      $variables['attributes']['class'][] = 'gin--high-contrast-mode';
++    }
++
++    // Set layout density.
++    $variables['attributes']['data-gin-layout-density'] = $settings->get('layout_density');
++
++    // Edit form? Use the new Gin Edit form layout.
++    if (\Drupal::classResolver(GinContentFormHelper::class)->isContentForm()) {
++      $variables['attributes']['class'][] = 'gin--edit-form';
++    }
++
++    // Only add gin--classic-toolbar class if user has permission.
++    if (
++      !\Drupal::currentUser()->hasPermission('access toolbar') &&
++      !\Drupal::currentUser()->hasPermission('access navigation')
++    ) {
++      return;
++    }
++
++    // Gin secondary toolbar.
++    if ($toolbar !== 'classic' || _gin_module_is_active('navigation')) {
++      $variables['page']['gin_secondary_toolbar'] = [
++        '#type' => 'toolbar',
++        '#access' => \Drupal::currentUser()->hasPermission('access toolbar') || \Drupal::currentUser()->hasPermission('access navigation'),
++        '#cache' => [
++          'keys' => ['toolbar_secondary'],
++          'contexts' => ['user.permissions'],
++        ],
++        '#attributes' => [
++          'id' => 'toolbar-administration-secondary',
++        ],
++      ];
++    }
++
++    // Check if Navigation module is active.
++    if (_gin_module_is_active('navigation')) {
++      $variables['attributes']['class'][] = 'gin--core-navigation';
++    }
++    elseif ($toolbar === 'new') {
++      /** @var \Drupal\gin\GinNavigaton $navigation */
++      $navigation = \Drupal::classResolver(GinNavigation::class);
++      // Get new navigation.
++      $variables['page_top']['navigation'] = $navigation->getNavigationStructure();
++      // Get active trail.
++      $variables['#attached']['drupalSettings']['active_trail_paths'] = $navigation->getNavigationActiveTrail();
++      // Set toolbar class.
++      $variables['attributes']['class'][] = 'gin--navigation';
++    }
++    else {
++      // Set toolbar class.
++      $variables['attributes']['class'][] = 'gin--' . $toolbar . '-toolbar';
++    }
++  }
++}
++
++/**
++ * Implements hook_preprocess_HOOK() for html__entity_browser__modal.
++ */
++function gin_preprocess_html__entity_browser__modal(&$variables) {
++  gin_preprocess_html($variables);
++
++  // Remove toolbar class in entity browser modal.
++  if (isset($variables['attributes']['class'])) {
++    $toolbar_class = preg_grep('/gin--(.*)-toolbar/', $variables['attributes']['class']);
++    foreach ($toolbar_class as $key => $class) {
++      unset($variables['attributes']['class'][$key]);
++    }
++  }
++}
++
++// Inlined from includes/local_actions.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++/**
++ * Local actions preprocess.
++ */
++function gin_preprocess_menu_local_action(&$variables) {
++  // Are we displaying an edit form?
++  if (_gin_form_actions()) {
++    $classes = &$variables['link']['#options']['attributes']['class'];
++    $classes = array_filter($classes, function ($e) {
++      return $e != 'button--primary';
++    });
++  }
++}
++
++// Inlined from includes/modules.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++use Composer\Semver\Semver;
++
++/**
++ * Implements hook_preprocess_HOOK() for project_browser_main_app.
++ */
++function gin_preprocess_project_browser_main_app(&$variables): void {
++  // Attach project browser library if version is <2.0.0-alpha10.
++  $version = _gin_module_version('project_browser');
++  if ($version && !Semver::satisfies($version, '>=2-alpha10')) {
++    $variables['#attached']['library'][] = 'gin/project_browser';
++  }
++}
++
++// Inlined from includes/navigation.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++/**
++ * Navigation alter().
++ */
++function gin_preprocess_navigation(&$variables) {
++  // Get theme configs.
++  /** @var \Drupal\gin\GinSettings $settings */
++  $settings = \Drupal::classResolver(GinSettings::class);
++  $logo_default = $settings->getDefault('logo.use_default');
++  $variables['icon_path'] = !$logo_default ? $settings->getDefault('logo.path') : '';
++  $variables['toolbar_variant'] = $settings->get('classic_toolbar');
++  $variables['core_navigation'] = _gin_module_is_active('navigation');
++  $variables['is_backend'] = TRUE;
++
++  // Attach the new drupal navigation styles.
++  $variables['#attached']['library'][] = 'gin/core_navigation';
++
++  if (!_gin_module_is_active('navigation')) {
++    $variables['#attached']['library'][] = 'gin/core_navigation_without_topbar';
++  }
++}
++
++// Inlined from includes/node.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++/**
++ * Implements hook_preprocess_HOOK() for node_edit_form.
++ */
++function gin_preprocess_node_edit_form(&$variables) {
++  $module_handler = \Drupal::service('module_handler');
++
++  // Check if Layout Paragraphs is active.
++  $layout_paragraphs = $module_handler->moduleExists('layout_paragraphs');
++  $variables['gin_layout_paragraphs'] = $layout_paragraphs;
++}
++
++// Inlined from includes/page.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++use Drupal\Component\Render\FormattableMarkup;
++use Drupal\node\Entity\Node;
++
++/**
++ * Implements hook_preprocess_HOOK() for page.
++ */
++function gin_preprocess_page(&$variables) {
++  // Required for allowing subtheming Gin.
++  $activeThemeName = \Drupal::theme()->getActiveTheme()->getName();
++  $variables['active_admin_theme'] = $activeThemeName;
++  $variables['active_core_navigation'] = _gin_module_is_active('navigation');
++
++  /** @var \Drupal\gin\GinSettings $settings */
++  $settings = \Drupal::classResolver(GinSettings::class);
++
++  // Expose Toolbar variant.
++  $variables['toolbar_variant'] = $settings->get('classic_toolbar');
++
++  // Expose Route name.
++  $variables['route_name'] = \Drupal::routeMatch()->getRouteName();
++
++  if (preg_match('#entity\.(?<entity_type_id>.+)\.canonical#', $variables['route_name'], $matches)) {
++    $entity = \Drupal::request()->attributes->get($matches['entity_type_id']);
++
++    if ($entity instanceof EntityInterface && $entity->hasLinkTemplate('edit-form') && $entity->access('update')) {
++      $variables['entity_title'] = $entity->label();
++      $variables['entity_edit_url'] = $entity->toUrl('edit-form');
++    }
++  }
++
++  // Get form actions.
++  if ($form_actions = _gin_form_actions()) {
++    if (_gin_module_is_active('navigation')) {
++      $variables['gin_form_actions'] = '';
++    }
++    else {
++      $variables['gin_form_actions'] = $form_actions;
++    }
++    $variables['gin_form_actions_class'] = 'gin-sticky-form-actions--preprocessed';
++  }
++}
++
++/**
++ * Implements hook_preprocess_HOOK() for page_attachments.
++ */
++function gin_page_attachments_alter(&$page) {
++  // Are we relevant?
++  $gin_activated = _gin_is_active();
++
++  if ($gin_activated) {
++    // Attach the init script.
++    $page['#attached']['library'][] = 'gin/gin_init';
++
++    // Attach breadcrumb styles.
++    $page['#attached']['library'][] = 'gin/breadcrumb';
++
++    // Attach accent library.
++    $page['#attached']['library'][] = 'gin/gin_accent';
++
++    // Attach sticky library.
++    $page['#attached']['library'][] = 'gin/sticky';
++
++    // Attach Drupal.once for older Drupal versions.
++    $drupal_version = (float) Drupal::VERSION;
++    if ($drupal_version < 9.3) {
++      $page['#attached']['library'][] = 'gin/once';
++    }
++
++    // Custom CSS file.
++    if (file_exists('public://gin-custom.css')) {
++      $page['#attached']['library'][] = 'gin/gin_custom_css';
++    }
++
++    // Expose settings to JS.
++    // Get theme settings.
++    $settings = \Drupal::classResolver(GinSettings::class);
++    $page['#attached']['drupalSettings']['gin']['darkmode'] = $settings->get('enable_darkmode');
++    $page['#attached']['drupalSettings']['gin']['darkmode_class'] = 'gin--dark-mode';
++    $page['#attached']['drupalSettings']['gin']['preset_accent_color'] = $settings->get('preset_accent_color');
++    $page['#attached']['drupalSettings']['gin']['accent_color'] = $settings->get('accent_color');
++    $page['#attached']['drupalSettings']['gin']['preset_focus_color'] = $settings->get('preset_focus_color');
++    $page['#attached']['drupalSettings']['gin']['focus_color'] = $settings->get('focus_color');
++    $page['#attached']['drupalSettings']['gin']['highcontrastmode'] = $settings->get('high_contrast_mode');
++    $page['#attached']['drupalSettings']['gin']['highcontrastmode_class'] = 'gin--high-contrast-mode';
++    $page['#attached']['drupalSettings']['gin']['toolbar_variant'] = $settings->get('classic_toolbar');
++    $page['#attached']['drupalSettings']['gin']['show_user_theme_settings'] = $settings->get('show_user_theme_settings');
++
++    // Expose stylesheets to JS.
++    $basethemeurl = '/' . \Drupal::service('extension.list.theme')->getPath('gin');
++    $page['#attached']['drupalSettings']['gin']['variables_css_path'] = $basethemeurl . '/dist/css/theme/variables.css';
++    $page['#attached']['drupalSettings']['gin']['accent_css_path'] = $basethemeurl . '/dist/css/theme/accent.css';
++    $page['#attached']['drupalSettings']['gin']['ckeditor_css_path'] = $basethemeurl . '/dist/css/theme/ckeditor.css';
++
++    $page['#attached']['html_head'][] = [
++      [
++        '#tag' => 'script',
++        '#attributes' => [
++          'type' => 'application/json',
++          'id' => 'gin-setting-darkmode',
++        ],
++        '#value' => new FormattableMarkup('{ "ginDarkmode": "@value" }', ['@value' => $settings->get('enable_darkmode') ?? 'unknown']),
++      ],
++      'gin_darkmode',
++    ];
++
++  }
++}
++
++/**
++ * Page title.
++ */
++function gin_preprocess_page_title(&$variables) {
++  if (preg_match('/entity\.node\..*/', \Drupal::routeMatch()->getRouteName(), $matches)) {
++    $node = \Drupal::routeMatch()->getParameter('node');
++    if ($node instanceof Node) {
++      if ($node->isDefaultTranslation() && !in_array($matches[0], [
++        'entity.node.content_translation_add',
++        'entity.node.delete_form',
++      ])) {
++        $variables['title'] = $node->getTitle();
++      }
++      elseif ($matches[0] === 'entity.node.edit_form') {
++        $variables['title_attributes']['class'][] = 'page-title--is-translation';
++        $args = [
++          '@title' => $node->getTitle(),
++          '@language' => $node->language()->getName(),
++        ];
++        $variables['title'] = t('@title <span class="page-title__language">(@language translation)</span>', $args);
++      }
++    }
++  }
++}
++
++/**
++ * Node revisions.
++ */
++function gin_preprocess_page__node__revisions(&$page) {
++  // Attach the init script.
++  $page['#attached']['library'][] = 'gin/revisions';
++}
++
++// Inlined from includes/paragraphs.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++/**
++ * Implements hook_preprocess_HOOK() for paragraphs operations dropbutton.
++ */
++function gin_preprocess_links__dropbutton__operations__paragraphs(&$variables) {
++  $variables['attributes']['class'][] = 'dropbutton--small';
++}
++
++// Inlined from includes/settings.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++/**
++ * Custom theme settings.
++ */
++function gin_form_system_theme_settings_alter(&$form, FormStateInterface $form_state, $form_id = NULL) {
++  // Work-around for a core bug affecting admin themes. See issue #943212.
++  if (isset($form_id)) {
++    return;
++  }
++
++  /*
++   * //////////////////////////
++   * Move default theme settings to bottom.
++   * * //////////////////////////
++   */
++  $form['logo']['#weight'] = 97;
++  $form['favicon']['#open'] = FALSE;
++  $form['favicon']['#weight'] = 98;
++  $form['theme_settings']['#open'] = FALSE;
++  $form['theme_settings']['#weight'] = 99;
++
++  /*
++   * //////////////////////////
++   * General settings.
++   * * ////////////////////////
++   */
++  /** @var \Drupal\gin\GinSettings $settings */
++  $settings = \Drupal::classResolver(GinSettings::class);
++
++  $form['custom_settings'] = [
++    '#type' => 'details',
++    '#open' => TRUE,
++    '#title' => t('Settings'),
++  ] + $settings->getSettingsForm();
++
++  // Allow user settings.
++  $form['custom_settings']['show_user_theme_settings'] = [
++    '#type' => 'checkbox',
++    '#title' => t('Users can override Gin settings'),
++    '#description' => t('Expose the admin theme settings to users.'),
++    '#default_value' => $settings->getDefault('show_user_theme_settings'),
++  ];
++
++  /*
++   * //////////////////////////
++   * Logo settings.
++   * * ////////////////////////
++   */
++  if (isset($form['logo']['settings']['logo_upload']['#upload_validators']['file_validate_extensions'])) {
++    $form['logo']['settings']['logo_upload']['#upload_validators'] = ['file_validate_extensions' => ['png gif jpg jpeg apng svg']];
++  }
++
++  // Upgrade path:
++  // Move settings to new fields.
++  if ($settings->getDefault('icon_default') === FALSE) {
++    $form['logo']['default_logo']['#default_value'] = FALSE;
++    $form['logo']['settings']['logo_path']['#default_value'] = $settings->getDefault('icon_path');
++    $form['#submit'][] = '_gin_form_system_theme_settings_form_submit';
++  }
++
++  // Attach custom library.
++  $form['#attached']['library'][] = 'gin/settings';
++}
++
++/**
++ * Cleanup settings.
++ */
++function _gin_form_system_theme_settings_form_submit(&$form, FormStateInterface $form_state) {
++  $config = \Drupal::configFactory()->getEditable('gin.settings');
++  $config->clear('icon_path')
++    ->clear('icon_default')
++    ->save();
++}
++
++// Inlined from includes/theme.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++/**
++ * Implements hook_theme().
++ */
++function gin_theme() {
++  // Check if Navigation module is active.
++  if (_gin_module_is_active('navigation')) {
++    $items['navigation_menu'] = [
++      'template' => 'navigation/navigation-menu',
++      'preprocess functions' => ['gin_preprocess_navigation'],
++      'variables' => [
++        'icon_path' => NULL,
++        'path' => \Drupal::service('extension.list.theme')->getPath('gin'),
++      ],
++    ];
++  }
++  else {
++    $items['navigation'] = [
++      'template' => 'navigation/navigation--gin',
++      'preprocess functions' => ['gin_preprocess_navigation'],
++      'variables' => [
++        'icon_path' => NULL,
++        'path' => \Drupal::service('extension.list.theme')->getPath('gin'),
++        'menu_middle' => [],
++        'menu_top' => [],
++        'menu_bottom' => [],
++      ],
++    ];
++
++    $items['menu_region__top'] = [
++      'template' => 'navigation/menu-region--top',
++      'variables' => [
++        'links' => [],
++        'title' => NULL,
++        'menu_name' => NULL,
++      ],
++    ];
++
++    $items['menu_region__middle'] = [
++      'template' => 'navigation/menu-region--middle',
++      'base hook' => 'menu',
++      'variables' => [
++        'menu_name' => NULL,
++        'items' => [],
++        'attributes' => [],
++        'title' => NULL,
++      ],
++    ];
++
++    // Check if help is enabled.
++    $help_enabled = _gin_module_is_active('help');
++
++    $items['menu_region__bottom'] = [
++      'template' => 'navigation/menu-region--bottom',
++      'variables' => [
++        'help_enabled' => $help_enabled,
++        'items' => [],
++        'title' => NULL,
++        'menu_name' => NULL,
++        'path' => \Drupal::service('extension.list.theme')->getPath('gin'),
++      ],
++    ];
++  }
++
++  return $items;
++}
++
++/**
++ * Implements page_alter().
++ */
++function gin_theme_suggestions_page_alter(&$suggestions, $variables) {
++  $path = \Drupal::requestStack()->getCurrentRequest()->getPathInfo();
++
++  if ($path != '/') {
++    $path = trim($path, '/');
++    $arg = str_replace(["/", '-'], ['_', '_'], $path);
++    $suggestions[] = 'page__' . $arg;
++  }
++
++  // The node page template is required to use the node content form.
++  if (\Drupal::classResolver(GinContentFormHelper::class)->isContentForm()
++    && !in_array('page__node', $suggestions)) {
++    $suggestions[] = 'page__node';
++  }
++}
++
++/**
++ * Implements toolbar_alter().
++ */
++function gin_theme_suggestions_toolbar_alter(array &$suggestions, array $variables) {
++  /** @var \Drupal\gin\GinSettings $settings */
++  $settings = \Drupal::classResolver(GinSettings::class);
++
++  $suggestions[] = 'toolbar__gin';
++
++  // Only if Classic Toolbar is disabled.
++  if ($settings->get('classic_toolbar') !== 'classic' || _gin_module_is_active('navigation')) {
++    if ($variables['element']['#attributes']['id'] === 'toolbar-administration-secondary') {
++      $suggestions[] = 'toolbar__gin__secondary';
++    }
++  }
++}
++
++/**
++ * Implements menu_alter().
++ */
++function gin_theme_suggestions_menu_alter(array &$suggestions, array $variables) {
++  if (isset($variables['theme_hook_original']) && strpos($variables['theme_hook_original'], 'menu__toolbar__') === 0) {
++    $suggestions[] = 'menu__toolbar__gin';
++  }
++}
++
++/**
++ * Implements top_bar_alter().
++ */
++function gin_theme_suggestions_top_bar_alter(array &$suggestions, array $variables) {
++  $suggestions[] = 'top_bar__gin';
++}
++
++/**
++ * Implements form_alter().
++ */
++function gin_theme_suggestions_form_alter(array &$suggestions, array $variables) {
++  $suggestions[] = 'form__' . str_replace('-', '_', $variables['element']['#id']);
++}
++
++/**
++ * Implements table_alter().
++ */
++function gin_theme_suggestions_table_alter(array &$suggestions, array $variables): void {
++  if (empty($variables['attributes']['class'])) {
++    return;
++  }
++
++  if (is_array($variables['attributes']['class']) && in_array('field-multiple-table', $variables['attributes']['class'])) {
++    $suggestions[] = 'table__simple';
++  }
++}
++
++// Inlined from includes/toolbar.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++use Drupal\gin\GinUserPicture;
++
++/**
++ * Implements hook_preprocess_menu().
++ */
++function gin_preprocess_menu(&$variables) {
++  if (isset($variables['theme_hook_original']) && strpos($variables['theme_hook_original'], 'menu__toolbar__') === 0) {
++    // Check if the admin_toolbar module is installed.
++    foreach ($variables['items'] as $key => $item) {
++      $gin_id = str_replace('.', '-', $key);
++      $variables['items'][$key]['gin_id'] = $gin_id;
++    }
++
++    // Move config & help menu items to end.
++    $to_move = ['system.admin_config', 'help.main'];
++    foreach ($to_move as $id) {
++      $index = array_search($id, array_keys($variables['items']));
++      if (is_numeric($index)) {
++        $variables['items'] += array_splice($variables['items'], $index, 1);
++      }
++    }
++  }
++}
++
++/**
++ * Implements hook_preprocess_menu__toolbar__gin().
++ */
++function gin_preprocess_menu__toolbar__gin(&$variables) {
++  // Get theme settings.
++  /** @var \Drupal\gin\GinSettings $settings */
++  $settings = \Drupal::classResolver(GinSettings::class);
++  $logo_path = $settings->getDefault('logo.path');
++  $logo_default = $settings->getDefault('logo.use_default');
++  $variables['icon_default'] = $logo_default;
++
++  if (!$logo_default) {
++    $variables['icon_path'] = $logo_path;
++  }
++
++  // Expose Toolbar variant.
++  $variables['toolbar_variant'] = $settings->get('classic_toolbar');
++}
++
++/**
++ * Implements toolbar preprocess.
++ */
++function gin_preprocess_toolbar(&$variables) {
++  // The controller resolver does not support Closures at this time. For now,
++  // we use a wrapper function to load the service with dependencies.
++  // @see https://www.drupal.org/project/drupal/issues/3060638
++  $variables['user_picture'] = [
++    '#lazy_builder' => [
++      GinUserPicture::class . '::build',
++      [],
++    ],
++    '#create_placeholder' => TRUE,
++  ];
++
++  // Check if Navigation module is active.
++  if (_gin_module_is_active('navigation')) {
++    // Attach the new drupal navigation styles.
++    $variables['#attached']['library'][] = 'gin/core_navigation';
++    return;
++  }
++
++  // Expose Toolbar variant.
++  /** @var \Drupal\gin\GinSettings $settings */
++  $settings = \Drupal::classResolver(GinSettings::class);
++  $variables['toolbar_variant'] = $settings->get('classic_toolbar');
++
++  switch ($variables['toolbar_variant']) {
++    case 'classic':
++      // Attach the classic toolbar styles.
++      $variables['#attached']['library'][] = 'gin/gin_classic_toolbar';
++      break;
++
++    case 'horizontal':
++      // Attach the horizontal toolbar styles.
++      $variables['#attached']['library'][] = 'gin/gin_horizontal_toolbar';
++      break;
++
++    case 'new':
++      // Attach the experimental drupal navigation styles.
++      $variables['#attached']['library'][] = 'gin/navigation';
++      break;
++
++    default:
++      // Attach toolbar styles.
++      $variables['#attached']['library'][] = 'gin/gin_toolbar';
++      break;
++  }
++}
++
++/**
++ * Implements toolbar preprocess.
++ */
++function gin_preprocess_toolbar__gin__secondary(&$variables) {
++  // Expose Toolbar variant.
++  /** @var \Drupal\gin\GinSettings $settings */
++  $settings = \Drupal::classResolver(GinSettings::class);
++  $variables['toolbar_variant'] = $settings->get('classic_toolbar');
++
++  if ($variables['toolbar_variant'] !== 'classic' || _gin_module_is_active('navigation')) {
++    // Move Admin Toolbar Search to start.
++    $toolbar_search = array_search('administration_search', array_keys($variables['tabs']));
++    if (is_numeric($toolbar_search)) {
++      foreach ($variables['tabs'] as $key => $item) {
++        if ($key === 'administration_search') {
++          array_unshift($variables['tabs'], $variables['tabs'][$key]);
++          unset($variables['tabs'][$key]);
++        }
++      }
++    }
++  }
++
++  // Move user tab to end.
++  $toolbar_user = array_search('user', array_keys($variables['tabs']));
++  if (is_numeric($toolbar_user)) {
++    foreach ($variables['tabs'] as $key => $item) {
++      if ($key === 'user') {
++        $user_tab = $variables['tabs'][$key];
++        unset($variables['tabs'][$key]);
++        $variables['tabs'][$key] = $user_tab;
++      }
++    }
++  }
++}
++
++// Inlined from includes/top_bar.theme: Drupal 12 reads a theme's procedural hooks from
++// its .theme file and src/Hook only, so an include file is never discovered.
++/**
++ * Implements hook_preprocess_HOOK() for top_bar.
++ */
++function gin_preprocess_top_bar(array &$variables) {
++  if (!_gin_module_is_active('navigation')) {
++    return;
++  }
++
++  $block_manager = \Drupal::service('plugin.manager.block');
++
++  // Get local actions.
++  if ($plugin_block = $block_manager->createInstance('local_actions_block', [])) {
++    $block_content = $plugin_block->build();
++    $variables['gin_local_actions'] = \Drupal::service('renderer')->render($block_content);
++    $variables['#attached']['library'][] = 'gin/top_bar';
++  }
++
++  // Get form actions.
++  $variables['gin_form_actions'] = [
++    '#pre_render' => [[GinPreRender::class, 'formActions']],
++    '#cache' => ['max-age' => 0],
++  ];
++
++  // Get breadcrumb.
++  if ($plugin_block = $block_manager->createInstance('system_breadcrumb_block', [])) {
++    $block_content = $plugin_block->build();
++    $variables['gin_breadcrumbs'] = \Drupal::service('renderer')->render($block_content);
++    $variables['#attached']['library'][] = 'gin/top_bar';
++  }
++}
+diff -ruN a/includes/breadcrumb.theme b/includes/breadcrumb.theme
+--- a/includes/breadcrumb.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/breadcrumb.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,166 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * breadcrumb.theme
+- */
+-
+-use Drupal\Core\Cache\CacheableMetadata;
+-use Drupal\Core\Entity\ContentEntityInterface;
+-use Drupal\Core\Entity\EntityInterface;
+-use Drupal\Core\Url;
+-use Drupal\node\NodeInterface;
+-
+-/**
+- * Breadcrumb.
+- */
+-function gin_preprocess_breadcrumb(&$variables) {
+-  if (empty($variables['breadcrumb'])) {
+-    return;
+-  }
+-
+-  $cacheability = new CacheableMetadata();
+-  $cacheability->addCacheContexts(['route']);
+-
+-  $entity = _gin_get_route_entity();
+-  $route_name = \Drupal::routeMatch()->getRouteName();
+-
+-  if ($entity !== NULL) {
+-    $url = $entity->toUrl();
+-    $entity_type_id = $entity->getEntityTypeId();
+-    $operation_label = _gin_get_route_entity_operation_label($route_name, $entity);
+-
+-    $url_access = $url->access(NULL, TRUE);
+-    $cacheability->addCacheableDependency($url_access);
+-
+-    // Media handling.
+-    if ($entity_type_id === 'media') {
+-      $media_config = \Drupal::config('media.settings');
+-      $cacheability->addCacheableDependency($media_config);
+-
+-      if (!$media_config->get('standalone_url')) {
+-        $url = Url::fromRoute('<front>');
+-      }
+-    }
+-
+-    // Custom block handling (a custom block cannot be viewed standalone).
+-    if ($entity_type_id === 'block_content') {
+-      $url = Url::fromRoute('<front>');
+-    }
+-  }
+-
+-  // Back to site item.
+-  foreach ($variables['breadcrumb'] as $key => $item) {
+-    if ($key === 0) {
+-      $variables['breadcrumb'][$key]['text'] = t('Back to site');
+-      $variables['breadcrumb'][$key]['attributes']['title'] = t('Return to site content');
+-
+-      if (isset($url, $url_access) && $url_access->isAllowed()) {
+-        // Link to the canonical route of the entity.
+-        $variables['breadcrumb'][$key]['url'] = $url;
+-      }
+-      else {
+-        // Let escapeAdmin override the return URL.
+-        $variables['breadcrumb'][$key]['attributes']['data'] = 'data-gin-toolbar-escape-admin';
+-      }
+-    }
+-    elseif (isset($url) && $item['url'] === $url->setAbsolute(FALSE)->toString()) {
+-      // Remove as we already have the back to site link set.
+-      unset($variables['breadcrumb'][$key]);
+-    }
+-  }
+-
+-  // Adjust breadcrumb for nodes: unset all items, except home link.
+-  if ($entity instanceof NodeInterface) {
+-    foreach ($variables['breadcrumb'] as $key => $item) {
+-      if ($key > 0) {
+-        unset($variables['breadcrumb'][$key]);
+-      }
+-    }
+-  }
+-
+-  // Adjust breadcrumb for entities.
+-  if (isset($operation_label)) {
+-    // Add bundle info.
+-    $variables['breadcrumb'][] = [
+-      'text' => $operation_label,
+-      'url' => '',
+-    ];
+-  }
+-
+-  // Node add: Fix Drupal 9 issue.
+-  if ($route_name === 'node.add') {
+-    foreach ($variables['breadcrumb'] as $key => $item) {
+-      if ($variables['breadcrumb'][$key]['text'] == '') {
+-        unset($variables['breadcrumb'][$key]);
+-      }
+-    }
+-  }
+-
+-  $cacheability->applyTo($variables);
+-}
+-
+-/**
+- * Helper function to extract the entity for the supplied route.
+- *
+- * @return null|\Drupal\Core\Entity\ContentEntityInterface
+- *   Returns the content entity.
+- */
+-function _gin_get_route_entity() {
+-  $route_match = \Drupal::routeMatch();
+-  // Entity will be found in the route parameters.
+-  if (($route = $route_match->getRouteObject()) && ($parameters = $route->getOption('parameters'))) {
+-    // Determine if the current route represents an entity.
+-    foreach ($parameters as $name => $options) {
+-      if (isset($options['type']) && strpos($options['type'], 'entity:') === 0) {
+-        $entity = $route_match->getParameter($name);
+-        if ($entity instanceof ContentEntityInterface && $entity->hasLinkTemplate('canonical')) {
+-          return $entity;
+-        }
+-
+-        // Since entity was found, no need to iterate further.
+-        return NULL;
+-      }
+-    }
+-  }
+-}
+-
+-/**
+- * Helper function to extract the entity operation label for the supplied route.
+- *
+- * @return null|string
+- *   Returns the label.
+- */
+-function _gin_get_route_entity_operation_label(string $route_name, EntityInterface $entity) {
+-  $entity_type = $entity->getEntityType();
+-  $type_label = $entity_type->getSingularLabel();
+-  $bundle_key = $entity_type->getKey('bundle');
+-
+-  if ($bundle_key && $bundle_entity = $entity->get($bundle_key)->entity) {
+-    $type_label = $bundle_entity->label();
+-  }
+-
+-  if ($entity_type->id() === 'user') {
+-    $type_label = 'account';
+-  }
+-
+-  $operation_labels = [
+-    '#entity.(?<entityTypeId>.+).canonical#' => t('View @bundle', ['@bundle' => $type_label]),
+-    '#entity.(?<entityTypeId>.+).delete_form#' => t('Delete @bundle', ['@bundle' => $type_label]),
+-    '#entity.(?<entityTypeId>.+).delete_multiple_form#' => t('Delete @bundle', ['@bundle' => $type_label]),
+-    '#entity.(?<entityTypeId>.+).edit_form#' => t('Edit @bundle', ['@bundle' => $type_label]),
+-    '#entity.(?<entityTypeId>.+).add_form#' => t('Add @bundle', ['@bundle' => $type_label]),
+-    '#entity.(?<entityTypeId>.+).add_page#' => t('Add @bundle', ['@bundle' => $type_label]),
+-    '#entity.(?<entityTypeId>.+).reset_form#' => t('Reset @bundle', ['@bundle' => $type_label]),
+-    '#entity.(?<entityTypeId>.+).cancel_form#' => t('Cancel @bundle', ['@bundle' => $type_label]),
+-    '#entity.(?<entityTypeId>.+).clone_form#' => t('Clone @bundle', ['@bundle' => $type_label]),
+-  ];
+-
+-  foreach ($operation_labels as $regex => $label) {
+-    if (preg_match($regex, $route_name)) {
+-      return $label;
+-    }
+-  }
+-
+-  return NULL;
+-}
+diff -ruN a/includes/form.theme b/includes/form.theme
+--- a/includes/form.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/form.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,186 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * form.theme
+- */
+-
+-use Drupal\Core\Form\FormStateInterface;
+-use Drupal\gin\GinContentFormHelper;
+-use Drupal\gin\GinDescriptionToggle;
+-use Drupal\gin\GinPreRender;
+-use Drupal\gin\GinSettings;
+-
+-/**
+- * Implements form_alter_HOOK() for some major form changes.
+- */
+-function gin_form_alter(&$form, $form_state, $form_id) {
+-  \Drupal::classResolver(GinContentFormHelper::class)->formAlter($form, $form_state, $form_id);
+-
+-  // User form (Login, Register or Forgot password).
+-  if (strpos($form_id, 'user_login') !== FALSE || strpos($form_id, 'user_register') !== FALSE || strpos($form_id, 'user_pass') !== FALSE) {
+-    $form['actions']['submit']['#attributes']['class'][] = 'button--primary';
+-  }
+-
+-  // Bulk forms: update action & actions to small variants.
+-  if (strpos($form_id, 'views_form') !== FALSE) {
+-    if (isset($form['header'])) {
+-      $bulk_form = current(preg_grep('/_bulk_form/', array_keys($form['header'])));
+-
+-      if (isset($form['header'][$bulk_form])) {
+-        $form['header'][$bulk_form]['action']['#attributes']['class'][] = 'form-element--type-select--small';
+-        $form['header'][$bulk_form]['actions']['submit']['#attributes']['class'][] = 'button--small';
+-
+-        // Remove double entry of submit button.
+-        unset($form['actions']['submit']);
+-      }
+-    }
+-  }
+-
+-  // Delete forms: alter buttons.
+-  if (strpos($form_id, 'delete_form') !== FALSE) {
+-    $form['actions']['submit']['#attributes']['class'][] = 'button--danger';
+-    $form['actions']['cancel']['#attributes']['class'][] = 'button--secondary';
+-  }
+-}
+-
+-/**
+- * Implements form_user_form_alter().
+- */
+-function gin_form_user_form_alter(&$form, FormStateInterface $form_state) {
+-  // If new user account, don't show settings yet.
+-  if ($form_state->getFormObject()->getEntity()->isNew()) {
+-    return;
+-  }
+-
+-  /** @var \Drupal\gin\GinSettings $settings */
+-  $settings = \Drupal::classResolver(GinSettings::class);
+-
+-  if ($settings->allowUserOverrides()) {
+-    // Inject the settings for the dark mode feature.
+-    $form['gin_theme_settings'] = [
+-      '#type' => 'details',
+-      '#title' => t('Admin theme settings'),
+-      '#open' => TRUE,
+-      '#weight' => 90,
+-    ];
+-
+-    /** @var \Drupal\Core\Session\AccountInterface $account */
+-    $account = $form_state->getBuildInfo()['callback_object']->getEntity();
+-    $form['gin_theme_settings']['enable_user_settings'] = [
+-      '#type' => 'checkbox',
+-      '#title' => t('Enable overrides'),
+-      '#description' => t("Enables default admin theme overrides."),
+-      '#default_value' => $settings->userOverrideEnabled($account),
+-      '#weight' => 0,
+-    ];
+-
+-    $form['gin_theme_settings']['user_settings'] = [
+-      '#type' => 'container',
+-      '#states' => [
+-        // Show if met.
+-        'visible' => [
+-          ':input[name="enable_user_settings"]' => ['checked' => TRUE],
+-        ],
+-      ],
+-    ] + $settings->getSettingsForm($account);
+-
+-    // Attach custom library.
+-    $form['#attached']['library'][] = 'gin/settings';
+-
+-    array_unshift($form['actions']['submit']['#submit'], '_gin_user_form_submit');
+-  }
+-}
+-
+-/**
+- * Implements template_preprocess_HOOK() for select.
+- */
+-function gin_preprocess_select(&$variables) {
+-  if (in_array('block-weight', $variables['attributes']['class'], TRUE)) {
+-    $variables['attributes']['class'][] = 'form-element--extrasmall';
+-  }
+-}
+-
+-/**
+- * Implements template_preprocess_HOOK() for form_element.
+- */
+-function gin_preprocess_form_element(&$variables) {
+-  \Drupal::classResolver(GinDescriptionToggle::class)->preprocess($variables);
+-}
+-
+-/**
+- * Implements template_preprocess_HOOK() for datetime_wrapper.
+- */
+-function gin_preprocess_datetime_wrapper(&$variables) {
+-  \Drupal::classResolver(GinDescriptionToggle::class)->preprocess($variables);
+-}
+-
+-/**
+- * Implements template_preprocess_HOOK() for details.
+- */
+-function gin_preprocess_details(&$variables) {
+-  \Drupal::classResolver(GinDescriptionToggle::class)->preprocess($variables);
+-}
+-
+-/**
+- * Implements template_preprocess_HOOK() for fieldset.
+- */
+-function gin_preprocess_fieldset(&$variables) {
+-  \Drupal::classResolver(GinDescriptionToggle::class)->preprocess($variables);
+-}
+-
+-/**
+- * Implements hook_element_info_alter().
+- */
+-function gin_element_info_alter(&$info) {
+-  if (array_key_exists('text_format', $info)) {
+-    $info['text_format']['#pre_render'][] = [
+-      GinPreRender::class,
+-      'textFormat',
+-    ];
+-  }
+-}
+-
+-/**
+- * Implements template_preprocess_HOOK() for text_format_wrapper.
+- */
+-function gin_preprocess_text_format_wrapper(&$variables) {
+-  /** @var \Drupal\gin\GinSettings $settings */
+-  $settings = \Drupal::classResolver(GinSettings::class);
+-  if ($settings->get('show_description_toggle') && !empty($variables['description'])) {
+-    $variables['description_display'] = 'invisible';
+-    $variables['description_toggle'] = TRUE;
+-  }
+-}
+-
+-/**
+- * Implements template_preprocess_inline_entity_form_entity_table() for forms.
+- */
+-function gin_preprocess_inline_entity_form_entity_table(array &$variables) {
+-  $variables['table']['#attached']['library'][] = 'gin/inline_entity_form';
+-}
+-
+-/**
+- * Set and get the form actions of the current request.
+- *
+- * @param array|null $actions
+- *   If not NULL, the given actions will be remembered for the current request
+- *   so that they can be retrieved later when processing the page.
+- *
+- * @return array|null
+- *   If set, the previously stored actions, NULL otherwise.
+- */
+-function _gin_form_actions(?array $actions = NULL): ?array {
+-  static $preparedActions;
+-  if ($actions !== NULL) {
+-    $preparedActions = $actions;
+-  }
+-  return $preparedActions;
+-}
+-
+-/**
+- * Implements hook_preprocess_HOOK() for checkbox_tree.
+- */
+-function gin_preprocess_checkbox_tree(array &$variables) {
+-  $variables['#attached']['library'][] = 'gin/term_reference_tree';
+-}
+diff -ruN a/includes/helper.theme b/includes/helper.theme
+--- a/includes/helper.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/helper.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,138 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * helper.theme
+- */
+-
+-use Drupal\Core\Form\FormStateInterface;
+-use Drupal\gin\GinSettings;
+-
+-/**
+- * Accent color element.
+- */
+-function _gin_accent_radios($element) {
+-  $options = array_keys($element['#options']);
+-
+-  foreach ($options as $values) {
+-    $element[$values]['#attributes']['data-gin-accent'] = $element[$values]['#return_value'];
+-  }
+-
+-  return $element;
+-}
+-
+-/**
+- * Toolbar element.
+- */
+-function _gin_toolbar_radios($element) {
+-  $options = array_keys($element['#options']);
+-
+-  $element['#attributes']['class'][] = 'toolbar-option';
+-
+-  foreach ($options as $values) {
+-    $element[$values]['#attributes']['class'][] = 'toolbar-option__' . $element[$values]['#return_value'];
+-    $element[$values]['#attributes']['data-gin-toolbar'] = $element[$values]['#return_value'];
+-  }
+-
+-  return $element;
+-}
+-
+-/**
+- * Implements helper function _gin_user_form_submit().
+- */
+-function _gin_user_form_submit(&$form, FormStateInterface $form_state) {
+-  /** @var \Drupal\Core\Session\AccountInterface $account */
+-  $account = $form_state->getBuildInfo()['callback_object']->getEntity();
+-
+-  $enabledUserOverrides = $form_state->getValue('enable_user_settings');
+-  /** @var \Drupal\gin\GinSettings $settings */
+-  $settings = \Drupal::classResolver(GinSettings::class);
+-  if ($enabledUserOverrides) {
+-    $user_settings = [
+-      'enable_darkmode' => $form_state->getValue('enable_darkmode'),
+-      'preset_accent_color' => $form_state->getValue('preset_accent_color'),
+-      'accent_color' => $form_state->getValue('accent_color'),
+-      'classic_toolbar' => $form_state->getValue('classic_toolbar'),
+-      'preset_focus_color' => $form_state->getValue('preset_focus_color'),
+-      'focus_color' => $form_state->getValue('focus_color'),
+-      'high_contrast_mode' => (bool) $form_state->getValue('high_contrast_mode'),
+-      'layout_density' => $form_state->getValue('layout_density'),
+-      'show_description_toggle' => $form_state->getValue('show_description_toggle'),
+-      'sticky_action_buttons' => $form_state->getValue('sticky_action_buttons'),
+-    ];
+-    $settings->setAll($user_settings, $account);
+-  }
+-  else {
+-    $settings->clear($account);
+-  }
+-
+-  // Clear render cache to ensure the correct
+-  // templates are loaded for our toolbar options.
+-  \Drupal::service('cache.render')->deleteAll();
+-}
+-
+-/**
+- * Helper function for check if Gin is active.
+- */
+-function _gin_is_active() {
+-  $theme_handler = \Drupal::service('theme_handler')->listInfo();
+-
+-  // Check if set as frontend theme.
+-  $frontend_theme_name = \Drupal::config('system.theme')->get('default');
+-
+-  // Check if base themes are set.
+-  if (isset($theme_handler[$frontend_theme_name]->base_themes)) {
+-    $frontend_base_themes = $theme_handler[$frontend_theme_name]->base_themes;
+-  }
+-
+-  // Add theme name to base theme array.
+-  $frontend_base_themes[$frontend_theme_name] = $frontend_theme_name;
+-
+-  // Check if set as admin theme.
+-  $admin_theme_name = \Drupal::config('system.theme')->get('admin');
+-
+-  // Admin theme will have no value if it is set to use the default theme.
+-  if ($admin_theme_name && isset($theme_handler[$admin_theme_name]->base_themes)) {
+-    $admin_base_themes = $theme_handler[$admin_theme_name]->base_themes;
+-    $admin_base_themes[$admin_theme_name] = $admin_theme_name;
+-  }
+-  else {
+-    $admin_base_themes = $frontend_base_themes;
+-  }
+-
+-  $base_themes = array_merge($admin_base_themes, $frontend_base_themes);
+-  $gin_activated = array_key_exists('gin', $base_themes);
+-
+-  return $gin_activated;
+-}
+-
+-/**
+- * Helper function for check if a module is active.
+- */
+-function _gin_module_is_active($module) {
+-  $module_handler = \Drupal::service('module_handler');
+-
+-  // Check if Navigation module is active.
+-  $check_module = $module_handler->moduleExists($module);
+-
+-  if ($check_module) {
+-    return TRUE;
+-  }
+-
+-  return FALSE;
+-}
+-
+-/**
+- * Helper function for check for the module version installed.
+- */
+-function _gin_module_version($module) {
+-  $extensionList = \Drupal::service('extension.list.module');
+-  $extension_info = $extensionList->getExtensionInfo($module);
+-
+-  if (!empty($extension_info['version'])) {
+-    return $extension_info['version'];
+-  }
+-
+-  // Module not found or version unavailable.
+-  return FALSE;
+-}
+diff -ruN a/includes/html.theme b/includes/html.theme
+--- a/includes/html.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/html.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,106 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * html.theme
+- */
+-
+-use Drupal\gin\GinContentFormHelper;
+-use Drupal\gin\GinNavigation;
+-use Drupal\gin\GinSettings;
+-
+-/**
+- * Implements hook_preprocess_HOOK() for html.
+- */
+-function gin_preprocess_html(&$variables) {
+-  // Are we relevant?
+-  $gin_activated = _gin_is_active();
+-
+-  if ($gin_activated) {
+-    // Check if IMCE is active.
+-    if (isset($variables['attributes']['class']) && in_array('imce-page', $variables['attributes']['class'])) {
+-      return;
+-    }
+-
+-    // Get theme settings.
+-    /** @var \Drupal\gin\GinSettings $settings */
+-    $settings = \Drupal::classResolver(GinSettings::class);
+-    $toolbar = $settings->get('classic_toolbar');
+-
+-    // Set accent color.
+-    $variables['attributes']['data-gin-accent'] = $settings->get('preset_accent_color');
+-
+-    // Set focus color.
+-    $variables['attributes']['data-gin-focus'] = $settings->get('preset_focus_color');
+-
+-    // High contrast mode.
+-    if ($settings->get('high_contrast_mode')) {
+-      $variables['attributes']['class'][] = 'gin--high-contrast-mode';
+-    }
+-
+-    // Set layout density.
+-    $variables['attributes']['data-gin-layout-density'] = $settings->get('layout_density');
+-
+-    // Edit form? Use the new Gin Edit form layout.
+-    if (\Drupal::classResolver(GinContentFormHelper::class)->isContentForm()) {
+-      $variables['attributes']['class'][] = 'gin--edit-form';
+-    }
+-
+-    // Only add gin--classic-toolbar class if user has permission.
+-    if (
+-      !\Drupal::currentUser()->hasPermission('access toolbar') &&
+-      !\Drupal::currentUser()->hasPermission('access navigation')
+-    ) {
+-      return;
+-    }
+-
+-    // Gin secondary toolbar.
+-    if ($toolbar !== 'classic' || _gin_module_is_active('navigation')) {
+-      $variables['page']['gin_secondary_toolbar'] = [
+-        '#type' => 'toolbar',
+-        '#access' => \Drupal::currentUser()->hasPermission('access toolbar') || \Drupal::currentUser()->hasPermission('access navigation'),
+-        '#cache' => [
+-          'keys' => ['toolbar_secondary'],
+-          'contexts' => ['user.permissions'],
+-        ],
+-        '#attributes' => [
+-          'id' => 'toolbar-administration-secondary',
+-        ],
+-      ];
+-    }
+-
+-    // Check if Navigation module is active.
+-    if (_gin_module_is_active('navigation')) {
+-      $variables['attributes']['class'][] = 'gin--core-navigation';
+-    }
+-    elseif ($toolbar === 'new') {
+-      /** @var \Drupal\gin\GinNavigaton $navigation */
+-      $navigation = \Drupal::classResolver(GinNavigation::class);
+-      // Get new navigation.
+-      $variables['page_top']['navigation'] = $navigation->getNavigationStructure();
+-      // Get active trail.
+-      $variables['#attached']['drupalSettings']['active_trail_paths'] = $navigation->getNavigationActiveTrail();
+-      // Set toolbar class.
+-      $variables['attributes']['class'][] = 'gin--navigation';
+-    }
+-    else {
+-      // Set toolbar class.
+-      $variables['attributes']['class'][] = 'gin--' . $toolbar . '-toolbar';
+-    }
+-  }
+-}
+-
+-/**
+- * Implements hook_preprocess_HOOK() for html__entity_browser__modal.
+- */
+-function gin_preprocess_html__entity_browser__modal(&$variables) {
+-  gin_preprocess_html($variables);
+-
+-  // Remove toolbar class in entity browser modal.
+-  if (isset($variables['attributes']['class'])) {
+-    $toolbar_class = preg_grep('/gin--(.*)-toolbar/', $variables['attributes']['class']);
+-    foreach ($toolbar_class as $key => $class) {
+-      unset($variables['attributes']['class'][$key]);
+-    }
+-  }
+-}
+diff -ruN a/includes/local_actions.theme b/includes/local_actions.theme
+--- a/includes/local_actions.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/local_actions.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,19 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * local_actions.theme
+- */
+-
+-/**
+- * Local actions preprocess.
+- */
+-function gin_preprocess_menu_local_action(&$variables) {
+-  // Are we displaying an edit form?
+-  if (_gin_form_actions()) {
+-    $classes = &$variables['link']['#options']['attributes']['class'];
+-    $classes = array_filter($classes, function ($e) {
+-      return $e != 'button--primary';
+-    });
+-  }
+-}
+diff -ruN a/includes/modules.theme b/includes/modules.theme
+--- a/includes/modules.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/modules.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,19 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * modules.theme
+- */
+-
+-use Composer\Semver\Semver;
+-
+-/**
+- * Implements hook_preprocess_HOOK() for project_browser_main_app.
+- */
+-function gin_preprocess_project_browser_main_app(&$variables): void {
+-  // Attach project browser library if version is <2.0.0-alpha10.
+-  $version = _gin_module_version('project_browser');
+-  if ($version && !Semver::satisfies($version, '>=2-alpha10')) {
+-    $variables['#attached']['library'][] = 'gin/project_browser';
+-  }
+-}
+diff -ruN a/includes/navigation.theme b/includes/navigation.theme
+--- a/includes/navigation.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/navigation.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,29 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * navigation.theme
+- */
+-
+-use Drupal\gin\GinSettings;
+-
+-/**
+- * Navigation alter().
+- */
+-function gin_preprocess_navigation(&$variables) {
+-  // Get theme configs.
+-  /** @var \Drupal\gin\GinSettings $settings */
+-  $settings = \Drupal::classResolver(GinSettings::class);
+-  $logo_default = $settings->getDefault('logo.use_default');
+-  $variables['icon_path'] = !$logo_default ? $settings->getDefault('logo.path') : '';
+-  $variables['toolbar_variant'] = $settings->get('classic_toolbar');
+-  $variables['core_navigation'] = _gin_module_is_active('navigation');
+-  $variables['is_backend'] = TRUE;
+-
+-  // Attach the new drupal navigation styles.
+-  $variables['#attached']['library'][] = 'gin/core_navigation';
+-
+-  if (!_gin_module_is_active('navigation')) {
+-    $variables['#attached']['library'][] = 'gin/core_navigation_without_topbar';
+-  }
+-}
+diff -ruN a/includes/node.theme b/includes/node.theme
+--- a/includes/node.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/node.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,17 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * node.theme
+- */
+-
+-/**
+- * Implements hook_preprocess_HOOK() for node_edit_form.
+- */
+-function gin_preprocess_node_edit_form(&$variables) {
+-  $module_handler = \Drupal::service('module_handler');
+-
+-  // Check if Layout Paragraphs is active.
+-  $layout_paragraphs = $module_handler->moduleExists('layout_paragraphs');
+-  $variables['gin_layout_paragraphs'] = $layout_paragraphs;
+-}
+diff -ruN a/includes/page.theme b/includes/page.theme
+--- a/includes/page.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/page.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,149 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * page.theme
+- */
+-
+-use Drupal\Component\Render\FormattableMarkup;
+-use Drupal\Core\Entity\EntityInterface;
+-use Drupal\gin\GinSettings;
+-use Drupal\node\Entity\Node;
+-
+-/**
+- * Implements hook_preprocess_HOOK() for page.
+- */
+-function gin_preprocess_page(&$variables) {
+-  // Required for allowing subtheming Gin.
+-  $activeThemeName = \Drupal::theme()->getActiveTheme()->getName();
+-  $variables['active_admin_theme'] = $activeThemeName;
+-  $variables['active_core_navigation'] = _gin_module_is_active('navigation');
+-
+-  /** @var \Drupal\gin\GinSettings $settings */
+-  $settings = \Drupal::classResolver(GinSettings::class);
+-
+-  // Expose Toolbar variant.
+-  $variables['toolbar_variant'] = $settings->get('classic_toolbar');
+-
+-  // Expose Route name.
+-  $variables['route_name'] = \Drupal::routeMatch()->getRouteName();
+-
+-  if (preg_match('#entity\.(?<entity_type_id>.+)\.canonical#', $variables['route_name'], $matches)) {
+-    $entity = \Drupal::request()->attributes->get($matches['entity_type_id']);
+-
+-    if ($entity instanceof EntityInterface && $entity->hasLinkTemplate('edit-form') && $entity->access('update')) {
+-      $variables['entity_title'] = $entity->label();
+-      $variables['entity_edit_url'] = $entity->toUrl('edit-form');
+-    }
+-  }
+-
+-  // Get form actions.
+-  if ($form_actions = _gin_form_actions()) {
+-    if (_gin_module_is_active('navigation')) {
+-      $variables['gin_form_actions'] = '';
+-    }
+-    else {
+-      $variables['gin_form_actions'] = $form_actions;
+-    }
+-    $variables['gin_form_actions_class'] = 'gin-sticky-form-actions--preprocessed';
+-  }
+-}
+-
+-/**
+- * Implements hook_preprocess_HOOK() for page_attachments.
+- */
+-function gin_page_attachments_alter(&$page) {
+-  // Are we relevant?
+-  $gin_activated = _gin_is_active();
+-
+-  if ($gin_activated) {
+-    // Attach the init script.
+-    $page['#attached']['library'][] = 'gin/gin_init';
+-
+-    // Attach breadcrumb styles.
+-    $page['#attached']['library'][] = 'gin/breadcrumb';
+-
+-    // Attach accent library.
+-    $page['#attached']['library'][] = 'gin/gin_accent';
+-
+-    // Attach sticky library.
+-    $page['#attached']['library'][] = 'gin/sticky';
+-
+-    // Attach Drupal.once for older Drupal versions.
+-    $drupal_version = (float) Drupal::VERSION;
+-    if ($drupal_version < 9.3) {
+-      $page['#attached']['library'][] = 'gin/once';
+-    }
+-
+-    // Custom CSS file.
+-    if (file_exists('public://gin-custom.css')) {
+-      $page['#attached']['library'][] = 'gin/gin_custom_css';
+-    }
+-
+-    // Expose settings to JS.
+-    // Get theme settings.
+-    $settings = \Drupal::classResolver(GinSettings::class);
+-    $page['#attached']['drupalSettings']['gin']['darkmode'] = $settings->get('enable_darkmode');
+-    $page['#attached']['drupalSettings']['gin']['darkmode_class'] = 'gin--dark-mode';
+-    $page['#attached']['drupalSettings']['gin']['preset_accent_color'] = $settings->get('preset_accent_color');
+-    $page['#attached']['drupalSettings']['gin']['accent_color'] = $settings->get('accent_color');
+-    $page['#attached']['drupalSettings']['gin']['preset_focus_color'] = $settings->get('preset_focus_color');
+-    $page['#attached']['drupalSettings']['gin']['focus_color'] = $settings->get('focus_color');
+-    $page['#attached']['drupalSettings']['gin']['highcontrastmode'] = $settings->get('high_contrast_mode');
+-    $page['#attached']['drupalSettings']['gin']['highcontrastmode_class'] = 'gin--high-contrast-mode';
+-    $page['#attached']['drupalSettings']['gin']['toolbar_variant'] = $settings->get('classic_toolbar');
+-    $page['#attached']['drupalSettings']['gin']['show_user_theme_settings'] = $settings->get('show_user_theme_settings');
+-
+-    // Expose stylesheets to JS.
+-    $basethemeurl = '/' . \Drupal::service('extension.list.theme')->getPath('gin');
+-    $page['#attached']['drupalSettings']['gin']['variables_css_path'] = $basethemeurl . '/dist/css/theme/variables.css';
+-    $page['#attached']['drupalSettings']['gin']['accent_css_path'] = $basethemeurl . '/dist/css/theme/accent.css';
+-    $page['#attached']['drupalSettings']['gin']['ckeditor_css_path'] = $basethemeurl . '/dist/css/theme/ckeditor.css';
+-
+-    $page['#attached']['html_head'][] = [
+-      [
+-        '#tag' => 'script',
+-        '#attributes' => [
+-          'type' => 'application/json',
+-          'id' => 'gin-setting-darkmode',
+-        ],
+-        '#value' => new FormattableMarkup('{ "ginDarkmode": "@value" }', ['@value' => $settings->get('enable_darkmode') ?? 'unknown']),
+-      ],
+-      'gin_darkmode',
+-    ];
+-
+-  }
+-}
+-
+-/**
+- * Page title.
+- */
+-function gin_preprocess_page_title(&$variables) {
+-  if (preg_match('/entity\.node\..*/', \Drupal::routeMatch()->getRouteName(), $matches)) {
+-    $node = \Drupal::routeMatch()->getParameter('node');
+-    if ($node instanceof Node) {
+-      if ($node->isDefaultTranslation() && !in_array($matches[0], [
+-        'entity.node.content_translation_add',
+-        'entity.node.delete_form',
+-      ])) {
+-        $variables['title'] = $node->getTitle();
+-      }
+-      elseif ($matches[0] === 'entity.node.edit_form') {
+-        $variables['title_attributes']['class'][] = 'page-title--is-translation';
+-        $args = [
+-          '@title' => $node->getTitle(),
+-          '@language' => $node->language()->getName(),
+-        ];
+-        $variables['title'] = t('@title <span class="page-title__language">(@language translation)</span>', $args);
+-      }
+-    }
+-  }
+-}
+-
+-/**
+- * Node revisions.
+- */
+-function gin_preprocess_page__node__revisions(&$page) {
+-  // Attach the init script.
+-  $page['#attached']['library'][] = 'gin/revisions';
+-}
+diff -ruN a/includes/paragraphs.theme b/includes/paragraphs.theme
+--- a/includes/paragraphs.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/paragraphs.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,13 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * paragraphs.theme
+- */
+-
+-/**
+- * Implements hook_preprocess_HOOK() for paragraphs operations dropbutton.
+- */
+-function gin_preprocess_links__dropbutton__operations__paragraphs(&$variables) {
+-  $variables['attributes']['class'][] = 'dropbutton--small';
+-}
+diff -ruN a/includes/settings.theme b/includes/settings.theme
+--- a/includes/settings.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/settings.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,82 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * settings.theme
+- */
+-
+-use Drupal\Core\Form\FormStateInterface;
+-use Drupal\gin\GinSettings;
+-
+-/**
+- * Custom theme settings.
+- */
+-function gin_form_system_theme_settings_alter(&$form, FormStateInterface $form_state, $form_id = NULL) {
+-  // Work-around for a core bug affecting admin themes. See issue #943212.
+-  if (isset($form_id)) {
+-    return;
+-  }
+-
+-  /*
+-   * //////////////////////////
+-   * Move default theme settings to bottom.
+-   * * //////////////////////////
+-   */
+-  $form['logo']['#weight'] = 97;
+-  $form['favicon']['#open'] = FALSE;
+-  $form['favicon']['#weight'] = 98;
+-  $form['theme_settings']['#open'] = FALSE;
+-  $form['theme_settings']['#weight'] = 99;
+-
+-  /*
+-   * //////////////////////////
+-   * General settings.
+-   * * ////////////////////////
+-   */
+-  /** @var \Drupal\gin\GinSettings $settings */
+-  $settings = \Drupal::classResolver(GinSettings::class);
+-
+-  $form['custom_settings'] = [
+-    '#type' => 'details',
+-    '#open' => TRUE,
+-    '#title' => t('Settings'),
+-  ] + $settings->getSettingsForm();
+-
+-  // Allow user settings.
+-  $form['custom_settings']['show_user_theme_settings'] = [
+-    '#type' => 'checkbox',
+-    '#title' => t('Users can override Gin settings'),
+-    '#description' => t('Expose the admin theme settings to users.'),
+-    '#default_value' => $settings->getDefault('show_user_theme_settings'),
+-  ];
+-
+-  /*
+-   * //////////////////////////
+-   * Logo settings.
+-   * * ////////////////////////
+-   */
+-  if (isset($form['logo']['settings']['logo_upload']['#upload_validators']['file_validate_extensions'])) {
+-    $form['logo']['settings']['logo_upload']['#upload_validators'] = ['file_validate_extensions' => ['png gif jpg jpeg apng svg']];
+-  }
+-
+-  // Upgrade path:
+-  // Move settings to new fields.
+-  if ($settings->getDefault('icon_default') === FALSE) {
+-    $form['logo']['default_logo']['#default_value'] = FALSE;
+-    $form['logo']['settings']['logo_path']['#default_value'] = $settings->getDefault('icon_path');
+-    $form['#submit'][] = '_gin_form_system_theme_settings_form_submit';
+-  }
+-
+-  // Attach custom library.
+-  $form['#attached']['library'][] = 'gin/settings';
+-}
+-
+-/**
+- * Cleanup settings.
+- */
+-function _gin_form_system_theme_settings_form_submit(&$form, FormStateInterface $form_state) {
+-  $config = \Drupal::configFactory()->getEditable('gin.settings');
+-  $config->clear('icon_path')
+-    ->clear('icon_default')
+-    ->save();
+-}
+diff -ruN a/includes/theme.theme b/includes/theme.theme
+--- a/includes/theme.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/theme.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,147 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * theme.theme
+- */
+-
+-use Drupal\gin\GinContentFormHelper;
+-use Drupal\gin\GinSettings;
+-
+-/**
+- * Implements hook_theme().
+- */
+-function gin_theme() {
+-  // Check if Navigation module is active.
+-  if (_gin_module_is_active('navigation')) {
+-    $items['navigation_menu'] = [
+-      'template' => 'navigation/navigation-menu',
+-      'preprocess functions' => ['gin_preprocess_navigation'],
+-      'variables' => [
+-        'icon_path' => NULL,
+-        'path' => \Drupal::service('extension.list.theme')->getPath('gin'),
+-      ],
+-    ];
+-  }
+-  else {
+-    $items['navigation'] = [
+-      'template' => 'navigation/navigation--gin',
+-      'preprocess functions' => ['gin_preprocess_navigation'],
+-      'variables' => [
+-        'icon_path' => NULL,
+-        'path' => \Drupal::service('extension.list.theme')->getPath('gin'),
+-        'menu_middle' => [],
+-        'menu_top' => [],
+-        'menu_bottom' => [],
+-      ],
+-    ];
+-
+-    $items['menu_region__top'] = [
+-      'template' => 'navigation/menu-region--top',
+-      'variables' => [
+-        'links' => [],
+-        'title' => NULL,
+-        'menu_name' => NULL,
+-      ],
+-    ];
+-
+-    $items['menu_region__middle'] = [
+-      'template' => 'navigation/menu-region--middle',
+-      'base hook' => 'menu',
+-      'variables' => [
+-        'menu_name' => NULL,
+-        'items' => [],
+-        'attributes' => [],
+-        'title' => NULL,
+-      ],
+-    ];
+-
+-    // Check if help is enabled.
+-    $help_enabled = _gin_module_is_active('help');
+-
+-    $items['menu_region__bottom'] = [
+-      'template' => 'navigation/menu-region--bottom',
+-      'variables' => [
+-        'help_enabled' => $help_enabled,
+-        'items' => [],
+-        'title' => NULL,
+-        'menu_name' => NULL,
+-        'path' => \Drupal::service('extension.list.theme')->getPath('gin'),
+-      ],
+-    ];
+-  }
+-
+-  return $items;
+-}
+-
+-/**
+- * Implements page_alter().
+- */
+-function gin_theme_suggestions_page_alter(&$suggestions, $variables) {
+-  $path = \Drupal::requestStack()->getCurrentRequest()->getPathInfo();
+-
+-  if ($path != '/') {
+-    $path = trim($path, '/');
+-    $arg = str_replace(["/", '-'], ['_', '_'], $path);
+-    $suggestions[] = 'page__' . $arg;
+-  }
+-
+-  // The node page template is required to use the node content form.
+-  if (\Drupal::classResolver(GinContentFormHelper::class)->isContentForm()
+-    && !in_array('page__node', $suggestions)) {
+-    $suggestions[] = 'page__node';
+-  }
+-}
+-
+-/**
+- * Implements toolbar_alter().
+- */
+-function gin_theme_suggestions_toolbar_alter(array &$suggestions, array $variables) {
+-  /** @var \Drupal\gin\GinSettings $settings */
+-  $settings = \Drupal::classResolver(GinSettings::class);
+-
+-  $suggestions[] = 'toolbar__gin';
+-
+-  // Only if Classic Toolbar is disabled.
+-  if ($settings->get('classic_toolbar') !== 'classic' || _gin_module_is_active('navigation')) {
+-    if ($variables['element']['#attributes']['id'] === 'toolbar-administration-secondary') {
+-      $suggestions[] = 'toolbar__gin__secondary';
+-    }
+-  }
+-}
+-
+-/**
+- * Implements menu_alter().
+- */
+-function gin_theme_suggestions_menu_alter(array &$suggestions, array $variables) {
+-  if (isset($variables['theme_hook_original']) && strpos($variables['theme_hook_original'], 'menu__toolbar__') === 0) {
+-    $suggestions[] = 'menu__toolbar__gin';
+-  }
+-}
+-
+-/**
+- * Implements top_bar_alter().
+- */
+-function gin_theme_suggestions_top_bar_alter(array &$suggestions, array $variables) {
+-  $suggestions[] = 'top_bar__gin';
+-}
+-
+-/**
+- * Implements form_alter().
+- */
+-function gin_theme_suggestions_form_alter(array &$suggestions, array $variables) {
+-  $suggestions[] = 'form__' . str_replace('-', '_', $variables['element']['#id']);
+-}
+-
+-/**
+- * Implements table_alter().
+- */
+-function gin_theme_suggestions_table_alter(array &$suggestions, array $variables): void {
+-  if (empty($variables['attributes']['class'])) {
+-    return;
+-  }
+-
+-  if (is_array($variables['attributes']['class']) && in_array('field-multiple-table', $variables['attributes']['class'])) {
+-    $suggestions[] = 'table__simple';
+-  }
+-}
+diff -ruN a/includes/toolbar.theme b/includes/toolbar.theme
+--- a/includes/toolbar.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/toolbar.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,135 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * toolbar.theme
+- */
+-
+-use Drupal\gin\GinSettings;
+-use Drupal\gin\GinUserPicture;
+-
+-/**
+- * Implements hook_preprocess_menu().
+- */
+-function gin_preprocess_menu(&$variables) {
+-  if (isset($variables['theme_hook_original']) && strpos($variables['theme_hook_original'], 'menu__toolbar__') === 0) {
+-    // Check if the admin_toolbar module is installed.
+-    foreach ($variables['items'] as $key => $item) {
+-      $gin_id = str_replace('.', '-', $key);
+-      $variables['items'][$key]['gin_id'] = $gin_id;
+-    }
+-
+-    // Move config & help menu items to end.
+-    $to_move = ['system.admin_config', 'help.main'];
+-    foreach ($to_move as $id) {
+-      $index = array_search($id, array_keys($variables['items']));
+-      if (is_numeric($index)) {
+-        $variables['items'] += array_splice($variables['items'], $index, 1);
+-      }
+-    }
+-  }
+-}
+-
+-/**
+- * Implements hook_preprocess_menu__toolbar__gin().
+- */
+-function gin_preprocess_menu__toolbar__gin(&$variables) {
+-  // Get theme settings.
+-  /** @var \Drupal\gin\GinSettings $settings */
+-  $settings = \Drupal::classResolver(GinSettings::class);
+-  $logo_path = $settings->getDefault('logo.path');
+-  $logo_default = $settings->getDefault('logo.use_default');
+-  $variables['icon_default'] = $logo_default;
+-
+-  if (!$logo_default) {
+-    $variables['icon_path'] = $logo_path;
+-  }
+-
+-  // Expose Toolbar variant.
+-  $variables['toolbar_variant'] = $settings->get('classic_toolbar');
+-}
+-
+-/**
+- * Implements toolbar preprocess.
+- */
+-function gin_preprocess_toolbar(&$variables) {
+-  // The controller resolver does not support Closures at this time. For now,
+-  // we use a wrapper function to load the service with dependencies.
+-  // @see https://www.drupal.org/project/drupal/issues/3060638
+-  $variables['user_picture'] = [
+-    '#lazy_builder' => [
+-      GinUserPicture::class . '::build',
+-      [],
+-    ],
+-    '#create_placeholder' => TRUE,
+-  ];
+-
+-  // Check if Navigation module is active.
+-  if (_gin_module_is_active('navigation')) {
+-    // Attach the new drupal navigation styles.
+-    $variables['#attached']['library'][] = 'gin/core_navigation';
+-    return;
+-  }
+-
+-  // Expose Toolbar variant.
+-  /** @var \Drupal\gin\GinSettings $settings */
+-  $settings = \Drupal::classResolver(GinSettings::class);
+-  $variables['toolbar_variant'] = $settings->get('classic_toolbar');
+-
+-  switch ($variables['toolbar_variant']) {
+-    case 'classic':
+-      // Attach the classic toolbar styles.
+-      $variables['#attached']['library'][] = 'gin/gin_classic_toolbar';
+-      break;
+-
+-    case 'horizontal':
+-      // Attach the horizontal toolbar styles.
+-      $variables['#attached']['library'][] = 'gin/gin_horizontal_toolbar';
+-      break;
+-
+-    case 'new':
+-      // Attach the experimental drupal navigation styles.
+-      $variables['#attached']['library'][] = 'gin/navigation';
+-      break;
+-
+-    default:
+-      // Attach toolbar styles.
+-      $variables['#attached']['library'][] = 'gin/gin_toolbar';
+-      break;
+-  }
+-}
+-
+-/**
+- * Implements toolbar preprocess.
+- */
+-function gin_preprocess_toolbar__gin__secondary(&$variables) {
+-  // Expose Toolbar variant.
+-  /** @var \Drupal\gin\GinSettings $settings */
+-  $settings = \Drupal::classResolver(GinSettings::class);
+-  $variables['toolbar_variant'] = $settings->get('classic_toolbar');
+-
+-  if ($variables['toolbar_variant'] !== 'classic' || _gin_module_is_active('navigation')) {
+-    // Move Admin Toolbar Search to start.
+-    $toolbar_search = array_search('administration_search', array_keys($variables['tabs']));
+-    if (is_numeric($toolbar_search)) {
+-      foreach ($variables['tabs'] as $key => $item) {
+-        if ($key === 'administration_search') {
+-          array_unshift($variables['tabs'], $variables['tabs'][$key]);
+-          unset($variables['tabs'][$key]);
+-        }
+-      }
+-    }
+-  }
+-
+-  // Move user tab to end.
+-  $toolbar_user = array_search('user', array_keys($variables['tabs']));
+-  if (is_numeric($toolbar_user)) {
+-    foreach ($variables['tabs'] as $key => $item) {
+-      if ($key === 'user') {
+-        $user_tab = $variables['tabs'][$key];
+-        unset($variables['tabs'][$key]);
+-        $variables['tabs'][$key] = $user_tab;
+-      }
+-    }
+-  }
+-}
+diff -ruN a/includes/top_bar.theme b/includes/top_bar.theme
+--- a/includes/top_bar.theme	2026-06-03 15:26:08.000000000 +0000
++++ b/includes/top_bar.theme	1970-01-01 00:00:00.000000000 +0000
+@@ -1,39 +0,0 @@
+-<?php
+-
+-/**
+- * @file
+- * top_bar.theme
+- */
+-
+-use Drupal\gin\GinPreRender;
+-
+-/**
+- * Implements hook_preprocess_HOOK() for top_bar.
+- */
+-function gin_preprocess_top_bar(array &$variables) {
+-  if (!_gin_module_is_active('navigation')) {
+-    return;
+-  }
+-
+-  $block_manager = \Drupal::service('plugin.manager.block');
+-
+-  // Get local actions.
+-  if ($plugin_block = $block_manager->createInstance('local_actions_block', [])) {
+-    $block_content = $plugin_block->build();
+-    $variables['gin_local_actions'] = \Drupal::service('renderer')->render($block_content);
+-    $variables['#attached']['library'][] = 'gin/top_bar';
+-  }
+-
+-  // Get form actions.
+-  $variables['gin_form_actions'] = [
+-    '#pre_render' => [[GinPreRender::class, 'formActions']],
+-    '#cache' => ['max-age' => 0],
+-  ];
+-
+-  // Get breadcrumb.
+-  if ($plugin_block = $block_manager->createInstance('system_breadcrumb_block', [])) {
+-    $block_content = $plugin_block->build();
+-    $variables['gin_breadcrumbs'] = \Drupal::service('renderer')->render($block_content);
+-    $variables['#attached']['library'][] = 'gin/top_bar';
+-  }
+-}

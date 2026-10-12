@@ -1,0 +1,42 @@
+diff -ruN a/modules/wse_deploy/src/Attribute/WorkspaceExport.php b/modules/wse_deploy/src/Attribute/WorkspaceExport.php
+--- a/modules/wse_deploy/src/Attribute/WorkspaceExport.php	1970-01-01 00:00:00.000000000 +0000
++++ b/modules/wse_deploy/src/Attribute/WorkspaceExport.php	2026-10-12 01:01:36.328105008 +0000
+@@ -0,0 +1,18 @@
++<?php
++
++declare(strict_types=1);
++
++namespace Drupal\wse_deploy\Attribute;
++
++use Drupal\Component\Plugin\Attribute\Plugin;
++
++/**
++ * Attribute discovery for WorkspaceExport plugins.
++ *
++ * Drupal 12 requires an attribute class on every plugin manager; the plugins
++ * themselves still use the WorkspaceExport annotation, which core keeps discovering
++ * beside the attribute until Drupal 13.
++ */
++#[\Attribute(\Attribute::TARGET_CLASS)]
++class WorkspaceExport extends Plugin {
++}
+diff -ruN a/modules/wse_deploy/src/WorkspaceExportPluginManager.php b/modules/wse_deploy/src/WorkspaceExportPluginManager.php
+--- a/modules/wse_deploy/src/WorkspaceExportPluginManager.php	2026-10-12 01:01:36.328105008 +0000
++++ b/modules/wse_deploy/src/WorkspaceExportPluginManager.php	2026-10-12 01:01:36.328105008 +0000
+@@ -7,6 +7,7 @@
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ use Drupal\Core\Plugin\DefaultPluginManager;
+ 
++use Drupal\wse_deploy\Attribute\WorkspaceExport as WorkspaceExportAttribute;
+ /**
+  * Provides a plugin manager for workspace export plugins.
+  *
+@@ -29,7 +30,7 @@
+    *   The module handler to invoke the alter hook with.
+    */
+   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+-    parent::__construct('Plugin/wse_deploy/WorkspaceExport', $namespaces, $module_handler, 'Drupal\wse_deploy\WorkspaceExportInterface', 'Drupal\wse_deploy\Annotation\WorkspaceExport');
++    parent::__construct('Plugin/wse_deploy/WorkspaceExport', $namespaces, $module_handler, 'Drupal\wse_deploy\WorkspaceExportInterface', WorkspaceExportAttribute::class, 'Drupal\wse_deploy\Annotation\WorkspaceExport');
+ 
+     $this->alterInfo('workspace_export_info');
+     $this->setCacheBackend($cache_backend, 'workspace_export');
