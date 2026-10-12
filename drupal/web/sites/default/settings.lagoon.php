@@ -102,7 +102,7 @@ if ($frontend) {
         'label' => getenv('LAGOON_ENVIRONMENT_TYPE') === 'production'
           ? parse_url($frontend, PHP_URL_HOST)
           : (getenv('LAGOON_GIT_BRANCH') ?: getenv('LAGOON_ENVIRONMENT') ?: 'Frontend'),
-        'url' => rtrim($frontend, '/') . '/druxt/node/preview?vm=[view_mode]#[jsonapi_node_preview_path]',
+        'url' => rtrim($frontend, '/') . '/druxt/node/preview?vm=[view_mode]&layout=[layout]#[jsonapi_node_preview_path]',
       ],
     ],
     'default' => 'settings:frontend',

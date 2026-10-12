@@ -274,10 +274,14 @@ export default {
     proxy: { api: true, files: true },
     // The section pages resolve paths themselves; no catch-all route.
     router: { wildcard: false },
-    // A preview document carries the page's paragraphs; these add the media
-    // an image paragraph refers to and its file, so the preview renders them
-    // from the one request.
-    nodePreview: { include: ['field_content.field_media', 'field_content.field_media.field_media_image'] },
+    // A preview document carries the page's paragraphs; the include adds the
+    // media an image paragraph refers to and its file, so the preview renders
+    // them from the one request. The layouts are the ones a preview's Layout
+    // picker may switch the frame to: the site's own, or the page alone.
+    nodePreview: {
+      include: ['field_content.field_media', 'field_content.field_media.field_media_image'],
+      layouts: ['default', 'preview'],
+    },
     // Menus ask for the fields a menu needs, not every attribute of a link.
     menu: { jsonApiMenuItems: true, query: { requiredOnly: true } },
     // No deprecated default field components: fields render through
