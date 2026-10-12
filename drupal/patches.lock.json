@@ -1,5 +1,5 @@
 {
-    "_hash": "b50532603417492ed54a34fa8eb7ef941acda74e9d66d6c2110e6255c26b6152",
+    "_hash": "05478ff6dbe192c0c80ff47b420a70fa48d3f0e97d25b53e4867ee99884c6f3c",
     "patches": {
         "drupal/core": [
             {
@@ -624,9 +624,9 @@
         "drupal/admin_audit_trail": [
             {
                 "package": "drupal/admin_audit_trail",
-                "description": "Drupal 12: read the original user through getOriginal(), the magic property is gone",
+                "description": "Drupal 12: getOriginal() in the user hooks, and hook_modules_installed moved out of the .install file that 12 never loads at run time",
                 "url": "patches/admin_audit_trail-drupal-12-entity-get-original.patch",
-                "sha256": "8f2a1041eaf96146e473d29cfbbf54a190239ac6915c0d4000d96badb36ba561",
+                "sha256": "906057aace160e952f70a2ce12c8f42336ff9ae3ee5a3e40660a229b89cc0e09",
                 "depth": 1,
                 "extra": {
                     "provenance": "root"

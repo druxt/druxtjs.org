@@ -280,7 +280,7 @@
                 "Drupal 12: _contextual_links_to_id() became ContextualLinksSerializer::linksToId()": "patches/custom_formatters-drupal-12-contextual-links-serializer.patch"
             },
             "drupal/admin_audit_trail": {
-                "Drupal 12: read the original user through getOriginal(), the magic property is gone": "patches/admin_audit_trail-drupal-12-entity-get-original.patch"
+                "Drupal 12: getOriginal() in the user hooks, and hook_modules_installed moved out of the .install file that 12 never loads at run time": "patches/admin_audit_trail-drupal-12-entity-get-original.patch"
             }
         },
         "drupal-lenient": {
