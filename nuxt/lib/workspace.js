@@ -99,6 +99,25 @@ const hasBearer = (headers = {}) =>
   )
 
 /**
+ * Whether an editor's token goes with a request, now or once the auth module's
+ * own interceptor runs.
+ *
+ * The auth module adds the token in an interceptor that runs after this
+ * site's, so a page's first requests hold it in the strategy and not yet in
+ * the headers. A cleared token can read back as `false`, or as the string
+ * "false" from a cookie, and neither counts.
+ *
+ * @param {object} [headers] - The request's headers, as an interceptor sees them.
+ * @param {object} [strategy] - The auth module's current strategy.
+ * @returns {boolean} True when a token goes with the request.
+ */
+const hasToken = (headers = {}, strategy = {}) => {
+  if (hasBearer(headers)) return true
+  const token = strategy && strategy.token && typeof strategy.token.get === 'function' ? strategy.token.get() : null
+  return typeof token === 'string' && token.trim() !== '' && token.trim() !== 'false'
+}
+
+/**
  * Sets or removes the header on a request's headers, in place.
  *
  * @param {object} headers - The request's headers.
@@ -117,4 +136,4 @@ const applyWorkspace = (headers, { signedIn, workspace, url, baseURL }) => {
   return headers
 }
 
-module.exports = { COOKIE, HEADER, MAX_AGE, applyWorkspace, hasBearer, isContentRequest, isWorkspaceId, readWorkspace, workspaceCookie }
+module.exports = { COOKIE, HEADER, MAX_AGE, applyWorkspace, hasBearer, hasToken, isContentRequest, isWorkspaceId, readWorkspace, workspaceCookie }
