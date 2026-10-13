@@ -56,10 +56,28 @@ class PreviewTargetWidget extends WidgetBase {
   /**
    * {@inheritdoc}
    *
-   * Puts a violation on the label or URL field it is about.
+   * Trims the label and the URL, as the targets endpoint does. A pasted URL
+   * often starts with a space.
+   */
+  public function massageFormValues(array $values, array $form, FormStateInterface $form_state): array {
+    foreach ($values as &$value) {
+      foreach (['label', 'url'] as $property) {
+        if (isset($value[$property]) && is_string($value[$property])) {
+          $value[$property] = trim($value[$property]);
+        }
+      }
+    }
+    return $values;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Puts a violation on the label or URL field it is about. The property
+   * path is relative to the field here, for example "0.url".
    */
   public function errorElement(array $element, ConstraintViolationInterface $error, array $form, FormStateInterface $form_state): array|bool {
-    $property = $error->arrayPropertyPath[0] ?? NULL;
+    $property = explode('.', $error->getPropertyPath())[1] ?? NULL;
     return is_string($property) && isset($element[$property]) ? $element[$property] : $element;
   }
 

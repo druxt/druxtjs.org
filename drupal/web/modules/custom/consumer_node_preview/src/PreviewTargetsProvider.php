@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Drupal\consumer_node_preview;
 
 use Drupal\consumers\Entity\ConsumerInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
+use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
 use Drupal\node\NodeInterface;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -32,9 +34,15 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  */
 class PreviewTargetsProvider implements PreviewTargetsProviderInterface {
 
+  /**
+   * How deep the include goes into paragraphs inside paragraphs.
+   */
+  protected const INCLUDE_DEPTH = 3;
+
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected ResourceTypeRepositoryInterface $resourceTypeRepository,
+    protected EntityFieldManagerInterface $entityFieldManager,
   ) {}
 
   /**
@@ -59,7 +67,7 @@ class PreviewTargetsProvider implements PreviewTargetsProviderInterface {
     foreach ($consumer->get('preview_layouts') as $item) {
       $layouts[] = (string) $item->get('value')->getValue();
     }
-    return $layouts;
+    return array_values(array_unique($layouts));
   }
 
   /**
@@ -109,7 +117,7 @@ class PreviewTargetsProvider implements PreviewTargetsProviderInterface {
     }
     // Like getAllTargets(), only a published consumer's targets count.
     $consumer = $this->entityTypeManager->getStorage('consumer')->load($matches[1]);
-    if (!$consumer instanceof ConsumerInterface || !$consumer->get('status')->value) {
+    if (!$consumer instanceof ConsumerInterface || !$consumer->isPublished()) {
       return NULL;
     }
     $target = $this->getTargets($consumer)[(int) $matches[2]] ?? NULL;
@@ -136,12 +144,7 @@ class PreviewTargetsProvider implements PreviewTargetsProviderInterface {
     if ($resource_type === NULL || $resource_type->isInternal()) {
       return NULL;
     }
-    $includes = [];
-    foreach ($node_preview->getFieldDefinitions() as $name => $definition) {
-      if ($definition->getType() === 'entity_reference_revisions' && $resource_type->isFieldEnabled($name)) {
-        $includes[] = $resource_type->getPublicName($name);
-      }
-    }
+    $includes = $this->revisionedIncludes($resource_type, $node_preview->getFieldDefinitions());
     $options = ['absolute' => $absolute];
     if ($includes) {
       $options['query']['include'] = implode(',', $includes);
@@ -156,6 +159,47 @@ class PreviewTargetsProvider implements PreviewTargetsProviderInterface {
     catch (RouteNotFoundException) {
       return NULL;
     }
+  }
+
+  /**
+   * Returns include paths for entity_reference_revisions fields.
+   *
+   * The paths go into paragraphs inside paragraphs too, so the document
+   * carries every unsaved level. The depth is capped, because a paragraph
+   * type can hold paragraphs of its own type.
+   *
+   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   *   The resource type to start from.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface[] $definitions
+   *   Its field definitions, keyed by field name.
+   * @param string $prefix
+   *   The path so far, with a trailing dot, or an empty string.
+   * @param int $depth
+   *   The level of $resource_type, from 1.
+   *
+   * @return list<string>
+   *   The include paths.
+   */
+  protected function revisionedIncludes(ResourceType $resource_type, array $definitions, string $prefix = '', int $depth = 1): array {
+    $paths = [];
+    foreach ($definitions as $name => $definition) {
+      if ($definition->getType() !== 'entity_reference_revisions' || !$resource_type->isFieldEnabled($name)) {
+        continue;
+      }
+      $public_name = $resource_type->getPublicName($name);
+      $paths[] = $prefix . $public_name;
+      if ($depth >= self::INCLUDE_DEPTH) {
+        continue;
+      }
+      foreach ($resource_type->getRelatableResourceTypesByField($public_name) as $target) {
+        if ($target->isInternal()) {
+          continue;
+        }
+        $target_definitions = $this->entityFieldManager->getFieldDefinitions($target->getEntityTypeId(), $target->getBundle());
+        array_push($paths, ...$this->revisionedIncludes($target, $target_definitions, $prefix . $public_name . '.', $depth + 1));
+      }
+    }
+    return array_values(array_unique($paths));
   }
 
   /**
@@ -196,7 +240,7 @@ class PreviewTargetsProvider implements PreviewTargetsProviderInterface {
         $targets[(string) $name] = [
           'label' => (string) ($target['label'] ?? $name),
           'url' => $url,
-          'layouts' => array_values($layouts),
+          'layouts' => array_values(array_unique($layouts)),
         ];
       }
     }

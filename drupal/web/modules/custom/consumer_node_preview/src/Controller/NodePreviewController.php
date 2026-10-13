@@ -81,7 +81,7 @@ final class NodePreviewController extends CoreNodePreviewController {
    */
   public function view(EntityInterface $node_preview, $view_mode_id = 'full', $langcode = NULL): array {
     $drupal = parent::view($node_preview, $view_mode_id, $langcode);
-    // Drupal 11 core attaches its preview bar to page_top, and the page
+    // Drupal 11.4 core attaches its preview bar to page_top, and the page
     // renderer reads page_top only from the top of the main content. So it
     // moves up to this build. Drupal 10 core adds the bar in hook_page_top()
     // and rejects page_top in #attached, so then there is nothing to move.
@@ -108,6 +108,11 @@ final class NodePreviewController extends CoreNodePreviewController {
     $templates = [];
     foreach ($all as $key => $target) {
       $template = UrlHelper::stripDangerousProtocols($this->targetsProvider->resolveUrl($target['url'], $node_preview, self::VIEW_MODE_PLACEHOLDER, self::LAYOUT_PLACEHOLDER));
+      // A URL without the [layout] token cannot change layout, so its target
+      // gets no Layout select.
+      if (!str_contains($template, self::LAYOUT_PLACEHOLDER)) {
+        $target['layouts'] = [];
+      }
       $target_layout = $target['layouts'][0] ?? '';
       if ((string) $key === (string) $active) {
         $layout = is_string($requested_layout) && in_array($requested_layout, $target['layouts'], TRUE) ? $requested_layout : $target_layout;

@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -116,7 +117,7 @@ class PreviewTargetsEndpointTest extends KernelTestBase {
    *
    * @param string $method
    *   The HTTP method.
-   * @param array|null $payload
+   * @param array<string, mixed>|null $payload
    *   The JSON body, if any.
    * @param string|null $consumer_uuid
    *   The consumer query parameter, if any.
@@ -229,6 +230,17 @@ class PreviewTargetsEndpointTest extends KernelTestBase {
       'targets' => [['label' => '', 'url' => 'https://ok.example.com/p']],
     ], $uuid)->getStatusCode());
 
+    // A target with neither value is an error. It is not dropped in silence.
+    $this->assertSame(422, $this->call('PUT', [
+      'targets' => [['label' => ' ', 'url' => '']],
+    ], $uuid)->getStatusCode());
+
+    // The message is plain text, with no HTML entities.
+    $response = $this->call('PUT', [
+      'targets' => [['label' => 'Bad', 'url' => 'ftp://example.com/?a=1&b=2']],
+    ], $uuid);
+    $this->assertStringContainsString('ftp://example.com/?a=1&b=2', json_decode((string) $response->getContent(), TRUE)['message']);
+
     $this->assertSame('http://localhost:3000/p', $this->storedTargets()[0]['url']);
   }
 
@@ -328,16 +340,11 @@ class PreviewTargetsEndpointTest extends KernelTestBase {
   }
 
   /**
-   * Tests that the X-Consumer-ID header selects a consumer without the query.
+   * Tests that the X-Consumer-ID header selects, but never grants access.
    *
-   * The header only selects. Ownership still decides access.
+   * Any client can send any value in the header.
    */
-  public function testConsumerIdHeaderSelectsTheConsumer(): void {
-    $this->setCurrentUser($this->owner);
-    $response = $this->call('GET', headers: ['X-Consumer-ID' => 'app']);
-    $this->assertSame(200, $response->getStatusCode());
-    $this->assertSame($this->consumer->uuid(), json_decode((string) $response->getContent(), TRUE)['consumer']);
-
+  public function testConsumerIdHeaderGrantsNothing(): void {
     $this->setCurrentUser($this->account(['register consumer node preview targets']));
     $this->assertSame(403, $this->call('GET', headers: ['X-Consumer-ID' => 'app'])->getStatusCode());
   }
@@ -348,6 +355,65 @@ class PreviewTargetsEndpointTest extends KernelTestBase {
   public function testUnknownConsumer(): void {
     $this->setCurrentUser($this->owner);
     $this->assertSame(404, $this->call('GET', consumer_uuid: 'ffffffff-ffff-4fff-8fff-ffffffffffff')->getStatusCode());
+  }
+
+  /**
+   * Tests that a request must name its consumer.
+   *
+   * The consumers negotiator would fall back to the default consumer, so a
+   * missing or mistyped X-Consumer-ID header would replace its targets.
+   */
+  public function testNoFallbackToTheDefaultConsumer(): void {
+    $default = Consumer::create([
+      'client_id' => 'default_consumer',
+      'label' => 'Default',
+      'is_default' => TRUE,
+      'owner_id' => $this->owner->id(),
+      'preview_targets' => [['label' => 'Kept', 'url' => 'https://kept.example.com/p']],
+    ]);
+    $default->save();
+    $this->setCurrentUser($this->account([
+      'register consumer node preview targets',
+      'administer consumer entities',
+    ]));
+    $payload = ['targets' => [['label' => 'Lost', 'url' => 'https://lost.example.com/p']]];
+
+    $this->assertSame(404, $this->call('PUT', $payload)->getStatusCode());
+    $this->assertSame(404, $this->call('PUT', $payload, headers: ['X-Consumer-ID' => 'mistyped'])->getStatusCode());
+
+    $storage = $this->container->get('entity_type.manager')->getStorage('consumer');
+    $storage->resetCache([$default->id()]);
+    $reloaded = $storage->load($default->id());
+    $this->assertInstanceOf(Consumer::class, $reloaded);
+    $this->assertSame('Kept', $reloaded->get('preview_targets')->label);
+  }
+
+  /**
+   * Tests that the X-Consumer-ID header names a consumer by its client id.
+   */
+  public function testClientIdNamesTheConsumer(): void {
+    $this->setCurrentUser($this->owner);
+    $response = $this->call('GET', headers: ['X-Consumer-ID' => 'app']);
+    $this->assertSame(200, $response->getStatusCode());
+    $this->assertSame($this->consumer->uuid(), json_decode((string) $response->getContent(), TRUE)['consumer']);
+  }
+
+  /**
+   * Tests that an anonymous user owns no consumer.
+   *
+   * Consumers stores 0 as the owner of a consumer that has none.
+   */
+  public function testAnonymousOwnsNothing(): void {
+    $ownerless = Consumer::create(['client_id' => 'ownerless', 'label' => 'Ownerless']);
+    $ownerless->save();
+    $this->assertSame(0, (int) $ownerless->getOwnerId());
+
+    Role::create(['id' => RoleInterface::ANONYMOUS_ID, 'label' => 'Anonymous user'])
+      ->grantPermission('register consumer node preview targets')
+      ->save();
+    $this->setUpCurrentUser(['uid' => 0]);
+    $this->assertTrue($this->container->get('current_user')->hasPermission('register consumer node preview targets'));
+    $this->assertSame(403, $this->call('GET', consumer_uuid: $ownerless->uuid())->getStatusCode());
   }
 
 }

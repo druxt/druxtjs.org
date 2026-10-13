@@ -20,7 +20,7 @@ interface PreviewTargetsProviderInterface {
   /**
    * The pattern a layout name matches: letters, numbers, - and _.
    */
-  public const LAYOUT_PATTERN = '/^[A-Za-z0-9_-]+$/';
+  public const LAYOUT_PATTERN = '/^[A-Za-z0-9_-]+$/D';
 
   /**
    * Returns the preview targets of one consumer.
@@ -112,7 +112,8 @@ interface PreviewTargetsProviderInterface {
    *
    * @return string
    *   The URL with [jsonapi_node_preview], [jsonapi_node_preview_path],
-   *   [uuid], [view_mode] and [layout] replaced.
+   *   [uuid], [view_mode] and [layout] replaced. When JSON:API has no
+   *   preview for the node's bundle, the two endpoint tokens stay as they are.
    */
   public function resolveUrl(string $url, NodeInterface $node_preview, string $view_mode_id, string $layout = ''): string;
 

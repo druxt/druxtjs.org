@@ -19,9 +19,9 @@ with consumers from the
 
 JSON:API Node Preview 1.0.0-beta5 and earlier serve stale or missing data for
 edited and never saved paragraphs, and its resolver is disabled entirely on
-sites that also run jsonapi_resources (any jsonapi_views site). Use a version
-with the include resolver fixes from
-[#3367724](https://git.drupalcode.org/project/jsonapi_node_preview/-/issues/3367724).
+sites that also run jsonapi_resources (any jsonapi_views site). Until a
+release has them, apply the include resolver fixes from
+https://www.drupal.org/i/3367724.
 
 ## Installation
 
@@ -102,8 +102,15 @@ A target URL is a template. It can use these tokens:
   target has no layouts. A layout name uses only letters, numbers, `-` and
   `_`.
 
+When JSON:API has no preview for the node's bundle, the two endpoint tokens
+stay in the URL as they are, so the frontend shows what is missing.
+
+Put `[view_mode]` in the path or the query, not in the fragment. A change to
+the fragment alone does not reload the frame.
+
 The preview document includes the node's entity reference revisions fields,
-such as paragraphs, so a frontend gets their unsaved values in one request.
+such as paragraphs, and the paragraphs inside those, up to three levels deep.
+So a frontend gets their unsaved values in one request.
 
 Put the document URL in the fragment, so it never reaches the frontend's
 server logs:
@@ -138,8 +145,10 @@ Content-Type: application/json
 `layouts` is optional. A PUT without it keeps the consumer's layouts as they
 are.
 
-Without the `consumer` parameter the consumer is negotiated from the request
-by the Consumers module, for example from the `X-Consumer-ID` header.
+Without the `consumer` parameter, the `X-Consumer-ID` header or a
+`consumerId` query parameter names the consumer by its client id. There is no
+fallback to the site's default consumer: a request that names no consumer, or
+an unknown one, gets a 404.
 
 Access needs all of:
 
@@ -155,6 +164,10 @@ modules attach, which is far more than URL registration should touch.
 
 Cookie authenticated PUT requests must send the `X-CSRF-Token` header from
 `/session/token`.
+
+The endpoint takes the site's global authentication providers: the session
+cookie, and an OAuth bearer token when Simple OAuth is installed. HTTP Basic
+authentication is not global in core, so it does not work here.
 
 ## CORS
 

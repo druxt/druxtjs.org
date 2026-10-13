@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\consumer_node_preview\Kernel;
 
+use Drupal\consumer_node_preview\Plugin\Field\FieldWidget\PreviewTargetWidget;
 use Drupal\consumers\Entity\Consumer;
+use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -141,6 +144,8 @@ class PreviewTargetsFieldTest extends KernelTestBase {
       '/node/preview#[jsonapi_node_preview_path]',
       '//evil.example.com/p',
       'node/preview',
+      // As stored, a leading space breaks the URL in the frame.
+      ' http://localhost:3000/p',
     ];
     foreach ($invalid as $url) {
       $this->assertCount(1, $this->targetViolations(['label' => 'Bad', 'url' => $url]), $url);
@@ -162,8 +167,29 @@ class PreviewTargetsFieldTest extends KernelTestBase {
    */
   public function testTargetNeedsLabelAndUrl(): void {
     $this->assertCount(1, $this->targetViolations(['label' => 'Local', 'url' => '']));
+    $this->assertCount(1, $this->targetViolations(['label' => 'Local', 'url' => '   ']));
     $this->assertCount(1, $this->targetViolations(['label' => '', 'url' => 'http://localhost:3000/p']));
+    $this->assertCount(1, $this->targetViolations(['label' => '   ', 'url' => 'http://localhost:3000/p']));
     $this->assertCount(1, $this->targetViolations(['label' => str_repeat('a', 256), 'url' => 'http://localhost:3000/p']));
+  }
+
+  /**
+   * Tests that the widget trims its values and puts errors on its fields.
+   */
+  public function testWidgetTrimsAndPlacesErrors(): void {
+    $widget = $this->container->get('entity_display.repository')
+      ->getFormDisplay('consumer', 'consumer')
+      ->getRenderer('preview_targets');
+    $this->assertInstanceOf(PreviewTargetWidget::class, $widget);
+
+    $values = $widget->massageFormValues([['label' => ' Local ', 'url' => " http://localhost:3000/p\t"]], [], new FormState());
+    $this->assertSame([['label' => 'Local', 'url' => 'http://localhost:3000/p']], $values);
+
+    $element = ['label' => ['#title' => 'Label'], 'url' => ['#title' => 'URL']];
+    $on_url = new ConstraintViolation('Bad URL', NULL, [], NULL, '0.url', 'x');
+    $this->assertSame($element['url'], $widget->errorElement($element, $on_url, [], new FormState()));
+    $on_row = new ConstraintViolation('Bad row', NULL, [], NULL, '0', 'x');
+    $this->assertSame($element, $widget->errorElement($element, $on_row, [], new FormState()));
   }
 
   /**
@@ -176,8 +202,15 @@ class PreviewTargetsFieldTest extends KernelTestBase {
       ['label' => 'Local', 'url' => 'http://localhost:3000/p'],
     ]);
     $consumer->set('status', FALSE)->save();
+    $shown = $this->createConsumer('Shown', [
+      ['label' => 'Live', 'url' => 'https://example.com/p'],
+    ]);
 
     $this->assertNull($this->provider->getTargetByKey($consumer->id() . ':0'));
+
+    // A default that names it falls back to the first target in the picker.
+    $this->setSetting('consumer_node_preview', ['default' => $consumer->id() . ':0']);
+    $this->assertSame($shown->id() . ':0', $this->provider->getDefaultKey());
   }
 
   /**
@@ -236,17 +269,55 @@ class PreviewTargetsFieldTest extends KernelTestBase {
   }
 
   /**
-   * Tests that a layout name is a Nuxt-style name, in the form and the API.
+   * Tests the layout name rule on the field.
    */
   public function testLayoutNamesAreValidated(): void {
     $consumer = Consumer::create([
       'client_id' => 'app',
       'label' => 'App',
-      'preview_layouts' => ['preview-2', 'not a name'],
+      'preview_layouts' => ['preview-2', 'not a name', "preview\n"],
     ]);
     $violations = $consumer->validate()->getByField('preview_layouts');
-    $this->assertCount(1, $violations);
+    $this->assertCount(2, $violations);
     $this->assertSame('preview_layouts.1.value', $violations[0]->getPropertyPath());
+    $this->assertSame('preview_layouts.2.value', $violations[1]->getPropertyPath());
+  }
+
+  /**
+   * Tests that a layout listed twice shows once.
+   */
+  public function testDuplicateLayoutsShowOnce(): void {
+    $consumer = Consumer::create([
+      'client_id' => 'app',
+      'label' => 'App',
+      'preview_layouts' => ['default', 'preview', 'default'],
+    ]);
+    $consumer->save();
+    $this->assertSame(['default', 'preview'], $this->provider->getLayouts($consumer));
+
+    $this->setSetting('consumer_node_preview', [
+      'targets' => ['site' => ['label' => 'Site', 'url' => '/p', 'layouts' => ['default', 'default']]],
+    ]);
+    $this->assertSame(['default'], $this->provider->getAllTargets()['settings:site']['layouts']);
+  }
+
+  /**
+   * Tests that the update hook installs the layouts field on an older site.
+   */
+  public function testUpdateInstallsTheLayoutsField(): void {
+    $manager = $this->container->get('entity.definition_update_manager');
+    $manager->uninstallFieldStorageDefinition($manager->getFieldStorageDefinition('preview_layouts', 'consumer'));
+    $this->assertNull($manager->getFieldStorageDefinition('preview_layouts', 'consumer'));
+
+    $this->container->get('module_handler')->loadInclude('consumer_node_preview', 'install');
+    consumer_node_preview_update_10001();
+
+    $this->assertNotNull($manager->getFieldStorageDefinition('preview_layouts', 'consumer'));
+    // The installed storage matches the field the module defines.
+    $this->assertArrayNotHasKey('consumer', $manager->getChangeList());
+    $consumer = Consumer::create(['client_id' => 'app', 'label' => 'App', 'preview_layouts' => ['preview']]);
+    $consumer->save();
+    $this->assertSame(['preview'], $this->provider->getLayouts(Consumer::load($consumer->id())));
   }
 
   /**

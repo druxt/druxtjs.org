@@ -109,7 +109,6 @@
   padding: var(--admin-space-l, var(--space-l, 1.5rem));
   border: 1px solid var(--admin-color-border-soft, #e6e7eb);
   border-radius: var(--admin-radius-m, 4px);
-  background-color: #fff;
 }
 
 .consumer-node-preview__request {
@@ -126,7 +125,6 @@
   tab-size: 2;
   border: 1px solid var(--admin-color-border, #d3d4d9);
   border-radius: var(--admin-radius-m, 4px);
-  background-color: #fff;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   line-height: 1.5;
 }

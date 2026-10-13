@@ -80,18 +80,37 @@
     const drupal = preview.querySelector('[data-consumer-node-preview-drupal]');
     let loaded = false;
     let drupalStale = false;
+    let drupalLoading = false;
 
-    // The Drupal tab follows the view mode once it is shown.
+    // The Drupal tab follows the view mode once it is shown. One request runs
+    // at a time, and asks again if the view mode moved on meanwhile. A failed
+    // request leaves the tab stale, so showing the tab again retries.
     const refreshDrupal = () => {
       if (
+        drupalLoading ||
         !drupalStale ||
         !settings.drupalUrl ||
         drupal.closest('[role="tabpanel"]').hidden
       ) {
         return;
       }
-      drupalStale = false;
-      Drupal.ajax({ url: fill(settings.drupalUrl, viewMode) }).execute();
+      const requested = viewMode;
+      drupalLoading = true;
+      Drupal.ajax({
+        url: fill(settings.drupalUrl, requested),
+        progress: { type: 'fullscreen' },
+      })
+        .execute()
+        .then(
+          () => {
+            drupalLoading = false;
+            drupalStale = requested !== viewMode;
+            refreshDrupal();
+          },
+          () => {
+            drupalLoading = false;
+          },
+        );
     };
 
     // Only a tab the editor picks is remembered, not the page's default.
@@ -150,7 +169,19 @@
     // Switching frontend, layout or view mode reloads only the frame and the
     // new tab link. A target or layout in the URL wins over the remembered
     // one. Each target remembers its own layout.
-    const frame = preview.querySelector('[data-consumer-node-preview-frame]');
+    let frame = preview.querySelector('[data-consumer-node-preview-frame]');
+    // A new frame loads the URL without a history entry. So the browser's
+    // Back button leaves the preview, instead of stepping back through the
+    // frame while the controls stay as they are.
+    const load = (url) => {
+      if (frame.getAttribute('src') === url) {
+        return;
+      }
+      const next = frame.cloneNode(false);
+      next.setAttribute('src', url);
+      frame.replaceWith(next);
+      frame = next;
+    };
     const open = preview.querySelector('[data-consumer-node-preview-open]');
     const targets = preview.querySelector(
       '[data-consumer-node-preview-target]',
@@ -159,6 +190,9 @@
       '[data-consumer-node-preview-layout]',
     );
     const query = new URLSearchParams(window.location.search);
+    // A layout in the URL counts once, for the target the page opens on,
+    // even when that is a remembered one. An unlisted one is ignored.
+    let requestedLayout = query.get('layout');
     let active = settings.active;
 
     const layoutsOf = (targetKey) =>
@@ -189,13 +223,14 @@
       }
       if (targetKey !== active) {
         active = targetKey;
-        layout = pickLayout(active, [recall(`layout.${active}`)]);
+        layout = pickLayout(active, [
+          requestedLayout,
+          recall(`layout.${active}`),
+        ]);
         listLayouts();
       }
       const url = fill(targetSettings[targetKey].url, viewMode, layout);
-      if (frame.getAttribute('src') !== url) {
-        frame.setAttribute('src', url);
-      }
+      load(url);
       open.setAttribute('href', url);
     };
     if (targets) {
@@ -215,12 +250,15 @@
         remember(`layout.${active}`, layout);
         show(active);
       });
-      if (!query.has('layout')) {
-        layout = pickLayout(active, [recall(`layout.${active}`), layout]);
-        listLayouts();
-        show(active);
-      }
+      layout = pickLayout(active, [
+        requestedLayout,
+        recall(`layout.${active}`),
+        layout,
+      ]);
+      listLayouts();
+      show(active);
     }
+    requestedLayout = null;
 
     // Core's View mode select, without core's page reload.
     const viewModes = preview.querySelector(

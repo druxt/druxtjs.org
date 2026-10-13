@@ -7,11 +7,20 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
 /**
  * Adds the preview layouts field to consumers.
  */
 function consumer_node_preview_update_10001(): void {
-  $entity_type = \Drupal::entityTypeManager()->getDefinition('consumer');
-  $definition = consumer_node_preview_entity_base_field_info($entity_type)['preview_layouts'];
+  // The storage as this update installs it. A later change to the field in
+  // hook_entity_base_field_info() needs an update of its own.
+  $definition = BaseFieldDefinition::create('string')
+    ->setLabel(new TranslatableMarkup('Preview layouts'))
+    ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
+    ->setTranslatable(FALSE)
+    ->setSetting('max_length', 64);
   \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition('preview_layouts', 'consumer', 'consumer_node_preview', $definition);
 }

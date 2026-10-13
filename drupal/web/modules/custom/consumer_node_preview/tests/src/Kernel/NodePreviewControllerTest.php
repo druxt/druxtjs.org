@@ -76,9 +76,21 @@ class NodePreviewControllerTest extends KernelTestBase {
   }
 
   /**
+   * Tests that the preview follows "Use the administration theme".
+   */
+  public function testThePreviewFollowsTheAdminThemeSetting(): void {
+    foreach ([TRUE, FALSE] as $use_admin_theme) {
+      $this->config('node.settings')->set('use_admin_theme', $use_admin_theme)->save();
+      $this->container->get('router.builder')->rebuild();
+      $route = $this->container->get('router.route_provider')->getRouteByName('entity.node.preview');
+      $this->assertSame($use_admin_theme, (bool) $route->getOption('_admin_route'));
+    }
+  }
+
+  /**
    * Tests that core's preview bar stays where the page renderer reads it.
    *
-   * Drupal 11 core attaches the bar to the controller's page_top, and the
+   * Drupal 11.4 core attaches the bar to the controller's page_top, and the
    * page renderer reads it from the top of the main content. Drupal 10 core
    * adds it in hook_page_top() instead, and rejects page_top in #attached.
    * So the preview keeps exactly what core attached, and adds no page_top
@@ -166,10 +178,27 @@ class NodePreviewControllerTest extends KernelTestBase {
     $this->assertSame('{node_preview}', $route->getRequirement('_node_preview_access'));
     $this->assertSame('node_preview', $route->getOption('parameters')['node_preview']['type']);
 
-    $response = NodePreviewController::create($this->container)->drupal($this->node(), 'teaser');
+    // A body whose summary only the teaser shows, so the view modes differ.
+    // Drupal 10 core installs the body storage with the node module.
+    if (!FieldStorageConfig::loadByName('node', 'body')) {
+      FieldStorageConfig::create(['field_name' => 'body', 'entity_type' => 'node', 'type' => 'text_with_summary'])->save();
+    }
+    FieldConfig::create(['field_name' => 'body', 'entity_type' => 'node', 'bundle' => 'page', 'settings' => ['display_summary' => TRUE]])->save();
+    $displays = $this->container->get('entity_display.repository');
+    $displays->getViewDisplay('node', 'page')->setComponent('body', ['type' => 'text_default'])->save();
+    $displays->getViewDisplay('node', 'page', 'teaser')->setComponent('body', ['type' => 'text_summary_or_trimmed'])->save();
+    $node = $this->node();
+    $node->set('body', ['value' => 'The whole body.', 'summary' => 'Only the summary.', 'format' => 'plain_text']);
+
+    $response = NodePreviewController::create($this->container)->drupal($node, 'teaser');
     $command = $response->getCommands()[0];
     $this->assertSame('[data-consumer-node-preview-drupal]', $command['selector']);
     $this->assertStringContainsString('Unsaved', (string) $command['data']);
+    $this->assertStringContainsString('Only the summary.', (string) $command['data']);
+    $this->assertStringNotContainsString('The whole body.', (string) $command['data']);
+
+    $full = (string) NodePreviewController::create($this->container)->drupal($node, 'full')->getCommands()[0]['data'];
+    $this->assertStringContainsString('The whole body.', $full);
   }
 
   /**
@@ -290,7 +319,12 @@ class NodePreviewControllerTest extends KernelTestBase {
     $this->container->get('router.builder')->rebuild();
 
     $node = $this->node();
-    $this->assertSame('/jsonapi/node/page/' . $node->uuid() . '/preview?include=field_content', $this->preview($node)['#jsonapi_url']);
+    $url = (string) $this->preview($node)['#jsonapi_url'];
+    $this->assertStringStartsWith('/jsonapi/node/page/' . $node->uuid() . '/preview?', $url);
+    parse_str((string) parse_url($url, PHP_URL_QUERY), $query);
+    // The field holds pages, which hold the field again. So the paths go
+    // three levels deep, and stop there.
+    $this->assertSame('field_content,field_content.field_content,field_content.field_content.field_content', $query['include']);
   }
 
   /**
@@ -351,6 +385,36 @@ class NodePreviewControllerTest extends KernelTestBase {
     $html = $this->html($node);
     $this->assertStringNotContainsString('data-consumer-node-preview-layout', $html);
     $this->assertStringContainsString('<iframe src="https://example.com/' . $node->uuid() . '?layout="', $html);
+  }
+
+  /**
+   * Tests that a target URL without the [layout] token gets no layouts.
+   */
+  public function testTargetWithoutTheTokenGetsNoLayouts(): void {
+    $this->setSetting('consumer_node_preview', [
+      'targets' => ['site' => ['label' => 'Site', 'url' => 'https://example.com/[uuid]', 'layouts' => ['default', 'preview']]],
+    ]);
+    $build = $this->preview();
+    $this->assertSame([], $build['#attached']['drupalSettings']['consumerNodePreview']['targets']['settings:site']['layouts']);
+    $this->assertStringNotContainsString('data-consumer-node-preview-layout', (string) $this->render($build));
+  }
+
+  /**
+   * Tests that the Layout select starts hidden on a target without layouts.
+   *
+   * It is still on the page, for the targets that have some.
+   */
+  public function testTheLayoutSelectStartsHiddenWithoutLayouts(): void {
+    $this->setSetting('consumer_node_preview', [
+      'targets' => [
+        'plain' => ['label' => 'Plain', 'url' => 'https://example.com/[uuid]'],
+        'site' => ['label' => 'Site', 'url' => 'https://example.com/[uuid]?layout=[layout]', 'layouts' => ['default']],
+      ],
+      'default' => 'settings:plain',
+    ]);
+    $html = $this->html();
+    $this->assertStringContainsString('data-consumer-node-preview-layout', $html);
+    $this->assertMatchesRegularExpression('/<div[^>]*\shidden[^>]*>(?:(?!<\/div>).)*data-consumer-node-preview-layout/s', $html);
   }
 
   /**

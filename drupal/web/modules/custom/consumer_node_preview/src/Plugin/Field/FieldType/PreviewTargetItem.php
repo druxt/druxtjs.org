@@ -28,12 +28,20 @@ class PreviewTargetItem extends FieldItemBase {
     $properties['label'] = DataDefinition::create('string')
       ->setLabel(t('Label'))
       ->setRequired(TRUE)
-      ->addConstraint('NotBlank')
+      ->addConstraint('NotBlank', [
+        'allowNull' => TRUE,
+        'normalizer' => 'trim',
+        'message' => 'A preview target needs a label.',
+      ])
       ->addConstraint('Length', ['max' => 255]);
     $properties['url'] = DataDefinition::create('string')
       ->setLabel(t('URL template'))
       ->setRequired(TRUE)
-      ->addConstraint('NotBlank')
+      ->addConstraint('NotBlank', [
+        'allowNull' => TRUE,
+        'normalizer' => 'trim',
+        'message' => 'A preview target needs a URL.',
+      ])
       ->addConstraint('Length', ['max' => 2048])
       ->addConstraint('ConsumerPreviewTargetUrl');
     return $properties;

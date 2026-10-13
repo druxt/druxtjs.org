@@ -21,7 +21,9 @@ class PreviewTargetUrlConstraintValidator extends ConstraintValidator {
     if (!is_string($value) || trim($value) === '') {
       return;
     }
-    $parts = parse_url(trim($value));
+    // The value as stored. A leading space would break the URL in the frame,
+    // so it fails here. The form and the endpoint trim before they save.
+    $parts = parse_url($value);
     $scheme = strtolower((string) ($parts['scheme'] ?? ''));
     if (!is_array($parts) || empty($parts['host']) || !in_array($scheme, ['http', 'https'], TRUE)) {
       $this->context->addViolation($constraint->message, ['%url' => $value]);
