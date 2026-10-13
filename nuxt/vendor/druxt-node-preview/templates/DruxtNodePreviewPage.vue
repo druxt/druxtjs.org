@@ -68,8 +68,20 @@ export default {
     // as well, where the query is known.
     const layout = this.$druxtNodePreview.layout(this.$route.query.layout)
     if (layout && this.$nuxt && this.$nuxt.layoutName !== layout) {
-      await this.$nuxt.loadLayout(layout)
-      this.$nuxt.setLayout(layout)
+      const previous = this.$nuxt.layoutName
+      try {
+        await this.$nuxt.loadLayout(layout)
+        this.$nuxt.setLayout(layout)
+      }
+      catch (error) {
+        // A layout chunk can fail to download. Then the preview shows in the
+        // layout the page already has.
+      }
+      // A new layout mounts a new page, which loads the preview. If this one
+      // loaded it too, the two would seed the same document twice. Nuxt falls
+      // back to the default layout for one the site does not have, and then
+      // nothing new mounts, so this page loads the preview itself.
+      if (this.$nuxt.layoutName !== previous) return
     }
 
     try {

@@ -146,6 +146,8 @@ class PreviewTargetsFieldTest extends KernelTestBase {
       'node/preview',
       // As stored, a leading space breaks the URL in the frame.
       ' http://localhost:3000/p',
+      // parse_url() fails on this.
+      'http:///p',
     ];
     foreach ($invalid as $url) {
       $this->assertCount(1, $this->targetViolations(['label' => 'Bad', 'url' => $url]), $url);
@@ -193,6 +195,31 @@ class PreviewTargetsFieldTest extends KernelTestBase {
   }
 
   /**
+   * Tests that the widget shows a label and a URL field for each target.
+   */
+  public function testWidgetShowsLabelAndUrl(): void {
+    $widget = $this->container->get('entity_display.repository')
+      ->getFormDisplay('consumer', 'consumer')
+      ->getRenderer('preview_targets');
+    $this->assertInstanceOf(PreviewTargetWidget::class, $widget);
+    $consumer = $this->createConsumer('App', [
+      ['label' => 'Local', 'url' => 'http://localhost:3000/p'],
+    ]);
+    $form = ['#parents' => []];
+    $element = $widget->form($consumer->get('preview_targets'), $form, new FormState())['widget'];
+
+    $this->assertSame('Local', $element[0]['label']['#default_value']);
+    $this->assertSame('http://localhost:3000/p', $element[0]['url']['#default_value']);
+    $this->assertSame(2048, $element[0]['url']['#maxlength']);
+    foreach (['[jsonapi_node_preview]', '[jsonapi_node_preview_path]', '[uuid]', '[view_mode]', '[layout]'] as $token) {
+      $this->assertStringContainsString($token, (string) $element[0]['url']['#description']);
+    }
+    // The field has unlimited values, so an empty row follows the target.
+    $this->assertSame('', $element[1]['label']['#default_value']);
+    $this->assertSame('', $element[1]['url']['#default_value']);
+  }
+
+  /**
    * Tests that the key of an unpublished consumer's target does not resolve.
    *
    * The picker lists published consumers only, so a key must agree.
@@ -201,15 +228,29 @@ class PreviewTargetsFieldTest extends KernelTestBase {
     $consumer = $this->createConsumer('Hidden', [
       ['label' => 'Local', 'url' => 'http://localhost:3000/p'],
     ]);
+    $key = $consumer->id() . ':0';
+    $this->assertNotNull($this->provider->getTargetByKey($key));
+
     $consumer->set('status', FALSE)->save();
+    $this->assertArrayNotHasKey($key, $this->provider->getTargetOptions());
+    $this->assertNull($this->provider->getTargetByKey($key));
+  }
+
+  /**
+   * Tests that a default naming an unpublished consumer's target falls back.
+   *
+   * It falls back to the first target in the picker.
+   */
+  public function testDefaultForUnpublishedConsumerFallsBack(): void {
+    $hidden = $this->createConsumer('Hidden', [
+      ['label' => 'Local', 'url' => 'http://localhost:3000/p'],
+    ]);
+    $hidden->set('status', FALSE)->save();
     $shown = $this->createConsumer('Shown', [
       ['label' => 'Live', 'url' => 'https://example.com/p'],
     ]);
 
-    $this->assertNull($this->provider->getTargetByKey($consumer->id() . ':0'));
-
-    // A default that names it falls back to the first target in the picker.
-    $this->setSetting('consumer_node_preview', ['default' => $consumer->id() . ':0']);
+    $this->setSetting('consumer_node_preview', ['default' => $hidden->id() . ':0']);
     $this->assertSame($shown->id() . ':0', $this->provider->getDefaultKey());
   }
 

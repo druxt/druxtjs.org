@@ -53,15 +53,26 @@ export default ({ app, store }, inject) => {
     }, { preserveState: !!(store.state || {}).druxtNodePreview })
   }
 
+  // True from when the editor leaves the preview route until a preview route
+  // opens again. vue-router changes currentRoute only after the next route's
+  // code loads, so a fetch that ends meanwhile still sees the preview route.
+  let left = false
+
   // Before the next route loads, so none of its components read a seeded
   // resource. Druxt then fetches the saved one.
   if (app.router) {
     app.router.beforeEach((to, from, next) => {
-      if (from.name === 'druxt-node-preview' && to.name !== 'druxt-node-preview' && seeded.length) {
-        for (const { type, id } of seeded.splice(0)) {
-          store.commit('druxt/flushResource', { type, id })
+      if (from.name === 'druxt-node-preview' && to.name !== 'druxt-node-preview') {
+        left = true
+        if (seeded.length) {
+          for (const { type, id } of seeded.splice(0)) {
+            store.commit('druxt/flushResource', { type, id })
+          }
+          store.commit('druxtNodePreview/stop')
         }
-        store.commit('druxtNodePreview/stop')
+      }
+      else if (to.name === 'druxt-node-preview') {
+        left = false
       }
       next()
     })
@@ -196,11 +207,13 @@ export default ({ app, store }, inject) => {
      *
      * @param {object} doc - The JSON:API document.
      *
-     * @returns {object} The type and id of the previewed resource.
+     * @returns {object|null} The type and id of the previewed resource, or null
+     *   when the editor has left the preview.
      */
     seed: (doc) => {
       // A fetch can end after the editor has left the preview. Then nothing
       // is seeded, so nothing unsaved reaches the next page.
+      if (left) return null
       if (app.router && (app.router.currentRoute || {}).name !== 'druxt-node-preview') return null
       for (const data of [doc.data, ...(doc.included || [])]) {
         store.commit('druxt/addResource', { resource: { data } })

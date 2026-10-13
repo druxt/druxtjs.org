@@ -214,6 +214,12 @@ class PreviewTargetsEndpointTest extends KernelTestBase {
     // Not a targets list.
     $this->assertSame(422, $this->call('PUT', ['nope' => TRUE], $uuid)->getStatusCode());
 
+    // A target that is not an object, or has a value that is not a string.
+    $this->assertSame(422, $this->call('PUT', ['targets' => ['https://ok.example.com/p']], $uuid)->getStatusCode());
+    $this->assertSame(422, $this->call('PUT', [
+      'targets' => [['label' => 'Bad', 'url' => ['https://ok.example.com/p']]],
+    ], $uuid)->getStatusCode());
+
     // A scheme an iframe must never get.
     $response = $this->call('PUT', [
       'targets' => [['label' => 'Bad', 'url' => 'javascript:alert(1)']],
