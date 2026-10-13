@@ -13,6 +13,8 @@
     "nuxt",
     "preview"
   ],
+  "repository": "github:druxt-contrib/druxt-node-preview",
+  "license": "MIT",
   "exports": {
     ".": {
       "require": "./dist/index.ssr.js",

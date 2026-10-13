@@ -14,6 +14,24 @@
 export default ({ app, store }, inject) => {
   const include = JSON.parse('<%= JSON.stringify(options.include) %>')
   const layouts = JSON.parse('<%= JSON.stringify(options.layouts) %>')
+  // Origins the preview may come from, besides this site's own.
+  const origins = JSON.parse('<%= JSON.stringify(options.origins) %>')
+
+  /**
+   * Throws unless the endpoint is on this site or an allowed origin.
+   *
+   * The endpoint comes from the URL fragment, which any link can set. So
+   * without this check, a crafted link could make the page fetch a document
+   * from anywhere, with the editor's credentials, and render it.
+   *
+   * @param {string} endpoint - The endpoint, a URL or a path.
+   */
+  const checkOrigin = (endpoint) => {
+    const { origin } = new URL(endpoint, window.location.origin)
+    if (origin !== window.location.origin && !origins.includes(origin)) {
+      throw new Error('The preview endpoint is not on this site or its Drupal site: ' + origin)
+    }
+  }
 
   // The type and id of every resource the preview put in the Druxt store.
   const seeded = []
@@ -60,15 +78,35 @@ export default ({ app, store }, inject) => {
    * @returns {string} The URL to request.
    */
   const withInclude = (url) => {
-    if (!include.length) return url
+    const configured = includeFor(url)
+    if (!configured.length) return url
     const [base, query = ''] = url.split('?')
     const params = query.split('&').filter((param) => param && !param.startsWith('include='))
     const current = (query.split('&').find((param) => param.startsWith('include=')) || 'include=')
       .slice('include='.length)
       .split(',')
       .filter(Boolean)
-    const merged = [...new Set([...current, ...include])]
+    const merged = [...new Set([...current, ...configured])]
     return base + '?' + [...params, 'include=' + merged.join(',')].join('&')
+  }
+
+  /**
+   * Returns the configured include paths for an endpoint.
+   *
+   * The option is a list for every previewed type, or an object of lists
+   * keyed by JSON:API type, such as `node--page`. JSON:API rejects a path
+   * that the type does not have, so a path only some bundles have goes in
+   * the object form.
+   *
+   * @param {string} url - The endpoint, from Consumer Node Preview:
+   *   `.../{entity type}/{bundle}/{uuid}/preview`.
+   *
+   * @returns {string[]} The include paths.
+   */
+  function includeFor(url) {
+    if (Array.isArray(include)) return include
+    const match = url.split('?')[0].match(/\/([^/]+)\/([^/]+)\/[0-9a-f-]{36}\/preview$/)
+    return (match && include[match[1] + '--' + match[2]]) || []
   }
 
   /**
@@ -126,6 +164,7 @@ export default ({ app, store }, inject) => {
      * @returns {object} The JSON:API document.
      */
     fetch: async (endpoint) => {
+      checkOrigin(endpoint)
       const url = withInclude(endpoint)
       const headers = { Accept: 'application/vnd.api+json' }
       const client = (app.$druxt || {}).axios
@@ -160,6 +199,9 @@ export default ({ app, store }, inject) => {
      * @returns {object} The type and id of the previewed resource.
      */
     seed: (doc) => {
+      // A fetch can end after the editor has left the preview. Then nothing
+      // is seeded, so nothing unsaved reaches the next page.
+      if (app.router && (app.router.currentRoute || {}).name !== 'druxt-node-preview') return null
       for (const data of [doc.data, ...(doc.included || [])]) {
         store.commit('druxt/addResource', { resource: { data } })
         seeded.push({ type: data.type, id: data.id })

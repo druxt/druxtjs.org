@@ -280,7 +280,8 @@ export default {
     // picker may switch the frame to: the page alone, which a preview opens
     // on, or the site's own.
     nodePreview: {
-      include: ['field_content.field_media', 'field_content.field_media.field_media_image'],
+      // Keyed by type: JSON:API refuses an include path a previewed type lacks.
+      include: { 'node--doc_page': ['field_content.field_media', 'field_content.field_media.field_media_image'] },
       layouts: ['preview', 'default'],
     },
     // Menus ask for the fields a menu needs, not every attribute of a link.

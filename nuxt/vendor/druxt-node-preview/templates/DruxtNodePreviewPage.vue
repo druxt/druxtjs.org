@@ -63,12 +63,21 @@ export default {
   },
 
   async mounted() {
-    const endpoint = this.$druxtNodePreview.endpoint()
-    if (!endpoint) {
-      this.error = 'No preview endpoint was provided in the URL fragment.'
-      return
+    // A statically generated site renders this page once, with no query, and
+    // Nuxt keeps that layout in the browser. So the listed layout is set here
+    // as well, where the query is known.
+    const layout = this.$druxtNodePreview.layout(this.$route.query.layout)
+    if (layout && this.$nuxt && this.$nuxt.layoutName !== layout) {
+      await this.$nuxt.loadLayout(layout)
+      this.$nuxt.setLayout(layout)
     }
+
     try {
+      const endpoint = this.$druxtNodePreview.endpoint()
+      if (!endpoint) {
+        this.error = 'No preview endpoint was provided in the URL fragment.'
+        return
+      }
       const document = await this.$druxtNodePreview.fetch(endpoint)
       this.entity = this.$druxtNodePreview.seed(document)
       this.document = document
