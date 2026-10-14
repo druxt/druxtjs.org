@@ -11,6 +11,10 @@ dependencies:
 third_party_settings:
   vale:
     enabled: true
+    level_overrides:
+      -
+        rule: ai-tells.ColonUsage
+        level: warning
 id: paragraph.docs_section_list.field_section
 field_name: field_section
 entity_type: paragraph

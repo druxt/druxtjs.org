@@ -4327,12 +4327,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Decipher/vale.git",
-                "reference": "13fe71d04662faa2d0dd7cd6763df8dacf81ea9d"
+                "reference": "b97d09ac407451562b24a10774e1481f1ad944b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Decipher/vale/zipball/13fe71d04662faa2d0dd7cd6763df8dacf81ea9d",
-                "reference": "13fe71d04662faa2d0dd7cd6763df8dacf81ea9d",
+                "url": "https://api.github.com/repos/Decipher/vale/zipball/b97d09ac407451562b24a10774e1481f1ad944b5",
+                "reference": "b97d09ac407451562b24a10774e1481f1ad944b5",
                 "shasum": ""
             },
             "require": {
@@ -4364,7 +4364,7 @@
                     "url": "https://github.com/Decipher"
                 }
             ],
-            "time": "2026-10-14T02:31:43+00:00"
+            "time": "2026-10-14T03:30:46+00:00"
         },
         {
             "name": "drupal/wse",
