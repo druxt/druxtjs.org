@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a23a9314efe0327c69f423736394a4e",
+    "content-hash": "7e9ceac7f6bab2a06dca7425a6cd572b",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -4327,12 +4327,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Decipher/vale.git",
-                "reference": "5e49426ba7f305653225f0895964d41230f3c5b5"
+                "reference": "1ee841af95be495a4d1db142e6e3ca0ef2e136cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Decipher/vale/zipball/5e49426ba7f305653225f0895964d41230f3c5b5",
-                "reference": "5e49426ba7f305653225f0895964d41230f3c5b5",
+                "url": "https://api.github.com/repos/Decipher/vale/zipball/1ee841af95be495a4d1db142e6e3ca0ef2e136cc",
+                "reference": "1ee841af95be495a4d1db142e6e3ca0ef2e136cc",
                 "shasum": ""
             },
             "require": {
@@ -4364,7 +4364,7 @@
                     "url": "https://github.com/Decipher"
                 }
             ],
-            "time": "2026-10-14T06:14:00+00:00"
+            "time": "2026-10-14T10:41:14+00:00"
         },
         {
             "name": "drupal/wse",
