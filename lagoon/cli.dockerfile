@@ -11,6 +11,8 @@ COPY lagoon /app/lagoon
 # Vale, the prose linter the vale module runs against text fields: the same
 # pinned binary and ai-tells rules the pipeline lints markdown with, so content
 # and markdown answer to one ruleset. install-vale.sh verifies both checksums.
+# Vale's release build links against glibc, which Alpine lacks; gcompat supplies the loader.
+RUN apk add --no-cache gcompat
 COPY .gitlab/scripts/install-vale.sh /app/.gitlab/scripts/install-vale.sh
 COPY .vale.ini /app/.vale.ini
 RUN bash /app/.gitlab/scripts/install-vale.sh /app/.vale/bin /app/.vale/styles
