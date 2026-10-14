@@ -260,6 +260,24 @@ class NodePreviewControllerTest extends KernelTestBase {
   }
 
   /**
+   * Tests that the picker marks the framed target by its key.
+   *
+   * Two targets can share a URL, for example two consumers of one frontend.
+   */
+  public function testThePickerMarksTheTargetByKey(): void {
+    $this->setSetting('consumer_node_preview', [
+      'targets' => [
+        'one' => ['label' => 'One', 'url' => 'https://same.example.com/preview'],
+        'two' => ['label' => 'Two', 'url' => 'https://same.example.com/preview'],
+      ],
+      'default' => 'settings:two',
+    ]);
+    $html = $this->html();
+    $this->assertStringContainsString('value="settings:two" selected="selected"', $html);
+    $this->assertStringNotContainsString('value="settings:one" selected', $html);
+  }
+
+  /**
    * Tests that a consumer's target is listed, and the query picks it.
    */
   public function testTheQueryPicksConsumerTarget(): void {

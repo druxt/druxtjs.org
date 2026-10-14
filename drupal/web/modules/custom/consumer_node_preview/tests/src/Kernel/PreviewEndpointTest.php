@@ -116,6 +116,20 @@ class PreviewEndpointTest extends KernelTestBase {
       'entity_type' => 'node',
       'bundle' => 'page',
     ])->save();
+    // The internal type has a revisioned field of its own. So only the stop
+    // at internal types keeps "field_internal.field_nested" out.
+    $this->installEntitySchema('entity_test_no_label');
+    FieldStorageConfig::create([
+      'field_name' => 'field_nested',
+      'entity_type' => 'entity_test_no_label',
+      'type' => 'entity_reference_revisions',
+      'settings' => ['target_type' => 'node'],
+    ])->save();
+    FieldConfig::create([
+      'field_name' => 'field_nested',
+      'entity_type' => 'entity_test_no_label',
+      'bundle' => 'entity_test_no_label',
+    ])->save();
     $this->container->get('router.builder')->rebuild();
 
     $endpoint = (string) $this->provider->getEndpoint($this->node('page'));

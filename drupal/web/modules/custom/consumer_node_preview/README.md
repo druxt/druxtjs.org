@@ -61,6 +61,11 @@ for further information.
   to the Frontend picker and fills the `[layout]` token. Changing it reloads
   only the frame. The frontend maps the name onto its own layouts, and should
   only accept names it knows.
+
+  The preview opens on the first layout the target lists, so list the
+  default first. The browser remembers the layout an editor picks for each
+  target, and that wins over the first. A `?layout=` query parameter wins
+  over both.
 - **Targets per environment.** settings.php can list targets too, which suits
   a URL that differs per environment and should not travel with a database
   copy:
