@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f2609014961c323d6f7b770c440194ed",
+    "content-hash": "1a23a9314efe0327c69f423736394a4e",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -4364,7 +4364,7 @@
                     "url": "https://github.com/Decipher"
                 }
             ],
-            "time": "2026-10-14T04:17:53+00:00"
+            "time": "2026-10-14T06:14:00+00:00"
         },
         {
             "name": "drupal/wse",
