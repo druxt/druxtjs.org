@@ -75,7 +75,12 @@ export default {
       }
       catch (error) {
         // A layout chunk can fail to download. Then the preview shows in the
-        // layout the page already has.
+        // layout the page already has. Webpack names that a ChunkLoadError, or
+        // says "Loading chunk" in the message. Any other error is a fault in
+        // the layout, so it goes to the console too.
+        if (!/chunk/i.test(`${error && error.name} ${error && error.message}`)) {
+          console.error('DruxtNodePreview could not load the layout:', error)
+        }
       }
       // A new layout mounts a new page, which loads the preview. If this one
       // loaded it too, the two would seed the same document twice. Nuxt falls
@@ -91,7 +96,11 @@ export default {
         return
       }
       const document = await this.$druxtNodePreview.fetch(endpoint)
-      this.entity = this.$druxtNodePreview.seed(document)
+      // seed() returns null once the editor is leaving. This page can still
+      // be mounted then, and a document without an entity would not render.
+      const entity = this.$druxtNodePreview.seed(document)
+      if (!entity) return
+      this.entity = entity
       this.document = document
     }
     catch (error) {
