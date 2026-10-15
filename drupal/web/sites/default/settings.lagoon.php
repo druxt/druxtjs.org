@@ -66,6 +66,11 @@ $settings['reverse_proxy_trusted_headers'] = \Symfony\Component\HttpFoundation\R
 $routes = array_filter(array_map('trim', explode(',', (string) getenv('LAGOON_ROUTES'))));
 $hosts = array_merge(['nginx', 'localhost'], array_map(static fn (string $route): string => (string) parse_url($route, PHP_URL_HOST), $routes));
 $settings['trusted_host_patterns'] = array_values(array_map(static fn (string $host): string => '^' . preg_quote($host) . '$', array_unique(array_filter($hosts))));
+// Vale, the prose linter: the binary and rules lagoon/cli.dockerfile installs
+// from .gitlab/scripts/install-vale.sh, the same pin the pipeline lints with.
+$settings['vale_binary'] = '/app/.vale/bin/vale';
+$settings['vale_config'] = '/app/.vale.ini';
+
 
 // Anonymous visitors go to the frontend. DRUXT_FRONTEND_URL wins; otherwise
 // the frontend's own route is picked from this environment's routes.

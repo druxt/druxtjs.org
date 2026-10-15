@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0d4ee8438d0dfdf9a5b5ead91dedc3f4",
+    "content-hash": "7e9ceac7f6bab2a06dca7425a6cd572b",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -4320,6 +4320,51 @@
             "support": {
                 "source": "https://git.drupalcode.org/project/token"
             }
+        },
+        {
+            "name": "drupal/vale",
+            "version": "dev-feature/1-real-vale-docs",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Decipher/vale.git",
+                "reference": "1ee841af95be495a4d1db142e6e3ca0ef2e136cc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Decipher/vale/zipball/1ee841af95be495a4d1db142e6e3ca0ef2e136cc",
+                "reference": "1ee841af95be495a4d1db142e6e3ca0ef2e136cc",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "drupal/paragraphs": "^1.19"
+            },
+            "type": "drupal-module",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Stuart Clark",
+                    "homepage": "https://www.drupal.org/u/deciphered",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "Lints the prose in text fields with the Vale style linter.",
+            "homepage": "https://www.drupal.org/project/vale",
+            "support": {
+                "issues": "https://www.drupal.org/project/issues/vale",
+                "source": "https://git.drupalcode.org/project/vale"
+            },
+            "funding": [
+                {
+                    "type": "github",
+                    "url": "https://github.com/Decipher"
+                }
+            ],
+            "time": "2026-10-14T10:41:14+00:00"
         },
         {
             "name": "drupal/wse",
@@ -16531,6 +16576,7 @@
         "drupal/consumer_node_preview": 20,
         "drupal/decoupled_settings": 10,
         "drupal/jsonapi_node_preview": 10,
+        "drupal/vale": 20,
         "drupal/wse": 20
     },
     "prefer-stable": true,

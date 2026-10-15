@@ -5,6 +5,17 @@ FROM uselagoon/php-8.3-cli-drupal:26.8.1
 COPY drupal/composer.json drupal/composer.lock drupal/patches.lock.json /app/drupal/
 COPY drupal/patches /app/drupal/patches
 RUN composer install --working-dir=/app/drupal --no-dev --no-interaction --no-progress
+# Vale, the prose linter the vale module runs on text fields: the same pinned
+# binary and ai-tells rules the pipeline lints markdown with, so content and
+# markdown answer to one ruleset. install-vale.sh verifies both checksums. It
+# sits before the code is copied, so a code change keeps this layer. Vale's
+# release build links against glibc, which Alpine lacks; gcompat supplies the
+# loader.
+RUN apk add --no-cache gcompat
+COPY .gitlab/scripts/install-vale.sh /app/.gitlab/scripts/install-vale.sh
+COPY .vale.ini /app/.vale.ini
+RUN bash /app/.gitlab/scripts/install-vale.sh /app/.vale/bin /app/.vale/styles
+
 COPY drupal /app/drupal
 COPY lagoon /app/lagoon
 

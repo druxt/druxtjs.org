@@ -46,6 +46,7 @@
         "drupal/simple_oauth_password_grant": "^2.1",
         "drupal/simple_oauth_revoke": "^3.0",
         "drupal/token": "^1.17",
+        "drupal/vale": "dev-feature/1-real-vale-docs#1ee841af95be495a4d1db142e6e3ca0ef2e136cc",
         "drupal/wse": "3.0.x-dev#532aca3b",
         "drush/drush": "^13",
         "js-cookie/js-cookie": "3.0.5"
@@ -80,6 +81,11 @@
         }
     },
     "repositories": [
+        {
+            "name": "vale",
+            "type": "vcs",
+            "url": "https://github.com/Decipher/vale"
+        },
         {
             "type": "package",
             "package": {
