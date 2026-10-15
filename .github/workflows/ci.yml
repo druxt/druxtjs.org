@@ -78,7 +78,7 @@ jobs:
           PROSE_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           BASE_REF: ${{ github.event.pull_request.base.ref }}
           MERGE_REQUEST_DESCRIPTION: ${{ github.event.pull_request.body }}
-          PROSE_LINT_GLOB: '!{nuxt,drupal/web/modules/custom/consumer_node_preview}/**'
+          PROSE_LINT_GLOB: '!nuxt/**'
         run: |
           if [ "$BASE_REF" = main ]; then
             git fetch --no-tags origin +refs/heads/develop:refs/remotes/origin/develop

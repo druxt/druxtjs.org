@@ -13,6 +13,7 @@ const {
   HEADER,
   applyWorkspace,
   hasBearer,
+  hasToken,
   isContentRequest,
   isWorkspaceId,
   readWorkspace,
@@ -112,5 +113,23 @@ test('a bearer token is found on the request or in the merged defaults', () => {
     { common: { Authorization: false } },
   ]) {
     assert.equal(hasBearer(headers), false, JSON.stringify(headers))
+  }
+})
+
+test("an editor's token counts from the headers or from the auth strategy", () => {
+  const holding = (value) => ({ token: { get: () => value } })
+  assert.equal(hasToken({ Authorization: 'Bearer abc' }), true)
+  assert.equal(hasToken({}, holding('Bearer abc')), true)
+  for (const strategy of [
+    undefined,
+    null,
+    {},
+    { token: {} },
+    holding(false),
+    holding('false'),
+    holding(''),
+    holding('  '),
+  ]) {
+    assert.equal(hasToken({}, strategy), false, JSON.stringify(strategy))
   }
 })

@@ -1,4 +1,4 @@
-import { applyWorkspace, hasBearer, readWorkspace } from '~/lib/workspace'
+import { applyWorkspace, hasToken, readWorkspace } from '~/lib/workspace'
 
 /**
  * A signed-in editor reads every page in the workspace they chose.
@@ -21,7 +21,7 @@ export default ({ app, store, req }) => {
   app.$druxt.axios.interceptors.request.use((config) => {
     config.headers = applyWorkspace(config.headers || {}, {
       // The token, not loggedIn: a server render sends it before it says so.
-      signedIn: hasBearer(config.headers),
+      signedIn: hasToken(config.headers, (app.$auth || {}).strategy),
       workspace: store.state.editor.workspace,
       url: config.url,
       baseURL: config.baseURL,
