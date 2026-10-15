@@ -11,8 +11,8 @@ Early. The content model is still being built.
 
 **Preview** on a page's edit form opens the preview in the admin theme,
 with three tabs. All three show the unsaved changes. The screen is the
-`consumer_node_preview` module's, carried as a copy in
-`drupal/web/modules/custom/consumer_node_preview` until it is released.
+`consumer_node_preview` module's, taken from drupal.org at a pinned
+1.0.x-dev commit.
 
 | Tab      | Shows                                                                            |
 | -------- | -------------------------------------------------------------------------------- |
