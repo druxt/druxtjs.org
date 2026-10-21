@@ -90,6 +90,7 @@ module:
   token: 0
   update: 0
   user: 0
+  vale: 0
   workflows: 0
   workspaces: 0
   workspaces_ui: 0

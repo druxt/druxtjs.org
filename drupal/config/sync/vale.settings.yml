@@ -1,0 +1,10 @@
+_core:
+  default_config_hash: 0IZ-VMFPRVSaCZ_Ifkx3K0hobitbs8jO6F6xyK_UNRY
+formats:
+  docs_markdown: md
+default_extension: html
+timeout: 10
+publish_only: true
+workspace_mode: advise
+check_limit: 120
+check_window: 60
