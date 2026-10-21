@@ -9,6 +9,34 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-10-21
+
+### Added
+
+- Prose linting on documentation pages with the vale module, 1.0.0-beta1
+  from drupal.org, under the same ai-tells rules the pipeline runs on
+  markdown. Paragraphs of text, callouts and section lists opt in, and
+  their Markdown format is linted as Markdown. A draft saves with its findings
+  shown, and the save that publishes a page is refused on an error-level
+  finding. The workspace publish check advises and does not block. The
+  Lagoon images install the pinned Vale and its rules, and the site's
+  config carries the module's Prose linting report.
+- Node preview from consumer_node_preview 1.0.x-dev on drupal.org, pinned
+  to a commit, and druxt-node-preview 85c1315. The preview bar keeps only
+  "Back to content editing", the view mode select switches without a page
+  reload, and a Layout select lists the layouts a target offers. The site
+  adds a bare `preview` layout, the page alone with no header or
+  navigation, which a preview opens on first. Consumer target URLs are
+  absolute now.
+
+### Fixed
+
+- The Layout Paragraphs dialog forms save inside a workspace.
+- A preview page the editor has left shows nothing instead of throwing,
+  and a layout that fails to load still lets the preview load.
+- A deploy hook installs the consumer preview layouts field on a database
+  that lacks it, since the module's release does not include one.
+
 ## [0.11.1] - 2026-10-11
 
 ### Fixed
