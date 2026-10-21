@@ -13,7 +13,7 @@ third_party_settings:
     enabled: true
     level_overrides:
       -
-        rule: ai-tells.ColonUsage
+        rule: druxtjs.ColonUsage
         level: warning
 id: paragraph.docs_text.field_text
 field_name: field_text

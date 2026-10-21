@@ -1,0 +1,15 @@
+---
+# The site's copy of ai-tells.ColonUsage. The upstream rule says "unless it
+# is a proper noun" in its message but its token cannot tell, so every
+# "specified: Druxt builds" on the documentation pages was a finding. This
+# copy keeps the upstream token and adds the product names the site writes
+# after a colon. .vale.ini turns the upstream rule off and this one on, and
+# .gitlab/scripts/install-vale.sh copies this folder into the styles path.
+extends: existence
+message: "AI punctuation: '%s'. Lowercase the word after the colon unless it is a proper noun."
+level: error
+nonword: true
+scope:
+  - '~heading'
+tokens:
+  - "(?<!:[^ ]+?):\\s(?!I\\b)(?!(?:Druxt|Drupal|Nuxt|Vue|Vuex|Decoupled Router|Simple OAuth|JSON:API|Tome|Lagoon|GitHub|GitLab|Composer|Storybook|Tailwind)\\b)[A-Z][a-z]*\\b"
