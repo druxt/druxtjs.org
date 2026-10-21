@@ -274,6 +274,16 @@ export default {
     proxy: { api: true, files: true },
     // The section pages resolve paths themselves; no catch-all route.
     router: { wildcard: false },
+    // A preview document carries the page's paragraphs; the include adds the
+    // media an image paragraph refers to and its file, so the preview renders
+    // them from the one request. The layouts are the ones a preview's Layout
+    // picker may switch the frame to: the page alone, which a preview opens
+    // on, or the site's own.
+    nodePreview: {
+      // Keyed by type: JSON:API refuses an include path a previewed type lacks.
+      include: { 'node--doc_page': ['field_content.field_media', 'field_content.field_media.field_media_image'] },
+      layouts: ['preview', 'default'],
+    },
     // Menus ask for the fields a menu needs, not every attribute of a link.
     menu: { jsonApiMenuItems: true, query: { requiredOnly: true } },
     // No deprecated default field components: fields render through

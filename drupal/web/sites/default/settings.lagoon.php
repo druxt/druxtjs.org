@@ -66,6 +66,11 @@ $settings['reverse_proxy_trusted_headers'] = \Symfony\Component\HttpFoundation\R
 $routes = array_filter(array_map('trim', explode(',', (string) getenv('LAGOON_ROUTES'))));
 $hosts = array_merge(['nginx', 'localhost'], array_map(static fn (string $route): string => (string) parse_url($route, PHP_URL_HOST), $routes));
 $settings['trusted_host_patterns'] = array_values(array_map(static fn (string $host): string => '^' . preg_quote($host) . '$', array_unique(array_filter($hosts))));
+// Vale, the prose linter: the binary and rules lagoon/cli.dockerfile installs
+// from .gitlab/scripts/install-vale.sh, the same pin the pipeline lints with.
+$settings['vale_binary'] = '/app/.vale/bin/vale';
+$settings['vale_config'] = '/app/.vale.ini';
+
 
 // Anonymous visitors go to the frontend. DRUXT_FRONTEND_URL wins; otherwise
 // the frontend's own route is picked from this environment's routes.
@@ -94,11 +99,19 @@ if ($frontend) {
   // this site's preview page, handed the JSON:API Node Preview document's
   // path in the fragment. The path is relative, so the page fetches it on
   // its own origin, through the proxy, with the editor's session.
+  // The picker names the frontend by where it runs: the site on production,
+  // the environment anywhere else.
   $settings['consumer_node_preview'] = [
     'targets' => [
       'frontend' => [
-        'label' => 'Frontend',
-        'url' => rtrim($frontend, '/') . '/druxt/node/preview?vm=[view_mode]#[jsonapi_node_preview_path]',
+        'label' => getenv('LAGOON_ENVIRONMENT_TYPE') === 'production'
+          ? parse_url($frontend, PHP_URL_HOST)
+          : (getenv('LAGOON_GIT_BRANCH') ?: getenv('LAGOON_ENVIRONMENT') ?: 'Frontend'),
+        'url' => rtrim($frontend, '/') . '/druxt/node/preview?vm=[view_mode]&layout=[layout]#[jsonapi_node_preview_path]',
+        // The Nuxt layouts the preview's Layout select offers, as listed in
+        // nuxt.config.js under druxt.nodePreview.layouts. A preview opens on
+        // the first one: the page alone, with the site's layout one pick away.
+        'layouts' => ['preview', 'default'],
       ],
     ],
     'default' => 'settings:frontend',

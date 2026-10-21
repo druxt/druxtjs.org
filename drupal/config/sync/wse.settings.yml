@@ -9,6 +9,8 @@ override_save_published_revisions: false
 squash_on_publish: false
 squash_on_publish_interval: 0
 clone_on_publish: false
-safe_forms: {  }
+safe_forms:
+  - layout_paragraphs_component_form
+  - layout_paragraphs_delete_component_form
 entity_workspace_status: {  }
 disable_sub_workspaces: false

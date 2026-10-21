@@ -11,6 +11,7 @@
         "drupal/admin_audit_trail": "^1.0.12",
         "drupal/codemirror_editor": "^2.0",
         "drupal/coffee": "^2.0",
+        "drupal/consumer_node_preview": "1.0.x-dev#9049e1687a06e0e2408a7e6f75ec7ebe0bee8d07",
         "drupal/consumers": "^1.24",
         "drupal/core-composer-scaffold": "^11",
         "drupal/core-project-message": "^11",
@@ -45,6 +46,7 @@
         "drupal/simple_oauth_password_grant": "^2.1",
         "drupal/simple_oauth_revoke": "^3.0",
         "drupal/token": "^1.17",
+        "drupal/vale": "1.0.0-beta1",
         "drupal/wse": "3.0.x-dev#532aca3b",
         "drush/drush": "^13",
         "js-cookie/js-cookie": "3.0.5"

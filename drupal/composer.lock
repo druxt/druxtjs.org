@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a2aac5dc1e20b80a141b4b464e208aa2",
+    "content-hash": "cf8e8ec87ffa68cdf37476d157a67cb5",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1430,6 +1430,56 @@
                 "source": "https://git.drupalcode.org/project/coffee",
                 "issues": "https://drupal.org/project/issues/coffee",
                 "irc": "irc://irc.freenode.org/drupal-contribute"
+            }
+        },
+        {
+            "name": "drupal/consumer_node_preview",
+            "version": "dev-1.0.x",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/consumer_node_preview.git",
+                "reference": "9049e1687a06e0e2408a7e6f75ec7ebe0bee8d07"
+            },
+            "require": {
+                "drupal/consumers": "^1.17",
+                "drupal/core": "^10.3 || ^11",
+                "drupal/jsonapi_node_preview": "^1.0@beta",
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "drupal/entity_reference_revisions": "^1.12",
+                "drupal/gin": "^4.1 || ^5"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-1.0.x": "1.0.x-dev"
+                },
+                "drupal": {
+                    "version": "1.0.x-dev",
+                    "datestamp": "1792055794",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Project has not opted into security advisory coverage!"
+                    }
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Stuart Clark",
+                    "homepage": "https://www.drupal.org/u/deciphered",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "Shows unsaved content in decoupled frontends from Drupal's Preview button.",
+            "homepage": "https://www.drupal.org/project/consumer_node_preview",
+            "support": {
+                "source": "https://git.drupalcode.org/project/consumer_node_preview",
+                "issues": "https://www.drupal.org/project/issues/consumer_node_preview"
             }
         },
         {
@@ -4269,6 +4319,56 @@
             "homepage": "https://www.drupal.org/project/token",
             "support": {
                 "source": "https://git.drupalcode.org/project/token"
+            }
+        },
+        {
+            "name": "drupal/vale",
+            "version": "1.0.0-beta1",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/vale.git",
+                "reference": "1.0.0-beta1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/vale-1.0.0-beta1.zip",
+                "reference": "1.0.0-beta1",
+                "shasum": "7a40a337a9b5c6c7aaba81cc656033093b2e8d08"
+            },
+            "require": {
+                "drupal/core": "^10.3 || ^11",
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "drupal/paragraphs": "^1.19"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "1.0.0-beta1",
+                    "datestamp": "1792551451",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Project has not opted into security advisory coverage!"
+                    }
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Stuart Clark",
+                    "homepage": "https://www.drupal.org/u/deciphered",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "Lints the prose in text fields with the Vale style linter.",
+            "homepage": "https://www.drupal.org/project/vale",
+            "support": {
+                "source": "https://git.drupalcode.org/project/vale",
+                "issues": "https://www.drupal.org/project/issues/vale"
             }
         },
         {
@@ -16478,6 +16578,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "drupal/consumer_node_preview": 20,
         "drupal/decoupled_settings": 10,
         "drupal/jsonapi_node_preview": 10,
         "drupal/wse": 20

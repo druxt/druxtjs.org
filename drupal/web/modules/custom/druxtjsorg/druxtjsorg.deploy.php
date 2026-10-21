@@ -254,3 +254,26 @@ function druxtjsorg_deploy_paragraph_workspace_field(): string {
     $definitions['workspace']);
   return 'Installed the Workspace field on paragraphs.';
 }
+
+/**
+ * Installs the preview layouts field on consumers.
+ *
+ * consumer_node_preview declares the field in hook_entity_base_field_info().
+ * The copy the site carried before its release installed the storage with
+ * an update hook, which the release does not ship, so a database that ran
+ * the earlier copy without that update has the field declared and no table
+ * for it. A deploy hook for the same reason as the paragraph field above.
+ */
+function druxtjsorg_deploy_consumer_preview_layouts(): string {
+  $manager = \Drupal::entityDefinitionUpdateManager();
+  if ($manager->getFieldStorageDefinition('preview_layouts', 'consumer')) {
+    return 'The consumer preview layouts field was already installed.';
+  }
+  $definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('consumer');
+  if (!isset($definitions['preview_layouts'])) {
+    return 'consumer_node_preview declares no preview layouts field; nothing to install.';
+  }
+  $manager->installFieldStorageDefinition('preview_layouts', 'consumer', 'consumer_node_preview',
+    $definitions['preview_layouts']);
+  return 'Installed the preview layouts field on consumers.';
+}

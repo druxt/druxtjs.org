@@ -7,6 +7,14 @@ dependencies:
     - paragraphs.paragraphs_type.docs_callout
   module:
     - text
+    - vale
+third_party_settings:
+  vale:
+    enabled: true
+    level_overrides:
+      -
+        rule: ai-tells.ColonUsage
+        level: warning
 id: paragraph.docs_callout.field_callout
 field_name: field_callout
 entity_type: paragraph
