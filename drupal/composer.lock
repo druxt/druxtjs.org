@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d9807e4603b0e794f8f4baed9b84d1e",
+    "content-hash": "cf8e8ec87ffa68cdf37476d157a67cb5",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -4323,26 +4323,37 @@
         },
         {
             "name": "drupal/vale",
-            "version": "1.0.x-dev",
+            "version": "1.0.0-beta1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Decipher/vale.git",
-                "reference": "d54c9d32563eae88a0c8cc5b0fc3bb12fe89365a"
+                "url": "https://git.drupalcode.org/project/vale.git",
+                "reference": "1.0.0-beta1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Decipher/vale/zipball/d54c9d32563eae88a0c8cc5b0fc3bb12fe89365a",
-                "reference": "d54c9d32563eae88a0c8cc5b0fc3bb12fe89365a",
-                "shasum": ""
+                "url": "https://ftp.drupal.org/files/projects/vale-1.0.0-beta1.zip",
+                "reference": "1.0.0-beta1",
+                "shasum": "7a40a337a9b5c6c7aaba81cc656033093b2e8d08"
             },
             "require": {
+                "drupal/core": "^10.3 || ^11",
                 "php": ">=8.3"
             },
             "require-dev": {
                 "drupal/paragraphs": "^1.19"
             },
-            "default-branch": true,
             "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "1.0.0-beta1",
+                    "datestamp": "1792551451",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Project has not opted into security advisory coverage!"
+                    }
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
             "license": [
                 "GPL-2.0-or-later"
             ],
@@ -4356,16 +4367,9 @@
             "description": "Lints the prose in text fields with the Vale style linter.",
             "homepage": "https://www.drupal.org/project/vale",
             "support": {
-                "issues": "https://www.drupal.org/project/issues/vale",
-                "source": "https://git.drupalcode.org/project/vale"
-            },
-            "funding": [
-                {
-                    "type": "github",
-                    "url": "https://github.com/Decipher"
-                }
-            ],
-            "time": "2026-10-21T02:11:00+00:00"
+                "source": "https://git.drupalcode.org/project/vale",
+                "issues": "https://www.drupal.org/project/issues/vale"
+            }
         },
         {
             "name": "drupal/wse",
@@ -16577,7 +16581,6 @@
         "drupal/consumer_node_preview": 20,
         "drupal/decoupled_settings": 10,
         "drupal/jsonapi_node_preview": 10,
-        "drupal/vale": 20,
         "drupal/wse": 20
     },
     "prefer-stable": true,
