@@ -9,6 +9,18 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.12.2] - 2026-10-21
+
+### Security
+
+- Drupal core 11.4.11, for SA-CORE-2026-014 (remote code execution),
+  SA-CORE-2026-015 and SA-CORE-2026-016 (cross-site scripting).
+- Custom Formatters 4.2.1 for SA-CONTRIB-2026-225 (remote code execution),
+  Gin 5.0.16 for SA-CONTRIB-2026-219 (cross-site scripting) and Simple
+  OAuth 6.1.3 for SA-CONTRIB-2026-242 (access bypass).
+- league/commonmark 2.10.4, which Markdown Easy renders with, for its
+  raw HTML and table advisories.
+
 ## [0.12.1] - 2026-10-21
 
 ### Fixed
