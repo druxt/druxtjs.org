@@ -104,6 +104,21 @@ if [ -z "$styles_dir" ]; then
   exit 0
 fi
 
+# --- the site's own styles ---------------------------------------------------
+# vale/styles holds rules the site writes itself, such as its copy of the
+# colon rule. They are copied on every run, since they change with the repo
+# rather than with the pinned package.
+site_styles="$(cd "$(dirname "$0")/../.." && pwd)/vale/styles"
+if [ -d "$site_styles" ]; then
+  mkdir -p "$styles_dir"
+  for style in "$site_styles"/*/; do
+    name="$(basename "$style")"
+    rm -rf "${styles_dir:?}/$name"
+    cp -R "$style" "$styles_dir/$name"
+    echo "site style $name installed in ${styles_dir}"
+  done
+fi
+
 marker="$styles_dir/ai-tells/.installed-version"
 if [ -f "$marker" ] && [ "$(cat "$marker")" = "$ai_tells_version" ]; then
   echo "ai-tells ${ai_tells_version} already installed in ${styles_dir}"

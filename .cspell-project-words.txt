@@ -96,3 +96,5 @@ describedby
 llmstxt
 wse
 nids
+nonword
+Vuex

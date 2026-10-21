@@ -14,6 +14,7 @@ RUN composer install --working-dir=/app/drupal --no-dev --no-interaction --no-pr
 RUN apk add --no-cache gcompat
 COPY .gitlab/scripts/install-vale.sh /app/.gitlab/scripts/install-vale.sh
 COPY .vale.ini /app/.vale.ini
+COPY vale /app/vale
 RUN bash /app/.gitlab/scripts/install-vale.sh /app/.vale/bin /app/.vale/styles
 
 COPY drupal /app/drupal
