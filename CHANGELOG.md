@@ -9,6 +9,17 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-10-21
+
+### Fixed
+
+- The colon rule no longer flags a product name after a colon. The ai-tells
+  rule says a proper noun may follow a colon but cannot tell one apart, so
+  every "specified: Druxt builds" on the documentation pages was a warning,
+  13 in all. The site now keeps its own copy of the rule with the product
+  names it writes after a colon, installed beside the pinned package, and
+  the content fields point their warning-level override at it.
+
 ## [0.12.0] - 2026-10-21
 
 ### Added
