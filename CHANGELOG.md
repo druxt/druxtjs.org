@@ -9,6 +9,17 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.12.4] - 2026-10-22
+
+### Fixed
+
+- Lagoon's built-in Sync DB and Sync files tasks work. They run
+  `drush sql-sync @<environment> @self` with the source environment's bare
+  name, which Drush reads as an entry in `self.site.yml`, and the site had
+  none, so the task stopped with "no alias record could be found". The file
+  now names main, develop and staging-content, with the volatile tables
+  copied as structure only, as the rollout does.
+
 ## [0.12.3] - 2026-10-22
 
 ### Fixed
