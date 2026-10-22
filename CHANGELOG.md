@@ -18,6 +18,12 @@ Druxt 1.0.0.
   block components on all three, and views and the router on Mercury,
   whose pages are all Canvas pages.
 
+### Fixed
+
+- Code blocks colour `drush`, `ddev`, `lagoon` and `npx` as commands, as
+  they did `composer` and `npm`, and a code paragraph can be PHP, so the
+  `settings.php` block on the caching page is highlighted.
+
 ## [0.21.0] - 2026-11-24
 
 ### Changed

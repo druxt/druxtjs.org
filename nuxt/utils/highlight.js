@@ -3,11 +3,23 @@ import 'prismjs/components/prism-bash.js'
 import 'prismjs/components/prism-json.js'
 import 'prismjs/components/prism-yaml.js'
 import 'prismjs/components/prism-nginx.js'
+import 'prismjs/components/prism-markup-templating.js'
+import 'prismjs/components/prism-php.js'
 
 // Prism highlights every code element on the page when it loads, by the
 // language in its class, and writes plain text where it has no grammar of
 // that name. Its own aliases cover the rest of the names below.
 Prism.languages.vue = Prism.languages.markup
+
+// Prism's bash grammar knows composer, curl and npm, but not the tools these
+// docs use alongside them, so a line that starts with drush showed as plain text.
+Prism.languages.insertBefore('bash', 'function', {
+  tool: {
+    pattern: /(^|[\s;|&]|[<>]\()(?:ddev|drush|lagoon|npx)(?=$|[)\s;|&])/,
+    lookbehind: true,
+    alias: 'function',
+  },
+})
 
 /** The Prism grammar for each language a code block can declare. */
 const GRAMMARS = {
@@ -22,6 +34,7 @@ const GRAMMARS = {
   yaml: 'yaml',
   yml: 'yaml',
   nginx: 'nginx',
+  php: 'php',
 }
 
 const escape = (code) => code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
