@@ -277,3 +277,39 @@ function druxtjsorg_deploy_consumer_preview_layouts(): string {
     $definitions['preview_layouts']);
   return 'Installed the preview layouts field on consumers.';
 }
+
+/**
+ * Drops workspace tracking rows whose revision is already the live one.
+ *
+ * A publish makes a workspace's revisions the default ones and then clears
+ * its tracking rows from a listener on the post-publish event. A listener
+ * that runs before it and throws leaves the rows behind, and the workspace
+ * can then neither be deleted (the purge refuses a default revision) nor
+ * reused. Such a row tracks a revision that is already live, so it goes.
+ */
+function druxtjsorg_deploy_prune_published_associations(): string {
+  $database = \Drupal::database();
+  $entity_type_manager = \Drupal::entityTypeManager();
+  $rows = $database->select('workspace_association', 'wa')
+    ->fields('wa', ['workspace', 'target_entity_type_id', 'target_entity_id', 'target_entity_revision_id'])
+    ->execute()
+    ->fetchAll();
+  $pruned = 0;
+  foreach ($rows as $row) {
+    $storage = $entity_type_manager->getStorage($row->target_entity_type_id);
+    $entity = $storage->load($row->target_entity_id);
+    if ($entity && (int) $entity->getRevisionId() === (int) $row->target_entity_revision_id) {
+      $database->delete('workspace_association')
+        ->condition('workspace', $row->workspace)
+        ->condition('target_entity_type_id', $row->target_entity_type_id)
+        ->condition('target_entity_id', $row->target_entity_id)
+        ->condition('target_entity_revision_id', $row->target_entity_revision_id)
+        ->execute();
+      $pruned++;
+    }
+  }
+  if ($pruned) {
+    Cache::invalidateTags(['workspace_list']);
+  }
+  return $pruned ? "Dropped $pruned workspace tracking row(s) whose revision is already live." : 'No workspace tracking row points at a live revision.';
+}

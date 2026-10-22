@@ -35,6 +35,14 @@ if (getenv('WSE_DEPLOY_KEY')) {
   $settings['wse_deploy.hash.key'] = getenv('WSE_DEPLOY_KEY');
   $config['wse_deploy.settings']['export_plugin_configuration']['remote_endpoint'] = rtrim((string) getenv('WSE_DEPLOY_TARGET'), '/');
 }
+// An environment with no target, production among them, is the end of the
+// chain. The HTTP export plugin still reports every publish and revert to
+// its endpoint, and with none set that is a relative URL the HTTP client
+// refuses after the publish has gone through. The module's dummy plugin
+// does nothing on those events, which is what the end of the chain wants.
+if (!getenv('WSE_DEPLOY_TARGET')) {
+  $config['wse_deploy.settings']['export_plugin'] = 'dummy';
+}
 // The key a deploy to this environment is signed with, when it is not this
 // environment's own: staging accepts the key local machines sign with and
 // signs with one that production alone accepts, so a deploy cannot skip it.
