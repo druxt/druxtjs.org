@@ -9,6 +9,20 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.12.3] - 2026-10-22
+
+### Fixed
+
+- Publishing a workspace on production no longer logs an error after the
+  publish. Workspaces Deploy reports every publish and revert to its target
+  environment, and production has none, so the report went to a relative URL
+  the HTTP client refused. An environment with no target now uses the
+  module's dummy export plugin, which reports nothing.
+- A workspace whose publish was interrupted after its revisions went live
+  can be deleted again. The interrupted publish left the workspace's
+  tracking rows behind, and the delete refused to purge live revisions. A
+  deploy hook drops every tracking row whose revision is already live.
+
 ## [0.12.2] - 2026-10-21
 
 ### Security
