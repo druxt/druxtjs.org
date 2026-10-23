@@ -36,6 +36,7 @@ node_modules/
 # Written by .devtools and scripts/docs-fetch.sh. Never committed.
 /.env
 /.docs-source/
+/.docs-api/
 
 # Vale and its styles, installed by .gitlab/scripts/install-vale.sh.
 /.vale/

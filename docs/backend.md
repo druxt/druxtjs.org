@@ -87,7 +87,7 @@ On the Drupal side, contrib modules provide the rest:
 | `simple_oauth_revoke`         | `POST /oauth/revoke`        | Revoking the access and refresh tokens when an editor signs out   |
 | `logout_token`                | `GET /session/logout/token` | Ending a Drupal session left open in the browser before a sign-in |
 
-`nuxt/patches/druxt-auth-0.5.0.patch` carries `druxt-auth` changes that are
+`nuxt/patches/druxt-auth-0.5.1.patch` carries `druxt-auth` changes that are
 not released yet:
 
 - Revoking both tokens at sign-out.

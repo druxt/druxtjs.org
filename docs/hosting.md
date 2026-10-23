@@ -117,19 +117,30 @@ runs it.
 | A page path with a trailing slash                 | A 301 to the same path without it                      |
 | `/jsonapi`, `/router/translate-path` and `/sites` | Proxied to Drupal                                      |
 
-A page edited in Drupal changes on the site once its stored copy is older
-than the time to live: the next request gets the old copy and renders the
-new one, and the request after that gets the new one. A deployment starts
-with an empty cache.
+Before the server takes the port, it renders every page once, following
+links from the authored pages and the generated ones. That fills the stored
+pages and Druxt's server cache, so the first visitor after a deployment reads
+neither from Drupal. The starting page shows until it finishes, for at most
+`DOCS_WARM_TIMEOUT`. A clear from Drupal reaches the server meanwhile, and
+schedules a refresh for once it is serving.
 
-| Variable           | Default             | What it does                                             |
-| ------------------ | ------------------- | -------------------------------------------------------- |
-| `DRUXT_BASE_URL`   | `http://nginx:8080` | Where the server reaches Drupal                          |
-| `SITE_ORIGIN`      | The `nuxt` route    | The origin in canonical links and share cards            |
-| `DOCS_CACHE_TTL`   | `300`               | Seconds before a stored page renders again               |
-| `DOCS_CACHE`       | On                  | `0` renders every page live                              |
-| `DOCS_CACHE_DIR`   | `nuxt/.cache/pages` | Where the stored pages go                                |
-| `START_FAIL_GRACE` | `30`                | Seconds the failed page shows before the container exits |
+Each save in Drupal clears Druxt's server cache through Purge. A few seconds
+after a clear that succeeds, the server renders the authored pages again, so
+an edit shows on the next request. A burst of clears renders them once. The
+generated pages refresh once their stored copy is older than the time to
+live: the next request gets the old copy and renders the new one.
+
+| Variable            | Default             | What it does                                              |
+| ------------------- | ------------------- | --------------------------------------------------------- |
+| `DRUXT_BASE_URL`    | `http://nginx:8080` | Where the server reaches Drupal                           |
+| `SITE_ORIGIN`       | The `nuxt` route    | The origin in canonical links and share cards             |
+| `DOCS_CACHE_TTL`    | `300`               | Seconds before a stored page renders again                |
+| `DOCS_CACHE`        | On                  | `0` renders every page live                               |
+| `DOCS_CACHE_DIR`    | `nuxt/.cache/pages` | Where the stored pages go                                 |
+| `DOCS_WARM`         | On                  | `0` skips rendering every page at start and after a clear |
+| `DOCS_WARM_DELAY`   | `5`                 | Seconds after a clear before the pages render again       |
+| `DOCS_WARM_TIMEOUT` | `120`               | Seconds the first render may hold the starting page       |
+| `START_FAIL_GRACE`  | `30`                | Seconds the failed page shows before the container exits  |
 
 The `nuxt` route the table's default names is picked from `LAGOON_ROUTES` at
 startup: the route for `druxtjs.org` wins over `www.druxtjs.org`, which wins

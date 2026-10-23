@@ -11,9 +11,11 @@ const http = require('http')
 const path = require('path')
 const { execFileSync, spawn } = require('child_process')
 const { deploymentReady, resolveOrigin, waitForBackend } = require('./backend')
-const { createHandler, createPageCache, crawl, LLMS_LINK } = require('./page-cache')
+const { createHandler, createPageCache, LLMS_LINK } = require('./page-cache')
 const { createArtefacts } = require('./artefacts')
 const { createStartingHandler } = require('./starting')
+const { createWarmer } = require('./warm')
+const { normalisePath } = require('../lib/site')
 
 const rootDir = path.join(__dirname, '..')
 const env = process.env
@@ -126,25 +128,58 @@ const main = async () => {
           render: (route) => app.server.renderRoute(route),
           log,
         })
-  handler = createHandler({
+  // Every page the site knows: the authored corpus the indexes describe, so a
+  // page authored in Drupal is rendered before its first visitor, and the
+  // generated reference pages.
+  const authored = async () => (await artefacts.corpus().catch(() => [])).map((doc) => doc.route)
+  const seeds = async () => [...new Set(['/', ...(await authored()), ...(await app.options.generate.routes())])]
+  // After a clear, the pages Drupal's content is on.
+  // Normalised first, so two spellings of one path take one place in the
+  // refresh's crawl limit and it never follows a link.
+  const refresh = async () => [...new Set(['/', ...(await authored())].map(normalisePath))]
+  // Without a page cache, a warm renders and keeps nothing but Druxt's cache.
+  // A failed render is logged and skipped, as the page cache's store does, so
+  // no crawl worker ends the warm while another is still rendering.
+  const renderOnly = async (route) => {
+    try {
+      const { html, error, redirected } = (await app.server.renderRoute(route)) || {}
+      return html && !error && !redirected ? html : null
+    } catch (error) {
+      log(`warm: ${route} did not render: ${error.message}`)
+      return null
+    }
+  }
+  const warmer =
+    env.DOCS_WARM === '0'
+      ? null
+      : createWarmer({
+          seeds,
+          refresh,
+          store: cache ? cache.store : renderOnly,
+          log,
+          delay: (Number(env.DOCS_WARM_DELAY) || 5) * 1000,
+          timeout: (Number(env.DOCS_WARM_TIMEOUT) || 120) * 1000,
+        })
+
+  const live = createHandler({
     cache,
     live: app.render,
     noindex: env.LAGOON_ENVIRONMENT_TYPE !== 'production',
     passThrough: app.options.docsPassThrough,
     artefacts,
   })
-  log(`serving ${env.SITE_ORIGIN || `http://${host}:${port}`}`)
+  const watched = warmer ? warmer.watchClears(live) : live
 
-  if (cache) {
-    const warmed = Date.now()
-    // Seeded from the same corpus the indexes describe, so a page authored
-    // in Drupal is pre-rendered rather than waiting for its first visitor.
-    const corpus = await artefacts.corpus().catch(() => [])
-    const authored = corpus.map((doc) => doc.route)
-    const seeds = ['/', ...new Set([...authored, ...(await app.options.generate.routes())])]
-    const { stored, visited } = await crawl({ seeds, store: cache.store })
-    log(`pre-rendered ${stored} of ${visited} pages in ${Math.round((Date.now() - warmed) / 1000)}s`)
+  // Pre-cache before the app takes the port, so the first visitor reads
+  // Druxt's cache rather than Drupal. A clear arriving meanwhile goes through.
+  if (warmer) {
+    handler = warmer.routeClears(handler, watched)
+    log('warming every page')
+    await warmer.first()
   }
+
+  handler = watched
+  log(`serving ${env.SITE_ORIGIN || `http://${host}:${port}`}`)
 }
 
 for (const signal of ['SIGINT', 'SIGTERM']) {

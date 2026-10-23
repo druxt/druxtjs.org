@@ -316,6 +316,9 @@ export default {
     cache: {
       secret: process.env.DRUXT_CACHE_SECRET,
       sessionCookie: 'S?SESS[0-9a-f]+',
+      // Entities, collections, Views results and route lookups as well,
+      // cleared by Purge on every save.
+      content: true,
     },
   },
 
