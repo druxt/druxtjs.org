@@ -26,7 +26,7 @@
     "daisyui": "1.25.4",
     "drupal-jsonapi-params": "2.3.2",
     "druxt": "0.25.0",
-    "druxt-auth": "patch:druxt-auth@npm%3A0.5.0#./patches/druxt-auth-0.5.0.patch",
+    "druxt-auth": "patch:druxt-auth@npm%3A0.5.1#./patches/druxt-auth-0.5.1.patch",
     "druxt-blocks": "0.18.0",
     "druxt-breadcrumb": "0.18.0",
     "druxt-entity": "0.29.0",
