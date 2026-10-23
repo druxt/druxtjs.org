@@ -39,8 +39,7 @@ Nuxt application.
   reads the pinned `druxt.js` to generate the `api/`, `components/` and module
   pages, which have no Drupal representation. The authored pages come from the
   database, and the sitemap and the `llms` files describe both.
-  The footer badge names `druxt` at that pin, never the installed package,
-  which follows npm's `dev` tag until 0.25.0 is released.
+  The footer badge names `druxt` at that pin, never the installed package.
 - **`github-slugger` stays at 1.5.0.** `druxt_docs` computes the table of
   contents with a PHP port of that version. Renovate is configured not to offer it.
 - **Patches are public upstream diffs.** `drupal/composer.json` points each one

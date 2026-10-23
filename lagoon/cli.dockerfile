@@ -1,4 +1,4 @@
-FROM uselagoon/php-8.3-cli-drupal:26.8.1
+FROM uselagoon/php-8.3-cli-drupal:26.10.0
 
 # drupal/ is the composer project. The vendored patches must be present
 # before the install applies them.

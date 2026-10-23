@@ -1,0 +1,48 @@
+# The environment names Lagoon's own tasks use.
+#
+# The platform's built-in "Sync DB" and "Sync files" tasks run
+# `drush sql-sync @<environment> @self` with the source environment's bare
+# name, and Drush reads a bare `@main` as `@self.main`: an entry in this
+# file. (The image prefixes the name with `lagoon.<project>-` only when its
+# own alias command is available to Drush, and here it is not.)
+#
+# Each entry reaches the environment the way lagoon.site.yml does, over the
+# platform's SSH endpoint as that environment's namespace. A sync copies the
+# volatile tables as structure only, the list post-rollout.sh uses.
+#
+# Production is here to be read from. Nothing in this repository writes to it.
+
+main:
+  host: ssh.amazeeio.cloud
+  user: druxtjs-org-main
+  root: /app/drupal/web
+  options:
+    command-specific:
+      sql-sync:
+        no-ordered-dump: true
+        structure-tables-list: 'cache,cache_*,cachetags,semaphore,sessions,watchdog,flood,key_value_expire,oauth2_token,oauth2_token__scopes,admin_audit_trail'
+  ssh:
+    options: '-o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 32222'
+
+develop:
+  host: ssh.amazeeio.cloud
+  user: druxtjs-org-develop
+  root: /app/drupal/web
+  options:
+    command-specific:
+      sql-sync:
+        no-ordered-dump: true
+        structure-tables-list: 'cache,cache_*,cachetags,semaphore,sessions,watchdog,flood,key_value_expire,oauth2_token,oauth2_token__scopes,admin_audit_trail'
+  ssh:
+    options: '-o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 32222'
+
+staging-content:
+  host: ssh.amazeeio.cloud
+  user: druxtjs-org-staging-content
+  root: /app/drupal/web
+  options:
+    command-specific:
+      sql-sync:
+        no-ordered-dump: true
+  ssh:
+    options: '-o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 32222'
