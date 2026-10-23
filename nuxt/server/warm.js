@@ -23,7 +23,7 @@ const CLEAR_PATH = '/_druxt/cache/clear'
  * @param {number} [options.delay] - Milliseconds after a clear before warming, so a burst of clears warms once.
  * @param {number} [options.timeout] - Milliseconds the first warm may hold the start.
  * @param {Function} [options.crawler] - The crawl, replaceable in tests.
- * @returns {object} `{ run, schedule, first, watchClears }`.
+ * @returns {object} `{ run, schedule, first, watchClears, routeClears }`.
  */
 const createWarmer = ({ seeds, refresh = seeds, store, log = () => {}, delay = 5000, timeout = 120000, crawler = crawl }) => {
   let running = null
@@ -85,7 +85,13 @@ const createWarmer = ({ seeds, refresh = seeds, store, log = () => {}, delay = 5
     return listener(req, res)
   }
 
-  return { run, schedule, first, watchClears }
+  // While the first warm holds the port, a clear from Drupal still reaches
+  // Druxt, so a save made during the warm is not lost. Everything else gets
+  // the starting page.
+  const routeClears = (starting, live) => (req, res) =>
+    req.method === 'POST' && String(req.url || '').split('?')[0] === CLEAR_PATH ? live(req, res) : starting(req, res)
+
+  return { run, schedule, first, watchClears, routeClears }
 }
 
 module.exports = { CLEAR_PATH, createWarmer }

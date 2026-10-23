@@ -107,6 +107,25 @@ describe('createWarmer', () => {
     assert.equal(seen[1].limit, 2)
   })
 
+  test('during the first warm only a clear reaches the live handler', () => {
+    const w = warmer({ crawler: counting().crawler })
+    const seen = []
+    const handler = w.routeClears(
+      (req) => seen.push(`starting ${req.method} ${req.url}`),
+      (req) => seen.push(`live ${req.method} ${req.url}`)
+    )
+    handler({ method: 'POST', url: `${CLEAR_PATH}?x=1` }, {})
+    handler({ method: 'GET', url: CLEAR_PATH }, {})
+    handler({ method: 'POST', url: '/how-to/caching' }, {})
+    handler({ method: 'GET', url: '/' }, {})
+    assert.deepEqual(seen, [
+      `live POST ${CLEAR_PATH}?x=1`,
+      `starting GET ${CLEAR_PATH}`,
+      'starting POST /how-to/caching',
+      'starting GET /',
+    ])
+  })
+
   test('only a successful POST to the clear endpoint schedules a warm', async () => {
     const { calls, crawler } = counting()
     const w = warmer({ crawler })

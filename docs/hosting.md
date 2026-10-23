@@ -121,7 +121,8 @@ Before the server takes the port, it renders every page once, following
 links from the authored pages and the generated ones. That fills the stored
 pages and Druxt's server cache, so the first visitor after a deployment reads
 neither from Drupal. The starting page shows until it finishes, for at most
-`DOCS_WARM_TIMEOUT`.
+`DOCS_WARM_TIMEOUT`. A clear from Drupal reaches the server meanwhile, and
+schedules a refresh for once it is serving.
 
 Each save in Drupal clears Druxt's server cache through Purge. A few seconds
 after a clear that succeeds, the server renders the authored pages again, so
