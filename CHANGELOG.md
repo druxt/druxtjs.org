@@ -9,6 +9,44 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-10-23
+
+### Added
+
+- Drupal's content is kept on the Nuxt server. With Druxt's
+  `cache.content` on, entities, collections, Views results and route
+  lookups are held between renders as well as the index and menus, so a
+  page already visited costs Drupal nothing until its lifetime runs out.
+  Purge clears it on every save.
+- The server renders the authored and generated pages before it takes the
+  port, so the stored pages and Druxt's cache are full for the first
+  visitor after a deployment. A clear from Drupal renders the authored
+  pages again a few seconds later, so an edit shows on the next request.
+  `DOCS_WARM`, `DOCS_WARM_DELAY` and `DOCS_WARM_TIMEOUT` control it.
+
+### Changed
+
+- The site runs on Druxt 0.25.0, every package at its release, and
+  druxt-auth 0.5.1.
+- The API reference is generated from the `druxt@0.25.0` tag by running
+  docgen directly, since druxt.js no longer has a `build:docs` script.
+  The authored markdown stays at the last commit that carried it.
+
+### Fixed
+
+- Lagoon's built-in Sync DB and Sync files tasks work. They run
+  `drush sql-sync @<environment> @self` with the source environment's bare
+  name, which Drush reads as an entry in `self.site.yml`, and the site had
+  none, so the task stopped with "no alias record could be found". The file
+  now names main, develop and staging-content, with the volatile tables
+  copied as structure only, as the rollout does.
+
+### Security
+
+- Lagoon's 26.10.0 base images for PHP, the CLI, nginx and MariaDB, which
+  carry the PHP releases that fix the critical vulnerability announced on
+  2026-10-21.
+
 ## [0.12.3] - 2026-10-22
 
 ### Fixed
