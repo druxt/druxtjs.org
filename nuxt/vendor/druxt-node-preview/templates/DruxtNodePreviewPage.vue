@@ -21,7 +21,7 @@
     />
 
     <p v-else>
-      Loading preview…
+      Loading preview...
     </p>
   </div>
 </template>
@@ -34,7 +34,7 @@ import DruxtNodePreview from './druxt-node-preview.vue'
  *
  * This page only works in the browser. The preview endpoint arrives in the
  * URL fragment, which never reaches the server, and the fetch uses the
- * editor's Drupal session cookie. A server render shows "Loading preview…".
+ * editor's Drupal session cookie. A server render shows "Loading preview...".
  */
 export default {
   name: 'DruxtNodePreviewPage',
@@ -57,8 +57,11 @@ export default {
   }),
 
   computed: {
+    // The view mode comes from the query, which any link can set, so only a
+    // machine name is used.
     viewMode() {
-      return this.$route.query.vm || 'full'
+      const { vm } = this.$route.query
+      return typeof vm === 'string' && /^[A-Za-z0-9_]+$/.test(vm) ? vm : 'full'
     },
   },
 
@@ -69,18 +72,34 @@ export default {
     const layout = this.$druxtNodePreview.layout(this.$route.query.layout)
     if (layout && this.$nuxt && this.$nuxt.layoutName !== layout) {
       const previous = this.$nuxt.layoutName
-      try {
-        await this.$nuxt.loadLayout(layout)
-        this.$nuxt.setLayout(layout)
-      }
-      catch (error) {
-        // A layout chunk can fail to download. Then the preview shows in the
-        // layout the page already has. Webpack names that a ChunkLoadError, or
-        // says "Loading chunk" in the message. Any other error is a fault in
-        // the layout, so it goes to the console too.
+      // A layout chunk can fail to download. Then the preview shows in the
+      // layout the page already has. Webpack names that a ChunkLoadError, or
+      // says "Loading chunk" in the message. Any other error is a fault in
+      // the layout, so it goes to the console too.
+      const report = (error) => {
         if (!/chunk/i.test(`${error && error.name} ${error && error.message}`)) {
           console.error('DruxtNodePreview could not load the layout:', error)
         }
+      }
+      const state = this.$nuxt.nuxt || {}
+      const before = state.err
+      try {
+        await this.$nuxt.loadLayout(layout)
+        if (state.err && state.err !== before) {
+          // Nuxt 2 does not reject a failed layout. It calls error() and
+          // resolves, and its error page would replace the preview. So the
+          // error is cleared. Nuxt's error handler can still change the
+          // layout, so the page waits for it before the check below.
+          report(state.err)
+          this.$nuxt.error(null)
+          await new Promise((done) => setTimeout(done))
+        }
+        else {
+          this.$nuxt.setLayout(layout)
+        }
+      }
+      catch (error) {
+        report(error)
       }
       // A new layout mounts a new page, which loads the preview. If this one
       // loaded it too, the two would seed the same document twice. Nuxt falls
@@ -89,23 +108,60 @@ export default {
       if (this.$nuxt.layoutName !== previous) return
     }
 
-    try {
-      const endpoint = this.$druxtNodePreview.endpoint()
-      if (!endpoint) {
-        this.error = 'No preview endpoint was provided in the URL fragment.'
-        return
+    return this.load()
+  },
+
+  // A site can keep pages alive. Leaving the preview flushes the seeded
+  // resources, so a page that comes back loads its preview again. Vue also
+  // calls activated after the first mount, and that call loads nothing.
+  activated() {
+    if (!this.left) return
+    this.left = false
+    return this.load()
+  },
+
+  deactivated() {
+    this.left = true
+  },
+
+  beforeDestroy() {
+    this.gone = true
+  },
+
+  methods: {
+    /**
+     * Fetches the preview and seeds the Druxt store with it.
+     */
+    async load() {
+      this.run = (this.run || 0) + 1
+      const run = this.run
+      // A reload starts clean. The old preview's resources are flushed, and
+      // an old error would hide a preview that now loads.
+      this.document = null
+      this.entity = null
+      this.error = null
+      try {
+        const endpoint = this.$druxtNodePreview.endpoint()
+        if (!endpoint) {
+          this.error = 'No preview endpoint was provided in the URL fragment.'
+          return
+        }
+        const document = await this.$druxtNodePreview.fetch(endpoint)
+        // The editor can open another preview before this fetch ends. A page
+        // that is gone, kept alive or loading again seeds nothing, so this
+        // document cannot replace a newer one.
+        if (this.gone || this.left || run !== this.run) return
+        // seed() returns null once the editor is leaving. This page can still
+        // be mounted then, and a document without an entity would not render.
+        const entity = this.$druxtNodePreview.seed(document)
+        if (!entity) return
+        this.entity = entity
+        this.document = document
       }
-      const document = await this.$druxtNodePreview.fetch(endpoint)
-      // seed() returns null once the editor is leaving. This page can still
-      // be mounted then, and a document without an entity would not render.
-      const entity = this.$druxtNodePreview.seed(document)
-      if (!entity) return
-      this.entity = entity
-      this.document = document
-    }
-    catch (error) {
-      this.error = error.message
-    }
+      catch (error) {
+        if (run === this.run) this.error = error.message
+      }
+    },
   },
 }
 </script>

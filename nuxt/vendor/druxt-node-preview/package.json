@@ -13,25 +13,30 @@
     "nuxt",
     "preview"
   ],
+  "homepage": "https://github.com/druxt-contrib/druxt-node-preview#readme",
+  "bugs": "https://github.com/druxt-contrib/druxt-node-preview/issues",
   "repository": "github:druxt-contrib/druxt-node-preview",
   "license": "MIT",
   "exports": {
     ".": {
       "require": "./dist/index.ssr.js",
-      "import": "./dist/index.esm.js"
-    }
+      "import": "./dist/index.ssr.js"
+    },
+    "./package.json": "./package.json"
   },
   "main": "dist/index.ssr.js",
   "module": "dist/index.esm.js",
   "files": [
     "dist",
-    "templates"
+    "templates",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "siroc build",
     "build:watch": "siroc build --watch",
     "changeset": "changeset",
     "lint": "eslint --ext .js,.vue src templates test",
+    "prepack": "npm run build",
     "test": "jest",
     "test:e2e": "playwright test",
     "test:e2e:stack": "test/e2e/run.sh",
@@ -58,7 +63,12 @@
   },
   "peerDependencies": {
     "druxt": ">=0.25.0-0 <1",
-    "druxt-entity": ">=0.29.0-0 <1"
+    "druxt-entity": ">=0.29.0-0 <1",
+    "vue": "^2.7.14"
+  },
+  "packageManager": "npm@8.19.4",
+  "engines": {
+    "node": ">=16.20.1"
   },
   "publishConfig": {
     "access": "public"

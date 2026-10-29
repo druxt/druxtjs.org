@@ -13,13 +13,9 @@ import DruxtModule from 'druxt/dist/components/DruxtModule.vue'
  * - `DruxtNodePreviewPage`
  * - `DruxtNodePreviewDefault`
  *
- * The wrapper receives the props it declares from: `document` (the whole
- * JSON:API preview document), `entity` (its main resource), `mode`, `type`
- * and `uuid`. Its default slot renders the node with `DruxtEntity`.
- *
- * A wrapper is any component with that name, for example
- * `components/druxt/node-preview/Page.vue` declaring an `entity` prop and
- * rendering `<h1>{{ entity.attributes.title }}</h1><slot />`.
+ * A wrapper receives whichever of these props it declares: `document` (the
+ * whole JSON:API preview document), `entity` (its main resource), `mode`,
+ * `type` and `uuid`. Its default slot renders the node with `DruxtEntity`.
  */
 export default {
   name: 'DruxtNodePreview',

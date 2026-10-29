@@ -17,21 +17,82 @@ export default ({ app, store }, inject) => {
   // Origins the preview may come from, besides this site's own.
   const origins = JSON.parse('<%= JSON.stringify(options.origins) %>')
 
+  // Drupal gives every JSON:API resource a UUID, and a JSON:API Node Preview
+  // URL ends in /{uuid}/preview.
+  const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+  const PREVIEW_PATH = /\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/preview$/
+
   /**
-   * Throws unless the endpoint is on this site or an allowed origin.
+   * Returns the node's UUID from a preview endpoint, or throws.
    *
-   * The endpoint comes from the URL fragment, which any link can set. So
-   * without this check, a crafted link could make the page fetch a document
-   * from anywhere, with the editor's credentials, and render it.
+   * The endpoint comes from the URL fragment, which any link can set. So it
+   * must be on this site or an allowed origin, and it must be a node preview.
+   * Without these checks, a crafted link could make the page fetch other JSON
+   * with the editor's credentials, such as an uploaded file, and render it.
    *
    * @param {string} endpoint - The endpoint, a URL or a path.
+   *
+   * @returns {string} The previewed node's UUID.
    */
-  const checkOrigin = (endpoint) => {
-    const { origin } = new URL(endpoint, window.location.origin)
+  const checkEndpoint = (endpoint) => {
+    const { origin, pathname } = new URL(endpoint, window.location.origin)
     if (origin !== window.location.origin && !origins.includes(origin)) {
       throw new Error('The preview endpoint is not on this site or its Drupal site: ' + origin)
     }
+    const match = pathname.match(PREVIEW_PATH)
+    if (!match) {
+      throw new Error('The preview endpoint is not a node preview: ' + pathname)
+    }
+    return match[1]
   }
+
+  /**
+   * Throws unless a response's content type is JSON:API.
+   *
+   * @param {*} type - The Content-Type header.
+   */
+  const checkType = (type) => {
+    if (!String(type || '').includes('application/vnd.api+json')) {
+      throw new Error('The preview response is not a JSON:API document.')
+    }
+  }
+
+  /**
+   * Throws unless the document is safe to put in the Druxt store.
+   *
+   * Every resource needs a JSON:API type and a UUID. The store keys resources
+   * by type and id, so a name such as `__proto__` would write to the object
+   * prototype.
+   *
+   * @param {*} doc - The response.
+   * @param {string} [uuid] - The UUID the main resource must have.
+   */
+  const checkDocument = (doc, uuid) => {
+    const safe = (key) => typeof key === 'string' && /^[A-Za-z0-9_-]+$/.test(key) && !(key in Object.prototype)
+    const included = (doc || {}).included
+    const resources = doc && typeof doc === 'object' && doc.data && typeof doc.data === 'object'
+      && (included === undefined || Array.isArray(included))
+      ? [doc.data, ...(included || [])]
+      : []
+    if (!resources.length || !resources.every((resource) => resource && safe(resource.type) && UUID.test(resource.id))) {
+      throw new Error('The preview response is not a node preview document.')
+    }
+    if (uuid && doc.data.id !== uuid) {
+      throw new Error('The preview response is not a preview of ' + uuid + '.')
+    }
+  }
+
+  /**
+   * Returns whether a route is the preview route.
+   *
+   * nuxt-i18n adds a language suffix to route names, such as
+   * `druxt-node-preview___en`.
+   *
+   * @param {object} route - A route.
+   *
+   * @returns {boolean} True for the preview route.
+   */
+  const isPreview = (route) => /^druxt-node-preview(___[A-Za-z0-9_-]+)?$/.test((route || {}).name || '')
 
   // The type and id of every resource the preview put in the Druxt store.
   const seeded = []
@@ -56,13 +117,16 @@ export default ({ app, store }, inject) => {
   // True from when the editor leaves the preview route until a preview route
   // opens again. vue-router changes currentRoute only after the next route's
   // code loads, so a fetch that ends meanwhile still sees the preview route.
+  // When that code fails to download, Nuxt reloads the page, which resets
+  // this. A site guard that cancels the leave with next(false) leaves it set
+  // until the next navigation, because vue-router has no hook for that.
   let left = false
 
   // Before the next route loads, so none of its components read a seeded
   // resource. Druxt then fetches the saved one.
   if (app.router) {
     app.router.beforeEach((to, from, next) => {
-      if (from.name === 'druxt-node-preview' && to.name !== 'druxt-node-preview') {
+      if (isPreview(from) && !isPreview(to)) {
         left = true
         if (seeded.length) {
           for (const { type, id } of seeded.splice(0)) {
@@ -71,7 +135,7 @@ export default ({ app, store }, inject) => {
           store.commit('druxtNodePreview/stop')
         }
       }
-      else if (to.name === 'druxt-node-preview') {
+      else if (isPreview(to)) {
         left = false
       }
       next()
@@ -165,37 +229,43 @@ export default ({ app, store }, inject) => {
     /**
      * Fetches the preview document with the editor's session.
      *
-     * The request goes through the Druxt client, so the site's request
-     * interceptors apply, with credentials, so the session cookie goes too.
-     * A path stays a path. The client resolves it against its own base URL,
-     * and interceptors that decide by path still see it.
+     * The request goes through the Druxt client, with credentials. The site's
+     * request interceptors apply, and the editor's session cookie goes with
+     * it. A path stays a path. The client resolves it against its own base
+     * URL, and interceptors that decide by path still see it.
      *
      * @param {string} endpoint - The JSON:API Node Preview endpoint.
      *
      * @returns {object} The JSON:API document.
      */
     fetch: async (endpoint) => {
-      checkOrigin(endpoint)
+      const uuid = checkEndpoint(endpoint)
       const url = withInclude(endpoint)
       const headers = { Accept: 'application/vnd.api+json' }
       const client = (app.$druxt || {}).axios
       if (client) {
+        let response
         try {
-          const response = await client.get(url, { headers, withCredentials: true })
-          return response.data
+          response = await client.get(url, { headers, withCredentials: true })
         }
         catch (error) {
-          const response = error.response || {}
-          if (!response.status) throw error
-          const body = typeof response.data === 'string' ? response.data : JSON.stringify(response.data || '')
-          throw failure(url, response.status, body)
+          const failed = error.response || {}
+          if (!failed.status) throw error
+          const body = typeof failed.data === 'string' ? failed.data : JSON.stringify(failed.data || '')
+          throw failure(url, failed.status, body)
         }
+        checkType((response.headers || {})['content-type'])
+        checkDocument(response.data, uuid)
+        return response.data
       }
       const response = await window.fetch(url, { credentials: 'include', headers })
       if (!response.ok) {
         throw failure(url, response.status, await response.text().catch(() => ''))
       }
-      return response.json()
+      checkType(response.headers && response.headers.get('content-type'))
+      const doc = await response.json()
+      checkDocument(doc, uuid)
+      return doc
     },
 
     /**
@@ -214,9 +284,14 @@ export default ({ app, store }, inject) => {
       // A fetch can end after the editor has left the preview. Then nothing
       // is seeded, so nothing unsaved reaches the next page.
       if (left) return null
-      if (app.router && (app.router.currentRoute || {}).name !== 'druxt-node-preview') return null
+      if (app.router && !isPreview(app.router.currentRoute)) return null
+      checkDocument(doc)
+      // DruxtEntity reads a resource under its language: its langcode prop,
+      // else the route's langcode meta. The preview's DruxtEntity has no
+      // langcode prop, so the resources go under the route's.
+      const prefix = (((app.router || {}).currentRoute || {}).meta || {}).langcode
       for (const data of [doc.data, ...(doc.included || [])]) {
-        store.commit('druxt/addResource', { resource: { data } })
+        store.commit('druxt/addResource', { prefix, resource: { data } })
         seeded.push({ type: data.type, id: data.id })
       }
       store.commit('druxtNodePreview/start', doc.data.id)
