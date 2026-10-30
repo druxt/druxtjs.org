@@ -1,0 +1,616 @@
+diff --git a/dist/index.esm.js b/dist/index.esm.js
+index 9fc061d..2f5f9ec 100644
+--- a/dist/index.esm.js
++++ b/dist/index.esm.js
+@@ -1,4 +1,280 @@
+ import { resolve } from 'path';
++import { DruxtClient } from 'druxt';
++
++const PREFIX = "[druxt-node-preview] ";
++const DEFAULT_TIMEOUT = 5e3;
++const MAX_TIMEOUT = 12e4;
++const PERMISSION = "register consumer node preview targets";
++const warn$1 = (message) => console.warn(PREFIX + message);
++const info = (message) => console.info(PREFIX + message);
++const fromEnv = (env, name) => typeof env[name] === "string" && env[name].trim() !== "" ? env[name].trim() : void 0;
++const toBaseUrl = (value) => {
++  try {
++    const url = new URL(value);
++    if (!["http:", "https:"].includes(url.protocol) || url.search || url.hash || typeof value !== "string")
++      return null;
++    return (url.origin + url.pathname).replace(/\/+$/, "");
++  } catch (e) {
++    return null;
++  }
++};
++const resolveRegister = (value, env) => {
++  if (value === void 0 || value === null || value === false) return null;
++  if (value !== true && (typeof value !== "object" || Array.isArray(value))) {
++    warn$1(
++      "Ignored the register option. Use true, or an object such as { url: 'https://www.example.com', consumer: 'frontend' }."
++    );
++    return null;
++  }
++  const options = value === true ? {} : value;
++  if (options.secret !== void 0) {
++    warn$1(
++      "Ignored druxt.nodePreview.register.secret. Never put the secret in nuxt.config.js. Set DRUXT_NODE_PREVIEW_CLIENT_SECRET in the environment instead."
++    );
++  }
++  const envUrl = fromEnv(env, "DRUXT_NODE_PREVIEW_URL");
++  const rawUrl = envUrl !== void 0 ? envUrl : options.url;
++  if (rawUrl === void 0) {
++    warn$1(
++      `Ignored the register option: it has no URL. Set druxt.nodePreview.register.url or DRUXT_NODE_PREVIEW_URL to the frontend's public URL, such as "https://www.example.com".`
++    );
++    return null;
++  }
++  const url = toBaseUrl(rawUrl);
++  if (!url) {
++    const where = envUrl !== void 0 ? " from DRUXT_NODE_PREVIEW_URL" : "";
++    warn$1(
++      `Ignored the register option: the URL ${JSON.stringify(rawUrl)}${where} is not a full http(s) URL. Use the frontend's public URL with no query or fragment, such as "https://www.example.com".`
++    );
++    return null;
++  }
++  const consumer = fromEnv(env, "DRUXT_NODE_PREVIEW_CLIENT_ID") || options.consumer;
++  if (typeof consumer !== "string" || !/^[\x21-\x7e]+$/.test(consumer)) {
++    warn$1(
++      "Ignored the register option: it has no usable consumer. Set druxt.nodePreview.register.consumer or DRUXT_NODE_PREVIEW_CLIENT_ID to the consumer's client ID."
++    );
++    return null;
++  }
++  const secret = fromEnv(env, "DRUXT_NODE_PREVIEW_CLIENT_SECRET");
++  if (!secret) {
++    warn$1(
++      "Ignored the register option: DRUXT_NODE_PREVIEW_CLIENT_SECRET is not set. Set it to the consumer's secret in the environment that runs Nuxt."
++    );
++    return null;
++  }
++  let label = new URL(url).host;
++  if (options.label !== void 0) {
++    if (typeof options.label === "string" && options.label.trim() !== "")
++      label = options.label.trim();
++    else
++      warn$1(
++        `Ignored the register label. Use a non-empty string. The label is "${label}".`
++      );
++  }
++  let timeout = DEFAULT_TIMEOUT;
++  if (options.timeout !== void 0) {
++    if (typeof options.timeout === "number" && options.timeout > 0 && options.timeout <= MAX_TIMEOUT)
++      timeout = options.timeout;
++    else
++      warn$1(
++        `Ignored the register timeout. Use a number of milliseconds up to ${MAX_TIMEOUT}. The timeout is ${DEFAULT_TIMEOUT}.`
++      );
++  }
++  return { url, label, consumer, secret, timeout };
++};
++const targetUrl = (url, path, layouts) => url + path + "?vm=[view_mode]" + (layouts.length ? "&layout=[layout]" : "") + "#[jsonapi_node_preview_path]";
++const mergeTargets = (targets, target) => {
++  const index = targets.findIndex((item) => item.label === target.label);
++  if (index === -1) return { targets: [...targets, target], changed: true };
++  if (targets[index].url === target.url) return { targets, changed: false };
++  const merged = [...targets];
++  merged[index] = target;
++  return { targets: merged, changed: true };
++};
++const parse = (text) => {
++  try {
++    return JSON.parse(text);
++  } catch (e) {
++    return void 0;
++  }
++};
++class RegisterError extends Error {
++}
++const isTimeout = (error) => error.code === "ETIMEDOUT" || error.code === "ECONNABORTED" && /timeout/i.test(String(error.message));
++const send = async (client, method, url, { headers, data }) => {
++  let response;
++  try {
++    response = await client.axios.request({
++      method,
++      url,
++      headers,
++      data,
++      maxRedirects: 0,
++      validateStatus: () => true
++    });
++  } catch (error) {
++    if (isTimeout(error)) {
++      const seconds = client.axios.defaults.timeout / 1e3;
++      throw new RegisterError(
++        `Drupal did not answer at ${url} within ${seconds} seconds. Check that Drupal is up, or raise the register timeout.`
++      );
++    }
++    const code = error.code ? ` (${error.code})` : `: ${error.message}`;
++    throw new RegisterError(
++      `Drupal did not answer at ${url}${code}. Check druxt.baseUrl, and that Drupal is up.`
++    );
++  }
++  const { status, headers: answered = {} } = response;
++  if (status >= 300 && status < 400) {
++    const location = answered.location ? ` to ${answered.location}` : "";
++    throw new RegisterError(
++      `Drupal redirected ${url}${location} (HTTP ${status}). The module does not follow redirects, so the secret stays on one host. Set druxt.baseUrl to the URL Drupal redirects to.`
++    );
++  }
++  const body = response.data;
++  return { status, data: typeof body === "string" ? parse(body) : body };
++};
++const reason = (data) => {
++  const text = data && typeof data === "object" && [data.error_description, data.message, data.error].find(
++    (value) => typeof value === "string" && value.trim() !== ""
++  );
++  return text ? ": " + text.trim().slice(0, 300) : "";
++};
++const getToken = async (client, base, { consumer, secret }) => {
++  const url = `${base}/oauth/token`;
++  const { status, data } = await send(client, "POST", url, {
++    headers: {
++      "Content-Type": "application/x-www-form-urlencoded",
++      Accept: "application/json"
++    },
++    data: new URLSearchParams({
++      grant_type: "client_credentials",
++      client_id: consumer,
++      client_secret: secret
++    }).toString()
++  });
++  if (status === 404) {
++    throw new RegisterError(
++      `${url} answered HTTP 404. Install and set up the Simple OAuth module on Drupal.`
++    );
++  }
++  if (status === 400 || status === 401) {
++    throw new RegisterError(
++      `Drupal refused the client credentials (HTTP ${status}${reason(data)}). Check that DRUXT_NODE_PREVIEW_CLIENT_SECRET is the secret of the consumer "${consumer}", and that the consumer is confidential, allows the Client credentials grant, and has a Client credentials user.`
++    );
++  }
++  if (status !== 200) {
++    throw new RegisterError(
++      `The token request answered HTTP ${status}${reason(data)}. Check Simple OAuth's settings and keys on Drupal.`
++    );
++  }
++  if (!data || typeof data.access_token !== "string" || !data.access_token) {
++    throw new RegisterError(
++      `The token request at ${url} gave no access token. Check that it is Simple OAuth's token endpoint.`
++    );
++  }
++  return data.access_token;
++};
++const checkTargets = (url, { status, data }, consumer) => {
++  if (status === 404) {
++    throw new RegisterError(
++      `The targets API at ${url} answered HTTP 404${reason(data)}. Check that Consumer Node Preview is installed, and that a consumer has the client ID "${consumer}".`
++    );
++  }
++  if (status === 401 || status === 403) {
++    throw new RegisterError(
++      `The targets API answered HTTP ${status}${reason(data)}. The consumer's Client credentials user must own the consumer "${consumer}", and the token's scope must give the "${PERMISSION}" permission.`
++    );
++  }
++  if (status === 422) {
++    throw new RegisterError(
++      `Drupal refused the target (HTTP 422${reason(data)}). Check the register url and the path option.`
++    );
++  }
++  if (status !== 200) {
++    throw new RegisterError(
++      `The targets API at ${url} answered HTTP ${status}${reason(data)}.`
++    );
++  }
++  const plain = (target) => target && typeof target.label === "string" && typeof target.url === "string";
++  if (!data || !Array.isArray(data.targets) || !data.targets.every(plain)) {
++    throw new RegisterError(
++      `The targets API at ${url} did not answer with a targets list. Check druxt.baseUrl.`
++    );
++  }
++};
++const registerTarget = async (settings) => {
++  const {
++    baseUrl,
++    druxt = {},
++    url,
++    label,
++    consumer,
++    secret,
++    path,
++    layouts,
++    timeout
++  } = settings;
++  let token;
++  const hide = (message) => [secret, token].filter(Boolean).reduce((text, value) => text.split(value).join("[hidden]"), message);
++  try {
++    if (typeof baseUrl !== "string" || !baseUrl) {
++      throw new RegisterError(
++        "druxt.baseUrl is not set. Set it to the Drupal site's URL."
++      );
++    }
++    const base = baseUrl.replace(/\/+$/, "");
++    const client = new DruxtClient(base, {
++      ...druxt,
++      axios: { ...druxt.axios || {}, timeout }
++    });
++    token = await getToken(client, base, settings);
++    const api = `${base}/api/consumer-node-preview/targets`;
++    const headers = {
++      Accept: "application/json",
++      Authorization: `Bearer ${token}`,
++      "X-Consumer-ID": consumer
++    };
++    const current = await send(client, "GET", api, { headers });
++    checkTargets(api, current, consumer);
++    const target = { label, url: targetUrl(url, path, layouts) };
++    const merged = mergeTargets(current.data.targets, target);
++    const wanted = [...new Set(layouts)];
++    const layoutsChanged = wanted.length > 0 && JSON.stringify(wanted) !== JSON.stringify(current.data.layouts || []);
++    if (!merged.changed && !layoutsChanged) {
++      info(
++        `The preview target "${label}" on the consumer "${consumer}" is up to date.`
++      );
++      return "unchanged";
++    }
++    const body = {
++      targets: merged.targets,
++      ...wanted.length ? { layouts: wanted } : {}
++    };
++    const saved = await send(client, "PUT", api, {
++      headers: { ...headers, "Content-Type": "application/json" },
++      data: body
++    });
++    checkTargets(api, saved, consumer);
++    info(
++      `Registered the preview target "${label}" on the consumer "${consumer}".`
++    );
++    return "registered";
++  } catch (error) {
++    const message = error instanceof RegisterError ? error.message : `${error.message}.`;
++    warn$1(
++      hide(
++        `Could not register the preview target: ${message} The site keeps its current targets.`
++      )
++    );
++    return "failed";
++  }
++};
++const registerOnce = (run) => {
++  const key = /* @__PURE__ */ Symbol.for("druxt-node-preview.register");
++  if (!process[key]) process[key] = run();
++  return process[key];
++};
+ 
+ const toOrigin = (url) => {
+   try {
+@@ -107,6 +383,21 @@ const NuxtModule = function(moduleOptions = {}) {
+   };
+   setOrigins();
+   if (this.nuxt) this.nuxt.hook("modules:done", setOrigins);
++  const register = resolveRegister(options.register, process.env);
++  if (register && this.nuxt) {
++    this.nuxt.hook(
++      "ready",
++      () => registerOnce(
++        () => registerTarget({
++          ...register,
++          druxt: (this.options || {}).druxt || {},
++          baseUrl: ((this.options || {}).druxt || {}).baseUrl,
++          path: options.path,
++          layouts: pluginOptions.layouts
++        })
++      )
++    );
++  }
+   this.addPlugin({
+     src: resolve(__dirname, "../templates/plugin.js"),
+     fileName: "druxt-node-preview.js",
+diff --git a/dist/index.ssr.js b/dist/index.ssr.js
+index 136251d..f66c618 100644
+--- a/dist/index.ssr.js
++++ b/dist/index.ssr.js
+@@ -1,6 +1,282 @@
+ 'use strict';
+ 
+ const path = require('path');
++const druxt = require('druxt');
++
++const PREFIX = "[druxt-node-preview] ";
++const DEFAULT_TIMEOUT = 5e3;
++const MAX_TIMEOUT = 12e4;
++const PERMISSION = "register consumer node preview targets";
++const warn$1 = (message) => console.warn(PREFIX + message);
++const info = (message) => console.info(PREFIX + message);
++const fromEnv = (env, name) => typeof env[name] === "string" && env[name].trim() !== "" ? env[name].trim() : void 0;
++const toBaseUrl = (value) => {
++  try {
++    const url = new URL(value);
++    if (!["http:", "https:"].includes(url.protocol) || url.search || url.hash || typeof value !== "string")
++      return null;
++    return (url.origin + url.pathname).replace(/\/+$/, "");
++  } catch (e) {
++    return null;
++  }
++};
++const resolveRegister = (value, env) => {
++  if (value === void 0 || value === null || value === false) return null;
++  if (value !== true && (typeof value !== "object" || Array.isArray(value))) {
++    warn$1(
++      "Ignored the register option. Use true, or an object such as { url: 'https://www.example.com', consumer: 'frontend' }."
++    );
++    return null;
++  }
++  const options = value === true ? {} : value;
++  if (options.secret !== void 0) {
++    warn$1(
++      "Ignored druxt.nodePreview.register.secret. Never put the secret in nuxt.config.js. Set DRUXT_NODE_PREVIEW_CLIENT_SECRET in the environment instead."
++    );
++  }
++  const envUrl = fromEnv(env, "DRUXT_NODE_PREVIEW_URL");
++  const rawUrl = envUrl !== void 0 ? envUrl : options.url;
++  if (rawUrl === void 0) {
++    warn$1(
++      `Ignored the register option: it has no URL. Set druxt.nodePreview.register.url or DRUXT_NODE_PREVIEW_URL to the frontend's public URL, such as "https://www.example.com".`
++    );
++    return null;
++  }
++  const url = toBaseUrl(rawUrl);
++  if (!url) {
++    const where = envUrl !== void 0 ? " from DRUXT_NODE_PREVIEW_URL" : "";
++    warn$1(
++      `Ignored the register option: the URL ${JSON.stringify(rawUrl)}${where} is not a full http(s) URL. Use the frontend's public URL with no query or fragment, such as "https://www.example.com".`
++    );
++    return null;
++  }
++  const consumer = fromEnv(env, "DRUXT_NODE_PREVIEW_CLIENT_ID") || options.consumer;
++  if (typeof consumer !== "string" || !/^[\x21-\x7e]+$/.test(consumer)) {
++    warn$1(
++      "Ignored the register option: it has no usable consumer. Set druxt.nodePreview.register.consumer or DRUXT_NODE_PREVIEW_CLIENT_ID to the consumer's client ID."
++    );
++    return null;
++  }
++  const secret = fromEnv(env, "DRUXT_NODE_PREVIEW_CLIENT_SECRET");
++  if (!secret) {
++    warn$1(
++      "Ignored the register option: DRUXT_NODE_PREVIEW_CLIENT_SECRET is not set. Set it to the consumer's secret in the environment that runs Nuxt."
++    );
++    return null;
++  }
++  let label = new URL(url).host;
++  if (options.label !== void 0) {
++    if (typeof options.label === "string" && options.label.trim() !== "")
++      label = options.label.trim();
++    else
++      warn$1(
++        `Ignored the register label. Use a non-empty string. The label is "${label}".`
++      );
++  }
++  let timeout = DEFAULT_TIMEOUT;
++  if (options.timeout !== void 0) {
++    if (typeof options.timeout === "number" && options.timeout > 0 && options.timeout <= MAX_TIMEOUT)
++      timeout = options.timeout;
++    else
++      warn$1(
++        `Ignored the register timeout. Use a number of milliseconds up to ${MAX_TIMEOUT}. The timeout is ${DEFAULT_TIMEOUT}.`
++      );
++  }
++  return { url, label, consumer, secret, timeout };
++};
++const targetUrl = (url, path, layouts) => url + path + "?vm=[view_mode]" + (layouts.length ? "&layout=[layout]" : "") + "#[jsonapi_node_preview_path]";
++const mergeTargets = (targets, target) => {
++  const index = targets.findIndex((item) => item.label === target.label);
++  if (index === -1) return { targets: [...targets, target], changed: true };
++  if (targets[index].url === target.url) return { targets, changed: false };
++  const merged = [...targets];
++  merged[index] = target;
++  return { targets: merged, changed: true };
++};
++const parse = (text) => {
++  try {
++    return JSON.parse(text);
++  } catch (e) {
++    return void 0;
++  }
++};
++class RegisterError extends Error {
++}
++const isTimeout = (error) => error.code === "ETIMEDOUT" || error.code === "ECONNABORTED" && /timeout/i.test(String(error.message));
++const send = async (client, method, url, { headers, data }) => {
++  let response;
++  try {
++    response = await client.axios.request({
++      method,
++      url,
++      headers,
++      data,
++      maxRedirects: 0,
++      validateStatus: () => true
++    });
++  } catch (error) {
++    if (isTimeout(error)) {
++      const seconds = client.axios.defaults.timeout / 1e3;
++      throw new RegisterError(
++        `Drupal did not answer at ${url} within ${seconds} seconds. Check that Drupal is up, or raise the register timeout.`
++      );
++    }
++    const code = error.code ? ` (${error.code})` : `: ${error.message}`;
++    throw new RegisterError(
++      `Drupal did not answer at ${url}${code}. Check druxt.baseUrl, and that Drupal is up.`
++    );
++  }
++  const { status, headers: answered = {} } = response;
++  if (status >= 300 && status < 400) {
++    const location = answered.location ? ` to ${answered.location}` : "";
++    throw new RegisterError(
++      `Drupal redirected ${url}${location} (HTTP ${status}). The module does not follow redirects, so the secret stays on one host. Set druxt.baseUrl to the URL Drupal redirects to.`
++    );
++  }
++  const body = response.data;
++  return { status, data: typeof body === "string" ? parse(body) : body };
++};
++const reason = (data) => {
++  const text = data && typeof data === "object" && [data.error_description, data.message, data.error].find(
++    (value) => typeof value === "string" && value.trim() !== ""
++  );
++  return text ? ": " + text.trim().slice(0, 300) : "";
++};
++const getToken = async (client, base, { consumer, secret }) => {
++  const url = `${base}/oauth/token`;
++  const { status, data } = await send(client, "POST", url, {
++    headers: {
++      "Content-Type": "application/x-www-form-urlencoded",
++      Accept: "application/json"
++    },
++    data: new URLSearchParams({
++      grant_type: "client_credentials",
++      client_id: consumer,
++      client_secret: secret
++    }).toString()
++  });
++  if (status === 404) {
++    throw new RegisterError(
++      `${url} answered HTTP 404. Install and set up the Simple OAuth module on Drupal.`
++    );
++  }
++  if (status === 400 || status === 401) {
++    throw new RegisterError(
++      `Drupal refused the client credentials (HTTP ${status}${reason(data)}). Check that DRUXT_NODE_PREVIEW_CLIENT_SECRET is the secret of the consumer "${consumer}", and that the consumer is confidential, allows the Client credentials grant, and has a Client credentials user.`
++    );
++  }
++  if (status !== 200) {
++    throw new RegisterError(
++      `The token request answered HTTP ${status}${reason(data)}. Check Simple OAuth's settings and keys on Drupal.`
++    );
++  }
++  if (!data || typeof data.access_token !== "string" || !data.access_token) {
++    throw new RegisterError(
++      `The token request at ${url} gave no access token. Check that it is Simple OAuth's token endpoint.`
++    );
++  }
++  return data.access_token;
++};
++const checkTargets = (url, { status, data }, consumer) => {
++  if (status === 404) {
++    throw new RegisterError(
++      `The targets API at ${url} answered HTTP 404${reason(data)}. Check that Consumer Node Preview is installed, and that a consumer has the client ID "${consumer}".`
++    );
++  }
++  if (status === 401 || status === 403) {
++    throw new RegisterError(
++      `The targets API answered HTTP ${status}${reason(data)}. The consumer's Client credentials user must own the consumer "${consumer}", and the token's scope must give the "${PERMISSION}" permission.`
++    );
++  }
++  if (status === 422) {
++    throw new RegisterError(
++      `Drupal refused the target (HTTP 422${reason(data)}). Check the register url and the path option.`
++    );
++  }
++  if (status !== 200) {
++    throw new RegisterError(
++      `The targets API at ${url} answered HTTP ${status}${reason(data)}.`
++    );
++  }
++  const plain = (target) => target && typeof target.label === "string" && typeof target.url === "string";
++  if (!data || !Array.isArray(data.targets) || !data.targets.every(plain)) {
++    throw new RegisterError(
++      `The targets API at ${url} did not answer with a targets list. Check druxt.baseUrl.`
++    );
++  }
++};
++const registerTarget = async (settings) => {
++  const {
++    baseUrl,
++    druxt: druxt$1 = {},
++    url,
++    label,
++    consumer,
++    secret,
++    path,
++    layouts,
++    timeout
++  } = settings;
++  let token;
++  const hide = (message) => [secret, token].filter(Boolean).reduce((text, value) => text.split(value).join("[hidden]"), message);
++  try {
++    if (typeof baseUrl !== "string" || !baseUrl) {
++      throw new RegisterError(
++        "druxt.baseUrl is not set. Set it to the Drupal site's URL."
++      );
++    }
++    const base = baseUrl.replace(/\/+$/, "");
++    const client = new druxt.DruxtClient(base, {
++      ...druxt$1,
++      axios: { ...druxt$1.axios || {}, timeout }
++    });
++    token = await getToken(client, base, settings);
++    const api = `${base}/api/consumer-node-preview/targets`;
++    const headers = {
++      Accept: "application/json",
++      Authorization: `Bearer ${token}`,
++      "X-Consumer-ID": consumer
++    };
++    const current = await send(client, "GET", api, { headers });
++    checkTargets(api, current, consumer);
++    const target = { label, url: targetUrl(url, path, layouts) };
++    const merged = mergeTargets(current.data.targets, target);
++    const wanted = [...new Set(layouts)];
++    const layoutsChanged = wanted.length > 0 && JSON.stringify(wanted) !== JSON.stringify(current.data.layouts || []);
++    if (!merged.changed && !layoutsChanged) {
++      info(
++        `The preview target "${label}" on the consumer "${consumer}" is up to date.`
++      );
++      return "unchanged";
++    }
++    const body = {
++      targets: merged.targets,
++      ...wanted.length ? { layouts: wanted } : {}
++    };
++    const saved = await send(client, "PUT", api, {
++      headers: { ...headers, "Content-Type": "application/json" },
++      data: body
++    });
++    checkTargets(api, saved, consumer);
++    info(
++      `Registered the preview target "${label}" on the consumer "${consumer}".`
++    );
++    return "registered";
++  } catch (error) {
++    const message = error instanceof RegisterError ? error.message : `${error.message}.`;
++    warn$1(
++      hide(
++        `Could not register the preview target: ${message} The site keeps its current targets.`
++      )
++    );
++    return "failed";
++  }
++};
++const registerOnce = (run) => {
++  const key = /* @__PURE__ */ Symbol.for("druxt-node-preview.register");
++  if (!process[key]) process[key] = run();
++  return process[key];
++};
+ 
+ const toOrigin = (url) => {
+   try {
+@@ -109,6 +385,21 @@ const NuxtModule = function(moduleOptions = {}) {
+   };
+   setOrigins();
+   if (this.nuxt) this.nuxt.hook("modules:done", setOrigins);
++  const register = resolveRegister(options.register, process.env);
++  if (register && this.nuxt) {
++    this.nuxt.hook(
++      "ready",
++      () => registerOnce(
++        () => registerTarget({
++          ...register,
++          druxt: (this.options || {}).druxt || {},
++          baseUrl: ((this.options || {}).druxt || {}).baseUrl,
++          path: options.path,
++          layouts: pluginOptions.layouts
++        })
++      )
++    );
++  }
+   this.addPlugin({
+     src: path.resolve(__dirname, "../templates/plugin.js"),
+     fileName: "druxt-node-preview.js",

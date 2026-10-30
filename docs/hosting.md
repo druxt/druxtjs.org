@@ -69,9 +69,10 @@ subdomains, are set in `.lagoon.yml`.
    the sanitise happened, and never on production. Either
    way it then runs `drush deploy`, or installs from `drupal/config/sync`
    when there is no database at all, which leaves the site empty. It
-   creates the frontend's OAuth consumer when there is none, and Simple
-   OAuth's keys, once, on the files volume, and records the
-   revision it deployed.
+   creates the frontend's OAuth consumer when there is none, the consumer
+   the frontend registers its preview target on (see
+   [Preview targets](#preview-targets)), and Simple OAuth's keys, once, on
+   the files volume, and records the revision it deployed.
 4. Once Drupal reports that revision, `nuxt` builds the app against it and
    starts serving. It then renders every page it can reach into its page
    cache.
@@ -181,12 +182,53 @@ environment variables. Nothing on your own machine reads that file.
 | Trusted hosts      | Every route in `LAGOON_ROUTES`, and `nginx`, the name `nuxt` uses     |
 | Hash salt          | `DRUPAL_HASH_SALT`, or one made from the database password            |
 | Frontend redirects | `DRUXT_FRONTEND_URL`, or the `nuxt` route                             |
+| Preview target     | The frontend's registration, or the `nuxt` route without it           |
 | Simple OAuth keys  | `files/private/oauth`, which nginx never serves                       |
 
 `drupal/config/sync` enables both database driver modules: `mysql` for
 Lagoon, and `sqlite` for local sites and CI. Drupal refuses to uninstall the
 module that provides the database it runs on, so a configuration without
 the driver fails to install on that database.
+
+## Preview targets
+
+A page's preview shows the frontend in a frame, at a Consumer Node Preview
+target. The frontend can register that target itself when it starts, so no
+one keeps its URL in Drupal by hand. It is on in an environment that has
+`DRUXT_NODE_PREVIEW_CLIENT_SECRET`:
+
+- The rollout runs `drush druxtjsorg:preview-registrar`. It makes the
+  `druxtjs_org_preview` consumer, a confidential client with only the client
+  credentials grant, and the `frontend_registrar` user it acts as and that
+  owns it. The user's one role may change that consumer's preview targets
+  and nothing else. The consumer's secret is set from the variable on every
+  rollout, because a copied database holds a sanitised one.
+- The frontend, as it builds and again as it starts, signs in as that
+  consumer and writes its own target to it, labelled with its host. The
+  build log says `Registered the preview target`, or that it is up to date.
+  A failure only logs a warning, and the frontend still starts.
+- `settings.lagoon.php` leaves its own target out, so the picker shows the
+  frontend once, as **Frontend: druxtjs.org** on production.
+
+Without the variable the consumer is still made, without a secret, and
+`settings.lagoon.php` sets the target to the `nuxt` route, as before.
+
+The variable has to reach the `cli` container for the rollout, the `php`
+container for the settings and the `nuxt` container for the registration,
+so give it the runtime scope. The image builds never need it. Any random
+value does, so long as every container sees the same one:
+
+```sh
+lagoon add variable -p druxtjs-org -e main -N DRUXT_NODE_PREVIEW_CLIENT_SECRET \
+  -V "$(openssl rand -base64 32)" -S runtime
+```
+
+A new variable reaches the containers on the next deployment.
+
+Set on the project instead of one environment, it turns registration on for
+every environment. A copied database drops production's registered target
+along with its secrets, so each environment's picker lists that environment's
+frontend alone.
 
 ## Staging environments
 

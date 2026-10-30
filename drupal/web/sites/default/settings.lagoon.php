@@ -103,12 +103,18 @@ if (!$frontend && getenv('LAGOON_ENVIRONMENT_TYPE') === 'production') {
 }
 if ($frontend) {
   $settings['druxt_docs_frontend_url'] = rtrim($frontend, '/');
-  // The Frontend tab of a page's preview, a Consumer Node Preview target:
-  // this site's preview page, handed the JSON:API Node Preview document's
-  // path in the fragment. The path is relative, so the page fetches it on
-  // its own origin, through the proxy, with the editor's session.
-  // The picker names the frontend by where it runs: the site on production,
-  // the environment anywhere else.
+}
+// The Frontend tab of a page's preview, a Consumer Node Preview target:
+// this site's preview page, handed the JSON:API Node Preview document's
+// path in the fragment. The path is relative, so the page fetches it on
+// its own origin, through the proxy, with the editor's session.
+//
+// An environment with DRUXT_NODE_PREVIEW_CLIENT_SECRET has its frontend
+// register that target on the druxtjs_org_preview consumer when it starts,
+// so this one is left out: the picker would show the same frontend twice.
+// Anywhere else the target is set here. The picker names the frontend by
+// where it runs: the site on production, the environment anywhere else.
+if ($frontend && !getenv('DRUXT_NODE_PREVIEW_CLIENT_SECRET')) {
   $settings['consumer_node_preview'] = [
     'targets' => [
       'frontend' => [
