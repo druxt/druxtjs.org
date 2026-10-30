@@ -15,7 +15,7 @@
   "dependencies": {
     "@druxt-contrib/anchors": "file:vendor/druxt-anchors",
     "@druxt-contrib/diff": "file:vendor/druxt-diff",
-    "@druxt-contrib/node-preview": "0.1.0-dev.20261030024907",
+    "@druxt-contrib/node-preview": "patch:@druxt-contrib/node-preview@npm%3A0.1.0-dev.20261030024907#./patches/druxt-node-preview-0.1.0-dev.20261030024907.patch",
     "@druxt-contrib/user": "file:vendor/druxt-user",
     "@nuxt/content": "1.15.1",
     "@nuxtjs/proxy": "2.1.0",

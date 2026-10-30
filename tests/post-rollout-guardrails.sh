@@ -167,7 +167,7 @@ fi
 
 app="$(build_app yes)"
 run_rollout "$app" LAGOON_ENVIRONMENT_TYPE=development LAGOON_ENVIRONMENT=feature-x > /dev/null
-for expected in "sql:sanitize" "TRUNCATE TABLE sessions" "TRUNCATE TABLE oauth2_token" "TRUNCATE TABLE watchdog" "UPDATE consumer_field_data"; do
+for expected in "sql:sanitize" "TRUNCATE TABLE sessions" "TRUNCATE TABLE oauth2_token" "TRUNCATE TABLE watchdog" "UPDATE consumer_field_data" "DELETE FROM consumer__preview_targets"; do
   if called "$app" "$expected"; then
     ok "sanitised: ${expected}"
   else
@@ -471,6 +471,14 @@ for bootstrap in yes no; do
     ok "sets up the sign-in consumer after ${step}"
   else
     no "did not set up the sign-in consumer after ${step} (client line: ${client:-none}, ${step} line: ${update:-none})"
+  fi
+  # After the update too, which imports the registrar's role and scope, and
+  # after the sanitise, whose placeholder secret it replaces.
+  registrar="$(line_of "$app" 'druxtjsorg:preview-registrar')"
+  if [ -n "$registrar" ] && [ -n "$update" ] && [ "$registrar" -gt "$update" ]; then
+    ok "sets up the preview registration consumer after ${step}"
+  else
+    no "did not set up the preview registration consumer after ${step} (registrar line: ${registrar:-none}, ${step} line: ${update:-none})"
   fi
 done
 
