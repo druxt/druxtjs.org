@@ -32,20 +32,26 @@ seeded ones: `DocPageFull` skips its own fetch of them.
 
 The tab's target is a Consumer Node Preview target. On Lagoon,
 `settings.lagoon.php` points it at the environment's own frontend. Elsewhere
-set it in `settings.php`; `[view_mode]` and `[jsonapi_node_preview_path]` are
-filled in for each preview:
+set it in `settings.php`; `[view_mode]`, `[layout]` and
+`[jsonapi_node_preview_path]` are filled in for each preview:
 
 ```php
 $settings['consumer_node_preview'] = [
   'targets' => [
     'frontend' => [
       'label' => 'Frontend',
-      'url' => 'http://localhost:3000/druxt/node/preview?vm=[view_mode]#[jsonapi_node_preview_path]',
+      'url' => 'http://localhost:3000/druxt/node/preview?vm=[view_mode]&layout=[layout]#[jsonapi_node_preview_path]',
+      'layouts' => ['preview', 'default'],
     ],
   ],
   'default' => 'settings:frontend',
 ];
 ```
+
+`layouts` lists the Nuxt layouts the Layout select offers, as
+`nuxt.config.js` lists them under `druxt.nodePreview.layouts`. A preview
+opens on the first one: the page alone, with the site's layout one pick
+away. Without `layouts` and `[layout]`, the tab has no Layout select.
 
 Without a target, the tab says so.
 
