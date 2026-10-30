@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\druxtjsorg\Kernel;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
@@ -55,6 +56,11 @@ final class PreviewDiffResourceTest extends KernelTestBase {
    * The live page.
    */
   private NodeInterface $node;
+
+  /**
+   * The entity type manager, which WorkspaceTestTrait reads.
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * {@inheritdoc}
