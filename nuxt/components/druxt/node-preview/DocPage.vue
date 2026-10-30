@@ -1,11 +1,13 @@
 <template>
   <article v-if="mode === 'full'">
-    <AppPageHeader :title="title" :description="description" />
+    <AppPreviewDiffToggle />
+    <AppPageHeader :title="title" :description="description" :entity="entity" />
     <AppProse :key="uuid" :title="title">
       <slot />
     </AppProse>
   </article>
   <div v-else class="mx-auto max-w-2xl px-4 py-8" :data-view-mode="mode">
+    <AppPreviewDiffToggle />
     <slot />
   </div>
 </template>
@@ -20,6 +22,9 @@
  * the prose container. Other view modes, a teaser card or a tutorial step,
  * appear inside another page's list rather than as a page, so they render
  * alone, without a page title above them.
+ *
+ * Both start with the toggle that shows the unsaved changes against the live
+ * page.
  */
 export default {
   props: {

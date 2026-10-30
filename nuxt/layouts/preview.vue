@@ -5,6 +5,8 @@
         <Nuxt />
       </div>
     </main>
+    <!-- A preview's diff against live, when the editor turns it on. -->
+    <AppPageDiff />
   </div>
 </template>
 
