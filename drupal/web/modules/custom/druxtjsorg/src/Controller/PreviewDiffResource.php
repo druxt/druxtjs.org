@@ -107,16 +107,21 @@ final class PreviewDiffResource extends ResourceBase implements ContainerInjecti
       ->addCacheContexts(['user', 'url.query_args:leftVersion', 'languages:language_content'])
       ->setCacheMaxAge(0);
 
-    $resource_type = $this->resourceTypeRepository->get($entity_type, $bundle);
-    $entity = $this->entityRepository->loadEntityByUuid($entity_type, $uuid);
-    $preview = $this->preview($uuid);
     // One answer for an unknown type, a page with nothing live and a page
     // this editor has no preview of, so the answer says nothing about
     // anyone else's.
-    if (!$resource_type instanceof ResourceType || $resource_type->isInternal() || !$resource_type->isVersionable()
-      || !$entity instanceof ContentEntityInterface || $entity->bundle() !== $bundle
+    $not_found = new CacheableNotFoundHttpException($cacheability, sprintf('No preview of a `%s--%s` resource with the UUID `%s` was found.', $entity_type, $bundle, $uuid));
+    // The type is checked before anything is loaded by it: loading an entity
+    // of a type the site does not have throws, rather than finding nothing.
+    $resource_type = $this->resourceTypeRepository->get($entity_type, $bundle);
+    if (!$resource_type instanceof ResourceType || $resource_type->isInternal() || !$resource_type->isVersionable()) {
+      throw $not_found;
+    }
+    $entity = $this->entityRepository->loadEntityByUuid($entity_type, $uuid);
+    $preview = $this->preview($uuid);
+    if (!$entity instanceof ContentEntityInterface || $entity->bundle() !== $bundle
       || !$preview instanceof ContentEntityInterface || $preview->uuid() !== $entity->uuid()) {
-      throw new CacheableNotFoundHttpException($cacheability, sprintf('No preview of a `%s--%s` resource with the UUID `%s` was found.', $entity_type, $bundle, $uuid));
+      throw $not_found;
     }
 
     // The loaded entity is the live revision: the page as its readers see it.

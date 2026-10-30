@@ -90,8 +90,8 @@ final class PreviewDiffResourceTest extends KernelTestBase {
   /**
    * Requests the preview diff as the current user.
    */
-  private function request(): Response {
-    $request = Request::create('/jsonapi/diff-preview/node/page/' . $this->node->uuid());
+  private function request(string $type = 'node/page'): Response {
+    $request = Request::create("/jsonapi/diff-preview/$type/" . $this->node->uuid());
     $request->headers->set('Accept', 'application/vnd.api+json');
     return $this->container->get('http_kernel')->handle($request);
   }
@@ -121,6 +121,15 @@ final class PreviewDiffResourceTest extends KernelTestBase {
   public function testNoPreviewIsNotFound(): void {
     $this->setCurrentUser($this->createUser(['access content', 'view all revisions']));
     self::assertSame(404, $this->request()->getStatusCode());
+  }
+
+  /**
+   * A type the site does not have is the same not found answer, not an error.
+   */
+  public function testUnknownTypeIsNotFound(): void {
+    $this->setCurrentUser($this->createUser(['access content', 'view all revisions']));
+    $this->preview('The unsaved title');
+    self::assertSame(404, $this->request('no_such_type/page')->getStatusCode());
   }
 
   /**
