@@ -3367,13 +3367,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@druxt-contrib/node-preview@file:vendor/druxt-node-preview::locator=druxtjs-org%40workspace%3A.":
-  version: 0.0.0
-  resolution: "@druxt-contrib/node-preview@file:vendor/druxt-node-preview#vendor/druxt-node-preview::hash=22fe02&locator=druxtjs-org%40workspace%3A."
+"@druxt-contrib/node-preview@npm:0.1.0-dev.20261030024907":
+  version: 0.1.0-dev.20261030024907
+  resolution: "@druxt-contrib/node-preview@npm:0.1.0-dev.20261030024907"
   peerDependencies:
-    druxt: ">=0.25.0-0 <1"
-    druxt-entity: ">=0.29.0-0 <1"
-  checksum: d5dc555949cded1cc926e4383dcfd618086c37a23b6aa9a9f8b811fea49482531c696c698d9f9a873ea54c4f16027789eed701648e388e29e4c6d9d16780202e
+    druxt: ">=0.25.0 <1"
+    druxt-entity: ">=0.29.0 <1"
+    vue: ^2.7.14
+  checksum: 89eea356ddbe1e686bd729338a78900c128eea9ba25efa556cde16bbae43e0bd0bc700e1c8420f5f2e898f5d9cfcaf254d6ff635eea124fa7b1e423eee5437db
   languageName: node
   linkType: hard
 
@@ -11146,7 +11147,7 @@ __metadata:
     "@babel/plugin-proposal-private-property-in-object": ^7.21.11
     "@druxt-contrib/anchors": "file:vendor/druxt-anchors"
     "@druxt-contrib/diff": "file:vendor/druxt-diff"
-    "@druxt-contrib/node-preview": "file:vendor/druxt-node-preview"
+    "@druxt-contrib/node-preview": 0.1.0-dev.20261030024907
     "@druxt-contrib/user": "file:vendor/druxt-user"
     "@nuxt/content": 1.15.1
     "@nuxt/postcss8": 1.1.3
