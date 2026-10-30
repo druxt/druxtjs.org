@@ -10,6 +10,7 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use Drupal\Tests\workspaces\Kernel\WorkspaceTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class PreviewDiffResourceTest extends KernelTestBase {
 
   use UserCreationTrait;
+  use WorkspaceTestTrait;
 
   /**
    * {@inheritdoc}
@@ -121,6 +123,33 @@ final class PreviewDiffResourceTest extends KernelTestBase {
   public function testNoPreviewIsNotFound(): void {
     $this->setCurrentUser($this->createUser(['access content', 'view all revisions']));
     self::assertSame(404, $this->request()->getStatusCode());
+  }
+
+  /**
+   * In a workspace, the left side is still the live page.
+   *
+   * An editor works in a workspace, where loading the page gives the
+   * workspace's own revision. Compared with that, an edit saved in the
+   * workspace would not show at all.
+   */
+  public function testWorkspaceComparesWithLive(): void {
+    $this->entityTypeManager = $this->container->get('entity_type.manager');
+    $this->initializeWorkspacesModule();
+    // Accounts and roles are saved in Live only.
+    $editor = $this->createUser(['access content', 'view all revisions', 'view any workspace']);
+    $this->switchToWorkspace('stage');
+    $saved = Node::load($this->node->id());
+    $saved->setTitle('The workspace title');
+    $saved->save();
+    $this->container->get('router.builder')->rebuild();
+    $this->setCurrentUser($editor);
+    $this->preview('The workspace title');
+    $response = $this->request();
+    self::assertSame(200, $response->getStatusCode(), (string) $response->getContent());
+    $document = json_decode((string) $response->getContent(), TRUE);
+    self::assertSame('The live title', $document['data']['attributes']['fields']['title']['left']);
+    self::assertSame('The workspace title', $document['data']['attributes']['fields']['title']['right']);
+    self::assertSame(1, $document['data']['attributes']['summary']['changed']);
   }
 
   /**

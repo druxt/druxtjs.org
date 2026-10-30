@@ -27,6 +27,7 @@ use Drupal\jsonapi_diff\Comparison\TreeBuilder;
 use Drupal\jsonapi_diff\JsonApiResource\DiffResourceObject;
 use Drupal\jsonapi_diff\RevisionPairResolver;
 use Drupal\jsonapi_resources\Resource\ResourceBase;
+use Drupal\workspaces\WorkspaceManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
@@ -63,6 +64,7 @@ final class PreviewDiffResource extends ResourceBase implements ContainerInjecti
     private readonly EntityRepositoryInterface $entityRepository,
     private readonly LanguageManagerInterface $languageManager,
     private readonly PrivateTempStoreFactory $tempStoreFactory,
+    private readonly ?WorkspaceManagerInterface $workspaceManager = NULL,
   ) {}
 
   /**
@@ -76,6 +78,7 @@ final class PreviewDiffResource extends ResourceBase implements ContainerInjecti
       $container->get('entity.repository'),
       $container->get('language_manager'),
       $container->get('tempstore.private'),
+      $container->has('workspaces.manager') ? $container->get('workspaces.manager') : NULL,
     );
   }
 
@@ -124,9 +127,18 @@ final class PreviewDiffResource extends ResourceBase implements ContainerInjecti
       throw $not_found;
     }
 
-    // The loaded entity is the live revision: the page as its readers see it.
+    // The left side is the live revision: the page as its readers see it. In
+    // a workspace, loading the page gives the workspace's own revision, and
+    // an edit saved there would not show against it, so live is loaded
+    // outside the workspace. A page the workspace created has nothing live.
+    $live = $this->workspaceManager
+      ? $this->workspaceManager->executeOutsideWorkspace(fn () => $this->entityRepository->loadEntityByUuid($entity_type, $uuid))
+      : $entity;
+    if (!$live instanceof ContentEntityInterface) {
+      throw $not_found;
+    }
     $left = $request->query->get('leftVersion');
-    $left = $left === NULL ? 'id:' . $entity->getRevisionId() : (string) $left;
+    $left = $left === NULL ? 'id:' . $live->getRevisionId() : (string) $left;
     $pair = $this->revisionPairResolver->resolve($entity, $left, $left);
     if (!$this->entityViewCheck->isViewable($preview, $pair->account, $cacheability)) {
       throw new CacheableAccessDeniedHttpException($cacheability, 'The current user is not allowed to view the preview.');
