@@ -5,6 +5,6 @@ package replaces this directory.
 
 | | |
 | --- | --- |
-| Commit | `a8fbb54` (branch `feature/1-preview-layouts`) |
+| Commit | `e8c3ff8` (branch `0.x`) |
 | Built with | `npm ci && npm run build`, the `dist` committed past the site's `dist` ignore |
 | Changed | Nothing |
