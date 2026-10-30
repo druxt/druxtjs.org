@@ -20,15 +20,15 @@ with three tabs. All three show the unsaved changes. The screen is the
 | Drupal   | The page's content in the admin theme, its paragraphs styled like the frontend's |
 | JSON:API | The `jsonapi_node_preview` document, with the page's paragraphs included         |
 
-The Frontend tab shows the page at `/druxt/node/preview`, which the vendored
-`@druxt-contrib/node-preview` module adds to the site. The page reads the
-JSON:API Node Preview document's path from the URL fragment, fetches it
-through the Druxt client with the editor's session, so the workspace header
-goes with it, seeds the store and renders the node through
-`DruxtNodePreviewDocPage`, the wrapper in `components/druxt/node-preview/`
-that gives it the page header and prose shell a saved page has. While a
-preview is active the page's paragraphs are the seeded ones: `DocPageFull`
-skips its own fetch of them.
+The Frontend tab shows the page at `/druxt/node/preview`, which the
+`@druxt-contrib/node-preview` module, a dev release from npm, adds to the
+site. The page reads the JSON:API Node Preview document's path from the URL
+fragment, fetches it through the Druxt client with the editor's session, so
+the workspace header goes with it, seeds the store and renders the node
+through `DruxtNodePreviewDocPage`, the wrapper in
+`components/druxt/node-preview/` that gives it the page header and prose shell
+a saved page has. While a preview is active the page's paragraphs are the
+seeded ones: `DocPageFull` skips its own fetch of them.
 
 The tab's target is a Consumer Node Preview target. On Lagoon,
 `settings.lagoon.php` points it at the environment's own frontend. Elsewhere
