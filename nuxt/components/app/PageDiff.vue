@@ -53,6 +53,11 @@ const MARKED = ['changed', 'added', 'moved']
  * field is marked word by word by `v-diff` in the paragraph's own wrapper
  * (mixins/diffable-field.js); this adds the rule in the margin beside each
  * changed block, and a marker where a block is gone.
+ *
+ * In a node preview the right side is the editor's unsaved edit, which
+ * jsonapi_diff cannot name: druxtjsorg's `diff-preview` resource compares it
+ * with the live page instead. The preview frame signs in with the editor's
+ * Drupal session, so the diff is on whenever they turn it on there.
  */
 export default {
   name: 'AppPageDiff',
@@ -63,8 +68,14 @@ export default {
     editor: ({ $store }) => $store.state.editor,
     signedIn: ({ $auth }) => Boolean($auth && $auth.loggedIn),
     shown: ({ editor }) => viewing(editor.revisions, editor.version),
+    /** The node being previewed, while @druxt-contrib/node-preview shows one. */
+    previewUuid: ({ $store }) => {
+      const preview = $store.state.druxtNodePreview
+      return preview && preview.active ? preview.uuid : null
+    },
     /** On while comparing something other than live itself. */
-    active: ({ signedIn, editor, shown }) => signedIn && editor.compare && shown.kind !== 'live',
+    active: ({ signedIn, editor, shown, previewUuid }) =>
+      previewUuid ? editor.compare : signedIn && editor.compare && shown.kind !== 'live',
     /**
      * The live revision is the left side: what the reader of the site gets.
      * `rel:latest-version` is not it, because on a page with a draft the
@@ -78,13 +89,18 @@ export default {
      * What a block the live page has and this view does not means: a draft
      * dropped it, an older revision never had it.
      */
-    goneLabel: ({ shown }) => (shown.kind === 'draft' ? 'Removed in this draft' : 'Not in this revision'),
+    goneLabel: ({ shown, previewUuid }) =>
+      previewUuid ? 'Removed in this preview' : shown.kind === 'draft' ? 'Removed in this draft' : 'Not in this revision',
     /** The jsonapi_diff version on the right: the draft, or a revision by id. */
     rightVersion: ({ shown }) => (shown.kind === 'draft' ? 'rel:working-copy' : shown.revision ? `id:${shown.revision.vid}` : null),
     // Both sides have to be known: a revision chosen by id has no right side
     // until the revision list has it.
-    key: ({ editor, leftVersion, rightVersion, active }) =>
-      active && editor.page && leftVersion && rightVersion ? `${editor.page.uuid}@${leftVersion}..${rightVersion}` : null,
+    key: ({ editor, leftVersion, rightVersion, active, previewUuid }) => {
+      if (!active) return null
+      // The preview resource takes the live page as its left side itself.
+      if (previewUuid) return `${previewUuid}@preview`
+      return editor.page && leftVersion && rightVersion ? `${editor.page.uuid}@${leftVersion}..${rightVersion}` : null
+    },
   },
 
   watch: {
@@ -122,10 +138,13 @@ export default {
     async load() {
       const key = this.key
       try {
-        const { data } = await this.$druxt.axios.get(`/jsonapi/diff/node/doc_page/${this.editor.page.uuid}`, {
-          params: { leftVersion: this.leftVersion, rightVersion: this.rightVersion },
-          headers: { Accept: 'application/vnd.api+json' },
-        })
+        const headers = { Accept: 'application/vnd.api+json' }
+        const { data } = this.previewUuid
+          ? await this.$druxt.axios.get(`/jsonapi/diff-preview/node/doc_page/${this.previewUuid}`, { headers })
+          : await this.$druxt.axios.get(`/jsonapi/diff/node/doc_page/${this.editor.page.uuid}`, {
+            params: { leftVersion: this.leftVersion, rightVersion: this.rightVersion },
+            headers,
+          })
         const view = normaliseDiff(data)
         // `v-diff` marks what is rendered when the diff arrives, so hand it
         // over once the changed blocks are on the page.
