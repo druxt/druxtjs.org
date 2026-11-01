@@ -20,7 +20,8 @@ import { isTrackableHostname } from './lib/analytics'
 
 /**
  * The version the badge names: `druxt` at the documentation's pinned commit,
- * from the checkout locally and from the file the image copies out of it.
+ * from the docgen checkout locally (then the docs checkout, which can be
+ * older) and from the file the image copies out of it.
  * The installed packages may be a development release, which the badge never
  * says. Hidden when neither is here.
  */
@@ -33,7 +34,11 @@ const docsSource = (() => {
     return {}
   }
 })()
-const druxtVersion = ['.pinned-druxt.json', '../.docs-source/packages/druxt/package.json'].reduce(
+const druxtVersion = [
+  '.pinned-druxt.json',
+  '../.docs-api/packages/druxt/package.json',
+  '../.docs-source/packages/druxt/package.json',
+].reduce(
   (found, file) => {
     if (found) return found
     try {
