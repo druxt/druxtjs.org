@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e96bc465385c442aec06062ccd2be1b0",
+    "content-hash": "7ffd80b10e8167becec8d5cf6fa5883d",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1438,7 +1438,7 @@
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/consumer_node_preview.git",
-                "reference": "9049e1687a06e0e2408a7e6f75ec7ebe0bee8d07"
+                "reference": "a5393d653ada7fe95d0589fa3b9b2a4b06e15811"
             },
             "require": {
                 "drupal/consumers": "^1.17",
@@ -1447,8 +1447,7 @@
                 "php": ">=8.1"
             },
             "require-dev": {
-                "drupal/entity_reference_revisions": "^1.12",
-                "drupal/gin": "^4.1 || ^5"
+                "drupal/entity_reference_revisions": "^1.12"
             },
             "type": "drupal-module",
             "extra": {
@@ -1457,7 +1456,7 @@
                 },
                 "drupal": {
                     "version": "1.0.x-dev",
-                    "datestamp": "1792055794",
+                    "datestamp": "1793575108",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Project has not opted into security advisory coverage!"
