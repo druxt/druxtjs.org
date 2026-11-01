@@ -1,0 +1,16 @@
+uuid: 2d9be38d-3195-498c-a71c-0fa02ad4ddb8
+langcode: en
+status: true
+dependencies: {  }
+id: preview_targets
+name: preview_targets
+description: 'Register the frontend as a node preview target on its own consumer.'
+grant_types:
+  client_credentials:
+    status: true
+    description: ''
+umbrella: false
+parent: null
+granularity_id: role
+granularity_configuration:
+  role: preview_target_registrar

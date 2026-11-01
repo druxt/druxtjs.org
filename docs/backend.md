@@ -20,32 +20,64 @@ with three tabs. All three show the unsaved changes. The screen is the
 | Drupal   | The page's content in the admin theme, its paragraphs styled like the frontend's |
 | JSON:API | The `jsonapi_node_preview` document, with the page's paragraphs included         |
 
-The Frontend tab shows the page at `/druxt/node/preview`, which the vendored
-`@druxt-contrib/node-preview` module adds to the site. The page reads the
-JSON:API Node Preview document's path from the URL fragment, fetches it
-through the Druxt client with the editor's session, so the workspace header
-goes with it, seeds the store and renders the node through
-`DruxtNodePreviewDocPage`, the wrapper in `components/druxt/node-preview/`
-that gives it the page header and prose shell a saved page has. While a
-preview is active the page's paragraphs are the seeded ones: `DocPageFull`
-skips its own fetch of them.
+The Frontend tab shows the page at `/druxt/node/preview`, which the
+`@druxt-contrib/node-preview` module, a dev release from npm, adds to the
+site. The page reads the JSON:API Node Preview document's path from the URL
+fragment, fetches it through the Druxt client with the editor's session, so
+the workspace header goes with it, seeds the store and renders the node
+through `DruxtNodePreviewDocPage`, the wrapper in
+`components/druxt/node-preview/` that gives it the page header and prose shell
+a saved page has. While a preview is active the page's paragraphs are the
+seeded ones: `DocPageFull` skips its own fetch of them.
 
-The tab's target is a Consumer Node Preview target. On Lagoon,
-`settings.lagoon.php` points it at the environment's own frontend. Elsewhere
-set it in `settings.php`; `[view_mode]` and `[jsonapi_node_preview_path]` are
-filled in for each preview:
+**Show changes against the live page**, at the top of the frame, marks what
+the unsaved edit changes, as the editor bar's diff does on a saved page. The
+title is marked word by word and each changed paragraph in the margin, with
+the minimap beside them.
+The frame's `?diff=1` starts it on. jsonapi_diff compares saved revisions
+only, so the `druxtjsorg` module's
+`/jsonapi/diff-preview/node/doc_page/{uuid}` compares the editor's own
+preview with the live page. Its response is `private` with a max-age of 0,
+so neither Drupal nor a shared cache stores it. The toggle is in the frame
+until Consumer Node Preview's bar takes controls from a site.
+
+The tab's target is a Consumer Node Preview target. On Lagoon, the frontend
+registers it on the `druxtjs_org_preview` consumer when it starts, where
+`DRUXT_NODE_PREVIEW_CLIENT_SECRET` is set, and `settings.lagoon.php` points
+it at the environment's own frontend where it is not.
+[Preview targets](hosting.md#preview-targets) in the hosting guide explains
+both. Elsewhere set it in `settings.php`; `[view_mode]`, `[layout]` and
+`[jsonapi_node_preview_path]` are filled in for each preview:
 
 ```php
 $settings['consumer_node_preview'] = [
   'targets' => [
     'frontend' => [
       'label' => 'Frontend',
-      'url' => 'http://localhost:3000/druxt/node/preview?vm=[view_mode]#[jsonapi_node_preview_path]',
+      'url' => 'http://localhost:3000/druxt/node/preview?vm=[view_mode]&layout=[layout]#[jsonapi_node_preview_path]',
+      'layouts' => ['preview', 'default'],
     ],
   ],
   'default' => 'settings:frontend',
 ];
 ```
+
+`layouts` lists the Nuxt layouts the Layout select offers, as
+`nuxt.config.js` lists them under `druxt.nodePreview.layouts`. A preview
+opens on the first one: the page alone, with the site's layout one pick
+away. Without `layouts` and `[layout]`, the tab has no Layout select.
+
+To try the registration locally, give the consumer a secret and start the
+frontend with the same one. `npm run setup` already made the consumer:
+
+```sh
+export DRUXT_NODE_PREVIEW_CLIENT_SECRET="$(openssl rand -base64 32)"
+(cd drupal && vendor/bin/drush druxtjsorg:preview-registrar)
+DRUXT_NODE_PREVIEW_URL=http://localhost:3000 npm run dev
+```
+
+The frontend logs that it registered its target, and the picker lists it as
+**Frontend: localhost:3000**, after the `settings.php` target.
 
 Without a target, the tab says so.
 

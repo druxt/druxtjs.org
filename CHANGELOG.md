@@ -9,6 +9,36 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-11-01
+
+### Added
+
+- The frontend registers its own Consumer Node Preview target on Drupal
+  when it starts, so no one keeps the target's URL in Drupal by hand. Every
+  rollout makes the `druxtjs_org_preview` consumer and the
+  `frontend_registrar` user it acts as, and sets the consumer's secret from
+  `DRUXT_NODE_PREVIEW_CLIENT_SECRET`. Where that variable is unset, the
+  target is set in `settings.lagoon.php` as before.
+- A node preview can show the unsaved edit against the live page. A toggle
+  at the top of the preview frame marks the changed title and paragraphs
+  the way the editor bar's diff does on a saved page, and `?diff=1` starts
+  it on. The `/jsonapi/diff-preview/node/{bundle}/{uuid}` resource behind
+  it answers only the editor's own preview and is never cached.
+
+### Changed
+
+- The site runs on Druxt 0.25.1, every package at its release except
+  druxt-breadcrumb, which had no changes. The API reference and the
+  package changelogs are generated from the 0.25.1 release commit.
+- `@druxt-contrib/node-preview` comes from npm at its first dev release in
+  place of the vendored copy. A preview fetch that ends after the editor
+  has left no longer seeds the store, and a layout that fails to load
+  shows the preview in the current layout instead of an error page.
+- The site runs vale 1.0.0. Inside a workspace, publishing an edit of a
+  published page with a prose error saves it as a draft instead of
+  refusing it, and the workspace publish stops on prose errors in
+  `advise` mode too.
+
 ## [0.13.0] - 2026-10-23
 
 ### Added

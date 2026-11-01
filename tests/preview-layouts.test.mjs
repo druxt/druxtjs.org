@@ -18,3 +18,21 @@ test("Drupal's preview target offers the frontend's preview layouts, in the same
   // A preview opens on the first layout its target lists.
   assert.equal(names(drupal[1])[0], 'preview')
 })
+
+test('the frontend registers its target on the consumer the rollout makes, where Drupal leaves its own out', () => {
+  const registrar = read('drupal/web/modules/custom/druxtjsorg/src/PreviewRegistrar.php')
+  const constant = (name) => registrar.match(new RegExp(`const ${name} = '([^']+)'`))?.[1]
+  const nuxt = read('nuxt/nuxt.config.js').match(
+    /register:\s*process\.env\.(\w+)\s*\?\s*\{[^}]*consumer:\s*'([^']+)'[^}]*\}\s*:\s*false/
+  )
+  const drupal = read('drupal/web/sites/default/settings.lagoon.php').match(
+    /if \(\$frontend && !getenv\('(\w+)'\)\) \{\s*\$settings\['consumer_node_preview'\]/
+  )
+  assert.ok(nuxt, 'nuxt.config.js registers only where the secret is set')
+  assert.ok(drupal, 'settings.lagoon.php sets its target only where the secret is not')
+  // One variable turns registration on, leaves the settings target out, and
+  // is the consumer's secret.
+  assert.equal(nuxt[1], constant('SECRET_VARIABLE'))
+  assert.equal(drupal[1], constant('SECRET_VARIABLE'))
+  assert.equal(nuxt[2], constant('CLIENT_ID'))
+})

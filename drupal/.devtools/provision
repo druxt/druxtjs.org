@@ -142,6 +142,13 @@ if ($has_config && str_contains((string) file_get_contents('config/sync/core.ext
   TASK('Creating the frontend\'s OAuth consumer if there is none.');
   drush('druxtjsorg:oauth-client');
   PASS('Frontend consumer in place.');
+
+  // The consumer the frontend registers its preview target on. Without
+  // DRUXT_NODE_PREVIEW_CLIENT_SECRET it has no secret, and the frontend
+  // does not register.
+  TASK('Creating the consumer the frontend registers its preview target on.');
+  drush('druxtjsorg:preview-registrar');
+  PASS('Preview registration consumer in place.');
 }
 
 echo PHP_EOL;
