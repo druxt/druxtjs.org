@@ -58,23 +58,27 @@ export default {
     const isComponent = /\/components$/.test(document.dir || '') && knowsComponent(document.slug)
     store.commit('setToc', [...(document.toc || []), ...(isComponent ? [{ id: 'try-it', depth: 2, text: 'Try it' }] : [])])
 
-    // Only the head's two lines are kept, so the page's state doesn't carry
-    // the whole changelog twice.
+    // Only what the head and the card need is kept, so the page's state
+    // doesn't carry the whole changelog twice.
     const notes = releaseNotes(route.path, document.text)
     delete document.text
+    const latest = notes && notes.latest
+    // The card also draws the newest version's change count and first change.
+    const card = latest ? [String(latest.changes.length), latest.changes[0] || ''] : []
 
-    return { document, notes: notes && { title: notes.title, description: notes.description } }
+    return { document, card, notes: notes && { title: notes.title, description: notes.description } }
   },
 
   head() {
     // A changelog is titled for its package; docgen titles them all alike.
-    // Its description leads with the newest version, so the share card's URL
-    // changes with each release.
+    // Its description leads with the newest version. The page and its card
+    // both come from the pinned build, so the card's URL can follow them.
     const { notes } = this
     return seoHead({
       title: notes ? notes.title : this.document.title,
       description: notes ? notes.description : documentDescription(this.document),
       path: this.$route.path,
+      card: this.card,
     })
   },
 

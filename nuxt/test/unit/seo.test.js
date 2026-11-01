@@ -168,7 +168,7 @@ describe('seoHead', () => {
   })
 
   it('serves the generated card for section pages and falls back to the site card', () => {
-    expect(content(head, 'og:image')).toMatch(/^https:\/\/druxtjs\.org\/og\/guide\/theming\.png\?v=[0-9a-z]+$/)
+    expect(content(head, 'og:image')).toBe('https://druxtjs.org/og/guide/theming.png')
 
     const home = seoHead({ title: null, path: '/', type: 'website' })
     expect(content(home, 'og:image')).toBe('https://druxtjs.org/og/site.png')
@@ -181,15 +181,23 @@ describe('seoHead', () => {
     // the same URL is never fetched again.
     const card = (head) => content(head, 'og:image')
     const path = '/api/packages/router/CHANGELOG'
-    const before = seoHead({ title: 'druxt-router release notes', description: 'druxt-router 0.32.0, 2026-10-23', path })
-    const same = seoHead({ title: 'druxt-router release notes', description: 'druxt-router 0.32.0, 2026-10-23', path })
-    const after = seoHead({ title: 'druxt-router release notes', description: 'druxt-router 0.32.1, 2026-11-01', path })
-    const retitled = seoHead({ title: 'Router release notes', description: 'druxt-router 0.32.0, 2026-10-23', path })
+    const page = (description, title = 'druxt-router release notes', drawn = ['1', 'A change.']) =>
+      seoHead({ title, description, path, card: drawn })
+    const before = page('druxt-router 0.32.0, 2026-10-23')
 
-    expect(card(same)).toBe(card(before))
-    expect(card(after)).not.toBe(card(before))
-    expect(card(retitled)).not.toBe(card(before))
-    expect(content(after, 'twitter:image')).toBe(card(after))
+    expect(card(before)).toMatch(/\?v=[0-9a-z]+$/)
+    expect(card(page('druxt-router 0.32.0, 2026-10-23'))).toBe(card(before))
+    expect(card(page('druxt-router 0.32.1, 2026-11-01'))).not.toBe(card(before))
+    expect(card(page('druxt-router 0.32.0, 2026-10-23', 'Router release notes'))).not.toBe(card(before))
+    expect(card(page('druxt-router 0.32.0, 2026-10-23', undefined, ['2', 'A change.']))).not.toBe(card(before))
+    expect(content(before, 'twitter:image')).toBe(card(before))
+  })
+
+  test("an authored page's card keeps a plain URL", () => {
+    // Drawn only when the server starts, so a URL that followed a live edit
+    // would name a card that hasn't been drawn yet.
+    expect(content(seoHead({ title: 'Theming', path: '/guide/theming' }), 'og:image'))
+      .toBe('https://druxtjs.org/og/guide/theming.png')
   })
 
   test('a caller-supplied image carries no dimension claims', () => {
