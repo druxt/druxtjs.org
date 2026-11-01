@@ -43,7 +43,8 @@ use Symfony\Component\Routing\Route;
  * The left side is resolved and access checked by jsonapi_diff's resolver,
  * from `leftVersion`, or the live revision when it is absent. The right side
  * is the editor's own preview, so it is only ever theirs to read, and the
- * response is never cached.
+ * response is private with a max-age of 0: neither Drupal nor a shared cache
+ * stores it.
  *
  * The document's own `self` link is the one jsonapi_diff's resource object
  * builds, to jsonapi_diff's route, which cannot read `preview:current`.

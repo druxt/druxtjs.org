@@ -37,8 +37,9 @@ the minimap beside them.
 The frame's `?diff=1` starts it on. jsonapi_diff compares saved revisions
 only, so the `druxtjsorg` module's
 `/jsonapi/diff-preview/node/doc_page/{uuid}` compares the editor's own
-preview with the live page, and is never cached. The toggle is in the
-frame until Consumer Node Preview's bar takes controls from a site.
+preview with the live page. Its response is `private` with a max-age of 0,
+so neither Drupal nor a shared cache stores it. The toggle is in the frame
+until Consumer Node Preview's bar takes controls from a site.
 
 The tab's target is a Consumer Node Preview target. On Lagoon, the frontend
 registers it on the `druxtjs_org_preview` consumer when it starts, where
