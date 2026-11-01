@@ -176,6 +176,30 @@ describe('seoHead', () => {
       .toBe('https://x.test/a.png')
   })
 
+  test("a card's URL changes when what it draws changes", () => {
+    // Share previews are cached by image URL, so a card drawn anew behind
+    // the same URL is never fetched again.
+    const card = (head) => content(head, 'og:image')
+    const path = '/api/packages/router/CHANGELOG'
+    const page = (description, title = 'druxt-router release notes', drawn = ['1', 'A change.']) =>
+      seoHead({ title, description, path, card: drawn })
+    const before = page('druxt-router 0.32.0, 2026-10-23')
+
+    expect(card(before)).toMatch(/\?v=[0-9a-z]+$/)
+    expect(card(page('druxt-router 0.32.0, 2026-10-23'))).toBe(card(before))
+    expect(card(page('druxt-router 0.32.1, 2026-11-01'))).not.toBe(card(before))
+    expect(card(page('druxt-router 0.32.0, 2026-10-23', 'Router release notes'))).not.toBe(card(before))
+    expect(card(page('druxt-router 0.32.0, 2026-10-23', undefined, ['2', 'A change.']))).not.toBe(card(before))
+    expect(content(before, 'twitter:image')).toBe(card(before))
+  })
+
+  test("an authored page's card keeps a plain URL", () => {
+    // Drawn only when the server starts, so a URL that followed a live edit
+    // would name a card that hasn't been drawn yet.
+    expect(content(seoHead({ title: 'Theming', path: '/guide/theming' }), 'og:image'))
+      .toBe('https://druxtjs.org/og/guide/theming.png')
+  })
+
   test('a caller-supplied image carries no dimension claims', () => {
     const head = seoHead({ title: 'x', description: 'y', path: '/guide', image: 'https://example.test/card.jpg' })
     expect(content(head, 'og:image')).toBe('https://example.test/card.jpg')

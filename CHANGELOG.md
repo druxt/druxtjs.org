@@ -9,6 +9,21 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.14.1] - 2026-11-01
+
+### Fixed
+
+- A shared changelog or API page shows its current card. Link previews are
+  cached by image URL, and each card kept one URL across releases, so a
+  changelog shared after a release still showed the version before. An API
+  page's card URL now changes whenever what the card draws does. Authored
+  pages keep a plain URL, because their cards are drawn only when the
+  server starts.
+- A changelog's description and card lead with its newest version again,
+  as in `druxt-router 0.32.1, 2026-11-01`. The page read the version from
+  text that @nuxt/content returns only when asked, so every changelog fell
+  back to a generic description.
+
 ## [0.14.0] - 2026-11-01
 
 ### Added

@@ -119,9 +119,12 @@ const breadcrumbGraph = ({ path, heading, url }) => {
  * @param {string} context.path - The route path.
  * @param {string} [context.image] - Absolute share image URL.
  * @param {string} [context.type] - Open Graph type; 'article' for documents.
+ * @param {Array<string>} [context.card] - What the page's card draws beyond
+ *   its title and summary. Given only where the card is drawn from the same
+ *   build as the page, so a new card URL never serves an old card.
  * @returns {object} A vue-meta head fragment.
  */
-export const seoHead = ({ title, description, path, image, type }) => {
+export const seoHead = ({ title, description, path, image, type, card }) => {
   const url = canonicalUrl(path)
   // A document with no frontmatter title falls back to its path. The homepage
   // passes none deliberately.
@@ -131,7 +134,12 @@ export const seoHead = ({ title, description, path, image, type }) => {
   // <title> gets it from head.titleTemplate instead.
   const shareTitle = heading ? heading + TITLE_SUFFIX : SITE_NAME
   // Section pages get their generated card; everything else the site card.
-  const shareImage = image || ogImageUrl(path) || SITE_ORIGIN + '/og/site.png'
+  // Given what the card draws, its URL changes when the card does, so a
+  // release reaches share previews. An authored page's card is drawn only
+  // when the server starts, so its URL stays plain rather than name a card
+  // that hasn't been drawn.
+  const facts = card && [shareTitle, summary, ...card]
+  const shareImage = image || ogImageUrl(path, facts) || SITE_ORIGIN + '/og/site.png'
   const ogType = type || 'article'
   const breadcrumb = breadcrumbGraph({ path, heading, url })
 
