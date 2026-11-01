@@ -1,7 +1,7 @@
 // GA4, as a plain gtag.js snippet: the Nuxt analytics modules need either
 // Universal Analytics or Nuxt 3.
 const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
-const { serviceRoute } = require('./server/backend')
+const { resolveOrigin, serviceRoute } = require('./server/backend')
 
 // The id is interpolated into an inline script, so check its shape first.
 if (!/^G-[A-Z0-9]+$/.test(GA_MEASUREMENT_ID)) {
@@ -20,7 +20,8 @@ import { isTrackableHostname } from './lib/analytics'
 
 /**
  * The version the badge names: `druxt` at the documentation's pinned commit,
- * from the checkout locally and from the file the image copies out of it.
+ * from the docgen checkout locally (then the docs checkout, which can be
+ * older) and from the file the image copies out of it.
  * The installed packages may be a development release, which the badge never
  * says. Hidden when neither is here.
  */
@@ -33,7 +34,11 @@ const docsSource = (() => {
     return {}
   }
 })()
-const druxtVersion = ['.pinned-druxt.json', '../.docs-source/packages/druxt/package.json'].reduce(
+const druxtVersion = [
+  '.pinned-druxt.json',
+  '../.docs-api/packages/druxt/package.json',
+  '../.docs-source/packages/druxt/package.json',
+].reduce(
   (found, file) => {
     if (found) return found
     try {
@@ -283,6 +288,13 @@ export default {
       // Keyed by type: JSON:API refuses an include path a previewed type lacks.
       include: { 'node--doc_page': ['field_content.field_media', 'field_content.field_media.field_media_image'] },
       layouts: ['preview', 'default'],
+      // The frontend adds its own preview target to the druxtjs_org_preview
+      // consumer when it starts, so no one keeps a URL in Drupal by hand.
+      // Only where the consumer's secret is set: settings.lagoon.php keeps
+      // its own target everywhere else, and leaves it out here.
+      register: process.env.DRUXT_NODE_PREVIEW_CLIENT_SECRET
+        ? { url: resolveOrigin(process.env), consumer: 'druxtjs_org_preview' }
+        : false,
     },
     // Menus ask for the fields a menu needs, not every attribute of a link.
     menu: { jsonApiMenuItems: true, query: { requiredOnly: true } },
