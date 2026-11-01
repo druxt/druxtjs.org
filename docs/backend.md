@@ -30,9 +30,12 @@ through `DruxtNodePreviewDocPage`, the wrapper in
 a saved page has. While a preview is active the page's paragraphs are the
 seeded ones: `DocPageFull` skips its own fetch of them.
 
-The tab's target is a Consumer Node Preview target. On Lagoon,
-`settings.lagoon.php` points it at the environment's own frontend. Elsewhere
-set it in `settings.php`; `[view_mode]`, `[layout]` and
+The tab's target is a Consumer Node Preview target. On Lagoon, the frontend
+registers it on the `druxtjs_org_preview` consumer when it starts, where
+`DRUXT_NODE_PREVIEW_CLIENT_SECRET` is set, and `settings.lagoon.php` points
+it at the environment's own frontend where it is not.
+[Preview targets](hosting.md#preview-targets) in the hosting guide explains
+both. Elsewhere set it in `settings.php`; `[view_mode]`, `[layout]` and
 `[jsonapi_node_preview_path]` are filled in for each preview:
 
 ```php
@@ -52,6 +55,18 @@ $settings['consumer_node_preview'] = [
 `nuxt.config.js` lists them under `druxt.nodePreview.layouts`. A preview
 opens on the first one: the page alone, with the site's layout one pick
 away. Without `layouts` and `[layout]`, the tab has no Layout select.
+
+To try the registration locally, give the consumer a secret and start the
+frontend with the same one. `npm run setup` already made the consumer:
+
+```sh
+export DRUXT_NODE_PREVIEW_CLIENT_SECRET="$(openssl rand -base64 32)"
+(cd drupal && vendor/bin/drush druxtjsorg:preview-registrar)
+DRUXT_NODE_PREVIEW_URL=http://localhost:3000 npm run dev
+```
+
+The frontend logs that it registered its target, and the picker lists it as
+**Frontend: localhost:3000**, after the `settings.php` target.
 
 Without a target, the tab says so.
 

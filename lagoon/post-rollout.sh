@@ -286,6 +286,12 @@ sanitise() {
 
   drush sql:query "UPDATE consumer_field_data SET secret = CONCAT('sanitised-', client_id);"
 
+  # Production's frontend registered its preview target on the consumer this
+  # copy holds. A preview through it would ask production for this
+  # environment's unsaved page, which production does not have. This
+  # environment's frontend registers its own when it starts.
+  drush sql:query "DELETE FROM consumer__preview_targets;"
+
   # Production's private key signs its CSRF tokens and its HMACs, and
   # `sql:sanitize` does not touch it, so a copy carries production's signing
   # secret into every environment that takes one. The cron key lets anyone
@@ -345,6 +351,12 @@ fi
 # this environment's callback nor the sign-in settings may be.
 echo "Allowing this environment's frontend to sign editors in."
 drush druxtjsorg:oauth-client
+
+# The consumer the frontend registers its preview target on. Its secret is
+# this environment's DRUXT_NODE_PREVIEW_CLIENT_SECRET, set again on every
+# rollout, because a copied database holds a sanitised one.
+echo "Letting this environment's frontend register its preview target."
+drush druxtjsorg:preview-registrar
 
 keys="$app/drupal/web/sites/default/files/private/oauth"
 if [ ! -s "$keys/private.key" ] || [ ! -s "$keys/public.key" ]; then
