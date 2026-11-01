@@ -30,6 +30,17 @@ through `DruxtNodePreviewDocPage`, the wrapper in
 a saved page has. While a preview is active the page's paragraphs are the
 seeded ones: `DocPageFull` skips its own fetch of them.
 
+**Show changes against the live page**, at the top of the frame, marks what
+the unsaved edit changes, as the editor bar's diff does on a saved page. The
+title is marked word by word and each changed paragraph in the margin, with
+the minimap beside them.
+The frame's `?diff=1` starts it on. jsonapi_diff compares saved revisions
+only, so the `druxtjsorg` module's
+`/jsonapi/diff-preview/node/doc_page/{uuid}` compares the editor's own
+preview with the live page. Its response is `private` with a max-age of 0,
+so neither Drupal nor a shared cache stores it. The toggle is in the frame
+until Consumer Node Preview's bar takes controls from a site.
+
 The tab's target is a Consumer Node Preview target. On Lagoon, the frontend
 registers it on the `druxtjs_org_preview` consumer when it starts, where
 `DRUXT_NODE_PREVIEW_CLIENT_SECRET` is set, and `settings.lagoon.php` points
