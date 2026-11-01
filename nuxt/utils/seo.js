@@ -131,7 +131,9 @@ export const seoHead = ({ title, description, path, image, type }) => {
   // <title> gets it from head.titleTemplate instead.
   const shareTitle = heading ? heading + TITLE_SUFFIX : SITE_NAME
   // Section pages get their generated card; everything else the site card.
-  const shareImage = image || ogImageUrl(path) || SITE_ORIGIN + '/og/site.png'
+  // The card's URL changes with its title and summary, which on a changelog
+  // lead with the newest version, so a release reaches share previews.
+  const shareImage = image || ogImageUrl(path, [shareTitle, summary]) || SITE_ORIGIN + '/og/site.png'
   const ogType = type || 'article'
   const breadcrumb = breadcrumbGraph({ path, heading, url })
 

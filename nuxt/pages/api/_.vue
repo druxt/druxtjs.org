@@ -39,9 +39,13 @@ export default {
     let path = params.pathMatch || 'README'
     if (path.endsWith('/')) path += 'index'
 
+    // A changelog's head leads with its newest version, read from the raw
+    // markdown, which @nuxt/content leaves out unless asked.
+    const changelog = /(^|\/)CHANGELOG$/.test(path)
+
     let document
     try {
-      document = await $content('api/', path).fetch()
+      document = await $content('api/', path, { text: changelog }).fetch()
       if (Array.isArray(document)) {
         document = await $content('api/', params.pathMatch + '/index').fetch()
       }
@@ -54,13 +58,19 @@ export default {
     const isComponent = /\/components$/.test(document.dir || '') && knowsComponent(document.slug)
     store.commit('setToc', [...(document.toc || []), ...(isComponent ? [{ id: 'try-it', depth: 2, text: 'Try it' }] : [])])
 
-    return { document }
+    // Only the head's two lines are kept, so the page's state doesn't carry
+    // the whole changelog twice.
+    const notes = releaseNotes(route.path, document.text)
+    delete document.text
+
+    return { document, notes: notes && { title: notes.title, description: notes.description } }
   },
 
   head() {
     // A changelog is titled for its package; docgen titles them all alike.
-    // Its description leads with the newest version, read from the text.
-    const notes = releaseNotes(this.$route.path, this.document.text)
+    // Its description leads with the newest version, so the share card's URL
+    // changes with each release.
+    const { notes } = this
     return seoHead({
       title: notes ? notes.title : this.document.title,
       description: notes ? notes.description : documentDescription(this.document),

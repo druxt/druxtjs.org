@@ -143,19 +143,45 @@ const titleFromPath = (path) => {
 }
 
 /**
+ * The card design's version. Bump it when og-card.js draws differently, so
+ * every card's URL changes with it.
+ */
+const CARD_DESIGN = 1
+
+/**
+ * A short FNV-1a hash, the same on the server and in the browser.
+ *
+ * @param {string} text - Any text.
+ * @returns {string} The hash in base 36.
+ */
+const fingerprint = (text) => {
+  let hash = 0x811c9dc5
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i)
+    hash = Math.imul(hash, 0x01000193) >>> 0
+  }
+  return hash.toString(36)
+}
+
+/**
  * The generated share card URL for a route, or null where none is generated.
  *
  * Cards exist for every content document; anything else falls back to
- * og/site.png.
+ * og/site.png. Share previews are cached by image URL, so a card drawn anew
+ * behind the same URL is never fetched again: given the facts the card
+ * draws, such as a changelog's newest version, the URL carries a fingerprint
+ * of them and changes when they do.
  *
  * @param {string} path - A route path.
+ * @param {Array<string>} [facts] - What the card draws.
  * @returns {string|null} Absolute image URL, or null.
  */
-const ogImageUrl = (path) => {
+const ogImageUrl = (path, facts) => {
   const normalised = normalisePath(path)
   const section = sectionFor(normalised)
   if (!section) return null
-  return SITE_ORIGIN + '/og' + normalised + '.png'
+  const url = SITE_ORIGIN + '/og' + normalised + '.png'
+  return facts ? url + '?v=' + fingerprint([CARD_DESIGN, ...facts].join('\n')) : url
 }
 
 /**

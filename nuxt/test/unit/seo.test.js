@@ -168,12 +168,28 @@ describe('seoHead', () => {
   })
 
   it('serves the generated card for section pages and falls back to the site card', () => {
-    expect(content(head, 'og:image')).toBe('https://druxtjs.org/og/guide/theming.png')
+    expect(content(head, 'og:image')).toMatch(/^https:\/\/druxtjs\.org\/og\/guide\/theming\.png\?v=[0-9a-z]+$/)
 
     const home = seoHead({ title: null, path: '/', type: 'website' })
     expect(content(home, 'og:image')).toBe('https://druxtjs.org/og/site.png')
     expect(content(seoHead({ title: 'A', path: '/a', image: 'https://x.test/a.png' }), 'og:image'))
       .toBe('https://x.test/a.png')
+  })
+
+  test("a card's URL changes when what it draws changes", () => {
+    // Share previews are cached by image URL, so a card drawn anew behind
+    // the same URL is never fetched again.
+    const card = (head) => content(head, 'og:image')
+    const path = '/api/packages/router/CHANGELOG'
+    const before = seoHead({ title: 'druxt-router release notes', description: 'druxt-router 0.32.0, 2026-10-23', path })
+    const same = seoHead({ title: 'druxt-router release notes', description: 'druxt-router 0.32.0, 2026-10-23', path })
+    const after = seoHead({ title: 'druxt-router release notes', description: 'druxt-router 0.32.1, 2026-11-01', path })
+    const retitled = seoHead({ title: 'Router release notes', description: 'druxt-router 0.32.0, 2026-10-23', path })
+
+    expect(card(same)).toBe(card(before))
+    expect(card(after)).not.toBe(card(before))
+    expect(card(retitled)).not.toBe(card(before))
+    expect(content(after, 'twitter:image')).toBe(card(after))
   })
 
   test('a caller-supplied image carries no dimension claims', () => {
