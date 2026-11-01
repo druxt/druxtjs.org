@@ -409,6 +409,7 @@ const placeViewport = (at, shown, total) => {
   return { top: pin(at / total * 100), height: pin(shown / total * 100) };
 };
 
+const WORD = /[\p{L}\p{N}][\p{L}\p{N}'\u2019-]*/gu;
 const diffTokens = (diff) => {
   const out = [];
   for (const run of wordDiff(diff.left, diff.right)) {
@@ -416,12 +417,23 @@ const diffTokens = (diff) => {
     for (const piece of run.text.match(/\S+|\s+/g) || []) {
       if (/^\s+$/.test(piece))
         continue;
-      out.push({
-        type: run.type,
-        text: piece,
-        block,
-        word: piece.replace(/[^\p{L}\p{N}]/gu, "").toLowerCase()
-      });
+      if (run.type === "-") {
+        out.push({
+          type: run.type,
+          text: piece,
+          block,
+          word: piece.replace(/[^\p{L}\p{N}]/gu, "").toLowerCase()
+        });
+        continue;
+      }
+      const words = piece.replace(/\]\([^)\s]*\)/g, "").match(WORD) || [""];
+      for (const word of words)
+        out.push({
+          type: run.type,
+          text: piece,
+          block,
+          word: word.toLowerCase()
+        });
     }
   }
   return out;
@@ -432,7 +444,7 @@ const renderedWords = (root) => {
   let node = walker.nextNode();
   while (node) {
     if (node.parentNode && node.parentNode.nodeName !== "INS" && node.parentNode.nodeName !== "DEL") {
-      const re = /[\p{L}\p{N}][\p{L}\p{N}'\u2019-]*/gu;
+      const re = new RegExp(WORD);
       let m;
       while (m = re.exec(node.nodeValue))
         words.push({

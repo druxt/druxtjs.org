@@ -7,7 +7,7 @@ scripts and development dependencies, the licence and the README.
 | | |
 | --- | --- |
 | Package | `@druxt-contrib/diff` |
-| Commit | `7ab4450` |
+| Commit | `7ab4450`, plus the fix to word alignment in `src/directive.js` |
 
 Replace `file:vendor/druxt-diff` in `package.json` with the published version
 once it is on npm, and delete this directory.
