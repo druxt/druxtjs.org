@@ -9,6 +9,8 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-11-02
+
 ### Added
 
 - A read-only MCP server at `/mcp`, so AI tools can search and read the docs.
