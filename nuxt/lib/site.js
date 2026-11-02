@@ -33,7 +33,17 @@ const SITE_DESCRIPTION
 /** What the playground page says about itself; its share card and sitemap entry come from PAGES. */
 const PLAYGROUND_DESCRIPTION = 'Render every Druxt component live against a Drupal backend, change its props, read the requests it makes, and copy the markup.'
 
+/** The docs server's page: its heading, share card, sitemap entry and llms.txt line. */
+const MCP_TITLE = 'Give your AI tool the Druxt docs'
+const MCP_DESCRIPTION = 'A read-only server your coding agent can search and read, so it answers from these docs instead of from memory.'
+
 const SECTIONS = {
+  mcp: {
+    label: 'MCP server',
+    description: MCP_DESCRIPTION,
+    priority: 0.7,
+    changefreq: 'monthly',
+  },
   playground: {
     label: 'Playground',
     description: PLAYGROUND_DESCRIPTION,
@@ -136,6 +146,7 @@ const sectionFor = (path) => {
  * @returns {string} A human-readable title, or an empty string for the root.
  */
 const titleFromPath = (path) => {
+  if (normalisePath(path) === '/mcp') return SECTIONS.mcp.label
   const segment = normalisePath(path).split('/').filter(Boolean).pop()
   if (!segment) return ''
   const words = segment.replace(/[-_]+/g, ' ').trim()
@@ -228,6 +239,15 @@ const docTypeExpression = () => {
  */
 const PAGES = [
   {
+    route: '/mcp',
+    title: MCP_TITLE,
+    description: MCP_DESCRIPTION,
+    weight: 0,
+    section: 'mcp',
+    // What site search matches besides the title.
+    keywords: ['MCP', 'Model Context Protocol', 'Claude Code', 'Cursor', 'VS Code', 'OpenCode', 'AI', 'agent'],
+  },
+  {
     route: '/playground',
     title: 'Live component playground',
     description: PLAYGROUND_DESCRIPTION,
@@ -249,6 +269,8 @@ const PAGES = [
 const packageName = (dir) => (dir === 'druxt' ? 'druxt' : `druxt-${dir}`)
 
 module.exports = {
+  MCP_DESCRIPTION,
+  MCP_TITLE,
   PAGES,
   PLAYGROUND_DESCRIPTION,
   SITE_ORIGIN,

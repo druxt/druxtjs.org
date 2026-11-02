@@ -1,0 +1,67 @@
+<template>
+  <section aria-label="Connect your client">
+    <div class="flex items-center gap-3 rounded-lg border border-base-300 bg-base-200 p-3 pl-4 font-mono text-sm sm:text-base">
+      <span class="flex-1 min-w-0 break-all">{{ url }}</span>
+      <button class="btn btn-sm btn-outline flex-none min-h-[44px] sm:min-h-0" type="button" @click="copy(url, 'url')">
+        {{ copied === 'url' ? 'Copied' : 'Copy' }}
+      </button>
+    </div>
+
+    <h2 id="connect" class="mt-8 mb-3 text-xl font-bold">Connect your client</h2>
+    <div class="flex flex-wrap gap-1 border-b border-base-300" role="tablist" aria-label="AI clients">
+      <button
+        v-for="(client, index) of clients"
+        :key="client.name"
+        class="-mb-px min-h-[44px] border-b-2 px-3 py-2 font-semibold"
+        :class="index === selected ? 'border-primary-focus text-primary-focus' : 'border-transparent text-base-content/70'"
+        type="button"
+        role="tab"
+        :aria-selected="index === selected ? 'true' : 'false'"
+        @click="selected = index"
+      >{{ client.name }}</button>
+    </div>
+    <div class="pt-4" role="tabpanel">
+      <p class="mb-3 text-base-content/70">{{ client.note }}</p>
+      <div class="flex items-start gap-3 rounded-lg bg-neutral p-4 text-neutral-content">
+        <pre class="flex-1 min-w-0 whitespace-pre-wrap break-words font-mono text-sm"><code>{{ client.code }}</code></pre>
+        <button class="btn btn-xs flex-none" type="button" @click="copy(client.code, client.name)">
+          {{ copied === client.name ? 'Copied' : 'Copy' }}
+        </button>
+      </div>
+      <a v-if="client.install" class="btn btn-primary btn-sm mt-3" :href="client.install">{{ client.action }}</a>
+    </div>
+  </section>
+</template>
+
+<script>
+import { SITE_ORIGIN } from '~/lib/site'
+import { mcpClients } from '~/lib/mcp-clients'
+
+/** The install tabs for the docs server, and the address they all point at. */
+export default {
+  data: () => ({ selected: 0, copied: null }),
+
+  computed: {
+    url: () => `${SITE_ORIGIN}/mcp`,
+    clients: ({ url }) => mcpClients(url),
+    client: ({ clients, selected }) => clients[selected],
+  },
+
+  methods: {
+    /**
+     * Copy text, and say so on the button that asked.
+     *
+     * @param {string} text - The text to copy.
+     * @param {string} key - Which button asked.
+     */
+    async copy(text, key) {
+      try {
+        await navigator.clipboard.writeText(text)
+        this.copied = key
+      } catch (e) {
+        // A browser can refuse the clipboard. The text is on the page to select.
+      }
+    },
+  },
+}
+</script>

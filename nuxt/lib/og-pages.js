@@ -31,6 +31,12 @@ const pageFromDoc = (doc) => {
     description: doc.description || undefined,
   }
 
+  // The address is what someone needs from a shared link to this page.
+  if (doc.section === 'mcp') {
+    page.title = 'druxtjs.org/mcp'
+    page.description = 'Claude Code, Cursor, VS Code and OpenCode. Read-only, with no sign-in.'
+  }
+
   if (doc.section === 'modules' && parts[1]) {
     page.module = parts[1]
     page.pkg = packageName(parts[1])

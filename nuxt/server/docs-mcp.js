@@ -10,6 +10,8 @@
  * The same path is also a page: a browser's GET goes on to it.
  */
 
+const crypto = require('crypto')
+
 const { SECTION_ORDER, isChangelog, toAbsoluteUrls } = require('../lib/llms-full-txt')
 
 const PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05']
@@ -261,4 +263,70 @@ const createDocsMcp = ({ corpus, origin, log = () => {} }) => async (req, res) =
   }
 }
 
-module.exports = { createDocsMcp, isMcpRequest, searchDocs }
+/**
+ * The server's discovery documents, for clients that find it before connecting.
+ *
+ * Public, read-only metadata, so any origin may read them and caches may keep
+ * them for an hour. Tools are left out, as the Server Card extension requires.
+ *
+ * @param {string} origin - The origin the server answers on.
+ * @returns {object} Which paths this serves, and the listener for them.
+ */
+const createMcpDiscovery = (origin) => {
+  const card = `${origin}/mcp/server-card`
+  const hostname = new URL(origin).hostname
+  const documents = {
+    '/mcp/server-card': {
+      type: 'application/mcp-server-card+json',
+      body: {
+        $schema: 'https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json',
+        name: 'org.druxtjs/docs',
+        version: '1.0.0',
+        title: 'Druxt docs',
+        description: 'Search and read the Druxt documentation and API reference.',
+        websiteUrl: `${origin}/mcp`,
+        repository: { url: 'https://github.com/druxt/druxtjs.org', source: 'github' },
+        remotes: [{ type: 'streamable-http', url: `${origin}/mcp`, supportedProtocolVersions: PROTOCOL_VERSIONS }],
+      },
+    },
+    '/.well-known/ai-catalog.json': {
+      type: 'application/ai-catalog+json',
+      body: {
+        specVersion: '1.0',
+        entries: [
+          { identifier: `urn:air:${hostname}:mcp:docs`, type: 'application/mcp-server-card+json', url: card },
+        ],
+      },
+    },
+  }
+  const prepared = Object.fromEntries(
+    Object.entries(documents).map(([path, { type, body }]) => {
+      const text = JSON.stringify(body, null, 2)
+      return [path, { type, text, etag: `"${crypto.createHash('sha1').update(text).digest('hex')}"` }]
+    })
+  )
+
+  return {
+    serves: (method, pathname) =>
+      ['GET', 'HEAD'].includes(method) && Object.prototype.hasOwnProperty.call(prepared, pathname),
+    handle: (req, res, pathname) => {
+      const { type, text, etag } = prepared[pathname]
+      const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type, If-None-Match',
+        'Access-Control-Expose-Headers': 'ETag',
+        'Cache-Control': 'public, max-age=3600',
+        ETag: etag,
+      }
+      if (req.headers['if-none-match'] === etag) {
+        res.writeHead(304, headers)
+        return res.end()
+      }
+      res.writeHead(200, { ...headers, 'Content-Type': type })
+      return res.end(req.method === 'HEAD' ? undefined : text)
+    },
+  }
+}
+
+module.exports = { createDocsMcp, createMcpDiscovery, isMcpRequest, searchDocs }

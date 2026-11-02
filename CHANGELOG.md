@@ -13,6 +13,11 @@ Druxt 1.0.0.
 
 - AI tools working in this repository connect to the Druxt docs server.
 
+- A page at `/mcp` that shows how to connect an AI client to the docs server, with
+  a share card, a sitemap entry and a line in `llms.txt`.
+- A server card at `/mcp/server-card` and an AI catalog at
+  `/.well-known/ai-catalog.json`, so clients can discover the server.
+
 ## [0.15.0] - 2026-11-02
 
 ### Added
