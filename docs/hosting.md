@@ -243,7 +243,9 @@ publishes.
 
 `server.json` is its entry in the [MCP Registry](https://registry.modelcontextprotocol.io).
 The name `org.druxtjs/docs` is authorised by a TXT record on `druxtjs.org`. Raise
-`version` to publish a change, then run `mcp-publisher publish`.
+`version` to publish a change: the `MCP Registry` workflow publishes each new
+version when it reaches `main`, using the `MCP_REGISTRY_KEY` secret on the
+`mcp-registry` environment.
 
 ## Staging environments
 
