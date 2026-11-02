@@ -17,7 +17,7 @@ export const mcpClients = (url) => {
     },
     {
       name: 'Cursor',
-      note: 'Add it in one click, or put this in .cursor/mcp.json.',
+      note: 'Put this in .cursor/mcp.json, or add it from a link:',
       language: 'json',
       code: json({ mcpServers: { druxt: { url } } }),
       action: 'Add to Cursor',
