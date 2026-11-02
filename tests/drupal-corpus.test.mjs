@@ -116,6 +116,35 @@ describe('paragraphMarkdown', () => {
 })
 
 describe('fetchDrupalDocs', () => {
+  test('reads a paragraph the collection omitted, in its place, and survives one it cannot', async () => {
+    const reference = (id) => ({ type: 'paragraph--docs_text', id })
+    const text = (id, value) => ({
+      type: 'paragraph--docs_text',
+      id,
+      attributes: { field_text: { value } },
+    })
+    const collection = {
+      data: [
+        {
+          attributes: { title: 'T', path: { alias: '/how-to/t' } },
+          relationships: {
+            field_content: { data: [reference('gone'), reference('old'), reference('kept')] },
+          },
+        },
+      ],
+      included: [text('kept', 'Third')],
+    }
+    const docs = await fetchDrupalDocs('http://drupal', {
+      log: () => {},
+      fetch: async (url) => {
+        if (url.endsWith('/docs_text/old')) return { data: text('old', 'Second') }
+        if (url.endsWith('/docs_text/gone')) throw new Error('403')
+        return collection
+      },
+    })
+    assert.equal(docs[0].content, 'Second\n\nThird')
+  })
+
   test('reads a page into the shape the indexes take', async () => {
     const answer = {
       data: [

@@ -109,6 +109,26 @@ describe('the page at the same path', () => {
 })
 
 describe('the tools', () => {
+  test('a question finds the guide, whatever words surround it', () => {
+    const pages = [
+      {
+        route: '/api/packages/views/components/DruxtView',
+        title: 'DruxtView',
+        section: 'api',
+        content: 'the the the to to do drupal backend how',
+      },
+      ...docs,
+    ]
+    assert.equal(searchDocs(pages, 'how do I proxy the Drupal backend')[0].route, '/how-to/proxy')
+  })
+
+  test('a word is not matched inside another word', () => {
+    assert.deepEqual(
+      searchDocs([{ route: '/a', title: 'Toast', section: 'how-to', content: 'bread' }], 'to the'),
+      []
+    )
+  })
+
   test('search ranks a title match first and leaves changelogs out', () => {
     assert.deepEqual(
       searchDocs(docs, 'proxy').map((d) => d.route),

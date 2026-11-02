@@ -219,6 +219,37 @@ const documentOf = (page, byId) => {
  * @throws {Error} When Drupal cannot be read, or answers something unusable.
  * @returns {Promise<Array<object>>} The documents.
  */
+/**
+ * Read the paragraphs a collection left out, one at a time.
+ *
+ * JSON:API omits an included paragraph when the node's reference isn't the
+ * paragraph's current revision, which a workspace import can leave behind.
+ * The page still renders it, so the indexes have to carry it too. One that
+ * can't be read is left out, and doesn't cost the rest of the corpus.
+ *
+ * @param {string} baseUrl - Drupal's base URL.
+ * @param {object} page - The node resource.
+ * @param {Map<string, object>} byId - The included resources, added to here.
+ * @param {object} options - Options.
+ * @param {Function} options.fetch - Fetches a JSON document.
+ * @param {Function} options.log - Logs a paragraph that could not be read.
+ */
+const readOmitted = async (baseUrl, page, byId, { fetch, log }) => {
+  const references = ((page.relationships || {}).field_content || {}).data || []
+  for (const { type, id } of references) {
+    if (byId.has(`${type}:${id}`) || type === 'paragraph--docs_layout_section') continue
+    const url = new URL(`/jsonapi/paragraph/${type.replace(/^paragraph--/, '')}/${id}`, baseUrl)
+    if (type === 'paragraph--docs_image') url.searchParams.set('include', 'field_media')
+    try {
+      const body = await fetch(url.href)
+      byId.set(`${type}:${id}`, body.data)
+      for (const [key, resource] of indexIncluded(body.included)) byId.set(key, resource)
+    } catch (error) {
+      log(`drupal corpus: paragraph ${id} not read: ${error.message}`)
+    }
+  }
+}
+
 const fetchDrupalDocs = async (baseUrl, { fetch = getJson, log = () => {} } = {}) => {
   const documents = []
   let next = collectionUrl(baseUrl)
@@ -234,6 +265,7 @@ const fetchDrupalDocs = async (baseUrl, { fetch = getJson, log = () => {} } = {}
 
     const byId = indexIncluded(body.included)
     for (const page of body.data) {
+      await readOmitted(baseUrl, page, byId, { fetch, log })
       const document = documentOf(page, byId)
       if (document) documents.push(document)
     }

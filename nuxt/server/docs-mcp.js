@@ -59,21 +59,46 @@ const TOOLS = [
 const pagesOf = (docs) =>
   docs.filter((doc) => SECTION_ORDER.includes(doc.section) && (doc.content || '').trim() && !isChangelog(doc.route))
 
-/** Counts how often a word appears in some text. */
-const count = (text, word) => String(text || '').toLowerCase().split(word).length - 1
+/** Words a question is made of, which say nothing about the page it wants. */
+const STOP_WORDS = new Set(
+  'a an and are can do does for from how i in is it my of on or the to use using what when where which with you your'.split(' ')
+)
 
-/** Pages for a query, best first: a word in the title counts most, then the description. */
+/** The lowercase words in some text, keeping dots and hyphens inside a word. */
+const wordsIn = (value) => String(value || '').toLowerCase().match(/[\p{L}\p{N}]+(?:[.-][\p{L}\p{N}]+)*/gu) || []
+
+/** Whether a word is in a page's text, as itself or as the start of a longer word. */
+const countIn = (words, word) => words.filter((candidate) => candidate === word || candidate.startsWith(word)).length
+
+/**
+ * Pages for a query, best first.
+ *
+ * A guide's title is the strongest signal. A page matching more of the query
+ * beats one repeating a single word, and repeats count less each time, so a
+ * long reference page can't win by length.
+ */
 const searchDocs = (docs, query) => {
-  const words = [...new Set(String(query).toLowerCase().split(/\s+/).filter(Boolean))]
+  const all = wordsIn(query)
+  const words = [...new Set(all.filter((word) => !STOP_WORDS.has(word)))]
   if (!words.length) return []
   return pagesOf(docs)
-    .map((doc) => ({
-      doc,
-      score: words.reduce(
-        (sum, word) => sum + count(doc.title, word) * 10 + count(doc.description, word) * 5 + count(doc.content, word),
-        0
-      ),
-    }))
+    .map((doc) => {
+      const title = wordsIn(doc.title)
+      const description = wordsIn(doc.description)
+      const content = wordsIn(doc.content)
+      let score = 0
+      let matched = 0
+      for (const word of words) {
+        const inTitle = countIn(title, word)
+        const inDescription = countIn(description, word)
+        const inContent = countIn(content, word)
+        if (inTitle + inDescription + inContent) matched += 1
+        score += inTitle * 10 + inDescription * 4 + Math.log2(1 + inContent)
+      }
+      // Guides answer questions. Reference pages rank behind them on a tie.
+      const guide = doc.section === 'api' ? 1 : 1.5
+      return { doc, score: score * guide * (matched / words.length) ** 2 }
+    })
     .filter(({ score }) => score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, MAX_RESULTS)

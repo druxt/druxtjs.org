@@ -13,6 +13,11 @@ Druxt 1.0.0.
 
 - A read-only MCP server at `/mcp`, so AI tools can search and read the docs.
 
+### Fixed
+
+- `llms-full.txt` no longer loses paragraphs whose reference isn't their current
+  revision, which a workspace import can leave behind.
+
 ## [0.14.1] - 2026-11-01
 
 ### Fixed
