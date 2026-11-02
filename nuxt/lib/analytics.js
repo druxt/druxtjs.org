@@ -5,6 +5,9 @@
  * separate from the dispatcher so the payloads can be asserted directly.
  */
 
+/** The GA4 property's measurement ID. */
+export const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
+
 /** GA4 rejects oversized values. */
 const MAX_TERM = 100
 
@@ -22,6 +25,44 @@ const MAX_TERM = 100
  */
 export const isTrackableHostname = (hostname) =>
   /^(?:[^.]+\.)*druxtjs\.org$/.test(String(hostname || ''))
+
+/**
+ * Whether this browser belongs to someone working on the site.
+ *
+ * `?no-track=1` on any page turns the opt-out on for this browser, and
+ * `?no-track=0` turns it off. Self-contained on purpose: nuxt.config.js embeds
+ * the function body into the inline snippet, so it must not close over
+ * anything.
+ *
+ * @param {Window} win - The browser's window.
+ * @returns {boolean} True when this browser sends no GA4 hits.
+ */
+export const isOptedOut = (win) => {
+  const asked = /[?&]no-track=([01])(?:&|$)/.exec(win.location.search)
+  try {
+    if (asked && asked[1] === '1') win.localStorage.setItem('druxt_no_track', '1')
+    if (asked && asked[1] === '0') win.localStorage.removeItem('druxt_no_track')
+    return win.localStorage.getItem('druxt_no_track') === '1'
+  } catch (e) {
+    // Storage can be blocked. The request in the URL still counts for this page.
+    return Boolean(asked && asked[1] === '1')
+  }
+}
+
+/**
+ * Stop this browser sending GA4 hits, now and on later visits.
+ *
+ * @param {Window} win - The browser's window.
+ * @param {string} id - The GA4 measurement ID.
+ */
+export const optOut = (win, id) => {
+  win[`ga-disable-${id}`] = true
+  try {
+    win.localStorage.setItem('druxt_no_track', '1')
+  } catch (e) {
+    // Storage can be blocked. The flag above still covers this page.
+  }
+}
 
 /**
  * Normalise a search term for aggregation.

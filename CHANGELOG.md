@@ -18,6 +18,11 @@ Druxt 1.0.0.
 - `llms-full.txt` no longer loses paragraphs whose references don't point to their
   current revision, which a workspace import can leave behind.
 
+### Changed
+
+- GA4 no longer counts a signed-in editor's browser, or one opted out with
+  `?no-track=1`.
+
 ## [0.14.1] - 2026-11-01
 
 ### Fixed
