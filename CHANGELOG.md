@@ -21,6 +21,11 @@ Druxt 1.0.0.
   server card have an icon.
 - The site icon sits on a white tile, so its dark triangle stays visible on a dark search page.
 
+### Fixed
+
+- A page that exists only in a workspace no longer answers "page not found" to an editor
+  once live has answered 404 for its path.
+
 ## [0.16.0] - 2026-11-02
 
 ### Added
