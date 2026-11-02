@@ -9,7 +9,7 @@
 const fs = require('fs')
 const path = require('path')
 const { ogCard, ogSiteCard } = require('./og-card')
-const { pageFromDoc, ogImageFile } = require('./og-pages')
+const { cardDocs, pageFromDoc, ogImageFile } = require('./og-pages')
 
 /**
  * Render every card.
@@ -20,17 +20,6 @@ const { pageFromDoc, ogImageFile } = require('./og-pages')
  * @param {string} options.outDir - Directory to write PNGs into.
  * @returns {Promise<number>} How many cards were written.
  */
-/**
- * The documents to draw cards for. Cards are drawn only at startup, so a page
- * published later would have none until the next restart. The MCP page's card
- * doesn't depend on its content, so it's always drawn.
- *
- * @param {Array<object>} docs - The corpus.
- * @returns {Array<object>} The corpus, with the MCP page's entry if it has none.
- */
-const cardDocs = (docs) =>
-  docs.some((doc) => doc.route === '/mcp') ? docs : [...docs, { route: '/mcp', title: 'MCP server', section: 'mcp' }]
-
 const renderOgImages = async (docs, { fontsDir, outDir }) => {
   const satori = require('satori').default || require('satori')
   const { Resvg } = require('@resvg/resvg-js')
@@ -68,4 +57,4 @@ const renderOgImages = async (docs, { fontsDir, outDir }) => {
   return written
 }
 
-module.exports = { cardDocs, renderOgImages, pageFromDoc, ogImageFile }
+module.exports = { renderOgImages, pageFromDoc, ogImageFile }

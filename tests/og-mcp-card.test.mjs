@@ -8,7 +8,7 @@ import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
-const { cardDocs } = require('../nuxt/lib/og-images.js')
+const { cardDocs } = require('../nuxt/lib/og-pages.js')
 
 describe('cardDocs', () => {
   test('adds the MCP page when the corpus has none', () => {
