@@ -293,7 +293,7 @@ const createMcpDiscovery = (origin) => {
         description: 'Search and read the Druxt documentation and API reference.',
         websiteUrl: `${origin}/mcp`,
         repository: { url: 'https://github.com/druxt/druxtjs.org', source: 'github' },
-        icons: [{ src: `${origin}/icon.png`, mimeType: 'image/png', sizes: ['400x400'] }],
+        icons: [{ src: `${origin}/icon.png`, mimeType: 'image/png', sizes: ['480x480'] }],
         remotes: [{ type: 'streamable-http', url: `${origin}/mcp`, supportedProtocolVersions: PROTOCOL_VERSIONS }],
       },
     },

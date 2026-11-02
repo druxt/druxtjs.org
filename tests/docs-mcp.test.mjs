@@ -5,7 +5,7 @@
 
 import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import http from 'node:http'
 import { createRequire } from 'node:module'
 
@@ -297,8 +297,10 @@ describe('the registry entry', () => {
     assert.equal(SERVER_VERSION, entry.version)
   })
 
-  test('the icon is a file the site serves', () => {
+  test('the icon is a file the site serves, at its declared size', () => {
     const [{ src }] = entry.icons
-    assert.ok(existsSync(new URL(`../nuxt/static${new URL(src).pathname}`, import.meta.url)))
+    const png = readFileSync(new URL(`../nuxt/static${new URL(src).pathname}`, import.meta.url))
+    // A PNG's header holds its width and height, so a new icon can't keep an old size.
+    assert.deepEqual(entry.icons[0].sizes, [`${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`])
   })
 })
