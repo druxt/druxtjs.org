@@ -5,11 +5,13 @@
 
 import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
+import { existsSync, readFileSync } from 'node:fs'
 import http from 'node:http'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
 const {
+  SERVER_VERSION,
   createDocsMcp,
   createMcpDiscovery,
   isMcpRequest,
@@ -103,6 +105,9 @@ describe('the protocol', () => {
       ['search_docs', 'list_docs', 'get_doc']
     )
     assert.ok(body.result.tools.every((t) => t.annotations.readOnlyHint))
+    // Claude's connector directory flags a tool without a title. Protocol
+    // versions before 2025-06-18 only know the annotation.
+    assert.ok(body.result.tools.every((t) => t.title && t.annotations.title === t.title))
   })
 
   test('refuses GET, broken JSON, a batch, an unknown method and an oversized body', async () => {
@@ -269,5 +274,31 @@ describe('discovery', () => {
     assert.equal(discovery.serves('GET', '/mcp/server-card'), true)
     assert.equal(discovery.serves('POST', '/mcp/server-card'), false)
     assert.equal(discovery.serves('GET', '/mcp'), false)
+  })
+})
+
+describe('the registry entry', () => {
+  const entry = JSON.parse(readFileSync(new URL('../server.json', import.meta.url)))
+
+  test('the card describes the version and icon server.json publishes', () => {
+    let text
+    const res = { writeHead: () => {}, end: (body) => (text = body) }
+    createMcpDiscovery('https://druxtjs.org').handle(
+      { method: 'GET', headers: {} },
+      res,
+      '/mcp/server-card'
+    )
+    const card = JSON.parse(text)
+    assert.equal(card.version, entry.version)
+    assert.deepEqual(card.icons, entry.icons)
+  })
+
+  test('the server reports the version server.json publishes', () => {
+    assert.equal(SERVER_VERSION, entry.version)
+  })
+
+  test('the icon is a file the site serves', () => {
+    const [{ src }] = entry.icons
+    assert.ok(existsSync(new URL(`../nuxt/static${new URL(src).pathname}`, import.meta.url)))
   })
 })

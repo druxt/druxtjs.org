@@ -17,6 +17,8 @@ const { SECTION_ORDER, isChangelog, toAbsoluteUrls } = require('../lib/llms-full
 const PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05']
 /** The server's one name: at runtime, on its card and in server.json. */
 const SERVER_NAME = 'org.druxtjs/docs'
+/** Raise it with server.json, which is what publishes it to the registry. */
+const SERVER_VERSION = '1.0.1'
 const MAX_BODY = 64 * 1024
 const MAX_RESULTS = 10
 const MAX_QUERY_WORDS = 20
@@ -31,32 +33,35 @@ const CORS = {
 const TOOLS = [
   {
     name: 'search_docs',
+    title: 'Search the docs',
     description: 'Search the Druxt documentation and API reference. Returns matching pages with their paths.',
     inputSchema: {
       type: 'object',
       properties: { query: { type: 'string', description: 'The words to search for.' } },
       required: ['query'],
     },
-    annotations: { readOnlyHint: true },
+    annotations: { title: 'Search the docs', readOnlyHint: true },
   },
   {
     name: 'list_docs',
+    title: 'List the docs',
     description: 'List Druxt documentation pages, optionally for one section.',
     inputSchema: {
       type: 'object',
       properties: { section: { type: 'string', enum: SECTION_ORDER } },
     },
-    annotations: { readOnlyHint: true },
+    annotations: { title: 'List the docs', readOnlyHint: true },
   },
   {
     name: 'get_doc',
+    title: 'Read a docs page',
     description: 'Read one Druxt documentation page as markdown, by its path, such as /how-to/proxy.',
     inputSchema: {
       type: 'object',
       properties: { path: { type: 'string', description: 'The page path.' } },
       required: ['path'],
     },
-    annotations: { readOnlyHint: true },
+    annotations: { title: 'Read a docs page', readOnlyHint: true },
   },
 ]
 
@@ -167,7 +172,7 @@ const respond = async (message, { corpus, origin }) => {
         ? params.protocolVersion
         : PROTOCOL_VERSIONS[0],
       capabilities: { tools: {} },
-      serverInfo: { name: SERVER_NAME, version: '1.0.0' },
+      serverInfo: { name: SERVER_NAME, version: SERVER_VERSION },
       instructions: 'Documentation for Druxt, the fully decoupled Drupal and Nuxt framework.',
     })
   }
@@ -283,11 +288,12 @@ const createMcpDiscovery = (origin) => {
       body: {
         $schema: 'https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json',
         name: SERVER_NAME,
-        version: '1.0.0',
+        version: SERVER_VERSION,
         title: 'Druxt docs',
         description: 'Search and read the Druxt documentation and API reference.',
         websiteUrl: `${origin}/mcp`,
         repository: { url: 'https://github.com/druxt/druxtjs.org', source: 'github' },
+        icons: [{ src: `${origin}/icon.png`, mimeType: 'image/png', sizes: ['400x400'] }],
         remotes: [{ type: 'streamable-http', url: `${origin}/mcp`, supportedProtocolVersions: PROTOCOL_VERSIONS }],
       },
     },
@@ -337,4 +343,4 @@ const createMcpDiscovery = (origin) => {
   }
 }
 
-module.exports = { createDocsMcp, createMcpDiscovery, isMcpRequest, searchDocs }
+module.exports = { SERVER_VERSION, createDocsMcp, createMcpDiscovery, isMcpRequest, searchDocs }
