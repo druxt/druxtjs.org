@@ -6,7 +6,8 @@
  * here when it appears there. Public, stateless and without sessions: every
  * answer comes from documents the site already serves to anyone, so a request
  * needs no credentials. It answers with JSON, which the Streamable HTTP
- * transport allows, and has nothing to push, so GET is refused.
+ * transport allows, and has nothing to push, so a client's GET is refused.
+ * The same path is also a page: a browser's GET goes on to it.
  */
 
 const { SECTION_ORDER, isChangelog, toAbsoluteUrls } = require('../lib/llms-full-txt')
@@ -150,6 +151,15 @@ const readBody = (req) =>
   })
 
 /**
+ * Whether a request is for the server, not the page at the same path.
+ *
+ * @param {object} req - The request.
+ * @returns {boolean} False for a GET or HEAD that isn't asking for an event stream.
+ */
+const isMcpRequest = (req) =>
+  !['GET', 'HEAD'].includes(req.method) || /text\/event-stream/i.test(String(req.headers.accept || ''))
+
+/**
  * The request handler for `/mcp`.
  *
  * @param {object} options - Options.
@@ -195,4 +205,4 @@ const createDocsMcp = ({ corpus, origin, log = () => {} }) => async (req, res) =
   }
 }
 
-module.exports = { createDocsMcp, searchDocs }
+module.exports = { createDocsMcp, isMcpRequest, searchDocs }

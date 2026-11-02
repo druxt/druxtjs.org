@@ -7,6 +7,7 @@
  * renders behind it. A page that is not stored yet renders live, and is
  * stored once it has answered 200.
  */
+const { isMcpRequest } = require('./docs-mcp')
 const { redirectFor } = require('./redirects')
 const { hasAuthCookie } = require('druxt-auth')
 const { hasEditorHint } = require('../lib/entity-operations')
@@ -220,7 +221,7 @@ const createHandler =
     // `static/`, so they must be answered before the asset test below sends
     // every `.xml` and `.txt` to the static middleware.
     if (artefacts && artefacts.isArtefact(req.method, pathname)) return artefacts.handle(req, res)
-    if (docsMcp && pathname === '/mcp') return docsMcp(req, res)
+    if (docsMcp && pathname === '/mcp' && isMcpRequest(req)) return docsMcp(req, res)
 
     // Drupal's login and editing screens, proxied: an editor's page, never a
     // stored one, and never one a cache between here and the browser keeps.

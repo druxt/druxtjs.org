@@ -9,7 +9,7 @@ import http from 'node:http'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
-const { createDocsMcp, searchDocs } = require('../nuxt/server/docs-mcp.js')
+const { createDocsMcp, isMcpRequest, searchDocs } = require('../nuxt/server/docs-mcp.js')
 
 const docs = [
   { route: '/how-to/proxy', title: 'Proxy the backend', description: 'Through Nuxt.', section: 'how-to', content: 'See [CORS](/how-to/configure-cors).' },
@@ -64,6 +64,15 @@ describe('the protocol', () => {
     assert.equal((await post([{ jsonrpc: '2.0', id: 1, method: 'ping' }])).status, 400)
     assert.equal((await post({ jsonrpc: '2.0', id: 1, method: 'nope' })).body.error.code, -32601)
     assert.equal((await post('x'.repeat(70000), true)).status, 413)
+  })
+})
+
+describe('the page at the same path', () => {
+  test('a browser reaches the page, and a client reaches the server', () => {
+    assert.equal(isMcpRequest({ method: 'GET', headers: { accept: 'text/html' } }), false)
+    assert.equal(isMcpRequest({ method: 'GET', headers: { accept: 'text/event-stream' } }), true)
+    assert.equal(isMcpRequest({ method: 'POST', headers: {} }), true)
+    assert.equal(isMcpRequest({ method: 'OPTIONS', headers: {} }), true)
   })
 })
 
