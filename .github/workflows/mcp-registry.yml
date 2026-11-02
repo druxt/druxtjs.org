@@ -1,0 +1,66 @@
+---
+name: MCP Registry
+
+# Keeps the docs server's registry entry in step with server.json. A pull request
+# validates the file. A merge to main publishes it, once for each version, because
+# the registry refuses a version it already holds. Raise `version` to publish.
+
+on:
+  push:
+    branches: [main]
+    paths: [server.json]
+  pull_request:
+    branches: [develop, main]
+    paths: [server.json]
+
+permissions:
+  contents: read
+
+env:
+  PUBLISHER_VERSION: 1.8.7
+  PUBLISHER_SHA256: 00b21004149a4ce66f0782508ae4a2bce67d1bea395a8da0bd8028159fb59579
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install mcp-publisher
+        run: |
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/v${PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz" -o publisher.tar.gz
+          echo "${PUBLISHER_SHA256}  publisher.tar.gz" | sha256sum -c -
+          tar xzf publisher.tar.gz mcp-publisher
+      - run: ./mcp-publisher validate
+
+  publish:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    # The key is held by this environment, so only main can reach it.
+    environment: mcp-registry
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Check whether this version is listed
+        id: listed
+        run: |
+          name=$(jq -r '.name | @uri' server.json)
+          version=$(jq -r '.version | @uri' server.json)
+          status=$(curl -s -o /dev/null -w '%{http_code}' "https://registry.modelcontextprotocol.io/v0.1/servers/${name}/versions/${version}")
+          case "$status" in
+            200) echo "listed=true" >> "$GITHUB_OUTPUT" ;;
+            404) echo "listed=false" >> "$GITHUB_OUTPUT" ;;
+            *) echo "The registry answered ${status}." >&2; exit 1 ;;
+          esac
+      - name: Install mcp-publisher
+        if: steps.listed.outputs.listed == 'false'
+        run: |
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/v${PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz" -o publisher.tar.gz
+          echo "${PUBLISHER_SHA256}  publisher.tar.gz" | sha256sum -c -
+          tar xzf publisher.tar.gz mcp-publisher
+      - name: Publish
+        if: steps.listed.outputs.listed == 'false'
+        env:
+          MCP_REGISTRY_KEY: ${{ secrets.MCP_REGISTRY_KEY }}
+        run: |
+          ./mcp-publisher login dns --domain druxtjs.org --private-key "$MCP_REGISTRY_KEY"
+          ./mcp-publisher publish

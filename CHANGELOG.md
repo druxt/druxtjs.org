@@ -9,6 +9,10 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- A workflow that publishes each new version of `server.json` to the MCP Registry.
+
 ## [0.16.0] - 2026-11-02
 
 ### Added
