@@ -9,6 +9,10 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- AI tools working in this repository connect to the Druxt docs server.
+
 ## [0.15.0] - 2026-11-02
 
 ### Added
