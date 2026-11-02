@@ -136,6 +136,19 @@ describe('setConsent', () => {
     assert.ok(!written.some((c) => c.startsWith('druxt-workspace')))
   })
 
+  test('a no holds on this page and after a reload when its write fails', () => {
+    const { win, items, scripts, run } = browser({ stored: { druxt_consent: 'granted' } })
+    run()
+    win.localStorage.setItem = () => {
+      throw new Error('full')
+    }
+    setConsent(win, 'denied', ID)
+    run()
+    assert.equal(scripts.length, 1)
+    assert.equal(win.gtag, undefined)
+    assert.equal(items.druxt_consent, undefined)
+  })
+
   test('a page view after taking it back sends nothing', () => {
     const { win, scripts, run } = browser({ stored: { druxt_consent: 'granted' } })
     run()

@@ -17,14 +17,18 @@
 </template>
 
 <script>
-import { GA_MEASUREMENT_ID, isOptedOut, readConsent, setConsent } from '~/lib/analytics'
+import { GA_MEASUREMENT_ID, isOptedOut, isTrackableHostname, readConsent, setConsent } from '~/lib/analytics'
 
 export default {
   data: () => ({ open: false }),
 
   mounted() {
-    // The snippet only exists on the production site, so previews never ask.
-    this.open = typeof window.druxtAnalytics === 'function' && !isOptedOut(window) && readConsent(window) === null
+    // The snippet is on production builds only, which include Lagoon's own routes.
+    // Neither previews nor those routes can measure anything, so they never ask.
+    this.open = typeof window.druxtAnalytics === 'function'
+      && isTrackableHostname(window.location.hostname)
+      && !isOptedOut(window)
+      && readConsent(window) === null
     this.$nuxt.$on('consent:open', this.show)
   },
 

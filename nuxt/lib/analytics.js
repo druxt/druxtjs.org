@@ -92,12 +92,13 @@ export const optOutEditors = (auth, win, id) => {
  * @returns {boolean} True when this browser may send GA4 hits.
  */
 export const hasConsent = (win) => {
+  // The answer given on this page wins, in case storing it failed.
+  if (win.druxtConsent) return win.druxtConsent === 'granted'
   try {
-    if (win.localStorage.getItem('druxt_consent') === 'granted') return true
+    return win.localStorage.getItem('druxt_consent') === 'granted'
   } catch (e) {
-    // Storage can be blocked. A yes on this visit is kept on the window instead.
+    return false
   }
-  return win.druxtConsent === 'granted'
 }
 
 /**
@@ -148,7 +149,13 @@ export const setConsent = (win, choice, id) => {
   try {
     win.localStorage.setItem('druxt_consent', choice)
   } catch (e) {
-    // Storage can be blocked, so the banner asks again on the next visit.
+    // Storage can be blocked or full, so the banner asks again on the next visit.
+    // An earlier yes mustn't outlive a no it couldn't be replaced by.
+    try {
+      win.localStorage.removeItem('druxt_consent')
+    } catch (e2) {
+      // Blocked storage holds no earlier yes that this page could reach.
+    }
   }
   if (choice === 'granted') {
     win[`ga-disable-${id}`] = false
