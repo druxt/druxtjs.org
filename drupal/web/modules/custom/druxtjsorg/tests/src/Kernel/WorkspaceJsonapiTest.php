@@ -137,12 +137,16 @@ final class WorkspaceJsonapiTest extends KernelTestBase {
   public function testACacheableResponseVariesByWorkspace(): void {
     $response = new CacheableJsonResponse(['message' => 'Unable to resolve path.'], 404);
     $event = new ResponseEvent($this->container->get('http_kernel'), Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $response);
-    $this->container->get('druxtjsorg.workspace_header_subscriber')->vary($event);
+    $this->container->get('event_dispatcher')->dispatch($event, KernelEvents::RESPONSE);
 
     self::assertContains('workspace', $response->getCacheableMetadata()->getCacheContexts());
 
     $priority = WorkspaceHeaderSubscriber::getSubscribedEvents()[KernelEvents::RESPONSE][1];
-    self::assertGreaterThan(DynamicPageCacheSubscriber::getSubscribedEvents()[KernelEvents::RESPONSE][0][1], $priority);
+    foreach (DynamicPageCacheSubscriber::getSubscribedEvents()[KernelEvents::RESPONSE] as [$method, $store]) {
+      if ($method === 'onResponse') {
+        self::assertGreaterThan($store, $priority);
+      }
+    }
   }
 
   /**
