@@ -13,6 +13,12 @@ Druxt 1.0.0.
 
 - A workflow that publishes each new version of `server.json` to the MCP Registry.
 
+### Changed
+
+- The docs server is version 1.0.1. Its tools have titles, and its registry entry and
+  server card have an icon.
+- The site icon sits on a white tile, so its dark triangle stays visible on a dark search page.
+
 ## [0.16.0] - 2026-11-02
 
 ### Added

@@ -5,6 +5,9 @@
   "description": "Search and read the Druxt documentation and API reference.",
   "websiteUrl": "https://druxtjs.org/mcp",
   "repository": { "url": "https://github.com/druxt/druxtjs.org", "source": "github" },
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "icons": [
+    { "src": "https://druxtjs.org/icon.png", "mimeType": "image/png", "sizes": ["480x480"] }
+  ],
   "remotes": [{ "type": "streamable-http", "url": "https://druxtjs.org/mcp" }]
 }
