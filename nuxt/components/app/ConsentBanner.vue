@@ -5,13 +5,13 @@
     aria-label="Analytics choice"
   >
     <p class="text-sm leading-relaxed">
-      May Google Analytics measure your visit? It sets cookies, and we use the data to help
-      improve the documentation. It stays off unless you allow it.
+      Help us improve the docs? Druxt is a small open source project, and Google Analytics shows
+      us where to focus. It sets cookies, so it stays off unless you allow it.
       <NuxtLink class="underline hover:text-primary" to="/privacy">Privacy policy</NuxtLink>
     </p>
     <div class="mt-3 grid grid-cols-2 gap-2">
       <button class="btn btn-sm btn-outline" type="button" @click="choose('granted')">Allow</button>
-      <button class="btn btn-sm btn-outline" type="button" @click="choose('denied')">Decline</button>
+      <button class="btn btn-sm btn-outline" type="button" @click="choose('denied')">No thanks</button>
     </div>
   </section>
 </template>
