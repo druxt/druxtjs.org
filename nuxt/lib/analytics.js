@@ -65,6 +65,25 @@ export const optOut = (win, id) => {
 }
 
 /**
+ * Stop a browser sending hits once an editor is signed in on it.
+ *
+ * Checks now and whenever sign-in changes. A sign-in that lands on the page the
+ * form was already on refreshes rather than navigates, so a route change can't
+ * be relied on to notice it.
+ *
+ * @param {object} auth - The auth module.
+ * @param {Window} win - The browser's window.
+ * @param {string} id - The GA4 measurement ID.
+ */
+export const optOutEditors = (auth, win, id) => {
+  if (!auth) return
+  if (auth.loggedIn) optOut(win, id)
+  auth.$storage.watchState('loggedIn', (loggedIn) => {
+    if (loggedIn) optOut(win, id)
+  })
+}
+
+/**
  * Normalise a search term for aggregation.
  *
  * Lowercased and whitespace-collapsed so "Drupal ", "drupal" and "DRUPAL"

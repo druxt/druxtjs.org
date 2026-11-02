@@ -1,4 +1,4 @@
-import { GA_MEASUREMENT_ID, optOut } from '~/lib/analytics'
+import { GA_MEASUREMENT_ID, optOutEditors } from '~/lib/analytics'
 
 /**
  * `$track(name, params)` - the docs site's only GA4 event entry point.
@@ -13,13 +13,9 @@ import { GA_MEASUREMENT_ID, optOut } from '~/lib/analytics'
  * @param {Function} inject - Nuxt's injector, used to expose `$track`.
  */
 export default ({ app }, inject) => {
-  // Checked after each navigation, since the auth plugin runs after this one.
-  const optOutEditor = () => {
-    if (app.$auth && app.$auth.loggedIn) optOut(window, GA_MEASUREMENT_ID)
-  }
+  // Once every plugin has run, since the auth plugin runs after this one.
   if (typeof window !== 'undefined') {
-    window.onNuxtReady(optOutEditor)
-    app.router.afterEach(optOutEditor)
+    window.onNuxtReady(() => optOutEditors(app.$auth, window, GA_MEASUREMENT_ID))
   }
 
   inject('track', (name, params = {}) => {
