@@ -241,6 +241,10 @@ claude mcp add --transport http druxt https://druxtjs.org/mcp
 It has no credentials or sessions, and only serves pages the site already
 publishes.
 
+`server.json` is its entry in the [MCP Registry](https://registry.modelcontextprotocol.io).
+The name `org.druxtjs/docs` is authorised by a TXT record on `druxtjs.org`. Raise
+`version` to publish a change, then run `mcp-publisher publish`.
+
 ## Staging environments
 
 A staging environment is where content is reviewed before production. It is the

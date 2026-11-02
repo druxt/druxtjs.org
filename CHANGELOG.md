@@ -17,6 +17,7 @@ Druxt 1.0.0.
   a share card, a sitemap entry and a line in `llms.txt`.
 - A server card at `/mcp/server-card` and an AI catalog at
   `/.well-known/ai-catalog.json`, so clients can discover the server.
+- `server.json`, the docs server's entry for the MCP Registry.
 
 ## [0.15.0] - 2026-11-02
 
