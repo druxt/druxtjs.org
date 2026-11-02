@@ -12,9 +12,26 @@ const require = createRequire(import.meta.url)
 const { createDocsMcp, isMcpRequest, searchDocs } = require('../nuxt/server/docs-mcp.js')
 
 const docs = [
-  { route: '/how-to/proxy', title: 'Proxy the backend', description: 'Through Nuxt.', section: 'how-to', content: 'See [CORS](/how-to/configure-cors).' },
-  { route: '/how-to/configure-cors', title: 'Configure CORS', description: 'In Drupal.', section: 'how-to', content: 'A proxy avoids this.' },
-  { route: '/api/packages/druxt/CHANGELOG', title: 'Changelog', section: 'api', content: 'proxy proxy proxy' },
+  {
+    route: '/how-to/proxy',
+    title: 'Proxy the backend',
+    description: 'Through Nuxt.',
+    section: 'how-to',
+    content: 'See [CORS](/how-to/configure-cors).',
+  },
+  {
+    route: '/how-to/configure-cors',
+    title: 'Configure CORS',
+    description: 'In Drupal.',
+    section: 'how-to',
+    content: 'A proxy avoids this.',
+  },
+  {
+    route: '/api/packages/druxt/CHANGELOG',
+    title: 'Changelog',
+    section: 'api',
+    content: 'proxy proxy proxy',
+  },
 ]
 
 let server
@@ -28,7 +45,9 @@ const call = (name, args) =>
   post({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name, arguments: args } })
 
 before(async () => {
-  server = http.createServer(createDocsMcp({ corpus: async () => docs, origin: 'https://example.test' }))
+  server = http.createServer(
+    createDocsMcp({ corpus: async () => docs, origin: 'https://example.test' })
+  )
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
   url = `http://127.0.0.1:${server.address().port}/mcp`
 })
@@ -36,13 +55,23 @@ after(() => server.close())
 
 describe('the protocol', () => {
   test('initialize agrees a version it knows, and offers tools', async () => {
-    const { body } = await post({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-03-26' } })
+    const { body } = await post({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'initialize',
+      params: { protocolVersion: '2025-03-26' },
+    })
     assert.equal(body.result.protocolVersion, '2025-03-26')
     assert.deepEqual(body.result.capabilities, { tools: {} })
   })
 
   test('initialize answers an unknown version with its own latest', async () => {
-    const { body } = await post({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '1999-01-01' } })
+    const { body } = await post({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'initialize',
+      params: { protocolVersion: '1999-01-01' },
+    })
     assert.equal(body.result.protocolVersion, '2025-06-18')
   })
 
@@ -54,7 +83,10 @@ describe('the protocol', () => {
 
   test('every tool is marked read-only', async () => {
     const { body } = await post({ jsonrpc: '2.0', id: 1, method: 'tools/list' })
-    assert.deepEqual(body.result.tools.map((t) => t.name), ['search_docs', 'list_docs', 'get_doc'])
+    assert.deepEqual(
+      body.result.tools.map((t) => t.name),
+      ['search_docs', 'list_docs', 'get_doc']
+    )
     assert.ok(body.result.tools.every((t) => t.annotations.readOnlyHint))
   })
 
@@ -78,7 +110,10 @@ describe('the page at the same path', () => {
 
 describe('the tools', () => {
   test('search ranks a title match first and leaves changelogs out', () => {
-    assert.deepEqual(searchDocs(docs, 'proxy').map((d) => d.route), ['/how-to/proxy', '/how-to/configure-cors'])
+    assert.deepEqual(
+      searchDocs(docs, 'proxy').map((d) => d.route),
+      ['/how-to/proxy', '/how-to/configure-cors']
+    )
   })
 
   test('get_doc returns the page with absolute links', async () => {
