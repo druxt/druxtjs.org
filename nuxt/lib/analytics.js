@@ -84,6 +84,108 @@ export const optOutEditors = (auth, win, id) => {
 }
 
 /**
+ * Whether the reader has allowed analytics. Only an explicit yes counts.
+ *
+ * Self-contained on purpose, like `isOptedOut`: the inline snippet embeds it.
+ *
+ * @param {Window} win - The browser's window.
+ * @returns {boolean} True when this browser may send GA4 hits.
+ */
+export const hasConsent = (win) => {
+  try {
+    if (win.localStorage.getItem('druxt_consent') === 'granted') return true
+  } catch (e) {
+    // Storage can be blocked. A yes on this visit is kept on the window instead.
+  }
+  return win.druxtConsent === 'granted'
+}
+
+/**
+ * The reader's choice, or null when there isn't a valid one and the banner asks.
+ *
+ * @param {Window} win - The browser's window.
+ * @returns {?string} 'granted', 'denied' or null.
+ */
+export const readConsent = (win) => {
+  if (win.druxtConsent) return win.druxtConsent
+  try {
+    const stored = win.localStorage.getItem('druxt_consent')
+    return stored === 'granted' || stored === 'denied' ? stored : null
+  } catch (e) {
+    return null
+  }
+}
+
+/**
+ * Expire the cookies GA4 set, on every domain it may have set them for.
+ *
+ * @param {Window} win - The browser's window.
+ */
+const clearAnalyticsCookies = (win) => {
+  const names = String(win.document.cookie || '')
+    .split(/;\s*/)
+    .map((cookie) => cookie.split('=')[0])
+    .filter((name) => name === '_ga' || name.startsWith('_ga_'))
+  names.forEach((name) => {
+    const expired = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+    win.document.cookie = expired
+    win.document.cookie = `${expired}; domain=.druxtjs.org`
+  })
+}
+
+/**
+ * Record the reader's choice and act on it now.
+ *
+ * A yes measures the page they are on. A no stops the tag already on the page,
+ * which can't be unloaded, and removes `gtag` so nothing else can send.
+ *
+ * @param {Window} win - The browser's window.
+ * @param {string} choice - 'granted' or 'denied'.
+ * @param {string} id - The GA4 measurement ID.
+ */
+export const setConsent = (win, choice, id) => {
+  win.druxtConsent = choice
+  try {
+    win.localStorage.setItem('druxt_consent', choice)
+  } catch (e) {
+    // Storage can be blocked, so the banner asks again on the next visit.
+  }
+  if (choice === 'granted') {
+    win[`ga-disable-${id}`] = false
+    if (typeof win.druxtAnalytics === 'function') win.druxtAnalytics()
+    return
+  }
+  win[`ga-disable-${id}`] = true
+  delete win.gtag
+  clearAnalyticsCookies(win)
+}
+
+/**
+ * The inline script that starts GA4, once the reader has said yes.
+ *
+ * Before that `gtag` doesn't exist, so every call to it does nothing and no
+ * event waits in a queue to be sent later. It stays a function on the window,
+ * since a yes has to start the same thing part-way through a page. vue-meta
+ * re-runs the script on each navigation, which is what sends each page view.
+ *
+ * @param {string} id - The GA4 measurement ID.
+ * @param {string} docType - A browser expression for the page's `doc_type`.
+ * @returns {string} The script's source.
+ */
+export const analyticsSnippet = (id, docType) =>
+  `window.druxtAnalytics=function(){`
+  + `if(!(${isTrackableHostname})(location.hostname)||(${isOptedOut})(window)||!(${hasConsent})(window)){`
+  + `window['ga-disable-${id}']=true;return;}`
+  + `window.dataLayer=window.dataLayer||[];`
+  + `if(!window.gtag){window.gtag=function(){dataLayer.push(arguments);};}`
+  + `if(!window.druxtAnalyticsLoaded){window.druxtAnalyticsLoaded=true;`
+  + `var s=document.createElement('script');s.async=true;`
+  + `s.src='https://www.googletagmanager.com/gtag/js?id=${id}';document.head.appendChild(s);`
+  + `gtag('js',new Date());}`
+  + `gtag('config','${id}',{doc_type:${docType}});`
+  + `};window.druxtAnalytics();`
+
+/**
  * Normalise a search term for aggregation.
  *
  * Lowercased and whitespace-collapsed so "Drupal ", "drupal" and "DRUPAL"

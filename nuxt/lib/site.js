@@ -36,7 +36,16 @@ const PLAYGROUND_DESCRIPTION = 'Render every Druxt component live against a Drup
 /** The MCP server page's section, for its sitemap entry and llms.txt heading. The page is in Drupal. */
 const MCP_DESCRIPTION = 'A read-only server your coding agent can search and read, so it answers from these docs instead of from memory.'
 
+/** The privacy policy's section, for its sitemap entry. The page is a Drupal page. */
+const PRIVACY_DESCRIPTION = 'What druxtjs.org collects, why, and how to turn it off.'
+
 const SECTIONS = {
+  privacy: {
+    label: 'Privacy',
+    description: PRIVACY_DESCRIPTION,
+    priority: 0.2,
+    changefreq: 'yearly',
+  },
   mcp: {
     label: 'MCP server',
     description: MCP_DESCRIPTION,

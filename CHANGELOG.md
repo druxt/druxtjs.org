@@ -11,6 +11,8 @@ Druxt 1.0.0.
 
 ### Added
 
+- A banner that asks before Google Analytics runs, a Cookie settings link in the footer to
+  change the answer, and a route for a privacy policy at `/privacy`.
 - A workflow that publishes each new version of `server.json` to the MCP Registry.
 
 ### Changed

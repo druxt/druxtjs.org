@@ -290,6 +290,8 @@ What the cutover from the druxt.js build needs, in order.
    A browser that has signed in as an editor stops sending hits from then on, and
    `?no-track=1` on any page does the same for anyone else on the team
    (`?no-track=0` undoes it).
+   Nothing loads from Google until a reader allows it in the banner, and the
+   footer's Cookie settings changes that choice.
 4. Confirm the Drupal environment variables the settings file reads, and that
    the site mail address is one the domain's SPF record allows to send.
 5. After the first deployment, check `sitemap.xml`, `robots.txt`,

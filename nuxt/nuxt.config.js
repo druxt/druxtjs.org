@@ -15,7 +15,7 @@ const isProduction = process.env.LAGOON_ENVIRONMENT_TYPE === 'production'
 const failedRoutes = []
 
 import { SITE_NAME, SITE_DESCRIPTION, SITE_ORIGIN, docTypeExpression } from './lib/site'
-import { GA_MEASUREMENT_ID, isOptedOut, isTrackableHostname } from './lib/analytics'
+import { GA_MEASUREMENT_ID, analyticsSnippet } from './lib/analytics'
 
 /**
  * The version the badge names: `druxt` at the documentation's pinned commit,
@@ -138,17 +138,13 @@ export default {
       // page re-fires gtag('config'); adding a page_view plugin double-counts.
       // The hostname gate keeps Lagoon's own routes out of the property: they
       // pass the environment check, but they are not the site.
-      // The opt-out keeps the people working on the site out of it too.
+      // The opt-out keeps the people working on the site out of it too, and
+      // nothing loads from Google until the reader allows it.
       ...(isProduction
         ? [
             {
-              hid: 'ga-src',
-              src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`,
-              async: true,
-            },
-            {
               hid: 'ga-init',
-              innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());if((${isTrackableHostname})(location.hostname)&&!(${isOptedOut})(window)){gtag('config','${GA_MEASUREMENT_ID}',{doc_type:${docTypeExpression()}});}else{window['ga-disable-${GA_MEASUREMENT_ID}']=true;}`,
+              innerHTML: analyticsSnippet(GA_MEASUREMENT_ID, docTypeExpression()),
             },
           ]
         : []),
