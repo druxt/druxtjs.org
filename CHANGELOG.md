@@ -12,10 +12,6 @@ Druxt 1.0.0.
 ### Added
 
 - AI tools working in this repository connect to the Druxt docs server.
-
-- A page at `/mcp` that shows how to connect an AI client to the docs server, with
-  a share card, a sitemap entry and a line in `llms.txt`.
-
 - A paragraph for the docs server's setup tabs, for a Drupal page at `/mcp` that
   shows how to connect an AI client, with a share card of its own.
 - A server card at `/mcp/server-card` and an AI catalog at
