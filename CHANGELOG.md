@@ -15,8 +15,8 @@ Druxt 1.0.0.
 
 ### Fixed
 
-- `llms-full.txt` no longer loses paragraphs whose reference isn't their current
-  revision, which a workspace import can leave behind.
+- `llms-full.txt` no longer loses paragraphs whose references don't point to their
+  current revision, which a workspace import can leave behind.
 
 ## [0.14.1] - 2026-11-01
 

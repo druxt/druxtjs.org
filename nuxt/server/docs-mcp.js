@@ -15,6 +15,7 @@ const { SECTION_ORDER, isChangelog, toAbsoluteUrls } = require('../lib/llms-full
 const PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05']
 const MAX_BODY = 64 * 1024
 const MAX_RESULTS = 10
+const MAX_QUERY_WORDS = 20
 const SNIPPET = 200
 
 const CORS = {
@@ -91,7 +92,8 @@ const countIn = (words, word) => {
  */
 const searchDocs = (docs, query) => {
   const all = wordsIn(query)
-  const words = [...new Set(all.filter((word) => !STOP_WORDS.has(word)))]
+  // A search walks every page for every word, on the server's only thread.
+  const words = [...new Set(all.filter((word) => !STOP_WORDS.has(word)))].slice(0, MAX_QUERY_WORDS)
   if (!words.length) return []
   return pagesOf(docs)
     .map((doc) => {
@@ -174,17 +176,24 @@ const respond = async (message, { corpus, origin }) => {
   return failure(-32601, `Unknown method: ${method}`)
 }
 
-/** Reads a request body, or null past the limit. */
+/**
+ * Reads a request body, or null as soon as it passes the limit.
+ *
+ * Rejects when the client aborts. Past the limit it stops collecting, and what
+ * still arrives is discarded while the answer goes out.
+ */
 const readBody = (req) =>
   new Promise((resolve, reject) => {
     const chunks = []
     let size = 0
     req.on('data', (chunk) => {
       size += chunk.length
-      if (size <= MAX_BODY) chunks.push(chunk)
+      if (size > MAX_BODY) resolve(null)
+      else chunks.push(chunk)
     })
-    req.on('end', () => resolve(size > MAX_BODY ? null : Buffer.concat(chunks).toString('utf8')))
+    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')))
     req.on('error', reject)
+    req.on('aborted', () => reject(new Error('The client aborted the request.')))
   })
 
 /**
@@ -222,8 +231,18 @@ const createDocsMcp = ({ corpus, origin, log = () => {} }) => async (req, res) =
     res.setHeader('Allow', 'POST, OPTIONS')
     return rpcError(405, -32000, 'This server answers POST only.')
   }
-  const body = await readBody(req)
-  if (body === null) return rpcError(413, -32600, 'Request too large.')
+  let body
+  try {
+    body = await readBody(req)
+  } catch (error) {
+    // Nobody is left to answer.
+    log(`docs-mcp: ${error.message}`)
+    return res.destroy()
+  }
+  if (body === null) {
+    res.setHeader('Connection', 'close')
+    return rpcError(413, -32600, 'Request too large.')
+  }
   let message
   try {
     message = JSON.parse(body)

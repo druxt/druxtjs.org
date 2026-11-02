@@ -36,10 +36,20 @@ const docs = [
 
 let server
 let url
+// node:http, not fetch: the site's floor is Node 16, which has no global fetch.
+const request = (method, body) =>
+  new Promise((resolve, reject) => {
+    const req = http.request(url, { method }, (res) => {
+      let text = ''
+      res.on('data', (chunk) => (text += chunk))
+      res.on('end', () => resolve({ status: res.statusCode, text }))
+    })
+    req.on('error', reject)
+    req.end(body)
+  })
 const post = async (body, raw = false) => {
-  const res = await fetch(url, { method: 'POST', body: raw ? body : JSON.stringify(body) })
-  const text = await res.text()
-  return { status: res.status, body: text ? JSON.parse(text) : null, headers: res.headers }
+  const { status, text } = await request('POST', raw ? body : JSON.stringify(body))
+  return { status, body: text ? JSON.parse(text) : null }
 }
 const call = (name, args) =>
   post({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name, arguments: args } })
@@ -91,11 +101,25 @@ describe('the protocol', () => {
   })
 
   test('refuses GET, broken JSON, a batch, an unknown method and an oversized body', async () => {
-    assert.equal((await fetch(url)).status, 405)
+    assert.equal((await request('GET')).status, 405)
     assert.equal((await post('{', true)).body.error.code, -32700)
     assert.equal((await post([{ jsonrpc: '2.0', id: 1, method: 'ping' }])).status, 400)
     assert.equal((await post({ jsonrpc: '2.0', id: 1, method: 'nope' })).body.error.code, -32601)
     assert.equal((await post('x'.repeat(70000), true)).status, 413)
+  })
+})
+
+describe('a client that goes away', () => {
+  test('an aborted request leaves the server answering', async () => {
+    await new Promise((resolve) => {
+      const req = http.request(url, { method: 'POST', headers: { 'Content-Length': 1000 } })
+      req.on('error', () => {})
+      req.write('{', () => {
+        req.destroy()
+        setTimeout(resolve, 50)
+      })
+    })
+    assert.equal((await post({ jsonrpc: '2.0', id: 1, method: 'ping' })).status, 200)
   })
 })
 
@@ -139,6 +163,11 @@ describe('the tools', () => {
       ).length,
       1
     )
+  })
+
+  test('only the first words of a long query are searched', () => {
+    const query = `${Array.from({ length: 5000 }, (_, i) => `word${i}`).join(' ')} proxy`
+    assert.deepEqual(searchDocs(docs, query), [])
   })
 
   test('a word is not matched inside another word', () => {
