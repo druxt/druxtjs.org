@@ -33,7 +33,16 @@ const SITE_DESCRIPTION
 /** What the playground page says about itself; its share card and sitemap entry come from PAGES. */
 const PLAYGROUND_DESCRIPTION = 'Render every Druxt component live against a Drupal backend, change its props, read the requests it makes, and copy the markup.'
 
+/** The MCP server page's section, for its sitemap entry and llms.txt heading. The page is in Drupal. */
+const MCP_DESCRIPTION = 'A read-only server your coding agent can search and read, so it answers from these docs instead of from memory.'
+
 const SECTIONS = {
+  mcp: {
+    label: 'MCP server',
+    description: MCP_DESCRIPTION,
+    priority: 0.7,
+    changefreq: 'monthly',
+  },
   playground: {
     label: 'Playground',
     description: PLAYGROUND_DESCRIPTION,

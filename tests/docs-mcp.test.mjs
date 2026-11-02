@@ -9,7 +9,12 @@ import http from 'node:http'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
-const { createDocsMcp, isMcpRequest, searchDocs } = require('../nuxt/server/docs-mcp.js')
+const {
+  createDocsMcp,
+  createMcpDiscovery,
+  isMcpRequest,
+  searchDocs,
+} = require('../nuxt/server/docs-mcp.js')
 
 const docs = [
   {
@@ -72,6 +77,7 @@ describe('the protocol', () => {
     })
     assert.equal(body.result.protocolVersion, '2025-03-26')
     assert.deepEqual(body.result.capabilities, { tools: {} })
+    assert.equal(body.result.serverInfo.name, createMcpDiscovery('https://example.test').name)
   })
 
   test('initialize answers an unknown version with its own latest', async () => {
@@ -196,5 +202,72 @@ describe('the tools', () => {
   test('list_docs filters by section', async () => {
     const text = (await call('list_docs', { section: 'api' })).body.result.content[0].text
     assert.equal(text, 'No pages in that section.')
+  })
+})
+
+describe('discovery', () => {
+  const discovery = createMcpDiscovery('https://example.test')
+  const fetchDoc = async (path, headers = {}) => {
+    const probe = http.createServer((req, res) => discovery.handle(req, res, path))
+    await new Promise((resolve) => probe.listen(0, '127.0.0.1', resolve))
+    try {
+      return await new Promise((resolve, reject) => {
+        const req = http.request(
+          { port: probe.address().port, host: '127.0.0.1', path, headers },
+          (res) => {
+            let text = ''
+            res.on('data', (chunk) => (text += chunk))
+            res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, text }))
+          }
+        )
+        req.on('error', reject)
+        req.end()
+      })
+    } finally {
+      probe.close()
+    }
+  }
+
+  test('the card names the server and leaves its tools out', async () => {
+    const { status, headers, text } = await fetchDoc('/mcp/server-card')
+    const card = JSON.parse(text)
+    assert.equal(status, 200)
+    assert.equal(headers['content-type'], 'application/mcp-server-card+json')
+    assert.equal(headers['access-control-allow-origin'], '*')
+    assert.equal(card.remotes[0].url, 'https://example.test/mcp')
+    assert.ok(card.description.length <= 100)
+    assert.equal(card.tools, undefined)
+  })
+
+  test('the catalog points at the card', async () => {
+    const { headers, text } = await fetchDoc('/.well-known/ai-catalog.json')
+    assert.equal(headers['content-type'], 'application/ai-catalog+json')
+    assert.equal(JSON.parse(text).entries[0].url, 'https://example.test/mcp/server-card')
+  })
+
+  test('an unchanged card answers 304', async () => {
+    const { headers } = await fetchDoc('/mcp/server-card')
+    const again = await fetchDoc('/mcp/server-card', { 'If-None-Match': headers.etag })
+    assert.equal(again.status, 304)
+    assert.equal(again.text, '')
+  })
+
+  test('a preflight gets the CORS headers and no body', async () => {
+    const answer = await new Promise((resolve) => {
+      const res = {
+        writeHead: (status, headers) => (res.seen = { status, headers }),
+        end: () => resolve(res.seen),
+      }
+      discovery.handle({ method: 'OPTIONS', headers: {} }, res, '/mcp/server-card')
+    })
+    assert.equal(answer.status, 204)
+    assert.equal(answer.headers['Access-Control-Allow-Origin'], '*')
+    assert.equal(discovery.serves('OPTIONS', '/mcp/server-card'), true)
+  })
+
+  test('it serves reads of its own two paths only', () => {
+    assert.equal(discovery.serves('GET', '/mcp/server-card'), true)
+    assert.equal(discovery.serves('POST', '/mcp/server-card'), false)
+    assert.equal(discovery.serves('GET', '/mcp'), false)
   })
 })

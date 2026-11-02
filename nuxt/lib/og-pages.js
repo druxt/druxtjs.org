@@ -31,6 +31,12 @@ const pageFromDoc = (doc) => {
     description: doc.description || undefined,
   }
 
+  // The address is what someone needs from a shared link to this page.
+  if (doc.section === 'mcp') {
+    page.title = 'druxtjs.org/mcp'
+    page.description = 'Claude Code, Cursor, VS Code and OpenCode. Read-only, with no sign-in.'
+  }
+
   if (doc.section === 'modules' && parts[1]) {
     page.module = parts[1]
     page.pkg = packageName(parts[1])
@@ -78,4 +84,15 @@ const pageFromDoc = (doc) => {
  */
 const ogImageFile = (route) => route.replace(/^\//, '').replace(/\/$/, '') + '.png'
 
-module.exports = { pageFromDoc, ogImageFile }
+/**
+ * The documents to draw cards for. Cards are drawn only at startup, so a page
+ * published later would have none until the next restart. The MCP page's card
+ * doesn't depend on its content, so it's always drawn.
+ *
+ * @param {Array<object>} docs - The corpus.
+ * @returns {Array<object>} The corpus, with the MCP page's entry if it has none.
+ */
+const cardDocs = (docs) =>
+  docs.some((doc) => doc.route === '/mcp') ? docs : [...docs, { route: '/mcp', title: 'MCP server', section: 'mcp' }]
+
+module.exports = { cardDocs, pageFromDoc, ogImageFile }

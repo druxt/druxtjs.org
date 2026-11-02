@@ -79,7 +79,7 @@ const buildLlmsTxt = (docs, options) => {
     'The complete documentation as a single file: ' + origin + '/llms-full.txt',
   ]
 
-  ;['tutorials', 'how-to', 'explanation', 'modules', 'playground'].forEach((section) => {
+  ;['tutorials', 'how-to', 'explanation', 'modules', 'playground', 'mcp'].forEach((section) => {
     const entries = inSection(section)
     if (!entries.length) return
     lines.push('', '## ' + SECTIONS[section].label, '')
