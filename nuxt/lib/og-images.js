@@ -9,7 +9,7 @@
 const fs = require('fs')
 const path = require('path')
 const { ogCard, ogSiteCard } = require('./og-card')
-const { pageFromDoc, ogImageFile } = require('./og-pages')
+const { cardDocs, pageFromDoc, ogImageFile } = require('./og-pages')
 
 /**
  * Render every card.
@@ -44,7 +44,7 @@ const renderOgImages = async (docs, { fontsDir, outDir }) => {
   )
   written++
 
-  for (const doc of docs) {
+  for (const doc of cardDocs(docs)) {
     const file = path.join(outDir, ogImageFile(doc.route))
     await fs.promises.mkdir(path.dirname(file), { recursive: true })
 

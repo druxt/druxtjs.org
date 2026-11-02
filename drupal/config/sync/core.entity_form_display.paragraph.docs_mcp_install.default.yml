@@ -1,0 +1,14 @@
+uuid: a84d0b2f-19c7-4d63-b5e2-6f7c31a9d052
+langcode: en
+status: true
+dependencies:
+  config:
+    - paragraphs.paragraphs_type.docs_mcp_install
+id: paragraph.docs_mcp_install.default
+targetEntityType: paragraph
+bundle: docs_mcp_install
+mode: default
+content: {  }
+hidden:
+  created: true
+  status: true

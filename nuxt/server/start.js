@@ -13,7 +13,7 @@ const { execFileSync, spawn } = require('child_process')
 const { deploymentReady, resolveOrigin, waitForBackend } = require('./backend')
 const { createHandler, createPageCache, LLMS_LINK } = require('./page-cache')
 const { createArtefacts } = require('./artefacts')
-const { createDocsMcp } = require('./docs-mcp')
+const { createDocsMcp, createMcpDiscovery } = require('./docs-mcp')
 const { createStartingHandler } = require('./starting')
 const { createWarmer } = require('./warm')
 const { normalisePath } = require('../lib/site')
@@ -169,6 +169,7 @@ const main = async () => {
     passThrough: app.options.docsPassThrough,
     artefacts,
     docsMcp: createDocsMcp({ corpus: artefacts.corpus, origin: env.SITE_ORIGIN || 'https://druxtjs.org', log }),
+    mcpDiscovery: createMcpDiscovery(env.SITE_ORIGIN || 'https://druxtjs.org'),
   })
   const watched = warmer ? warmer.watchClears(live) : live
 

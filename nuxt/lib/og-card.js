@@ -36,6 +36,7 @@ const LOGO_PATHS = [
  * landing page gets the plural. Labels follow lib/site.js SECTIONS.
  */
 const SECTIONS = {
+  mcp: { label: 'Druxt docs for your AI tool', plural: 'Druxt docs for your AI tool', icon: 'guide', mono: true },
   guide: { label: 'Guide', plural: 'Guide', icon: 'guide', mono: false },
   modules: { label: 'Module', plural: 'Modules', icon: 'modules', mono: false },
   components: { label: 'Component', plural: 'Components', icon: 'components', mono: true },

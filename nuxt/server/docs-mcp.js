@@ -10,9 +10,13 @@
  * The same path is also a page: a browser's GET goes on to it.
  */
 
+const crypto = require('crypto')
+
 const { SECTION_ORDER, isChangelog, toAbsoluteUrls } = require('../lib/llms-full-txt')
 
 const PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05']
+/** The server's one name: at runtime, on its card and in server.json. */
+const SERVER_NAME = 'org.druxtjs/docs'
 const MAX_BODY = 64 * 1024
 const MAX_RESULTS = 10
 const MAX_QUERY_WORDS = 20
@@ -163,7 +167,7 @@ const respond = async (message, { corpus, origin }) => {
         ? params.protocolVersion
         : PROTOCOL_VERSIONS[0],
       capabilities: { tools: {} },
-      serverInfo: { name: 'druxt-docs', version: '1.0.0' },
+      serverInfo: { name: SERVER_NAME, version: '1.0.0' },
       instructions: 'Documentation for Druxt, the fully decoupled Drupal and Nuxt framework.',
     })
   }
@@ -261,4 +265,76 @@ const createDocsMcp = ({ corpus, origin, log = () => {} }) => async (req, res) =
   }
 }
 
-module.exports = { createDocsMcp, isMcpRequest, searchDocs }
+/**
+ * The server's discovery documents, for clients that find it before connecting.
+ *
+ * Public, read-only metadata, so any origin may read them and caches may keep
+ * them for an hour. Tools are left out, as the Server Card extension requires.
+ *
+ * @param {string} origin - The origin the server answers on.
+ * @returns {object} Which paths this serves, and the listener for them.
+ */
+const createMcpDiscovery = (origin) => {
+  const card = `${origin}/mcp/server-card`
+  const hostname = new URL(origin).hostname
+  const documents = {
+    '/mcp/server-card': {
+      type: 'application/mcp-server-card+json',
+      body: {
+        $schema: 'https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json',
+        name: SERVER_NAME,
+        version: '1.0.0',
+        title: 'Druxt docs',
+        description: 'Search and read the Druxt documentation and API reference.',
+        websiteUrl: `${origin}/mcp`,
+        repository: { url: 'https://github.com/druxt/druxtjs.org', source: 'github' },
+        remotes: [{ type: 'streamable-http', url: `${origin}/mcp`, supportedProtocolVersions: PROTOCOL_VERSIONS }],
+      },
+    },
+    '/.well-known/ai-catalog.json': {
+      type: 'application/ai-catalog+json',
+      body: {
+        specVersion: '1.0',
+        entries: [
+          { identifier: `urn:air:${hostname}:mcp:docs`, type: 'application/mcp-server-card+json', url: card },
+        ],
+      },
+    },
+  }
+  const prepared = Object.fromEntries(
+    Object.entries(documents).map(([path, { type, body }]) => {
+      const text = JSON.stringify(body, null, 2)
+      return [path, { type, text, etag: `"${crypto.createHash('sha1').update(text).digest('hex')}"` }]
+    })
+  )
+
+  return {
+    name: SERVER_NAME,
+    serves: (method, pathname) =>
+      ['GET', 'HEAD', 'OPTIONS'].includes(method) && Object.prototype.hasOwnProperty.call(prepared, pathname),
+    handle: (req, res, pathname) => {
+      const { type, text, etag } = prepared[pathname]
+      const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type, If-None-Match',
+        'Access-Control-Expose-Headers': 'ETag',
+        'Cache-Control': 'public, max-age=3600',
+        ETag: etag,
+      }
+      // A browser's preflight, for a request that sends If-None-Match.
+      if (req.method === 'OPTIONS') {
+        res.writeHead(204, headers)
+        return res.end()
+      }
+      if (req.headers['if-none-match'] === etag) {
+        res.writeHead(304, headers)
+        return res.end()
+      }
+      res.writeHead(200, { ...headers, 'Content-Type': type })
+      return res.end(req.method === 'HEAD' ? undefined : text)
+    },
+  }
+}
+
+module.exports = { createDocsMcp, createMcpDiscovery, isMcpRequest, searchDocs }

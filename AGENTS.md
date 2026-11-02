@@ -67,6 +67,13 @@ lint:audit:nuxt` audits `nuxt/` with Yarn 4 in a scratch copy, because Yarn
 - **PHP 8.3 is the floor.** The Composer lock is resolved against
   `config.platform.php` 8.3.0, and CI runs on 8.3.
 
+## Druxt docs
+
+Read the Druxt docs rather than relying on memory. The MCP server at
+`https://druxtjs.org/mcp` is configured here for Claude Code, VS Code, Cursor
+and OpenCode. Where a tool has no MCP support, use
+`https://druxtjs.org/llms.txt`.
+
 ## How Drupal serves the site
 
 Drupal renders only administration. Gin, from contrib, is both the default

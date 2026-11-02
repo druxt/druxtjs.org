@@ -1,0 +1,10 @@
+uuid: 7c2f4f0e-6a55-4e8b-9f1d-2b6d3a9c8e41
+langcode: en
+status: true
+dependencies: {  }
+id: docs_mcp_install
+label: 'MCP server install'
+icon_uuid: null
+icon_default: null
+description: 'The MCP server address and the setup tabs for each AI client, where the editor puts them in the page.'
+behavior_plugins: {  }

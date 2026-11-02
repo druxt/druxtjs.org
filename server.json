@@ -1,0 +1,10 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "org.druxtjs/docs",
+  "title": "Druxt docs",
+  "description": "Search and read the Druxt documentation and API reference.",
+  "websiteUrl": "https://druxtjs.org/mcp",
+  "repository": { "url": "https://github.com/druxt/druxtjs.org", "source": "github" },
+  "version": "1.0.0",
+  "remotes": [{ "type": "streamable-http", "url": "https://druxtjs.org/mcp" }]
+}
