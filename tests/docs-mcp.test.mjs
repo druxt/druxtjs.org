@@ -122,6 +122,25 @@ describe('the tools', () => {
     assert.equal(searchDocs(pages, 'how do I proxy the Drupal backend')[0].route, '/how-to/proxy')
   })
 
+  test('a word finds its other forms', () => {
+    const pages = [
+      {
+        route: '/how-to/theming',
+        title: 'Theme Druxt components',
+        section: 'how-to',
+        content: 'Wrappers.',
+      },
+    ]
+    assert.equal(searchDocs(pages, 'theming')[0].route, '/how-to/theming')
+    assert.equal(
+      searchDocs(
+        [{ route: '/c', title: 'Cache responses', section: 'how-to', content: 'x' }],
+        'caching'
+      ).length,
+      1
+    )
+  })
+
   test('a word is not matched inside another word', () => {
     assert.deepEqual(
       searchDocs([{ route: '/a', title: 'Toast', section: 'how-to', content: 'bread' }], 'to the'),

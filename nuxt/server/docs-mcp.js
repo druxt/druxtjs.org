@@ -67,8 +67,20 @@ const STOP_WORDS = new Set(
 /** The lowercase words in some text, keeping dots and hyphens inside a word. */
 const wordsIn = (value) => String(value || '').toLowerCase().match(/[\p{L}\p{N}]+(?:[.-][\p{L}\p{N}]+)*/gu) || []
 
-/** Whether a word is in a page's text, as itself or as the start of a longer word. */
-const countIn = (words, word) => words.filter((candidate) => candidate === word || candidate.startsWith(word)).length
+/**
+ * A word without its common English endings, so "theming" finds "Theme" and
+ * "caching" finds "Cache".
+ */
+const stem = (word) => {
+  const bare = word.replace(/(?:ing|ed|es|s)$/, '').replace(/e$/, '')
+  return bare.length >= 3 ? bare : word
+}
+
+/** How often a word is in a page's text, in any of its forms. */
+const countIn = (words, word) => {
+  const wanted = stem(word)
+  return words.filter((candidate) => candidate === word || stem(candidate) === wanted).length
+}
 
 /**
  * Pages for a query, best first.

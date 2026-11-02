@@ -93,12 +93,19 @@ describe('paragraphMarkdown', () => {
     assert.equal(markdown, '> **Before you start:** read this.')
   })
 
-  test('takes an image down to its alt text, which is the part that reads', () => {
+  test('takes an image down to its alt text and file URL', () => {
     const byId = new Map([
       [
         'media--image:m1',
-        { relationships: { field_media_image: { data: { meta: { alt: 'A screenshot' } } } } },
+        {
+          relationships: {
+            field_media_image: {
+              data: { type: 'file--file', id: 'f1', meta: { alt: 'A screenshot' } },
+            },
+          },
+        },
       ],
+      ['file--file:f1', { attributes: { uri: { url: '/files/a.png' } } }],
     ])
     const markdown = paragraphMarkdown(
       {
@@ -107,7 +114,7 @@ describe('paragraphMarkdown', () => {
       },
       byId
     )
-    assert.equal(markdown, '![A screenshot]()')
+    assert.equal(markdown, '![A screenshot](/files/a.png)')
   })
 
   test('drops a layout section, which is presentation rather than content', () => {
