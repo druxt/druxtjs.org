@@ -1,6 +1,5 @@
 // GA4, as a plain gtag.js snippet: the Nuxt analytics modules need either
 // Universal Analytics or Nuxt 3.
-const GA_MEASUREMENT_ID = 'G-Y1ZRHGDGSD'
 const { resolveOrigin, serviceRoute } = require('./server/backend')
 
 // The id is interpolated into an inline script, so check its shape first.
@@ -16,7 +15,7 @@ const isProduction = process.env.LAGOON_ENVIRONMENT_TYPE === 'production'
 const failedRoutes = []
 
 import { SITE_NAME, SITE_DESCRIPTION, SITE_ORIGIN, docTypeExpression } from './lib/site'
-import { isTrackableHostname } from './lib/analytics'
+import { GA_MEASUREMENT_ID, isOptedOut, isTrackableHostname } from './lib/analytics'
 
 /**
  * The version the badge names: `druxt` at the documentation's pinned commit,
@@ -139,6 +138,7 @@ export default {
       // page re-fires gtag('config'); adding a page_view plugin double-counts.
       // The hostname gate keeps Lagoon's own routes out of the property: they
       // pass the environment check, but they are not the site.
+      // The opt-out keeps the people working on the site out of it too.
       ...(isProduction
         ? [
             {
@@ -148,7 +148,7 @@ export default {
             },
             {
               hid: 'ga-init',
-              innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());if((${isTrackableHostname})(location.hostname)){gtag('config','${GA_MEASUREMENT_ID}',{doc_type:${docTypeExpression()}});}`,
+              innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());if((${isTrackableHostname})(location.hostname)&&!(${isOptedOut})(window)){gtag('config','${GA_MEASUREMENT_ID}',{doc_type:${docTypeExpression()}});}else{window['ga-disable-${GA_MEASUREMENT_ID}']=true;}`,
             },
           ]
         : []),
