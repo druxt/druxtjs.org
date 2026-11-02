@@ -230,6 +230,17 @@ every environment. A copied database drops production's registered target
 along with its secrets, so each environment's picker lists that environment's
 frontend alone.
 
+## Documentation server
+
+`/mcp` is a read-only MCP server over the same pages as `llms.txt`, for AI tools:
+
+```sh
+claude mcp add --transport http druxt https://druxtjs.org/mcp
+```
+
+It has no credentials or sessions, and only serves pages the site already
+publishes.
+
 ## Staging environments
 
 A staging environment is where content is reviewed before production. It is the

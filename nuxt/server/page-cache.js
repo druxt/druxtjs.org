@@ -185,10 +185,11 @@ const crawl = async ({ seeds, store, concurrency = 2, limit = 5000 }) => {
  * @param {Function} options.live - Nuxt's renderer, `(req, res) => void`.
  * @param {boolean} [options.noindex] - Ask search engines not to index this environment.
  * @param {Function} [options.passThrough] - True for a path the backend answers, which is never stored.
+ * @param {Function} [options.docsMcp] - The listener for `/mcp`.
  * @returns {Function} An HTTP request listener.
  */
 const createHandler =
-  ({ cache, live, noindex = false, artefacts = null, passThrough = null }) =>
+  ({ cache, live, noindex = false, artefacts = null, passThrough = null, docsMcp = null }) =>
   async (req, res) => {
     for (const [name, value] of Object.entries(SECURITY_HEADERS)) res.setHeader(name, value)
     res.setHeader('Link', LLMS_LINK)
@@ -219,6 +220,7 @@ const createHandler =
     // `static/`, so they must be answered before the asset test below sends
     // every `.xml` and `.txt` to the static middleware.
     if (artefacts && artefacts.isArtefact(req.method, pathname)) return artefacts.handle(req, res)
+    if (docsMcp && pathname === '/mcp') return docsMcp(req, res)
 
     // Drupal's login and editing screens, proxied: an editor's page, never a
     // stored one, and never one a cache between here and the browser keeps.
