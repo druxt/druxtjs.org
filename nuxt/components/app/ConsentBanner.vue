@@ -5,8 +5,8 @@
     aria-label="Analytics choice"
   >
     <p class="text-sm leading-relaxed">
-      Help us improve the docs? Druxt is a small open source project, and Google Analytics shows
-      us where to focus. It sets cookies, so it stays off unless you allow it.
+      Help us improve the docs? Druxt is a small open source project, and we use Google Analytics
+      data to make the documentation better. It sets cookies, so it stays off unless you allow it.
       <NuxtLink class="underline hover:text-primary" to="/privacy">Privacy policy</NuxtLink>
     </p>
     <div class="mt-3 grid grid-cols-2 gap-2">
