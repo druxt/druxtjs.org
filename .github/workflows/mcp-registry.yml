@@ -26,6 +26,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
       - name: Install mcp-publisher
         run: |
           curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/download/v${PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz" -o publisher.tar.gz
@@ -38,8 +40,14 @@ jobs:
     runs-on: ubuntu-latest
     # The key is held by this environment, so only main can reach it.
     environment: mcp-registry
+    # A queued run checks the registry after the one ahead of it has published.
+    concurrency:
+      group: mcp-registry-publish
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
       - name: Check whether this version is listed
         id: listed
         run: |
