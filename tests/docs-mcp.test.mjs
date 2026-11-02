@@ -3,7 +3,7 @@
 //
 //   node --test "tests/*.test.mjs"
 
-import { after, before, describe, test } from 'node:test'
+import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
 import http from 'node:http'
 import { createRequire } from 'node:module'
@@ -54,14 +54,13 @@ const post = async (body, raw = false) => {
 const call = (name, args) =>
   post({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name, arguments: args } })
 
-before(async () => {
-  server = http.createServer(
-    createDocsMcp({ corpus: async () => docs, origin: 'https://example.test' })
-  )
-  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
-  url = `http://127.0.0.1:${server.address().port}/mcp`
-})
-after(() => server.close())
+// Started here, not in a hook: Node 16 doesn't run top-level hooks.
+server = http.createServer(
+  createDocsMcp({ corpus: async () => docs, origin: 'https://example.test' })
+)
+await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
+url = `http://127.0.0.1:${server.address().port}/mcp`
+server.unref()
 
 describe('the protocol', () => {
   test('initialize agrees a version it knows, and offers tools', async () => {
