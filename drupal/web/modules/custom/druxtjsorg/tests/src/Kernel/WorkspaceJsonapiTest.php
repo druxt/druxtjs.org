@@ -61,6 +61,7 @@ final class WorkspaceJsonapiTest extends KernelTestBase {
     'basic_auth',
     'jsonapi',
     'jsonapi_hypermedia',
+    'dynamic_page_cache',
     'workspaces',
     'druxtjsorg',
   ];
@@ -141,12 +142,11 @@ final class WorkspaceJsonapiTest extends KernelTestBase {
 
     self::assertContains('workspace', $response->getCacheableMetadata()->getCacheContexts());
 
-    $priority = WorkspaceHeaderSubscriber::getSubscribedEvents()[KernelEvents::RESPONSE][1];
-    foreach (DynamicPageCacheSubscriber::getSubscribedEvents()[KernelEvents::RESPONSE] as [$method, $store]) {
-      if ($method === 'onResponse') {
-        self::assertGreaterThan($store, $priority);
-      }
-    }
+    // Named, so a renamed listener fails here rather than comparing nothing.
+    $listeners = array_column(DynamicPageCacheSubscriber::getSubscribedEvents()[KernelEvents::RESPONSE], 1, 0);
+    self::assertArrayHasKey('onResponse', $listeners);
+    self::assertTrue($this->container->has('dynamic_page_cache_subscriber'));
+    self::assertGreaterThan($listeners['onResponse'], WorkspaceHeaderSubscriber::getSubscribedEvents()[KernelEvents::RESPONSE][1]);
   }
 
   /**
