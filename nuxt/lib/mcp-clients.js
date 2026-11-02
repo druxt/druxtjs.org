@@ -12,11 +12,13 @@ export const mcpClients = (url) => {
     {
       name: 'Claude Code',
       note: 'Run this once.',
+      language: 'bash',
       code: `claude mcp add --transport http druxt ${url}`,
     },
     {
       name: 'Cursor',
       note: 'Add it in one click, or put this in .cursor/mcp.json.',
+      language: 'json',
       code: json({ mcpServers: { druxt: { url } } }),
       action: 'Add to Cursor',
       install: `cursor://anysphere.cursor-deeplink/mcp/install?name=druxt&config=${cursor}`,
@@ -24,11 +26,13 @@ export const mcpClients = (url) => {
     {
       name: 'VS Code',
       note: 'Put this in .vscode/mcp.json.',
+      language: 'json',
       code: json({ servers: { druxt: { type: 'http', url } } }),
     },
     {
       name: 'OpenCode',
       note: 'Put this in opencode.json.',
+      language: 'json',
       code: json({ mcp: { druxt: { type: 'remote', url } } }),
     },
   ]

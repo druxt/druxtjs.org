@@ -21,12 +21,14 @@
       >{{ client.name }}</button>
     </div>
     <div class="pt-4" role="tabpanel">
-      <p class="mb-3 text-base-content/70">{{ client.note }}</p>
-      <div class="flex items-start gap-3 rounded-lg bg-neutral p-4 text-neutral-content">
-        <pre class="flex-1 min-w-0 whitespace-pre-wrap break-words font-mono text-sm"><code>{{ client.code }}</code></pre>
-        <button class="btn btn-xs flex-none" type="button" @click="copy(client.code, client.name)">
+      <div class="mb-3 flex items-center gap-3">
+        <p class="flex-1 min-w-0 text-base-content/70">{{ client.note }}</p>
+        <button class="btn btn-xs btn-outline flex-none min-h-[44px] sm:min-h-0" type="button" @click="copy(client.code, client.name)">
           {{ copied === client.name ? 'Copied' : 'Copy' }}
         </button>
+      </div>
+      <div class="prose max-w-none">
+        <DuiCodeBlock :key="client.name" :code="client.code" :language="client.language" />
       </div>
       <a v-if="client.install" class="btn btn-primary btn-sm mt-3" :href="client.install">{{ client.action }}</a>
     </div>
