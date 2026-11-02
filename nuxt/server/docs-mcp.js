@@ -15,6 +15,8 @@ const crypto = require('crypto')
 const { SECTION_ORDER, isChangelog, toAbsoluteUrls } = require('../lib/llms-full-txt')
 
 const PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05']
+/** The server's one name: at runtime, on its card and in server.json. */
+const SERVER_NAME = 'org.druxtjs/docs'
 const MAX_BODY = 64 * 1024
 const MAX_RESULTS = 10
 const MAX_QUERY_WORDS = 20
@@ -165,7 +167,7 @@ const respond = async (message, { corpus, origin }) => {
         ? params.protocolVersion
         : PROTOCOL_VERSIONS[0],
       capabilities: { tools: {} },
-      serverInfo: { name: 'druxt-docs', version: '1.0.0' },
+      serverInfo: { name: SERVER_NAME, version: '1.0.0' },
       instructions: 'Documentation for Druxt, the fully decoupled Drupal and Nuxt framework.',
     })
   }
@@ -280,7 +282,7 @@ const createMcpDiscovery = (origin) => {
       type: 'application/mcp-server-card+json',
       body: {
         $schema: 'https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json',
-        name: 'org.druxtjs/docs',
+        name: SERVER_NAME,
         version: '1.0.0',
         title: 'Druxt docs',
         description: 'Search and read the Druxt documentation and API reference.',
@@ -307,8 +309,9 @@ const createMcpDiscovery = (origin) => {
   )
 
   return {
+    name: SERVER_NAME,
     serves: (method, pathname) =>
-      ['GET', 'HEAD'].includes(method) && Object.prototype.hasOwnProperty.call(prepared, pathname),
+      ['GET', 'HEAD', 'OPTIONS'].includes(method) && Object.prototype.hasOwnProperty.call(prepared, pathname),
     handle: (req, res, pathname) => {
       const { type, text, etag } = prepared[pathname]
       const headers = {
@@ -318,6 +321,11 @@ const createMcpDiscovery = (origin) => {
         'Access-Control-Expose-Headers': 'ETag',
         'Cache-Control': 'public, max-age=3600',
         ETag: etag,
+      }
+      // A browser's preflight, for a request that sends If-None-Match.
+      if (req.method === 'OPTIONS') {
+        res.writeHead(204, headers)
+        return res.end()
       }
       if (req.headers['if-none-match'] === etag) {
         res.writeHead(304, headers)

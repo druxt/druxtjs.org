@@ -77,6 +77,7 @@ describe('the protocol', () => {
     })
     assert.equal(body.result.protocolVersion, '2025-03-26')
     assert.deepEqual(body.result.capabilities, { tools: {} })
+    assert.equal(body.result.serverInfo.name, createMcpDiscovery('https://example.test').name)
   })
 
   test('initialize answers an unknown version with its own latest', async () => {
@@ -249,6 +250,19 @@ describe('discovery', () => {
     const again = await fetchDoc('/mcp/server-card', { 'If-None-Match': headers.etag })
     assert.equal(again.status, 304)
     assert.equal(again.text, '')
+  })
+
+  test('a preflight gets the CORS headers and no body', async () => {
+    const answer = await new Promise((resolve) => {
+      const res = {
+        writeHead: (status, headers) => (res.seen = { status, headers }),
+        end: () => resolve(res.seen),
+      }
+      discovery.handle({ method: 'OPTIONS', headers: {} }, res, '/mcp/server-card')
+    })
+    assert.equal(answer.status, 204)
+    assert.equal(answer.headers['Access-Control-Allow-Origin'], '*')
+    assert.equal(discovery.serves('OPTIONS', '/mcp/server-card'), true)
   })
 
   test('it serves reads of its own two paths only', () => {
