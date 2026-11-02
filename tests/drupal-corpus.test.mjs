@@ -93,12 +93,19 @@ describe('paragraphMarkdown', () => {
     assert.equal(markdown, '> **Before you start:** read this.')
   })
 
-  test('takes an image down to its alt text, which is the part that reads', () => {
+  test('takes an image down to its alt text and file URL', () => {
     const byId = new Map([
       [
         'media--image:m1',
-        { relationships: { field_media_image: { data: { meta: { alt: 'A screenshot' } } } } },
+        {
+          relationships: {
+            field_media_image: {
+              data: { type: 'file--file', id: 'f1', meta: { alt: 'A screenshot' } },
+            },
+          },
+        },
       ],
+      ['file--file:f1', { attributes: { uri: { url: '/files/a.png' } } }],
     ])
     const markdown = paragraphMarkdown(
       {
@@ -107,7 +114,7 @@ describe('paragraphMarkdown', () => {
       },
       byId
     )
-    assert.equal(markdown, '![A screenshot]()')
+    assert.equal(markdown, '![A screenshot](/files/a.png)')
   })
 
   test('drops a layout section, which is presentation rather than content', () => {
@@ -116,6 +123,35 @@ describe('paragraphMarkdown', () => {
 })
 
 describe('fetchDrupalDocs', () => {
+  test('reads a paragraph the collection omitted, in its place, and survives one it cannot', async () => {
+    const reference = (id) => ({ type: 'paragraph--docs_text', id })
+    const text = (id, value) => ({
+      type: 'paragraph--docs_text',
+      id,
+      attributes: { field_text: { value } },
+    })
+    const collection = {
+      data: [
+        {
+          attributes: { title: 'T', path: { alias: '/how-to/t' } },
+          relationships: {
+            field_content: { data: [reference('gone'), reference('old'), reference('kept')] },
+          },
+        },
+      ],
+      included: [text('kept', 'Third')],
+    }
+    const docs = await fetchDrupalDocs('http://drupal', {
+      log: () => {},
+      fetch: async (url) => {
+        if (url.endsWith('/docs_text/old')) return { data: text('old', 'Second') }
+        if (url.endsWith('/docs_text/gone')) throw new Error('403')
+        return collection
+      },
+    })
+    assert.equal(docs[0].content, 'Second\n\nThird')
+  })
+
   test('reads a page into the shape the indexes take', async () => {
     const answer = {
       data: [

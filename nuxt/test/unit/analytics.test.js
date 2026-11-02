@@ -6,14 +6,76 @@
 
 import {
   copyCodeEvent,
+  isOptedOut,
   isReportableTerm,
   isTrackableHostname,
+  optOut,
   languageFromClass,
   normaliseTerm,
   notFoundEvent,
   searchEvent,
   searchSelectEvent,
 } from '../../lib/analytics'
+
+const fakeWindow = (search = '', blocked = false) => {
+  const items = {}
+  const refuse = () => {
+    throw new Error('blocked')
+  }
+  return {
+    location: { search },
+    localStorage: blocked
+      ? { getItem: refuse, setItem: refuse, removeItem: refuse }
+      : {
+          getItem: (key) => (key in items ? items[key] : null),
+          setItem: (key, value) => {
+            items[key] = value
+          },
+          removeItem: (key) => {
+            delete items[key]
+          },
+        },
+  }
+}
+
+describe('isOptedOut', () => {
+  it('tracks a browser that never asked', () => {
+    expect(isOptedOut(fakeWindow())).toBe(false)
+  })
+
+  it('remembers ?no-track=1 on later pages', () => {
+    const win = fakeWindow('?a=b&no-track=1')
+    expect(isOptedOut(win)).toBe(true)
+    win.location.search = ''
+    expect(isOptedOut(win)).toBe(true)
+  })
+
+  it('turns back on with ?no-track=0', () => {
+    const win = fakeWindow('?no-track=1')
+    isOptedOut(win)
+    win.location.search = '?no-track=0'
+    expect(isOptedOut(win)).toBe(false)
+  })
+
+  it('still honours the URL when storage is blocked', () => {
+    expect(isOptedOut(fakeWindow('?no-track=1', true))).toBe(true)
+    expect(isOptedOut(fakeWindow('', true))).toBe(false)
+  })
+
+  it('survives being embedded in the inline snippet', () => {
+    const embedded = new Function(`return (${isOptedOut})`)()
+    expect(embedded(fakeWindow('?no-track=1'))).toBe(true)
+  })
+})
+
+describe('optOut', () => {
+  it('stops hits now and on the next visit', () => {
+    const win = fakeWindow()
+    optOut(win, 'G-TEST')
+    expect(win['ga-disable-G-TEST']).toBe(true)
+    expect(isOptedOut(win)).toBe(true)
+  })
+})
 
 describe('isTrackableHostname', () => {
   it('sends hits for the site and its subdomains', () => {

@@ -9,6 +9,22 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-11-02
+
+### Added
+
+- A read-only MCP server at `/mcp`, so AI tools can search and read the docs.
+
+### Fixed
+
+- `llms-full.txt` no longer loses paragraphs whose references don't point to their
+  current revision, which a workspace import can leave behind.
+
+### Changed
+
+- GA4 no longer counts a signed-in editor's browser, or one opted out with
+  `?no-track=1`.
+
 ## [0.14.1] - 2026-11-01
 
 ### Fixed

@@ -230,6 +230,17 @@ every environment. A copied database drops production's registered target
 along with its secrets, so each environment's picker lists that environment's
 frontend alone.
 
+## Documentation server
+
+`/mcp` is a read-only MCP server over the same pages as `llms.txt`, for AI tools:
+
+```sh
+claude mcp add --transport http druxt https://druxtjs.org/mcp
+```
+
+It has no credentials or sessions, and only serves pages the site already
+publishes.
+
 ## Staging environments
 
 A staging environment is where content is reviewed before production. It is the
@@ -270,6 +281,9 @@ What the cutover from the druxt.js build needs, in order.
    platform first or its record points at the cluster's ingress instead.
 3. Set `LAGOON_ENVIRONMENT_TYPE=production` on that environment: it turns on
    the GA4 tag and turns off the `noindex` header previews send.
+   A browser that has signed in as an editor stops sending hits from then on, and
+   `?no-track=1` on any page does the same for anyone else on the team
+   (`?no-track=0` undoes it).
 4. Confirm the Drupal environment variables the settings file reads, and that
    the site mail address is one the domain's SPF record allows to send.
 5. After the first deployment, check `sitemap.xml`, `robots.txt`,
