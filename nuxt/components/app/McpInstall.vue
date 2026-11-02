@@ -7,7 +7,7 @@
       </button>
     </div>
 
-    <h2 id="connect" class="mt-8 mb-3 text-xl font-bold">Connect your client</h2>
+    <div class="mt-6"></div>
     <div class="flex flex-wrap gap-1 border-b border-base-300" role="tablist" aria-label="AI clients">
       <button
         v-for="(client, index) of clients"
@@ -20,15 +20,12 @@
         @click="selected = index"
       >{{ client.name }}</button>
     </div>
-    <div class="pt-4" role="tabpanel">
-      <div class="mb-3 flex items-center gap-3">
-        <p class="flex-1 min-w-0 text-base-content/70">{{ client.note }}</p>
-        <button class="btn btn-xs btn-outline flex-none min-h-[44px] sm:min-h-0" type="button" @click="copy(client.code, client.name)">
-          {{ copied === client.name ? 'Copied' : 'Copy' }}
-        </button>
-      </div>
+    <!-- All rendered, and only one shown. AppProse moves each code block when it
+         adds its copy button, so a block Vue swapped would vanish. -->
+    <div v-for="(client, index) of clients" v-show="index === selected" :key="client.name" class="pt-4" role="tabpanel">
+      <p class="mb-3 text-base-content/70">{{ client.note }}</p>
       <div class="prose max-w-none">
-        <DuiCodeBlock :key="client.name" :code="client.code" :language="client.language" />
+        <DuiCodeBlock :code="client.code" :language="client.language" />
       </div>
       <a v-if="client.install" class="btn btn-primary btn-sm mt-3" :href="client.install">{{ client.action }}</a>
     </div>
@@ -46,7 +43,6 @@ export default {
   computed: {
     url: () => `${SITE_ORIGIN}/mcp`,
     clients: ({ url }) => mcpClients(url),
-    client: ({ clients, selected }) => clients[selected],
   },
 
   methods: {
