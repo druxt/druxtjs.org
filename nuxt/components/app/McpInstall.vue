@@ -63,3 +63,10 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+/* The page's prose colours every link, which would hide this one's text. */
+a.btn {
+  color: #fff;
+}
+</style>
