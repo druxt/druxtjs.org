@@ -86,13 +86,18 @@ const ogImageFile = (route) => route.replace(/^\//, '').replace(/\/$/, '') + '.p
 
 /**
  * The documents to draw cards for. Cards are drawn only at startup, so a page
- * published later would have none until the next restart. The MCP page's card
- * doesn't depend on its content, so it's always drawn.
+ * published later would have none until the next restart. The MCP and privacy
+ * pages' cards don't depend on their content, so they're always drawn.
  *
  * @param {Array<object>} docs - The corpus.
- * @returns {Array<object>} The corpus, with the MCP page's entry if it has none.
+ * @returns {Array<object>} The corpus, with an entry for each of those pages it lacks.
  */
-const cardDocs = (docs) =>
-  docs.some((doc) => doc.route === '/mcp') ? docs : [...docs, { route: '/mcp', title: 'MCP server', section: 'mcp' }]
+const cardDocs = (docs) => {
+  const missing = [
+    { route: '/mcp', title: 'MCP server', section: 'mcp' },
+    { route: '/privacy', title: 'Privacy policy', section: 'privacy' },
+  ].filter((page) => !docs.some((doc) => doc.route === page.route))
+  return missing.length ? [...docs, ...missing] : docs
+}
 
 module.exports = { cardDocs, pageFromDoc, ogImageFile }
