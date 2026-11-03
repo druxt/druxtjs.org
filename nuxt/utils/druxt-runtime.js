@@ -19,16 +19,18 @@ import { rerouteFiles, schemaImporter } from '~/utils/runtime-rules'
  * @param {object} backend
  * @param {string} backend.baseUrl - The backend's own origin, as its JSON:API links name it.
  * @param {string} [backend.proxyRoot] - Where requests go on this origin instead; '' for this site's own proxy.
+ * @param {string} [backend.filesRoot] - Where file URLs point, when not under `proxyRoot`.
+ * @param {Function} [backend.adapter] - An axios adapter that answers in place of the network, as the mock's does.
  * @param {object} [backend.settings] - The Druxt module settings to carry over.
  * @param {object} [backend.state] - This site's own store state, which its wrappers read.
  * @param {object} [backend.mutations] - This site's own store mutations, for the same reason.
  */
-export function createRuntime({ baseUrl, proxyRoot = '', settings = {}, state = {}, mutations = {} }) {
+export function createRuntime({ baseUrl, proxyRoot = '', filesRoot = proxyRoot, adapter, settings = {}, state = {}, mutations = {} }) {
   // One axios for everything, sent through the proxy; the client strips
   // `baseUrl` from the links the backend hands back, so they stay relative.
-  const http = axios.create({ baseURL: proxyRoot || undefined })
+  const http = axios.create({ baseURL: proxyRoot || undefined, ...(adapter ? { adapter } : {}) })
   // Files too: a file entity names its URL on the backend's own origin.
-  if (proxyRoot) http.interceptors.response.use(rerouteFiles(proxyRoot))
+  if (filesRoot) http.interceptors.response.use(rerouteFiles(filesRoot))
   const options = { ...settings, baseUrl, endpoint: '/jsonapi', proxy: { api: false, files: false }, axios: http }
   const client = new DruxtClient(baseUrl, options)
   client.settings = options
