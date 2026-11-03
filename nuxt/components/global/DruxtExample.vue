@@ -816,7 +816,8 @@ export default {
         this.readResolution(key)
         this.writeUrl()
       } catch (e) {
-        this.error = e.message
+        // A render the reader has since replaced, such as a slow mock load, keeps its error to itself.
+        if (key === this.renderKey) this.error = e.message
       }
     },
 
