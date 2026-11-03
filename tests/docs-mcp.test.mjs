@@ -5,11 +5,13 @@
 
 import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFileSync } from 'node:fs'
 import http from 'node:http'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
 const {
+  SERVER_VERSION,
   createDocsMcp,
   createMcpDiscovery,
   isMcpRequest,
@@ -77,6 +79,7 @@ describe('the protocol', () => {
     })
     assert.equal(body.result.protocolVersion, '2025-03-26')
     assert.deepEqual(body.result.capabilities, { tools: {} })
+    assert.equal(body.result.serverInfo.name, createMcpDiscovery('https://example.test').name)
   })
 
   test('initialize answers an unknown version with its own latest', async () => {
@@ -102,6 +105,9 @@ describe('the protocol', () => {
       ['search_docs', 'list_docs', 'get_doc']
     )
     assert.ok(body.result.tools.every((t) => t.annotations.readOnlyHint))
+    // Claude's connector directory flags a tool without a title. Protocol
+    // versions before 2025-06-18 only know the annotation.
+    assert.ok(body.result.tools.every((t) => t.title && t.annotations.title === t.title))
   })
 
   test('refuses GET, broken JSON, a batch, an unknown method and an oversized body', async () => {
@@ -251,9 +257,50 @@ describe('discovery', () => {
     assert.equal(again.text, '')
   })
 
+  test('a preflight gets the CORS headers and no body', async () => {
+    const answer = await new Promise((resolve) => {
+      const res = {
+        writeHead: (status, headers) => (res.seen = { status, headers }),
+        end: () => resolve(res.seen),
+      }
+      discovery.handle({ method: 'OPTIONS', headers: {} }, res, '/mcp/server-card')
+    })
+    assert.equal(answer.status, 204)
+    assert.equal(answer.headers['Access-Control-Allow-Origin'], '*')
+    assert.equal(discovery.serves('OPTIONS', '/mcp/server-card'), true)
+  })
+
   test('it serves reads of its own two paths only', () => {
     assert.equal(discovery.serves('GET', '/mcp/server-card'), true)
     assert.equal(discovery.serves('POST', '/mcp/server-card'), false)
     assert.equal(discovery.serves('GET', '/mcp'), false)
+  })
+})
+
+describe('the registry entry', () => {
+  const entry = JSON.parse(readFileSync(new URL('../server.json', import.meta.url)))
+
+  test('the card describes the version and icon server.json publishes', () => {
+    let text
+    const res = { writeHead: () => {}, end: (body) => (text = body) }
+    createMcpDiscovery('https://druxtjs.org').handle(
+      { method: 'GET', headers: {} },
+      res,
+      '/mcp/server-card'
+    )
+    const card = JSON.parse(text)
+    assert.equal(card.version, entry.version)
+    assert.deepEqual(card.icons, entry.icons)
+  })
+
+  test('the server reports the version server.json publishes', () => {
+    assert.equal(SERVER_VERSION, entry.version)
+  })
+
+  test('the icon is a file the site serves, at its declared size', () => {
+    const [{ src }] = entry.icons
+    const png = readFileSync(new URL(`../nuxt/static${new URL(src).pathname}`, import.meta.url))
+    // A PNG's header holds its width and height, so a new icon can't keep an old size.
+    assert.deepEqual(entry.icons[0].sizes, [`${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`])
   })
 })

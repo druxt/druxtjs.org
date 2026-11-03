@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\druxtjsorg\EventSubscriber;
 
+use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -13,6 +14,7 @@ use Drupal\workspaces\WorkspaceInterface;
 use Drupal\workspaces\WorkspaceManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -32,6 +34,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * workspace an editor deleted or lost: the request reads and writes live, and
  * says so in the log. The cookie stays until the editor chooses Live in the
  * bar or switches in Drupal, since only a switch writes it.
+ *
+ * Every cacheable response varies by workspace. Core adds that context to
+ * render arrays only, and a response that names no tracked entity carries
+ * nothing else that would: Decoupled Router's 404 for a page that exists only
+ * in a workspace was cached on live and served back inside the workspace.
  */
 final class WorkspaceHeaderSubscriber implements EventSubscriberInterface {
 
@@ -60,6 +67,8 @@ final class WorkspaceHeaderSubscriber implements EventSubscriberInterface {
         // After the route's authentication providers are enforced (31).
         ['confirm', 30],
       ],
+      // Before DynamicPageCacheSubscriber stores the response (7).
+      KernelEvents::RESPONSE => ['vary', 8],
     ];
   }
 
@@ -110,6 +119,16 @@ final class WorkspaceHeaderSubscriber implements EventSubscriberInterface {
   public function confirm(RequestEvent $event): void {
     if ($event->getRequest()->attributes->has(self::ATTRIBUTE) && !$this->currentUser->isAuthenticated()) {
       throw new AccessDeniedHttpException('The workspace this request names is not available.');
+    }
+  }
+
+  /**
+   * Keeps a cached response to the workspace it was built in.
+   */
+  public function vary(ResponseEvent $event): void {
+    $response = $event->getResponse();
+    if ($response instanceof CacheableResponseInterface) {
+      $response->getCacheableMetadata()->addCacheContexts(['workspace']);
     }
   }
 
