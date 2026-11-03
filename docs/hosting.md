@@ -243,7 +243,9 @@ publishes.
 
 `server.json` is its entry in the [MCP Registry](https://registry.modelcontextprotocol.io).
 The name `org.druxtjs/docs` is authorised by a TXT record on `druxtjs.org`. Raise
-`version` to publish a change, then run `mcp-publisher publish`.
+`version` to publish a change: the `MCP Registry` workflow publishes each new
+version when it reaches `main`, using the `MCP_REGISTRY_KEY` secret on the
+`mcp-registry` environment.
 
 ## Staging environments
 
@@ -288,6 +290,8 @@ What the cutover from the druxt.js build needs, in order.
    A browser that has signed in as an editor stops sending hits from then on, and
    `?no-track=1` on any page does the same for anyone else on the team
    (`?no-track=0` undoes it).
+   Nothing loads from Google until a reader allows it in the banner, and the
+   footer's Cookie settings changes that choice.
 4. Confirm the Drupal environment variables the settings file reads, and that
    the site mail address is one the domain's SPF record allows to send.
 5. After the first deployment, check `sitemap.xml`, `robots.txt`,

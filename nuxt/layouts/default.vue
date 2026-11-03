@@ -53,6 +53,11 @@
 
     <AppSignInDialog />
 
+    <!-- Asks once per browser whether Google Analytics may run. -->
+    <client-only>
+      <AppConsentBanner />
+    </client-only>
+
     <!-- For a signed-in editor: the revision pill and the diff drawn on the page. -->
     <AppEditorBar />
     <AppPageDiff />

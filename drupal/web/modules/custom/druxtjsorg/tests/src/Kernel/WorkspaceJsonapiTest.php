@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\druxtjsorg\Kernel;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\druxtjsorg\Controller\WorkspaceEntityResource;
 use Drupal\druxtjsorg\EventSubscriber\WorkspaceHeaderSubscriber;
@@ -12,6 +13,7 @@ use Drupal\druxtjsorg\Negotiator\CookieWorkspaceNegotiator;
 use Drupal\druxtjsorg\Hook\WorkspaceCacheHooks;
 use Drupal\druxtjsorg\Revisions\LiveWorkingCopy;
 use Drupal\druxtjsorg\Revisions\WorkspaceVersionNegotiator;
+use Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
@@ -25,8 +27,10 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * JSON:API reads and writes in the workspace a request header names.
@@ -57,6 +61,7 @@ final class WorkspaceJsonapiTest extends KernelTestBase {
     'basic_auth',
     'jsonapi',
     'jsonapi_hypermedia',
+    'dynamic_page_cache',
     'workspaces',
     'druxtjsorg',
   ];
@@ -125,6 +130,23 @@ final class WorkspaceJsonapiTest extends KernelTestBase {
     self::assertSame('Staged title', $this->title($this->editor, 'stage'));
     self::assertSame('Live title', $this->title($this->editor));
     self::assertSame('Live title', $this->title(NULL));
+  }
+
+  /**
+   * A response naming no tracked entity is not shared between workspaces.
+   */
+  public function testACacheableResponseVariesByWorkspace(): void {
+    $response = new CacheableJsonResponse(['message' => 'Unable to resolve path.'], 404);
+    $event = new ResponseEvent($this->container->get('http_kernel'), Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $response);
+    $this->container->get('event_dispatcher')->dispatch($event, KernelEvents::RESPONSE);
+
+    self::assertContains('workspace', $response->getCacheableMetadata()->getCacheContexts());
+
+    // Named, so a renamed listener fails here rather than comparing nothing.
+    $listeners = array_column(DynamicPageCacheSubscriber::getSubscribedEvents()[KernelEvents::RESPONSE], 1, 0);
+    self::assertArrayHasKey('onResponse', $listeners);
+    self::assertTrue($this->container->has('dynamic_page_cache_subscriber'));
+    self::assertGreaterThan($listeners['onResponse'], WorkspaceHeaderSubscriber::getSubscribedEvents()[KernelEvents::RESPONSE][1]);
   }
 
   /**
