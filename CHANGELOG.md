@@ -9,6 +9,8 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-11-03
+
 ### Added
 
 - A banner that asks before Google Analytics runs, a Cookie settings link in the footer to
