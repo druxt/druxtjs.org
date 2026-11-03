@@ -118,3 +118,6 @@ styles/
 
 # Written by the Lagoon image: druxt's manifest at the documentation's pin.
 /.pinned-druxt.json
+
+# Share cards, drawn when the server starts
+static/og/

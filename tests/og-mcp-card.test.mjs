@@ -8,18 +8,29 @@ import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
-const { cardDocs } = require('../nuxt/lib/og-pages.js')
+const { cardDocs, pageFromDoc } = require('../nuxt/lib/og-pages.js')
+const { ogCard } = require('../nuxt/lib/og-card.js')
 
 describe('cardDocs', () => {
   test('adds the MCP page when the corpus has none', () => {
     assert.deepEqual(
       cardDocs([{ route: '/a' }]).map((doc) => doc.route),
-      ['/a', '/mcp']
+      ['/a', '/mcp', '/privacy']
     )
   })
 
+  test('draws the privacy card with its own label before the page exists', () => {
+    const doc = cardDocs([]).find((entry) => entry.route === '/privacy')
+    assert.equal(doc.section, 'privacy')
+    assert.equal(ogCard(pageFromDoc(doc)).type, 'div')
+    assert.equal(JSON.stringify(ogCard(pageFromDoc(doc))).includes('Privacy'), true)
+  })
+
   test('leaves the published page alone', () => {
-    const docs = [{ route: '/mcp', title: 'Published', section: 'mcp' }]
+    const docs = [
+      { route: '/mcp', title: 'Published', section: 'mcp' },
+      { route: '/privacy', title: 'Published', section: 'privacy' },
+    ]
     assert.equal(cardDocs(docs), docs)
   })
 })

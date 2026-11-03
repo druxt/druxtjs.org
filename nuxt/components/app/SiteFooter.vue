@@ -36,8 +36,12 @@
     </div>
 
     <div class="border-t border-base-300">
-      <div class="max-w-[110rem] mx-auto px-4 sm:px-6 py-4 text-xs text-base-content/70">
-        Released under the MIT licence.
+      <div class="max-w-[110rem] mx-auto px-4 sm:px-6 py-4 text-xs text-base-content/70 flex flex-wrap gap-x-4 gap-y-2">
+        <span>Released under the MIT licence.</span>
+        <NuxtLink class="underline hover:text-primary" to="/privacy">Privacy</NuxtLink>
+        <button class="underline hover:text-primary" type="button" @click="$nuxt.$emit('consent:open')">
+          Cookie settings
+        </button>
       </div>
     </div>
   </footer>
