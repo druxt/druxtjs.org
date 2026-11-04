@@ -5,14 +5,12 @@
 </template>
 
 <script>
+import { DruxtEntityMixin } from 'druxt-entity'
 import { parseExampleLink } from '~/utils/live-examples'
 
 /** A live Druxt component in the page, set up from the playground link its editor pasted. */
 export default {
-  inheritAttrs: false,
-  props: {
-    entity: { type: Object, default: undefined },
-  },
+  mixins: [DruxtEntityMixin],
   computed: {
     /** The pasted link, when it names a live card; a broken one renders nothing rather than a broken card. */
     link: ({ entity }) => {
