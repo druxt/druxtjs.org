@@ -14,6 +14,10 @@ Druxt 1.0.0.
 - An Umami mock backend in the playground, answered in the browser by
   `decoupled-drupal-mock` with no Drupal behind it. Every component but
   DruxtView renders on it, since the mock has only the first page of each view.
+- A Live example paragraph type that puts a playground card in a docs page. The
+  editor sets the card up on `/playground` and pastes its address in. It renders
+  on the Umami mock unless the link names another of the site's backends, loads
+  nothing until a reader scrolls to it, and starts with its props folded away.
 
 ## [0.17.0] - 2026-11-03
 

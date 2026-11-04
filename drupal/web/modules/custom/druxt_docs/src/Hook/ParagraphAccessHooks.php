@@ -28,6 +28,7 @@ final class ParagraphAccessHooks {
     'docs_diagram',
     'docs_image',
     'docs_layout_section',
+    'docs_live_example',
     'docs_rich_text',
     'docs_text',
   ];

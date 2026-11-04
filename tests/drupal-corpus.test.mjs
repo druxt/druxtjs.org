@@ -14,6 +14,7 @@ const {
   fetchDrupalDocs,
   mergeCorpus,
   paragraphMarkdown,
+  PARAGRAPH_TYPES,
 } = require('../nuxt/lib/drupal-corpus.js')
 const { createArtefacts } = require('../nuxt/server/artefacts.js')
 const { createHandler } = require('../nuxt/server/page-cache.js')
@@ -115,6 +116,33 @@ describe('paragraphMarkdown', () => {
       byId
     )
     assert.equal(markdown, '![A screenshot](/files/a.png)')
+  })
+
+  test('links a live example to its card on the playground, as the site does', () => {
+    const markdown = paragraphMarkdown({
+      type: 'paragraph--docs_live_example',
+      attributes: {
+        field_example: 'https://develop.druxtjs.org/playground?component=DruxtMenu&backend=mock',
+      },
+    })
+    assert.equal(
+      markdown,
+      '[Live example: `<DruxtMenu>`](/playground?component=DruxtMenu&backend=mock)'
+    )
+  })
+
+  test('drops a live example whose link is not a playground card', () => {
+    for (const field_example of ['', 'not a link', '/how-to/theming'])
+      assert.equal(
+        paragraphMarkdown({ type: 'paragraph--docs_live_example', attributes: { field_example } }),
+        ''
+      )
+  })
+
+  test('asks for every paragraph type it turns into markdown', () => {
+    const url = new URL(collectionUrl('https://cms.example'))
+    for (const type of PARAGRAPH_TYPES.filter((t) => t !== 'docs_layout_section'))
+      assert.ok(url.searchParams.has(`fields[paragraph--${type}]`), type)
   })
 
   test('drops a layout section, which is presentation rather than content', () => {

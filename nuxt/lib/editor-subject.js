@@ -20,6 +20,7 @@ const KINDS = {
   'paragraph--docs_callout': 'Callout',
   'paragraph--docs_image': 'Image',
   'paragraph--docs_diagram': 'Diagram',
+  'paragraph--docs_live_example': 'Live example',
   'paragraph--docs_table': 'Table',
 }
 
@@ -33,6 +34,7 @@ const FIELDS = {
   field_callout: 'text',
   field_media: 'image',
   field_diagram: 'diagram',
+  field_example: 'playground link',
 }
 
 /**

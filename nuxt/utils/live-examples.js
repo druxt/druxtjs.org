@@ -462,3 +462,30 @@ export const knowsComponent = (name) => !!(COMPONENTS[name] || CONTEXT_ONLY[name
 
 /** The picker: three groups, only the first enabled. */
 
+
+/**
+ * A live example in a docs page, from the playground link its editor pasted:
+ * the card's state as the playground's query, or null when the link is not a
+ * live card. Any of the site's environments will do, and so will a path.
+ *
+ * The backend is one of the site's own, the mock unless the link names
+ * another: a page never sends its readers' browsers to a Drupal an editor
+ * typed in, and the mock answers with no backend up at all.
+ *
+ * @param {string} link - The playground address, `https://druxtjs.org/playground?component=DruxtMenu`.
+ * @returns {object|null} The query, `{ component, backend, ...values }`.
+ */
+export const parseExampleLink = (link) => {
+  let url
+  try {
+    url = new URL(String(link || '').trim(), 'https://druxtjs.org')
+  } catch (e) {
+    return null
+  }
+  if (url.pathname.replace(/\/+$/, '') !== '/playground') return null
+  const { component, backend, ...values } = Object.fromEntries(url.searchParams)
+  // Own keys only: `toString` is on every object.
+  const has = (object, key) => Object.prototype.hasOwnProperty.call(object, key)
+  if (!has(COMPONENTS, component)) return null
+  return { component, backend: has(BACKENDS, backend) ? backend : 'mock', ...values }
+}
