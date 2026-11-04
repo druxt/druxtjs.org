@@ -9,6 +9,12 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- An Umami mock backend in the playground, answered in the browser by
+  `decoupled-drupal-mock` with no Drupal behind it. Every component but
+  DruxtView renders on it, since the mock has only the first page of each view.
+
 ## [0.17.0] - 2026-11-03
 
 ### Added

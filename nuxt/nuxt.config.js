@@ -424,6 +424,19 @@ export default {
 
   hooks: {
     /**
+     * Writes the Umami mock into static/, for the playground's in-browser
+     * backend. A child process, because the preset is an ES module.
+     *
+     * @param {object} builder - The Nuxt builder.
+     */
+    'build:before'(builder) {
+      const path = require('path')
+      const { execFileSync } = require('child_process')
+      const { rootDir, dir } = builder.nuxt.options
+      execFileSync(process.execPath, [path.join(rootDir, 'scripts/mock-dump.mjs'), path.join(rootDir, dir.static)], { stdio: 'inherit' })
+    },
+
+    /**
      * Collects routes whose generation failed, so the build can refuse to ship them.
      *
      * @param {object} failure - The failed route.
@@ -506,8 +519,14 @@ export default {
   // One hashed stylesheet the browser caches across visits, instead of CSS
   // inlined into every page's HTML on every request. The theme-init script
   // still sets the color scheme before this loads, so dark mode doesn't flash.
+  // The mock declares its entry in `exports` alone, which webpack 4 does not read.
+  alias: {
+    'decoupled-drupal-mock$': require('path').join(__dirname, 'node_modules/decoupled-drupal-mock/dist/index.js'),
+  },
   build: {
     extractCSS: true,
+    // Its dist is ES2020, which webpack 4 does not parse.
+    transpile: ['decoupled-drupal-mock'],
   },
   telemetry: true,
 

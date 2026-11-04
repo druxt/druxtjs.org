@@ -8,13 +8,15 @@
   // node --test's built-in reporters, which knip reads as packages in the
   // test:coverage script, and nuxt/'s packages the tests reach through
   // nuxt/: the diff package through nuxt/lib/diff.js, druxt-auth through
-  // nuxt/server/page-cache.js and the remark parser through
-  // nuxt/lib/llms-full-txt.js. All belong to nuxt/'s manifest.
+  // nuxt/server/page-cache.js, the remark parser through
+  // nuxt/lib/llms-full-txt.js and the Drupal mock through
+  // nuxt/utils/mock-backend.js. All belong to nuxt/'s manifest.
   "ignoreDependencies": [
     "junit",
     "spec",
     "@druxt-contrib/diff",
     "druxt-auth",
+    "decoupled-drupal-mock",
     "unified",
     "remark-parse",
     "unist-util-visit",

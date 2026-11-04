@@ -121,3 +121,6 @@ styles/
 
 # Share cards, drawn when the server starts
 static/og/
+
+# The Umami mock, written by scripts/mock-dump.mjs as the build starts.
+/static/_mock/
