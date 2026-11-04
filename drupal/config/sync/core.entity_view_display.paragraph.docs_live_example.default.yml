@@ -1,0 +1,21 @@
+uuid: da862096-3cc8-440b-bc1f-bb8207bd7141
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.docs_live_example.field_example
+    - paragraphs.paragraphs_type.docs_live_example
+id: paragraph.docs_live_example.default
+targetEntityType: paragraph
+bundle: docs_live_example
+mode: default
+content:
+  field_example:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden: {  }

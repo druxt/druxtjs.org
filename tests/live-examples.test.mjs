@@ -350,3 +350,73 @@ describe("a reader's own Drupal", () => {
     }
   })
 })
+
+describe('a live example in a docs page', () => {
+  test("names the playground's own components and backends, for the corpus as well", async () => {
+    const { LIVE_COMPONENTS, BACKEND_IDS } = await import('../nuxt/lib/example-link.js')
+    assert.deepEqual(LIVE_COMPONENTS, m.COMPONENT_NAMES)
+    assert.deepEqual(BACKEND_IDS, Object.keys(m.BACKENDS))
+  })
+
+  test('reads the card from a playground link', () => {
+    assert.deepEqual(
+      m.parseExampleLink(
+        'https://druxtjs.org/playground?component=DruxtMenu&backend=umami&name=main&depth=2'
+      ),
+      { component: 'DruxtMenu', backend: 'umami', name: 'main', depth: '2' }
+    )
+  })
+
+  test('takes a link from any of the site environments, or a path alone', () => {
+    const want = { component: 'DruxtMenu', backend: 'mock' }
+    assert.deepEqual(
+      m.parseExampleLink(
+        'https://develop.druxtjs.org/playground/?component=DruxtMenu&backend=mock'
+      ),
+      want
+    )
+    assert.deepEqual(m.parseExampleLink('/playground?component=DruxtMenu&backend=mock'), want)
+    assert.deepEqual(m.parseExampleLink('  /playground?component=DruxtMenu&backend=mock\n'), want)
+  })
+
+  test('renders on the mock unless the link names a known backend', () => {
+    assert.equal(m.parseExampleLink('/playground?component=DruxtMenu').backend, 'mock')
+    assert.equal(
+      m.parseExampleLink('/playground?component=DruxtMenu&backend=nowhere').backend,
+      'mock'
+    )
+    assert.equal(
+      m.parseExampleLink('/playground?component=DruxtMenu&backend=constructor').backend,
+      'mock'
+    )
+  })
+
+  test("never sends a reader's browser to a Drupal the link names", () => {
+    const card = m.parseExampleLink(
+      '/playground?component=DruxtMenu&backend=https://drupal.example'
+    )
+    assert.equal(card.backend, 'mock')
+  })
+
+  test('keeps the wrapper switched off', () => {
+    assert.equal(
+      m.parseExampleLink('/playground?component=DruxtMenu&wrapper=false').wrapper,
+      'false'
+    )
+  })
+
+  test('refuses a link that is not a live card', () => {
+    for (const link of [
+      '',
+      undefined,
+      'not a link',
+      '/playground',
+      '/playground?component=DruxtNothing',
+      '/playground?component=toString',
+      '/api/packages/menu/components/DruxtMenu?component=DruxtMenu',
+      // Rendered by a parent: nothing to show on its own.
+      '/playground?component=DruxtField',
+    ])
+      assert.equal(m.parseExampleLink(link), null, String(link))
+  })
+})

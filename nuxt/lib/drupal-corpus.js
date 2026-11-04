@@ -18,6 +18,7 @@
  */
 
 const { getJson } = require('../server/backend')
+const { exampleHref, parseExampleLink } = require('./example-link')
 
 /** The paragraph bundles a page body is built from. */
 const PARAGRAPH_TYPES = [
@@ -26,6 +27,7 @@ const PARAGRAPH_TYPES = [
   'docs_diagram',
   'docs_image',
   'docs_layout_section',
+  'docs_live_example',
   'docs_rich_text',
   'docs_text',
 ]
@@ -63,6 +65,7 @@ const collectionUrl = (baseUrl) => {
   params.set('fields[paragraph--docs_code]', 'field_code,field_language')
   params.set('fields[paragraph--docs_diagram]', 'field_diagram,field_syntax')
   params.set('fields[paragraph--docs_image]', 'field_media')
+  params.set('fields[paragraph--docs_live_example]', 'field_example')
   params.set('fields[paragraph--docs_layout_section]', 'behavior_settings')
   return url.href
 }
@@ -140,6 +143,13 @@ const paragraphMarkdown = (paragraph, byId = new Map()) => {
       const file = image && byId.get(`${image.type}:${image.id}`)
       const src = (file && file.attributes && file.attributes.uri && file.attributes.uri.url) || ''
       return alt ? `![${alt}](${src})` : ''
+    }
+
+    // A live example is a link to its card as the page renders it: a path on
+    // this site, as an image's file is, with the backend the card uses.
+    case 'docs_live_example': {
+      const query = parseExampleLink(textValue(attributes.field_example))
+      return query ? `[Live example: \`<${query.component}>\`](${exampleHref(query)})` : ''
     }
 
     // A section is a layout, not content. Its children are listed beside it.

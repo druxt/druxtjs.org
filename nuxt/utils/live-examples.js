@@ -462,3 +462,7 @@ export const knowsComponent = (name) => !!(COMPONENTS[name] || CONTEXT_ONLY[name
 
 /** The picker: three groups, only the first enabled. */
 
+
+
+// A docs page's example link, read the same way the corpus reads it.
+export { parseExampleLink } from '../lib/example-link.js'
