@@ -646,6 +646,19 @@ html {
   margin: 0;
 }
 
+/* Typography 0.4 predates not-prose, and draws its list markers as li::before
+   content, which no list-style class removes. A live example in a docs page
+   numbers its own lists, so prose's numbers and bullets came out doubled. */
+.prose .not-prose li {
+  padding-left: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.prose .not-prose li::before {
+  content: none;
+}
+
 /* Props rows: label over control on a phone, side by side from `sm`. Plain
    CSS because this Tailwind version drops multi-token arbitrary values. */
 .druxt-props-row {

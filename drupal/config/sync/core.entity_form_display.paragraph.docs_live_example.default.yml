@@ -1,0 +1,23 @@
+uuid: ce618fce-38f1-47aa-a0e1-30b829aa8ab1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.docs_live_example.field_example
+    - paragraphs.paragraphs_type.docs_live_example
+id: paragraph.docs_live_example.default
+targetEntityType: paragraph
+bundle: docs_live_example
+mode: default
+content:
+  field_example:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: 'https://druxtjs.org/playground?component=DruxtMenu&backend=mock'
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

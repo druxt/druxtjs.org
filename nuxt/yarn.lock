@@ -10503,6 +10503,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"decoupled-drupal-mock-umami@npm:1.0.0-alpha.2":
+  version: 1.0.0-alpha.2
+  resolution: "decoupled-drupal-mock-umami@npm:1.0.0-alpha.2"
+  peerDependencies:
+    decoupled-drupal-mock: ^1.0.0-alpha.2
+  checksum: 969167c67e6b13748adf026532888ec0d1fce00288f5d5121c77263c09b85dabceca30679923b0eb57819663dc41e343f9d4b647d433a5c7a2fbd7bf30a1e009
+  languageName: node
+  linkType: hard
+
+"decoupled-drupal-mock@npm:1.0.0-alpha.2":
+  version: 1.0.0-alpha.2
+  resolution: "decoupled-drupal-mock@npm:1.0.0-alpha.2"
+  bin:
+    decoupled-drupal-mock: dist/cli.js
+  checksum: 03cb2edb25137b7b30dab05d31336fef64a1b36220674d7303edd2e7a1632ca0fdf0ab5cac30d6fdccbfb3372fa98d1033c065ba130981d06c8c856dec13faed
+  languageName: node
+  linkType: hard
+
 "dedent@npm:^0.7.0":
   version: 0.7.0
   resolution: "dedent@npm:0.7.0"
@@ -11173,6 +11191,8 @@ __metadata:
     consola: 2.15.3
     core-js: 3.50.0
     daisyui: 1.25.4
+    decoupled-drupal-mock: 1.0.0-alpha.2
+    decoupled-drupal-mock-umami: 1.0.0-alpha.2
     drupal-jsonapi-params: 2.3.2
     druxt: 0.25.1
     druxt-auth: "patch:druxt-auth@npm%3A0.5.1#./patches/druxt-auth-0.5.1.patch"

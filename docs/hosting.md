@@ -208,7 +208,7 @@ one keeps its URL in Drupal by hand. It is on in an environment that has
   build log says `Registered the preview target`, or that it is up to date.
   A failure only logs a warning, and the frontend still starts.
 - `settings.lagoon.php` leaves its own target out, so the picker shows the
-  frontend once, as **Frontend: druxtjs.org** on production.
+  frontend once, as **druxtjs.org** in the **Frontend** group on production.
 
 Without the variable the consumer is still made, without a secret, and
 `settings.lagoon.php` sets the target to the `nuxt` route, as before.

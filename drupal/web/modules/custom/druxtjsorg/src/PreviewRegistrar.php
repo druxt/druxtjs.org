@@ -67,8 +67,8 @@ final class PreviewRegistrar {
   public static function initial(): array {
     return [
       'client_id' => self::CLIENT_ID,
-      // The preview's Frontend picker shows this before each target's own
-      // label, the frontend's host: "Frontend: druxtjs.org".
+      // The preview's Frontend picker heads this consumer's targets with
+      // this, above each target's own label, the frontend's host.
       'label' => 'Frontend',
       'description' => 'The documentation site registering its preview target. A confidential client: the client credentials grant only, as a user that may change this consumer\'s preview targets and nothing else.',
     ];

@@ -2,8 +2,9 @@
   <div>
     <h1 class="text-3xl font-semibold tracking-tight mb-2">Live component playground</h1>
     <p class="text-base-content/70 mb-8 max-w-content">
-      Pick a Druxt component and render it against a live Drupal: this site's, the Umami demo, or
-      your own. Its props are the controls and its examples are presets.
+      Pick a Druxt component and render it against a Drupal: this site's, the Umami demo, a mock of
+      Umami that runs in your browser, or your own. Its props are the controls and its examples are
+      presets.
     </p>
 
     <DruxtExample />
@@ -25,7 +26,7 @@
       <p>
         What renders depends on the wrapper components in front of the backend. This site ships
         wrappers for its own pages, blocks, menus and views, so its content comes out themed. The
-        Umami demo and your own Drupal render through Druxt's default output, which is plain on
+        Umami demo, its mock and your own Drupal render through Druxt's default output, which is plain on
         purpose: a list of fields for an entity, or a plain list for a menu. That is the starting
         point a wrapper component builds on.
         <NuxtLink to="/how-to/theming" class="link">Theming</NuxtLink> shows how.

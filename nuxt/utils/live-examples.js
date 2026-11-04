@@ -6,11 +6,14 @@
  * on its own. The card reads nothing else.
  */
 
+import { MOCK_ORIGIN, MOCK_ROOT, isMockUrl, mockFetch } from './mock-backend.js'
+
 /**
- * Backends the card can render against. Both are proxied onto this origin:
- * `api` is where the option lists come from; a runtime's client is told the
- * backend's own `baseUrl` (this site's when unset) and sends through
- * `proxyRoot`.
+ * Backends the card can render against. The first two are proxied onto this
+ * origin: `api` is where the option lists come from; a runtime's client is
+ * told the backend's own `baseUrl` (this site's when unset) and sends through
+ * `proxyRoot`. The mock never leaves the browser: its requests are answered
+ * by decoupled-drupal-mock, and its files are served from `filesRoot`.
  */
 export const BACKENDS = {
   // Its Storybook is the environment's own, read from the runtime config.
@@ -23,11 +26,23 @@ export const BACKENDS = {
     nodeBundles: ['recipe', 'article', 'page'],
     storybook: 'https://storybook.umami.demo.druxtjs.org/',
     storybookLabel: 'Umami',
+    umami: true,
+  },
+  mock: {
+    label: 'Umami mock, in your browser',
+    api: `${MOCK_ORIGIN}/jsonapi`,
+    baseUrl: MOCK_ORIGIN,
+    proxyRoot: MOCK_ORIGIN,
+    filesRoot: MOCK_ROOT,
+    mock: true,
+    umami: true,
+    nodeBundles: ['recipe', 'article', 'page'],
   },
 }
 
 const get = async (api, path) => {
-  const response = await fetch(`${api}${path}`, { headers: { Accept: 'application/vnd.api+json' } })
+  const send = isMockUrl(api) ? mockFetch : fetch
+  const response = await send(`${api}${path}`, { headers: { Accept: 'application/vnd.api+json' } })
   if (!response.ok) throw new Error(`${response.status} from ${path}`)
   return response.json()
 }
@@ -218,11 +233,14 @@ export const SOURCES = {
   },
 }
 
+/** Whether the card is on Umami's content: the live demo or the mock of it. */
+const isUmami = (card) => !!(BACKENDS[card.backend] || {}).umami
+
 /** The frontend theme: this site's own, or the Umami demo's. */
-const siteTheme = (card) => (card.backend === 'umami' ? 'umami' : ((card.$config || {}).decoupledTheme || {}).default)
+const siteTheme = (card) => (isUmami(card) ? 'umami' : ((card.$config || {}).decoupledTheme || {}).default)
 
 /** One value per backend: what demos best on each. */
-const perBackend = (site, umami) => (card) => (card.backend === 'umami' ? umami : site)
+const perBackend = (site, umami) => (card) => (isUmami(card) ? umami : site)
 
 /**
  * The option a select takes on its own: the one whose value is `want`, or
@@ -312,7 +330,7 @@ export const COMPONENTS = {
     story: 'druxt-menu-druxtmenu--default',
     args: ['name'],
     props: [
-      { name: 'name', type: 'string', control: 'select', source: 'menus', default: 'main', prefer: (card) => (card.backend === 'umami' ? 'main' : 'docs'), description: 'The menu machine name.' },
+      { name: 'name', type: 'string', control: 'select', source: 'menus', default: 'main', prefer: (card) => (isUmami(card) ? 'main' : 'docs'), description: 'The menu machine name.' },
       { name: 'minDepth', type: 'number', control: 'number', default: 0, description: 'The minimum depth to render.' },
       { name: 'maxDepth', type: 'number', control: 'number', default: null, description: 'The maximum depth to render.' },
     ],
@@ -321,13 +339,14 @@ export const COMPONENTS = {
   DruxtView: {
     story: 'druxt-views-druxtview--default',
     args: [],
-    // JSON:API Views is not on this site's Drupal yet.
-    backends: { umami: true, site: 'needs JSON:API Views on that Drupal' },
+    // JSON:API Views is not on this site's Drupal yet. The mock has each
+    // view's first page only, as its preset recorded them.
+    backends: { umami: true, site: 'needs JSON:API Views on that Drupal', mock: 'has only the first page of each view, so its pager would fail' },
     chain: {
       label: 'viewId, displayId',
       description: 'Each one narrows the next.',
       steps: [
-        { name: 'viewId', source: 'views', required: true, prefer: (card) => (card.backend === 'umami' ? 'recipes' : 'frontpage') },
+        { name: 'viewId', source: 'views', required: true, prefer: (card) => (isUmami(card) ? 'recipes' : 'frontpage') },
         { name: 'displayId', source: 'displays', needs: ['viewId'], default: 'default' },
       ],
     },
@@ -443,3 +462,7 @@ export const knowsComponent = (name) => !!(COMPONENTS[name] || CONTEXT_ONLY[name
 
 /** The picker: three groups, only the first enabled. */
 
+
+
+// A docs page's example link, read the same way the corpus reads it.
+export { parseExampleLink } from '../lib/example-link.js'

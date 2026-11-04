@@ -104,12 +104,17 @@
 
       <!-- Props panel: the props table, live. -->
       <div class="border-t border-base-300 px-[18px] pt-3 pb-4">
-        <p class="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-base-content/70">
+        <!-- In a docs page the rows start folded, so the example reads as part of the page. -->
+        <button v-if="placement === 'docs'" type="button" data-testid="props-toggle" class="flex items-center gap-2 min-h-[24px] text-[10.5px] font-semibold uppercase tracking-[0.08em] text-base-content/70" :aria-expanded="String(propsOpen)" @click="propsOpen = !propsOpen">
+          <span class="text-[10px]" aria-hidden="true">{{ propsOpen ? '▾' : '▸' }}</span>
+          Props <span class="normal-case tracking-normal font-normal text-[12px] ml-1">{{ propsOpen ? 'live: every change re-renders above' : 'change them and it re-renders' }}</span>
+        </button>
+        <p v-else class="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-base-content/70">
           Props <span class="normal-case tracking-normal font-normal text-[12px] ml-2">live: every change re-renders above</span>
         </p>
 
         <!-- Dependent chain, one row. -->
-        <div v-if="schema.chain" class="druxt-props-row gap-x-4 gap-y-2 py-2.5 border-t border-base-300 mt-2">
+        <div v-if="propsOpen && schema.chain" class="druxt-props-row gap-x-4 gap-y-2 py-2.5 border-t border-base-300 mt-2">
           <div>
             <p class="font-mono text-[12.5px]" :class="dirtyChain ? 'font-medium' : ''">{{ schema.chain.label }}</p>
             <p class="text-[11.5px] text-base-content/70">{{ schema.chain.description }}</p>
@@ -134,7 +139,7 @@
         </div>
 
         <!-- Plain rows: the component's own, then the shared DruxtModule props. -->
-        <div v-for="prop in rows" :key="prop.name" class="druxt-props-row gap-x-4 gap-y-2 py-2.5 border-t border-base-300">
+        <div v-for="prop in propsOpen ? rows : []" :key="prop.name" class="druxt-props-row gap-x-4 gap-y-2 py-2.5 border-t border-base-300">
           <div>
             <p class="font-mono text-[12.5px]" :class="isDirty(prop) ? 'font-medium' : ''">{{ prop.name }}</p>
             <p class="text-[11.5px] text-base-content/70">{{ prop.type }}<template v-if="prop.default !== undefined && prop.default !== null">, {{ prop.default }}</template></p>
@@ -199,7 +204,7 @@
           </div>
         </div>
 
-        <!-- From a module or reference page: this card, on its own page, as set here. -->
+        <!-- From a docs, module or reference page: this card, on its own page, as set here. -->
         <div v-if="placement !== 'playground'" class="pt-2.5 flex items-center gap-2 min-h-[20px] pl-5">
           <NuxtLink :to="{ path: '/playground', query: shareQuery }" class="text-primary-focus text-[12.5px] font-medium" @click.native="track('example_open_playground')">Open in the playground</NuxtLink>
         </div>
@@ -246,10 +251,12 @@ import {
   pageFor,
   parseOrigin,
   pickOption,
+  parseExampleLink,
   probeBackend,
 } from '~/utils/live-examples'
 import { COPY_STATES, copyText } from '~/utils/copy-button'
 import { createRuntime } from '~/utils/druxt-runtime'
+import { mockAdapter } from '~/utils/mock-backend'
 import mutations from '~/store/mutations'
 
 // The props every module component shares. `value` and `settings` are
@@ -282,11 +289,13 @@ export default {
     component: { type: String, default: '' },
     /** On a module page: the picker offers that package's components only. */
     pkg: { type: String, default: '' },
+    /** In a docs page: the playground link its editor pasted, which fixes the component and sets the card up. */
+    link: { type: String, default: '' },
   },
 
   data() {
     return {
-      name: this.component || liveComponentsOf(this.pkg)[0] || '',
+      name: this.component || (parseExampleLink(this.link) || {}).component || liveComponentsOf(this.pkg)[0] || '',
       backend: 'site',
       // A reader's own Drupal, once probed; and the form that asks for it.
       custom: null,
@@ -298,6 +307,7 @@ export default {
       options: {},
       loading: {},
       wrapper: true,
+      propsOpen: !this.link,
       openResolution: false,
       copyState: null,
       error: null,
@@ -315,14 +325,14 @@ export default {
     /** The backend in a URL: its key, or a reader's origin. */
     backendId: ({ backend, custom }) => (backend === 'custom' && custom ? custom.baseUrl : backend),
     copyStates: () => COPY_STATES,
-    fixed: ({ component }) => !!component,
+    fixed: ({ component, link }) => !!component || !!link,
     live: ({ name }) => !!COMPONENTS[name],
     contextOnly: ({ name }) => CONTEXT_ONLY[name] || null,
     shipped: ({ name }) => SHIPPED_WRAPPERS[name] || null,
     schema: ({ name }) => COMPONENTS[name] || { props: [], examples: [] },
     fixedValues: ({ schema }) => schema.fixedValues || {},
     /** Where the card sits, for analytics. */
-    placement: ({ component, pkg }) => (component ? 'api' : pkg ? 'module' : 'playground'),
+    placement: ({ component, pkg, link }) => (link ? 'docs' : component ? 'api' : pkg ? 'module' : 'playground'),
 
     /** Only components that render on their own; the others have their own pages. */
     picker: ({ pkg }) => COMPONENT_NAMES.filter((n) => !pkg || packageOf(n) === pkg),
@@ -466,10 +476,17 @@ export default {
     this.resetKey = 0
     // What a shared playground URL asks for, applied on the first fill and then dropped.
     this.initial = {}
+    // Watches for a docs page's example to come near the screen.
+    this.observer = null
   },
 
   async mounted() {
-    if (this.placement === 'playground') this.readUrl()
+    if (this.placement === 'docs') {
+      await this.inView()
+      if (this._isDestroyed) return
+      this.readUrl(parseExampleLink(this.link) || {})
+    }
+    if (this.placement === 'playground') this.readUrl(this.$route.query || {})
     if (this.customInput) {
       this.customOpen = true
       await this.useCustom()
@@ -482,6 +499,7 @@ export default {
   },
 
   beforeDestroy() {
+    if (this.observer) this.observer.disconnect()
     this.unmount()
   },
 
@@ -491,14 +509,32 @@ export default {
     /**
      * The playground's state in its URL, so a card can be shared: the
      * component and backend, every value chosen, and the wrapper when off.
+     * A docs page's example reads its link the same way.
      */
-    readUrl() {
-      const { component, backend, wrapper, ...rest } = this.$route.query || {}
+    readUrl(query) {
+      const { component, backend, wrapper, ...rest } = query
       if (component && COMPONENTS[component]) this.name = component
       if (backend && BACKENDS[backend]) this.backend = backend
       // A reader's Drupal in a shared link: probed once the card is up.
       if (backend && /^https?:\/\//.test(backend)) this.customInput = backend
       this.initial = { ...rest, ...(wrapper === 'false' ? { wrapper: false } : {}) }
+    },
+
+    /**
+     * Resolves once the card is near the screen, so a page loads nothing for
+     * an example its reader never scrolls to.
+     */
+    inView() {
+      if (typeof IntersectionObserver === 'undefined') return Promise.resolve()
+      return new Promise((resolve) => {
+        this.observer = new IntersectionObserver((entries) => {
+          if (!entries.some((e) => e.isIntersecting)) return
+          this.observer.disconnect()
+          this.observer = null
+          resolve()
+        }, { rootMargin: '200px' })
+        this.observer.observe(this.$el)
+      })
     },
 
     /** The backend select: a known one, or the form for a reader's own. */
@@ -778,7 +814,10 @@ export default {
         // This site's own state, minus the Druxt modules the runtime brings of its own.
         const own = new Set(['druxt', 'druxtRouter', 'druxtSchema', 'druxtMenu', 'druxtViews'])
         const state = Object.fromEntries(Object.entries(this.$store.state).filter(([k]) => !own.has(k)))
-        const runtime = createRuntime({ baseUrl: b.baseUrl || settings.baseUrl || window.location.origin, proxyRoot: b.proxyRoot, settings, state, mutations })
+        // The mock answers in the browser, so its runtime gets the mock's adapter instead of the network.
+        const adapter = b.mock ? await mockAdapter() : undefined
+        if (key !== this.renderKey) return
+        const runtime = createRuntime({ baseUrl: b.baseUrl || settings.baseUrl || window.location.origin, proxyRoot: b.proxyRoot, filesRoot: b.filesRoot, adapter, settings, state, mutations })
         runtime.axios.interceptors.request.use((config) => {
           const url = /^https?:/.test(config.url || '') ? config.url : [config.baseURL || '', config.url || ''].map((part, i) => (i ? part.replace(/^\/+/, '') : part.replace(/\/+$/, ''))).filter(Boolean).join('/')
           this.requests.push(`${(config.method || 'get').toUpperCase()} /${url.replace(/^https?:\/\/[^/]+/, '').replace(/^\/+/, '')}`)
@@ -812,7 +851,8 @@ export default {
         this.readResolution(key)
         this.writeUrl()
       } catch (e) {
-        this.error = e.message
+        // A render the reader has since replaced, such as a slow mock load, keeps its error to itself.
+        if (key === this.renderKey) this.error = e.message
       }
     },
 
