@@ -18,6 +18,7 @@
  */
 
 const { getJson } = require('../server/backend')
+const { exampleHref, parseExampleLink } = require('./example-link')
 
 /** The paragraph bundles a page body is built from. */
 const PARAGRAPH_TYPES = [
@@ -144,19 +145,11 @@ const paragraphMarkdown = (paragraph, byId = new Map()) => {
       return alt ? `![${alt}](${src})` : ''
     }
 
-    // A live example is a link to its card, the one place it renders: a path
-    // on this site, as an image's file is, whichever environment it was
-    // copied from.
+    // A live example is a link to its card as the page renders it: a path on
+    // this site, as an image's file is, with the backend the card uses.
     case 'docs_live_example': {
-      let url
-      try {
-        url = new URL(textValue(attributes.field_example).trim(), 'https://druxtjs.org')
-      } catch (e) {
-        return ''
-      }
-      const component = url.searchParams.get('component')
-      if (url.pathname.replace(/\/+$/, '') !== '/playground' || !component) return ''
-      return `[Live example: \`<${component}>\`](/playground${url.search})`
+      const query = parseExampleLink(textValue(attributes.field_example))
+      return query ? `[Live example: \`<${query.component}>\`](${exampleHref(query)})` : ''
     }
 
     // A section is a layout, not content. Its children are listed beside it.

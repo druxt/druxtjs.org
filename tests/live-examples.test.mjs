@@ -352,6 +352,12 @@ describe("a reader's own Drupal", () => {
 })
 
 describe('a live example in a docs page', () => {
+  test("names the playground's own components and backends, for the corpus as well", async () => {
+    const { LIVE_COMPONENTS, BACKEND_IDS } = await import('../nuxt/lib/example-link.js')
+    assert.deepEqual(LIVE_COMPONENTS, m.COMPONENT_NAMES)
+    assert.deepEqual(BACKEND_IDS, Object.keys(m.BACKENDS))
+  })
+
   test('reads the card from a playground link', () => {
     assert.deepEqual(
       m.parseExampleLink(

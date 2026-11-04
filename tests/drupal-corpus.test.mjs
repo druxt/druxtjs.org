@@ -131,8 +131,26 @@ describe('paragraphMarkdown', () => {
     )
   })
 
+  test("links a live example to the backend its card renders on, not the editor's", () => {
+    const markdown = paragraphMarkdown({
+      type: 'paragraph--docs_live_example',
+      attributes: {
+        field_example: '/playground?component=DruxtMenu&backend=https://drupal.example&name=main',
+      },
+    })
+    assert.equal(
+      markdown,
+      '[Live example: `<DruxtMenu>`](/playground?component=DruxtMenu&backend=mock&name=main)'
+    )
+  })
+
   test('drops a live example whose link is not a playground card', () => {
-    for (const field_example of ['', 'not a link', '/how-to/theming'])
+    for (const field_example of [
+      '',
+      'not a link',
+      '/how-to/theming',
+      '/playground?component=DruxtField',
+    ])
       assert.equal(
         paragraphMarkdown({ type: 'paragraph--docs_live_example', attributes: { field_example } }),
         ''
