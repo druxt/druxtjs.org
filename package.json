@@ -36,8 +36,8 @@
     "lint:prose": "PROSE_LINT_GLOB='!nuxt/**' bash .gitlab/scripts/lint-prose.sh --all",
     "lint:prose:install": "bash .gitlab/scripts/install-vale.sh .vale/bin .vale/styles",
     "prepare": "node scripts/prepare.mjs",
-    "test": "node --test tests/*.test.mjs",
-    "test:coverage": "node -e \"const[a,b]=process.versions.node.split('.').map(Number);if(a<22||(a===22&&b<8)){console.error('test:coverage needs Node >= 22.8 for --experimental-test-coverage; use npm test on the Node 16 floor.');process.exit(1)}\" && mkdir -p reports && node --test --experimental-test-coverage --test-coverage-include=\"scripts/**\" --test-coverage-lines=88 --test-coverage-branches=87 --test-coverage-functions=87 --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=reports/junit.xml tests/*.test.mjs"
+    "test": "node -e \"const[a,b]=process.versions.node.split('.').map(Number);if(a<20||(a===20&&b<19)||a===21||(a===22&&b<7)){console.error('npm test needs Node >= 20.19 or >= 22.7, which import the ES modules in nuxt/utils/ without a type field.');process.exit(1)}\" && node --test tests/*.test.mjs",
+    "test:coverage": "node -e \"const[a,b]=process.versions.node.split('.').map(Number);if(a<22||(a===22&&b<8)){console.error('test:coverage needs Node >= 22.8 for --experimental-test-coverage; use npm test on Node >= 20.19.');process.exit(1)}\" && mkdir -p reports && node --test --experimental-test-coverage --test-coverage-include=\"scripts/**\" --test-coverage-lines=88 --test-coverage-branches=87 --test-coverage-functions=87 --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=reports/junit.xml tests/*.test.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "17.8.1",
