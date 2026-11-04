@@ -9,6 +9,8 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-11-04
+
 ### Added
 
 - An Umami mock backend in the playground, answered in the browser by
