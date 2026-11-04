@@ -77,7 +77,8 @@ DRUXT_NODE_PREVIEW_URL=http://localhost:3000 npm run dev
 ```
 
 The frontend logs that it registered its target, and the picker lists it as
-**Frontend: localhost:3000**, after the `settings.php` target.
+**localhost:3000** in the **Frontend** group, after the **Site** group that
+holds the `settings.php` target.
 
 Without a target, the tab says so.
 

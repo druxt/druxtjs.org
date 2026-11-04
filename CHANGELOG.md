@@ -19,6 +19,11 @@ Druxt 1.0.0.
   on the Umami mock unless the link names another of the site's backends, loads
   nothing until a reader scrolls to it, and starts with its props folded away.
 
+### Changed
+
+- The preview's Frontend picker groups its targets by consumer, from the latest
+  Consumer Node Preview.
+
 ## [0.17.0] - 2026-11-03
 
 ### Added
