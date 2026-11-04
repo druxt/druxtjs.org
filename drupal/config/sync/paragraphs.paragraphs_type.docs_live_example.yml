@@ -1,0 +1,10 @@
+uuid: 29fedaf7-914a-4e1b-8920-8f56a2ad51c1
+langcode: en
+status: true
+dependencies: {  }
+id: docs_live_example
+label: 'Live example'
+icon_uuid: null
+icon_default: null
+description: 'A Druxt component rendered live in the page, set up on the playground and pasted in as its link.'
+behavior_plugins: {  }

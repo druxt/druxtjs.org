@@ -1,7 +1,7 @@
 {
   "name": "druxtjs-org",
   "description": "The Fully Decoupled Drupal Framework",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "private": true,
   "scripts": {
     "cypress:open": "npx cypress open --project test",
@@ -24,6 +24,8 @@
     "consola": "2.15.3",
     "core-js": "3.50.0",
     "daisyui": "1.25.4",
+    "decoupled-drupal-mock": "1.0.0-alpha.2",
+    "decoupled-drupal-mock-umami": "1.0.0-alpha.2",
     "drupal-jsonapi-params": "2.3.2",
     "druxt": "0.25.1",
     "druxt-auth": "patch:druxt-auth@npm%3A0.5.1#./patches/druxt-auth-0.5.1.patch",

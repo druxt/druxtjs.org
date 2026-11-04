@@ -59,8 +59,9 @@ Nuxt application.
   before committing.
 - **The coverage floor goes up, never down.** `npm run test:coverage` fails
   below 88% of lines, 87% of branches and 87% of functions in `scripts/`. It
-  needs Node 22.8 or later, so CI runs it. `npm test` is the same suite on
-  Node 16, without coverage.
+  needs Node 22.8 or later, so CI runs it. `npm test` is the same suite
+  without coverage, on Node 20.19 or 22.7 and later: the tests import the ES
+  modules in `nuxt/utils/`, which older Node cannot load.
 - **The frontend's audit is report-only, and the root's blocks.** `npm run
 lint:audit:nuxt` audits `nuxt/` with Yarn 4 in a scratch copy, because Yarn
   3.8.7's audit endpoint now answers 400. Nuxt 2's frozen tree cannot pass it.

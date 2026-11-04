@@ -1,0 +1,19 @@
+uuid: a985d469-847d-4d47-9387-ea7ed096ba7b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_example
+    - paragraphs.paragraphs_type.docs_live_example
+id: paragraph.docs_live_example.field_example
+field_name: field_example
+entity_type: paragraph
+bundle: docs_live_example
+label: 'Playground link'
+description: 'Set the example up on /playground, then copy the address from the browser and paste it here.'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
