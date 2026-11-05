@@ -26,6 +26,7 @@ const PARAGRAPH_TYPES = [
   'docs_code',
   'docs_diagram',
   'docs_image',
+  'docs_issue',
   'docs_layout_section',
   'docs_live_example',
   'docs_rich_text',
@@ -66,6 +67,7 @@ const collectionUrl = (baseUrl) => {
   params.set('fields[paragraph--docs_diagram]', 'field_diagram,field_syntax')
   params.set('fields[paragraph--docs_image]', 'field_media')
   params.set('fields[paragraph--docs_live_example]', 'field_example')
+  params.set('fields[paragraph--docs_issue]', 'field_issue_title,field_issue_summary')
   params.set('fields[paragraph--docs_layout_section]', 'behavior_settings')
   return url.href
 }
@@ -150,6 +152,15 @@ const paragraphMarkdown = (paragraph, byId = new Map()) => {
     case 'docs_live_example': {
       const query = parseExampleLink(textValue(attributes.field_example))
       return query ? `[Live example: \`<${query.component}>\`](${exampleHref(query)})` : ''
+    }
+
+    // An issue is the heading its title was before the page listed issues,
+    // with its summary under it. Its fix is its children, listed beside it.
+    case 'docs_issue': {
+      const title = textValue(attributes.field_issue_title)
+      if (!title) return ''
+      const summary = textValue(attributes.field_issue_summary)
+      return summary ? `## ${title}\n\n${summary}` : `## ${title}`
     }
 
     // A section is a layout, not content. Its children are listed beside it.

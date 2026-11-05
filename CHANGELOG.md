@@ -9,6 +9,15 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- An Issue paragraph type for troubleshooting pages. Each issue has a title, an
+  area and a one-line summary, and holds its fix as Text and Code blocks. A
+  page lists its issues closed, grouped by area, with a search that matches the
+  fix as well as the title and chips that filter by area. Every fix is in the
+  server-rendered page, a link to an issue opens it, and the MCP server and
+  `llms-full.txt` read each issue as a heading with its summary.
+
 ## [0.18.0] - 2026-11-04
 
 ### Added

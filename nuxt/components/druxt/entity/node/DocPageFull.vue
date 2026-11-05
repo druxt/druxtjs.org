@@ -6,19 +6,23 @@
       This revision's content could not be read.
       <button type="button" class="link link-primary" @click="retry">Try again</button>
     </p>
-    <template v-for="paragraph in roots">
+    <template v-for="run in runs">
+      <!-- A run of Issue blocks is one searchable list, grouped by area. -->
+      <AppIssueList v-if="run.issues" :key="run.key" :issues="run.issues" :repeats="run.repeats" :ids="run.ids" :children-of="childrenOf" />
       <DruxtLayoutParagraph
-        v-if="layoutOf(paragraph).layout"
-        :key="paragraph.id"
-        :entity="paragraph"
-        :children="childrenOf(paragraph)"
+        v-else-if="layoutOf(run.paragraph).layout"
+        :key="run.key"
+        :entity="run.paragraph"
+        :children="childrenOf(run.paragraph)"
       />
-      <DruxtEntity v-else :key="paragraph.id" :type="paragraph.type" :uuid="paragraph.id" />
+      <DruxtEntity v-else :key="run.key" :type="run.paragraph.type" :uuid="run.paragraph.id" />
     </template>
   </div>
 </template>
 
 <script>
+import { runsOf } from '~/utils/issues'
+
 const layoutOf = (paragraph) => ((paragraph.attributes || {}).behavior_settings || {}).layout_paragraphs || {}
 
 /**
@@ -81,6 +85,9 @@ export default {
     },
     roots() {
       return this.paragraphs.filter((paragraph) => layoutOf(paragraph).layout || !layoutOf(paragraph).parent_uuid)
+    },
+    runs() {
+      return runsOf(this.roots)
     },
   },
   methods: {

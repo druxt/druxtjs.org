@@ -26,6 +26,11 @@ use Drupal\paragraphs\ParagraphInterface;
  * A block readers never see, because it or its section is unpublished or
  * layout_paragraphs has disabled it, gives none.
  *
+ * Issues are listed by area, not one by one: a run of Issue blocks gives a
+ * heading for each area it has, in the order the area field lists them,
+ * which is how the page groups them. Their fixes are closed until a reader
+ * opens one, so their headings are not on the page's contents either.
+ *
  * The value depends on every paragraph read and every text format rendered,
  * so their cache tags are this field's, and JSON:API adds them to the page's
  * response.
@@ -38,6 +43,13 @@ final class TableOfContentsItemList extends FieldItemList implements CacheableDe
    * The field holding a page's paragraphs.
    */
   private const CONTENT = 'field_content';
+
+  /**
+   * The troubleshooting block, and the field holding its area.
+   */
+  private const ISSUE = 'docs_issue';
+
+  private const AREA = 'field_issue_area';
 
   /**
    * The field each block type keeps its text in, and the text's format.
@@ -63,7 +75,18 @@ final class TableOfContentsItemList extends FieldItemList implements CacheableDe
     }
     $layout = new LayoutParagraphsLayout($entity->get(self::CONTENT));
     $blocks = [];
+    $run = [];
     foreach ($layout->getRootComponents() as $component) {
+      $paragraph = $this->translated($component->getEntity());
+      if ($paragraph->bundle() === self::ISSUE) {
+        $this->cacheability->addCacheableDependency($paragraph);
+        if (!$paragraph instanceof EntityPublishedInterface || $paragraph->isPublished()) {
+          $run[] = $paragraph;
+        }
+        continue;
+      }
+      array_push($blocks, ...$this->areas($run));
+      $run = [];
       foreach ($this->inReadingOrder($layout, $component) as $paragraph) {
         $block = $this->text($paragraph);
         if ($block !== NULL) {
@@ -71,6 +94,7 @@ final class TableOfContentsItemList extends FieldItemList implements CacheableDe
         }
       }
     }
+    array_push($blocks, ...$this->areas($run));
     foreach (TableOfContents::build($blocks) as $delta => $entry) {
       $this->list[$delta] = $this->createItem($delta, $entry);
     }
@@ -99,6 +123,36 @@ final class TableOfContentsItemList extends FieldItemList implements CacheableDe
         yield from $this->inReadingOrder($layout, $child);
       }
     }
+  }
+
+  /**
+   * A heading for each area a run of issues has, in the area field's order.
+   *
+   * @param \Drupal\paragraphs\ParagraphInterface[] $issues
+   *   The run's Issue blocks.
+   *
+   * @return list<array{markdown: string}>
+   *   One markdown heading per area.
+   */
+  private function areas(array $issues): array {
+    if ($issues === [] || !$issues[0]->hasField(self::AREA)) {
+      return [];
+    }
+    $values = array_map(fn (ParagraphInterface $issue): string => (string) $issue->get(self::AREA)->value, $issues);
+    $storage = $issues[0]->get(self::AREA)->getFieldDefinition()->getFieldStorageDefinition();
+    // The labels and their order are the storage's, so a change to it
+    // changes the headings.
+    if ($storage instanceof CacheableDependencyInterface) {
+      $this->cacheability->addCacheableDependency($storage);
+    }
+    $allowed = $storage->getSetting('allowed_values') ?? [];
+    $headings = [];
+    foreach ($allowed as $value => $label) {
+      if (in_array((string) $value, $values, TRUE)) {
+        $headings[] = ['markdown' => '## ' . $label];
+      }
+    }
+    return $headings;
   }
 
   /**
