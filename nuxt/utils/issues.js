@@ -1,3 +1,4 @@
+import GithubSlugger from 'github-slugger'
 import { headingId } from './headings.js'
 
 /**
@@ -21,6 +22,9 @@ const areaOf = (entity) => {
   return AREAS.some((area) => area.value === value) ? value : ''
 }
 
+/** An Issue's title as its heading read, without the code marks. */
+const titleText = (entity) => ((entity.attributes || {}).field_issue_title || '').replace(/`/g, '')
+
 /**
  * A page's root paragraphs in reading order, with each run of issues
  * gathered into one item, which the page renders as one list.
@@ -30,8 +34,12 @@ const areaOf = (entity) => {
  * github-slugger does, so the second run's "Install and build" is
  * `install-and-build-1`, and the list has to give it that id too.
  *
+ * Each issue's id is numbered page-wide the same way, in reading order, so
+ * two issues with one title get two ids and the first keeps the old
+ * heading's.
+ *
  * @param {Array<object>} roots - The page's root paragraphs.
- * @returns {Array<object>} `{ key, paragraph }` or `{ key, issues, repeats }` items.
+ * @returns {Array<object>} `{ key, paragraph }` or `{ key, issues, repeats, ids }` items.
  */
 export const runsOf = (roots) => {
   const runs = []
@@ -42,9 +50,11 @@ export const runsOf = (roots) => {
     else runs.push({ key: `issues-${paragraph.id}`, issues: [paragraph] })
   }
   const seen = {}
+  const slugger = new GithubSlugger()
   for (const run of runs.filter((o) => o.issues)) {
     run.repeats = { ...seen }
     for (const area of new Set(run.issues.map((issue) => areaOf(issue)))) seen[area] = (seen[area] || 0) + 1
+    run.ids = Object.fromEntries(run.issues.map((issue) => [issue.id, slugger.slug(titleText(issue))]))
   }
   return runs
 }
@@ -68,14 +78,15 @@ export const segmentsOf = (title) =>
  * heading opens the issue.
  *
  * @param {object} entity - The Issue paragraph.
+ * @param {object} [ids] - The page's numbered ids by paragraph uuid, from runsOf().
  * @returns {object} `{ entity, id, title, segments, area, summary }`.
  */
-export const issueOf = (entity) => {
+export const issueOf = (entity, ids = {}) => {
   const attributes = entity.attributes || {}
   const title = attributes.field_issue_title || ''
   return {
     entity,
-    id: headingId(title.replace(/`/g, '')),
+    id: ids[entity.id] || headingId(titleText(entity)),
     title,
     segments: segmentsOf(title),
     area: areaOf(entity),
