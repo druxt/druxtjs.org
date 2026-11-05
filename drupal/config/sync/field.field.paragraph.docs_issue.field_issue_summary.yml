@@ -1,0 +1,28 @@
+uuid: fc6a1527-4708-4a29-a2f6-ffd77ffda5ad
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_issue_summary
+    - paragraphs.paragraphs_type.docs_issue
+  module:
+    - vale
+third_party_settings:
+  vale:
+    enabled: true
+    level_overrides:
+      -
+        rule: druxtjs.ColonUsage
+        level: warning
+id: paragraph.docs_issue.field_issue_summary
+field_name: field_issue_summary
+entity_type: paragraph
+bundle: docs_issue
+label: Summary
+description: 'One line, shown under the title while the issue is closed.'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
