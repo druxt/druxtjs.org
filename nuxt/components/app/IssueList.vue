@@ -73,18 +73,21 @@ export default {
     childrenOf: { type: Function, required: true },
     /** How many earlier lists on the page had each area, for its heading ids. */
     repeats: { type: Object, default: () => ({}) },
+    /** Each issue's id, numbered page-wide, by paragraph uuid. */
+    ids: { type: Object, default: () => ({}) },
   },
 
   data: () => ({
     enhanced: false,
     query: '',
     area: '',
-    // Each issue's searchable text, read from the rendered page once mounted.
+    // Each issue's searchable text, read from the rendered page, and again
+    // whenever a fix's content changes, as a revision switch does.
     texts: {},
   }),
 
   computed: {
-    list: ({ issues }) => issues.map(issueOf),
+    list: ({ issues, ids }) => issues.map((issue) => issueOf(issue, ids)),
     groups: ({ list, repeats }) => groupByArea(list, repeats),
     shownCount() {
       return this.list.filter((issue) => this.shown(issue)).length
@@ -110,12 +113,29 @@ export default {
   mounted() {
     this.enhanced = true
     this.$nextTick(() => {
-      for (const element of this.$refs.issues || []) this.$set(this.texts, element.id, element.textContent)
+      this.readTexts()
       this.open(this.$route.hash, false)
     })
+    // A fix renders through DruxtEntity, which re-renders on its own, without
+    // this component's update hooks.
+    if (typeof MutationObserver !== 'undefined') {
+      this.observer = new MutationObserver(() => this.readTexts())
+      this.observer.observe(this.$el, { childList: true, characterData: true, subtree: true })
+    }
+  },
+
+  beforeDestroy() {
+    if (this.observer) this.observer.disconnect()
   },
 
   methods: {
+    /** Reads each issue's text from the page, replacing it only when it changed. */
+    readTexts() {
+      const texts = Object.fromEntries((this.$refs.issues || []).map((element) => [element.id, element.textContent]))
+      const same = Object.keys(texts).length === Object.keys(this.texts).length &&
+        Object.entries(texts).every(([id, text]) => this.texts[id] === text)
+      if (!same) this.texts = texts
+    },
     found(issue) {
       return matches(this.query, this.texts[issue.id] || `${issue.title} ${issue.summary}`)
     },

@@ -61,6 +61,21 @@ describe('runsOf', () => {
       ['install-and-build-1', 'stale-or-changed-content'],
     ])
   })
+
+  test('numbers issues that share a title page-wide, the first keeping the plain id', () => {
+    const same = { field_issue_title: 'CORS errors in `nuxt dev`', field_issue_area: 'install' }
+    const runs = runsOf([
+      issue('i1', same),
+      issue('i2', { ...same, field_issue_area: 'backend' }),
+      { type: 'paragraph--docs_layout_section', id: 's1' },
+      issue('i3', same),
+    ]).filter((run) => run.issues)
+    const ids = runs.map((run) => run.issues.map((entity) => issueOf(entity, run.ids).id))
+    assert.deepEqual(ids, [
+      ['cors-errors-in-nuxt-dev', 'cors-errors-in-nuxt-dev-1'],
+      ['cors-errors-in-nuxt-dev-2'],
+    ])
+  })
 })
 
 describe('issueOf', () => {

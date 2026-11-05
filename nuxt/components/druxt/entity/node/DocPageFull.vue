@@ -8,7 +8,7 @@
     </p>
     <template v-for="run in runs">
       <!-- A run of Issue blocks is one searchable list, grouped by area. -->
-      <AppIssueList v-if="run.issues" :key="run.key" :issues="run.issues" :repeats="run.repeats" :children-of="childrenOf" />
+      <AppIssueList v-if="run.issues" :key="run.key" :issues="run.issues" :repeats="run.repeats" :ids="run.ids" :children-of="childrenOf" />
       <DruxtLayoutParagraph
         v-else-if="layoutOf(run.paragraph).layout"
         :key="run.key"
