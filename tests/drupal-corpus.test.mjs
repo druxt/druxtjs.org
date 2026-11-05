@@ -163,6 +163,25 @@ describe('paragraphMarkdown', () => {
       assert.ok(url.searchParams.has(`fields[paragraph--${type}]`), type)
   })
 
+  test('writes an issue as the heading its title was, with its summary under it', () => {
+    const field_issue_title = '"This dependency was not found: druxt" after an npm install'
+    assert.equal(
+      paragraphMarkdown({
+        type: 'paragraph--docs_issue',
+        attributes: {
+          field_issue_title,
+          field_issue_summary: 'Druxt 0.25 needs axios 0.34.0 or later.',
+        },
+      }),
+      `## ${field_issue_title}\n\nDruxt 0.25 needs axios 0.34.0 or later.`
+    )
+    assert.equal(
+      paragraphMarkdown({ type: 'paragraph--docs_issue', attributes: { field_issue_title } }),
+      `## ${field_issue_title}`
+    )
+    assert.equal(paragraphMarkdown({ type: 'paragraph--docs_issue', attributes: {} }), '')
+  })
+
   test('drops a layout section, which is presentation rather than content', () => {
     assert.equal(paragraphMarkdown({ type: 'paragraph--docs_layout_section', attributes: {} }), '')
   })

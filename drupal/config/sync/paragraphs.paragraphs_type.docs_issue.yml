@@ -1,0 +1,16 @@
+uuid: 3b0595e0-2c03-4d0e-98bb-f4a85860aeda
+langcode: en
+status: true
+dependencies:
+  module:
+    - layout_paragraphs
+id: docs_issue
+label: Issue
+icon_uuid: null
+icon_default: null
+description: 'One troubleshooting issue: the symptom, its area and a one-line summary. The fix goes inside it as Text and Code blocks.'
+behavior_plugins:
+  layout_paragraphs:
+    enabled: true
+    available_layouts:
+      layout_onecol: 'One column'
