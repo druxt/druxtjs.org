@@ -21,7 +21,8 @@ const KINDS = {
   'paragraph--docs_image': 'Image',
   'paragraph--docs_diagram': 'Diagram',
   'paragraph--docs_live_example': 'Live example',
-  'paragraph--docs_issue': 'Issue',
+  'paragraph--docs_issue_list': 'Issues list',
+  'node--docs_issue': 'Issue',
   'paragraph--docs_table': 'Table',
 }
 
@@ -36,9 +37,7 @@ const FIELDS = {
   field_media: 'image',
   field_diagram: 'diagram',
   field_example: 'playground link',
-  field_issue_title: 'title',
   field_issue_area: 'area',
-  field_issue_summary: 'summary',
 }
 
 /**

@@ -312,7 +312,7 @@ export default {
     // Display schemas, view and form, for what this site renders. Generated
     // when the app builds, then again on the server after each cache clear.
     schema: {
-      filter: ['node--doc_page--.*', 'paragraph--docs_.*', 'media--image--.*'],
+      filter: ['node--doc_page--.*', 'node--docs_issue--.*', 'paragraph--docs_.*', 'media--image--.*'],
       refresh: true,
     },
     // The JSON:API index and the menus are the same for every anonymous reader,

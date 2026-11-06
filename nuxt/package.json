@@ -37,7 +37,7 @@
     "druxt-router": "0.32.1",
     "druxt-schema": "0.12.1",
     "druxt-site": "0.15.1",
-    "druxt-views": "0.23.1",
+    "druxt-views": "patch:druxt-views@npm%3A0.23.1#./patches/druxt-views-0.23.1.patch",
     "github-slugger": "1.5.0",
     "mdast-util-to-string": "^2.0.0",
     "mermaid": "8.14.0",
@@ -67,7 +67,7 @@
     "druxt-router": "0.32.1",
     "druxt-schema": "0.12.1",
     "druxt-site": "0.15.1",
-    "druxt-views": "0.23.1",
+    "druxt-views": "patch:druxt-views@npm%3A0.23.1#./patches/druxt-views-0.23.1.patch",
     "vue-template-compiler": "2.7.16",
     "ws": "7.5.11"
   },

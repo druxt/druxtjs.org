@@ -14,6 +14,7 @@ import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
 const {
+  LIVE_QUERY,
   LLMS_LINK,
   SECURITY_HEADERS,
   createHandler,
@@ -338,6 +339,48 @@ describe('createHandler', () => {
     } finally {
       rmSync(dir, { recursive: true, force: true })
     }
+  })
+
+  // The troubleshooting list keeps its area and search in the URL, so a
+  // shared filtered list is its own page. Stored, every search anyone typed
+  // would be a page on disk, so it is rendered live and not kept.
+  test("renders the troubleshooting list's filters live, and keeps no copy of them", async () => {
+    const dir = tempDir()
+    try {
+      const cache = createPageCache({
+        dir,
+        ttl: 60000,
+        render: async () => ({ html: '<p>stored</p>' }),
+      })
+      await cache.store('/how-to/troubleshooting')
+      await cache.store('/how-to/troubleshooting/cors')
+      await withServer(createHandler({ cache, live: live() }), async (base) => {
+        for (const url of [
+          '/how-to/troubleshooting?area=backend',
+          '/how-to/troubleshooting/cors?q=cors+policy',
+        ]) {
+          const filtered = await request(`${base}${url}`)
+          assert.equal(filtered.body, 'live', url)
+          assert.equal(filtered.headers['x-docs-cache'], undefined, url)
+        }
+        // Any other query string is still the stored page, and so is the
+        // same key on any other page.
+        assert.equal(
+          (await request(`${base}/how-to/troubleshooting?utm_source=x`)).body,
+          '<p>stored</p>'
+        )
+        assert.equal((await request(`${base}/how-to/troubleshooting/cors`)).body, '<p>stored</p>')
+      })
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  test("lists the troubleshooting list's own query keys, as its views page names them", async () => {
+    const { AREA_KEY, ISSUES_PAGE, ISSUES_PATH } = await import('../nuxt/utils/issues.js')
+    const keys = [AREA_KEY, ...Object.values(ISSUES_PAGE.filters).map((filter) => filter.query)]
+    assert.deepEqual(Object.keys(LIVE_QUERY), [ISSUES_PATH])
+    assert.deepEqual([...LIVE_QUERY[ISSUES_PATH]].sort(), keys.sort())
   })
 
   test("hands Drupal's own paths to the live app and never stores them", async () => {
