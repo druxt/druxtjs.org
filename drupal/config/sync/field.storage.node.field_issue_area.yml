@@ -1,13 +1,13 @@
-uuid: c469079c-f241-4d2a-aeae-af240712f536
+uuid: c6b4c697-f68a-4ab5-be0e-14459efcecdf
 langcode: en
 status: true
 dependencies:
   module:
+    - node
     - options
-    - paragraphs
-id: paragraph.field_issue_area
+id: node.field_issue_area
 field_name: field_issue_area
-entity_type: paragraph
+entity_type: node
 type: list_string
 settings:
   allowed_values:

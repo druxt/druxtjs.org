@@ -16,10 +16,7 @@ const issue = (id, attributes) => ({ type: ISSUE_TYPE, id, attributes })
 describe('AREAS', () => {
   test("is field_issue_area's allowed values, in its order", () => {
     const yaml = readFileSync(
-      new URL(
-        '../drupal/config/sync/field.storage.paragraph.field_issue_area.yml',
-        import.meta.url
-      ),
+      new URL('../drupal/config/sync/field.storage.node.field_issue_area.yml', import.meta.url),
       'utf8'
     )
     const allowed = [...yaml.matchAll(/value: (\S+)\n\s+label: '([^']+)'/g)].map(

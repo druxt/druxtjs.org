@@ -1,17 +1,15 @@
-uuid: 1c44439b-f5e3-44ee-b12c-2ea9d15db749
+uuid: ee5f5600-36b4-47c5-a600-a44449510804
 langcode: en
 status: true
 dependencies:
   module:
-    - paragraphs
-id: paragraph.field_issue_title
-field_name: field_issue_title
-entity_type: paragraph
-type: string
+    - node
+id: node.field_issue_search_text
+field_name: field_issue_search_text
+entity_type: node
+type: string_long
 settings:
-  max_length: 255
   case_sensitive: false
-  is_ascii: false
 module: core
 locked: false
 cardinality: 1

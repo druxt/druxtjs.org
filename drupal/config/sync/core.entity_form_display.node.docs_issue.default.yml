@@ -1,0 +1,100 @@
+uuid: 411f668a-3719-428f-805a-fe30e20de2b2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.docs_issue.field_content
+    - field.field.node.docs_issue.field_description
+    - field.field.node.docs_issue.field_issue_area
+    - field.field.node.docs_issue.field_issue_search_text
+    - field.field.node.docs_issue.field_weight
+    - node.type.docs_issue
+  module:
+    - content_moderation
+    - layout_paragraphs
+    - maxlength
+id: node.docs_issue.default
+targetEntityType: node
+bundle: docs_issue
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_content:
+    type: layout_paragraphs
+    weight: 4
+    region: content
+    settings:
+      view_mode: default
+      preview_view_mode: preview
+      form_display_mode: default
+      nesting_depth: 0
+      require_layouts: 0
+      empty_message: 'Add the blocks that fix it.'
+    third_party_settings: {  }
+  field_description:
+    type: string_textarea
+    weight: 1
+    region: content
+    settings:
+      rows: 2
+      placeholder: ''
+    third_party_settings:
+      maxlength:
+        maxlength_js: 160
+        maxlength_js_label: 'Shown under the title and in search results: <strong>@remaining</strong> of @limit characters left.'
+        maxlength_js_enforce: false
+  field_issue_area:
+    type: options_select
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_weight:
+    type: number
+    weight: 3
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  moderation_state:
+    type: moderation_state_default
+    weight: 100
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 120
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 5
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  field_issue_search_text: true
+  path: true
+  promote: true
+  sticky: true
+  url_redirects: true

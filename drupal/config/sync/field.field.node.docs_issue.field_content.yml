@@ -1,0 +1,56 @@
+uuid: f4709714-435d-4795-985f-2b7d5c6d5421
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_content
+    - node.type.docs_issue
+    - paragraphs.paragraphs_type.docs_callout
+    - paragraphs.paragraphs_type.docs_code
+    - paragraphs.paragraphs_type.docs_diagram
+    - paragraphs.paragraphs_type.docs_image
+    - paragraphs.paragraphs_type.docs_rich_text
+    - paragraphs.paragraphs_type.docs_text
+  module:
+    - entity_reference_revisions
+id: node.docs_issue.field_content
+field_name: field_content
+entity_type: node
+bundle: docs_issue
+label: Fix
+description: 'The blocks a reader sees when they open the issue.'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      docs_callout: docs_callout
+      docs_code: docs_code
+      docs_diagram: docs_diagram
+      docs_image: docs_image
+      docs_rich_text: docs_rich_text
+      docs_text: docs_text
+    negate: 0
+    target_bundles_drag_drop:
+      docs_callout:
+        weight: 1
+        enabled: true
+      docs_code:
+        weight: 2
+        enabled: true
+      docs_diagram:
+        weight: 3
+        enabled: true
+      docs_image:
+        weight: 4
+        enabled: true
+      docs_rich_text:
+        weight: 5
+        enabled: true
+      docs_text:
+        weight: 6
+        enabled: true
+field_type: entity_reference_revisions

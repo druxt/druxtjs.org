@@ -1,0 +1,23 @@
+uuid: f1d5359c-2fef-42ca-8d1b-933595a1af5a
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.docs_issue
+  module:
+    - node
+id: docs_issue
+label: 'Troubleshooting issue'
+type: 'canonical_entities:node'
+pattern: '/how-to/troubleshooting/[node:title]'
+selection_criteria:
+  ed818601-223f-4a80-a07c-fff2ac859249:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      docs_issue: docs_issue
+selection_logic: and
+weight: 0
+relationships: {  }
