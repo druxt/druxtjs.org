@@ -7,7 +7,6 @@ namespace Drupal\druxtjsorg;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Site\Settings;
 use Drupal\druxtjsorg\Controller\WorkspaceEntityResource;
 use Drupal\druxtjsorg\EventSubscriber\WorkspaceHeaderSubscriber;
 use Drupal\druxtjsorg\Negotiator\CookieWorkspaceNegotiator;
@@ -21,9 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * Simple OAuth serves only the claims listed in its parameter, whatever the
  * alter hook adds. The workspace services are registered only beside
- * Workspaces. CORS lets the frontend read a preview with its token; the
- * container is rebuilt on every rollout, so it follows the environment's
- * frontend URL.
+ * Workspaces.
  */
 final class DruxtjsorgServiceProvider extends ServiceProviderBase {
 
@@ -76,9 +73,6 @@ final class DruxtjsorgServiceProvider extends ServiceProviderBase {
       $container->getDefinition('jsonapi.version_negotiator')->setClass(WorkspaceVersionNegotiator::class);
     }
     $this->swapFieldItemNormalizer($container);
-    if ($container->hasParameter('cors.config')) {
-      $container->setParameter('cors.config', PreviewCors::config($container->getParameter('cors.config'), Settings::get('druxt_docs_frontend_url')));
-    }
     if (!$container->hasParameter('simple_oauth.openid.claims')) {
       return;
     }

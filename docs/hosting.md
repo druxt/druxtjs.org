@@ -232,24 +232,22 @@ The frame reads the editor's preview through the frontend's proxy, with a
 Drupal session the editor has on the frontend's own site. An editor signed
 in to Drupal only has none there. A target with a preview token needs none.
 Consumer Node Preview puts a short-lived token for the editor in the frame's
-URL, and the frontend asks Drupal for the preview with it. Turn it on with
-one more variable, for the `nuxt` container:
+URL, and the frontend asks for the preview with it, through its own proxy.
+Turn it on with one more variable, for the `nuxt` container:
 
 ```sh
 lagoon add variable -p druxtjs-org -e main -N DRUXT_NODE_PREVIEW_REGISTER_TOKEN \
   -V true -S runtime
 ```
 
-It needs a release of `@druxt-contrib/node-preview` with token targets. The
-rest is already in place on every rollout:
+It needs a release of `@druxt-contrib/node-preview` with token targets. Every
+rollout gives the consumer the authorization code grant as well, which
+Consumer Node Preview issues tokens to, with the sign-in consumer's scopes. A
+token has only the roles its editor holds.
 
-- The consumer also has the authorization code grant, which Consumer Node
-  Preview issues tokens to, with the sign-in consumer's scopes. A token
-  has only the roles its editor holds.
-- Drupal answers the frontend's browser across sites: `druxtjsorg` turns
-  core's CORS on for this environment's frontend URL (`druxt_docs_frontend_url`),
-  for `GET` with the token's header and without cookies. No other site is
-  allowed.
+The target's endpoint is a path, so the frame's request for the preview goes
+to the frontend, which proxies the API to Drupal. Drupal doesn't need a CORS
+setting for it.
 
 Set on the project instead of one environment, it turns registration on for
 every environment. A copied database drops production's registered target
