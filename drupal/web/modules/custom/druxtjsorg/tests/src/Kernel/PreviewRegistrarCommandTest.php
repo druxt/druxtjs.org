@@ -7,6 +7,7 @@ namespace Drupal\Tests\druxtjsorg\Kernel;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\consumers\Entity\Consumer;
 use Drupal\druxtjsorg\Drush\Commands\DruxtjsorgCommands;
+use Drupal\druxtjsorg\OAuthClient;
 use Drupal\druxtjsorg\PreviewRegistrar;
 use Drupal\KernelTests\KernelTestBase;
 use Drush\Log\DrushLoggerManager;
@@ -41,6 +42,8 @@ final class PreviewRegistrarCommandTest extends KernelTestBase {
     'wse',
     'consumers',
     'simple_oauth',
+    // The sign-in scopes, which preview tokens carry, name its grant.
+    'simple_oauth_password_grant',
     'jsonapi_node_preview',
     'consumer_node_preview',
     'druxtjsorg',
@@ -63,7 +66,11 @@ final class PreviewRegistrarCommandTest extends KernelTestBase {
       'user_role' => 'user.role.preview_target_registrar',
       'oauth2_scope' => 'simple_oauth.oauth2_scope.preview_targets',
     ];
+    foreach (OAuthClient::SCOPES as $scope) {
+      $shipped["oauth2_scope.$scope"] = "simple_oauth.oauth2_scope.$scope";
+    }
     foreach ($shipped as $type => $name) {
+      $type = explode('.', $type)[0];
       $this->container->get('entity_type.manager')->getStorage($type)
         ->create(Yaml::decode(file_get_contents("$sync/$name.yml")))
         ->save();
@@ -114,8 +121,9 @@ final class PreviewRegistrarCommandTest extends KernelTestBase {
     self::assertSame((int) $account->id(), (int) $consumer->get('user_id')->target_id);
     self::assertSame((int) $account->id(), (int) $consumer->getOwnerId());
     self::assertTrue((bool) $consumer->get('confidential')->value);
-    self::assertSame(['client_credentials'], array_column($consumer->get('grant_types')->getValue(), 'value'));
+    self::assertSame(['client_credentials', 'authorization_code'], array_column($consumer->get('grant_types')->getValue(), 'value'));
     self::assertSame([PreviewRegistrar::SCOPE], array_column($consumer->get('scopes')->getValue(), 'scope_id'));
+    self::assertSame(OAuthClient::SCOPES, array_column($consumer->get('authorization_code_scopes')->getValue(), 'scope_id'));
     // Simple OAuth 6 refuses a consumer without its required fields, as the
     // default consumer found.
     self::assertCount(0, $consumer->validate());

@@ -198,11 +198,12 @@ one keeps its URL in Drupal by hand. It is on in an environment that has
 `DRUXT_NODE_PREVIEW_CLIENT_SECRET`:
 
 - The rollout runs `drush druxtjsorg:preview-registrar`. It makes the
-  `druxtjs_org_preview` consumer, a confidential client with only the client
-  credentials grant, and the `frontend_registrar` user it acts as and that
-  owns it. The user's one role may change that consumer's preview targets
-  and nothing else. The consumer's secret is set from the variable on every
-  rollout, because a copied database holds a sanitised one.
+  `druxtjs_org_preview` consumer, a confidential client, and the
+  `frontend_registrar` user it acts as and that owns it. With the client
+  credentials grant the consumer signs in as that user, whose one role may
+  change the consumer's preview targets and nothing else. The consumer's
+  secret is set from the variable on every rollout, because a copied
+  database holds a sanitised one.
 - The frontend, as it builds and again as it starts, signs in as that
   consumer and writes its own target to it, labelled with its host. The
   build log says `Registered the preview target`, or that it is up to date.
@@ -224,6 +225,31 @@ lagoon add variable -p druxtjs-org -e main -N DRUXT_NODE_PREVIEW_CLIENT_SECRET \
 ```
 
 A new variable reaches the containers on the next deployment.
+
+### Previews with a token
+
+The frame reads the editor's preview through the frontend's proxy, with a
+Drupal session the editor has on the frontend's own site. An editor signed
+in to Drupal only has none there. A target with a preview token needs none.
+Consumer Node Preview puts a short-lived token for the editor in the frame's
+URL, and the frontend asks Drupal for the preview with it. Turn it on with
+one more variable, for the `nuxt` container:
+
+```sh
+lagoon add variable -p druxtjs-org -e main -N DRUXT_NODE_PREVIEW_REGISTER_TOKEN \
+  -V true -S runtime
+```
+
+It needs a release of `@druxt-contrib/node-preview` with token targets. The
+rest is already in place on every rollout:
+
+- The consumer also has the authorization code grant, which Consumer Node
+  Preview issues tokens to, with the sign-in consumer's scopes. A token
+  has only the roles its editor holds.
+- Drupal answers the frontend's browser across sites: `druxtjsorg` turns
+  core's CORS on for this environment's frontend URL (`druxt_docs_frontend_url`),
+  for `GET` with the token's header and without cookies. No other site is
+  allowed.
 
 Set on the project instead of one environment, it turns registration on for
 every environment. A copied database drops production's registered target

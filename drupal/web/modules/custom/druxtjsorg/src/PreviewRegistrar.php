@@ -13,6 +13,11 @@ namespace Drupal\druxtjsorg;
  * not the sign-in one, which is public, and a user that owns the consumer and
  * holds only the permission to change its targets. The token acts as that
  * user. Every rollout applies these, as it does for the sign-in consumer.
+ *
+ * A target with a preview token lets a frontend on another site read the
+ * editor's preview without the editor's session. Consumer Node Preview issues
+ * that token only to a consumer with the authorization code grant, with the
+ * scopes the editor would get by signing in to it: the sign-in consumer's.
  */
 final class PreviewRegistrar {
 
@@ -70,7 +75,7 @@ final class PreviewRegistrar {
       // The preview's Frontend picker heads this consumer's targets with
       // this, above each target's own label, the frontend's host.
       'label' => 'Frontend',
-      'description' => 'The documentation site registering its preview target. A confidential client: the client credentials grant only, as a user that may change this consumer\'s preview targets and nothing else.',
+      'description' => 'The documentation site registering its preview target. A confidential client: the client credentials grant, as a user that may change this consumer\'s preview targets and nothing else, and the authorization code grant, for the preview tokens an editor\'s preview reads with.',
     ];
   }
 
@@ -88,8 +93,12 @@ final class PreviewRegistrar {
       'confidential' => TRUE,
       'third_party' => TRUE,
       'is_default' => FALSE,
-      'grant_types' => ['client_credentials'],
+      'grant_types' => ['client_credentials', 'authorization_code'],
+      // The client credentials token's scope: the registrar's role.
       'scopes' => [self::SCOPE],
+      // A preview token's: what the editor gets by signing in, and never
+      // more, since a token's roles are only those the editor holds.
+      'authorization_code_scopes' => OAuthClient::SCOPES,
       // The client credentials user, whom the token acts as.
       'user_id' => $uid,
       // Consumer Node Preview lets a user change only the targets of a
