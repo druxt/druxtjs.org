@@ -23,6 +23,7 @@ import { seoHead } from '~/utils/seo'
 import { documentDescription, extractHero } from '~/utils/content'
 import { liveComponentsOf } from '~/utils/live-examples'
 import { isPackageRoot } from '~/components/app/icon/module'
+import { notFound } from '~/lib/not-found'
 
 export default {
   name: 'AppModuleDocument',
@@ -32,7 +33,8 @@ export default {
     pkg: { type: String, default: null },
   },
 
-  async asyncData({ $content, error, params, store, route }) {
+  async asyncData(context) {
+    const { $content, params, store, route } = context
     // Trim the trailing slash, so `/modules/entity/` resolves like `/modules/entity`.
     const match = (params.pathMatch || '').replace(/\/+$/, '')
     const slug = match
@@ -47,7 +49,8 @@ export default {
         document = await $content('modules/', slug + '/index').fetch()
       }
     } catch (e) {
-      return error({ statusCode: 404, message: 'Document not found' })
+      // No module README: the path may be one Drupal holds or redirects.
+      return notFound(context)
     }
 
     const { hero, body } = extractHero(document)

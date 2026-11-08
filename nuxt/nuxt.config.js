@@ -278,8 +278,9 @@ export default {
     baseUrl: DRUXT_BASE_URL,
     // JSON:API, path lookups and files are served on this origin.
     proxy: { api: true, files: true },
-    // The section pages resolve paths themselves; no catch-all route.
-    router: { wildcard: false },
+    // A path no page claims goes to DruxtRouter's catch-all route, which
+    // resolves it through Drupal: a page, a redirect or Drupal's 404.
+    router: { wildcard: true },
     // A preview document carries the page's paragraphs; the include adds the
     // media an image paragraph refers to and its file, so the preview renders
     // them from the one request. The layouts are the ones a preview's Layout

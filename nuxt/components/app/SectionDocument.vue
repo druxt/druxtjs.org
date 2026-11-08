@@ -21,6 +21,7 @@ import { seoHead } from '~/utils/seo'
 import { documentDescription } from '~/utils/content'
 import { fetchDrupalPage, nextSteps, sectionOf } from '~/lib/drupal-document'
 import { versionFromQuery } from '~/lib/revisions'
+import { notFound } from '~/lib/not-found'
 
 /** Pages docgen writes into the authored sections; they come from its corpus, not Drupal. */
 const GENERATED = ['/how-to/contributing']
@@ -33,7 +34,8 @@ const GENERATED = ['/how-to/contributing']
  */
 export default {
   name: 'AppSectionDocument',
-  async asyncData({ $config, $content, error, params, redirect, store, route }) {
+  async asyncData(context) {
+    const { $config, $content, error, params, redirect, store, route } = context
     const section = sectionOf(route.path)
     const path = route.path.replace(/\/$/, '') || '/'
 
@@ -46,7 +48,7 @@ export default {
         store.commit('setEditorCompare', Boolean(route.query.diff))
       }
       const document = await fetchDrupalPage(store, path)
-      if (!document) return error({ statusCode: 404, message: 'Document not found' })
+      if (!document) return notFound(context)
       // Drupal matches aliases in any case; one spelling is the page.
       if (document.redirect) return redirect(301, document.redirect, route.query)
       // Siblings in the docs menu's order, the section landing first.
