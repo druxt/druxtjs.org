@@ -18,6 +18,12 @@ Druxt 1.0.0.
   block components on all three, and views and the router on Mercury,
   whose pages are all Canvas pages.
 
+### Fixed
+
+- The page cache no longer keeps a page that sends `Cache-Control: no-store`
+  or `private`, such as an editor's preview, and drops a copy it had. Before,
+  it kept every page that answered 200.
+
 ## [0.21.0] - 2026-11-24
 
 ### Changed

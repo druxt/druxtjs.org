@@ -65,12 +65,58 @@ const isPage = (method, pathname) =>
   (method === 'GET' || method === 'HEAD') && !ASSET.test(pathname) && !NOT_PAGES.test(pathname)
 
 /**
+ * Whether a response asks every cache not to keep it.
+ *
+ * A page that sends `Cache-Control: no-store` or `private`, such as an
+ * editor's preview, is never stored, so the store keeps only pages any
+ * reader may be given.
+ *
+ * @param {string|string[]|number|undefined} cacheControl - The response's Cache-Control header.
+ * @returns {boolean} True when the page must not be stored.
+ */
+const forbidsStore = (cacheControl) =>
+  /(^|[\s,])(no-store|private)(?=$|[\s,=])/i.test([].concat(cacheControl || []).join(','))
+
+/**
+ * Renders a page for the store, with the headers the page sets.
+ *
+ * Nuxt's renderRoute has no response, so a page that sets a header while
+ * it renders, as it does live, gives it to this stand-in instead, and the
+ * store learns whether it may keep the page. The stand-in takes the
+ * redirect a page writes and sends nothing anywhere.
+ *
+ * @param {Function} renderRoute - Nuxt's `renderRoute(route, context)`.
+ * @returns {Function} `(route) => { html, error, redirected, cacheControl }`.
+ */
+const renderForStore = (renderRoute) => async (route) => {
+  const headers = new Map()
+  const res = {
+    statusCode: 200,
+    headersSent: false,
+    setHeader: (name, value) => headers.set(String(name).toLowerCase(), value),
+    getHeader: (name) => headers.get(String(name).toLowerCase()),
+    hasHeader: (name) => headers.has(String(name).toLowerCase()),
+    removeHeader: (name) => headers.delete(String(name).toLowerCase()),
+    writeHead(status, values = {}) {
+      this.statusCode = status
+      for (const [name, value] of Object.entries(values)) this.setHeader(name, value)
+      return this
+    },
+    end() {},
+    on() {},
+    once() {},
+  }
+  const result = await renderRoute(route, { res })
+  return result && { ...result, cacheControl: headers.get('cache-control') }
+}
+
+/**
  * A directory of rendered pages.
  *
  * @param {object} options - Options.
  * @param {string} options.dir - Where the HTML files go.
  * @param {number} options.ttl - Milliseconds before a stored page renders again.
- * @param {Function} options.render - Renders a path to `{ html, error, redirected }`.
+ * @param {Function} options.render - Renders a path to `{ html, error, redirected, cacheControl }`.
  * @param {Function} [options.log] - Logs a line.
  * @returns {{ read: Function, store: Function, fileFor: Function }} The cache.
  */
@@ -119,10 +165,11 @@ const createPageCache = ({ dir, ttl, render, log = () => {} }) => {
     const job = (async () => {
       const file = fileFor(pathname)
       if (!file) return null
-      const { html, error, redirected } = (await render(pathname)) || {}
-      if (!html || error || redirected) {
-        // Gone, moved or failing: the next request renders live.
-        const reason = error ? error.statusCode || 'error' : redirected ? 'redirect' : 'empty'
+      const { html, error, redirected, cacheControl } = (await render(pathname)) || {}
+      const kept = !forbidsStore(cacheControl)
+      if (!html || error || redirected || !kept) {
+        // Gone, moved, failing or not to be kept: the next request renders live.
+        const reason = error ? error.statusCode || 'error' : redirected ? 'redirect' : !kept ? 'no-store' : 'empty'
         log(`cache: ${pathname} not stored: ${reason}`)
         await Promise.all(['', ...ENCODINGS.map((e) => e.suffix)].map((s) => fs.promises.rm(file + s, { force: true })))
         return null
@@ -283,7 +330,7 @@ const createHandler =
     if (!page) {
       res.setHeader('X-Docs-Cache', 'MISS')
       res.on('finish', () => {
-        if (res.statusCode === 200) cache.store(pathname)
+        if (res.statusCode === 200 && !forbidsStore(res.getHeader('cache-control'))) cache.store(pathname)
       })
       return live(req, res)
     }
@@ -307,4 +354,4 @@ const createHandler =
   }
 
 module.exports = {
-  LIVE_QUERY, LLMS_LINK, SECURITY_HEADERS, createHandler, createPageCache, crawl, isPage }
+  LIVE_QUERY, LLMS_LINK, SECURITY_HEADERS, createHandler, createPageCache, crawl, forbidsStore, isPage, renderForStore }
