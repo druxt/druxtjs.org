@@ -17,6 +17,14 @@ Druxt 1.0.0.
   `DRUXT_NODE_PREVIEW_REGISTER_TOKEN`, once a release of
   `@druxt-contrib/node-preview` has token targets.
 
+### Changed
+
+- Consumer Node Preview 1.0.0-beta1, from a development snapshot. Preview
+  tokens last 15 minutes, and go only to targets on the site's own frontend
+  hosts and Cloudflare's quick tunnels. A deploy hook adds the column the
+  release gives stored preview targets, because the release doesn't include
+  an update for it.
+
 ### Fixed
 
 - Every rollout reset the preview consumer to the client credentials grant

@@ -249,6 +249,20 @@ The target's endpoint is a path, so the frame's request for the preview goes
 to the frontend, which proxies the API to Drupal. Drupal doesn't need a CORS
 setting for it.
 
+Consumer Node Preview gives a token only to a target on a host it allows,
+listed in `consumer_node_preview.settings` (**Configuration → Web services →
+Consumer Node Preview**):
+
+- `druxtjs.org` and `www.druxtjs.org`, production's frontend
+- `*.druxtjs-org.au2.amazee.io`, the other environments' frontends
+- `*.trycloudflare.com`, Cloudflare's quick tunnels, for testing a local
+  frontend against a deployed Drupal
+
+A host added on the settings form lasts until the next rollout, which imports
+the list again. Add a host for good in `drupal/config/sync`. A Cloudflare tunnel
+with its own host name is one example: it needs a domain whose DNS Cloudflare
+runs, and `druxtjs.org`'s doesn't.
+
 Set on the project instead of one environment, it turns registration on for
 every environment. A copied database drops production's registered target
 along with its secrets, so each environment's picker lists that environment's

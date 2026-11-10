@@ -279,6 +279,44 @@ function druxtjsorg_deploy_consumer_preview_layouts(): string {
 }
 
 /**
+ * Adds the columns consumer_node_preview 1.0.0-beta1 gives preview targets.
+ *
+ * The release adds a last seen time to each preview target, with no update
+ * for a site that ran an earlier copy. Drupal changes a field's columns only
+ * while it holds no data, and a site that registers its frontend has targets
+ * stored, so the missing columns are added here, with the rows left as they
+ * are. Their last seen time stays empty, as for a target added by hand. A
+ * deploy hook for the same reason as the paragraph field above.
+ */
+function druxtjsorg_deploy_preview_targets_last_seen(): string {
+  $manager = \Drupal::entityDefinitionUpdateManager();
+  $definition = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('consumer')['preview_targets'] ?? NULL;
+  if (!$definition || !$manager->getFieldStorageDefinition('preview_targets', 'consumer')) {
+    return 'Consumers have no installed preview targets field; nothing to update.';
+  }
+  // The storage and its schema handler keep both methods protected.
+  $storage = \Drupal::entityTypeManager()->getStorage('consumer');
+  $handler = (new \ReflectionMethod($storage, 'getStorageSchema'))->invoke($storage);
+  // What the field's tables should hold, as Drupal would create them now.
+  $expected = (new \ReflectionMethod($handler, 'getSchemaFromStorageDefinition'))->invoke($handler, $definition);
+  $schema = \Drupal::database()->schema();
+  $added = [];
+  foreach ($expected as $table => $table_schema) {
+    foreach ($table_schema['fields'] as $column => $spec) {
+      if ($schema->tableExists($table) && !$schema->fieldExists($table, $column)) {
+        $schema->addField($table, $column, $spec);
+        $added[] = "$table.$column";
+      }
+    }
+  }
+  // Record the schema and definition as installed, so Drupal reports no
+  // pending change for the field.
+  \Drupal::keyValue('entity.storage_schema.sql')->set('consumer.field_schema_data.preview_targets', $expected);
+  \Drupal::service('entity.last_installed_schema.repository')->setLastInstalledFieldStorageDefinition($definition);
+  return $added ? 'Added ' . implode(', ', $added) . '.' : 'The preview targets columns were already in place.';
+}
+
+/**
  * Drops workspace tracking rows whose revision is already the live one.
  *
  * A publish makes a workspace's revisions the default ones and then clears

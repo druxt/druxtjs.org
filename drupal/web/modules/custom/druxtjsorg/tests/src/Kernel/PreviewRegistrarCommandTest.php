@@ -163,13 +163,19 @@ final class PreviewRegistrarCommandTest extends KernelTestBase {
    */
   public function testRolloutKeepsRegisteredTargets(): void {
     $this->rollout('first-secret');
+    // A registered target carries the time its frontend last registered it.
     $target = [
       'label' => 'druxtjs.org',
       'url' => 'https://druxtjs.org/druxt/node/preview?vm=[view_mode]&layout=[layout]#[jsonapi_node_preview_path]',
+      'last_seen' => 1794300000,
     ];
     $this->consumer()->set('preview_targets', [$target])->save();
     $this->rollout('first-secret');
-    self::assertSame([$target], $this->consumer()->get('preview_targets')->getValue());
+    $kept = $this->consumer()->get('preview_targets')->getValue();
+    self::assertCount(1, $kept);
+    self::assertSame($target['label'], $kept[0]['label']);
+    self::assertSame($target['url'], $kept[0]['url']);
+    self::assertSame($target['last_seen'], (int) $kept[0]['last_seen']);
   }
 
 }
