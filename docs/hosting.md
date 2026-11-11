@@ -208,6 +208,11 @@ one keeps its URL in Drupal by hand. It is on in an environment that has
   consumer and writes its own target to it, labelled with its host. The
   build log says `Registered the preview target`, or that it is up to date.
   A failure only logs a warning, and the frontend still starts.
+- The running frontend writes its target again every six hours. On Lagoon
+  it leaves the target in place when it stops, because a rollout stops the
+  old `nuxt` pod after the new one has written the same target. Off Lagoon,
+  a frontend that stops removes its target, on a Consumer Node Preview
+  version that can remove one.
 - `settings.lagoon.php` leaves its own target out, so the picker shows the
   frontend once, as **druxtjs.org** in the **Frontend** group on production.
 

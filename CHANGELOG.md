@@ -25,6 +25,12 @@ Druxt 1.0.0.
   expiry, and saving a target no longer signs editors out of open previews.
   A deploy hook adds the last seen column to stored preview targets, because
   the release's update adds only the expiry column.
+- The frontend runs the released `@druxt-contrib/node-preview` 0.1.0, in place
+  of a patched snapshot. It writes its preview target again every six hours,
+  and on Lagoon leaves the target in place when it stops, so a rollout never
+  removes the target the new frontend just wrote.
+- The server closes Nuxt before it exits, so a frontend stopped off Lagoon
+  removes its preview target.
 
 ### Fixed
 

@@ -288,8 +288,15 @@ export default {
       // consumer when it starts, so no one keeps a URL in Drupal by hand.
       // Only where the consumer's secret is set: settings.lagoon.php keeps
       // its own target everywhere else, and leaves it out here.
+      // On Lagoon the target stays when the server stops: a rollout stops
+      // the old pod after the new one has registered the same target, so
+      // removing it would leave Drupal with none until the next heartbeat.
       register: process.env.DRUXT_NODE_PREVIEW_CLIENT_SECRET
-        ? { url: resolveOrigin(process.env), consumer: 'druxtjs_org_preview' }
+        ? {
+            url: resolveOrigin(process.env),
+            consumer: 'druxtjs_org_preview',
+            cleanup: process.env.LAGOON_ENVIRONMENT_TYPE ? false : undefined,
+          }
         : false,
     },
     // Menus ask for the fields a menu needs, not every attribute of a link.

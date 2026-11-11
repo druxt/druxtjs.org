@@ -35,6 +35,8 @@ const setPhase = (phase) => {
 // The describedby link from the first response: the starting page is one too.
 let handler = createStartingHandler(state, { headers: { Link: LLMS_LINK } })
 const server = http.createServer((req, res) => handler(req, res))
+// The loaded Nuxt app, closed before the process exits.
+let nuxtApp = null
 
 const nuxt = (args, extraEnv) =>
   new Promise((resolve, reject) => {
@@ -120,6 +122,7 @@ const main = async () => {
 
   const { loadNuxt } = require('nuxt')
   const app = await loadNuxt({ for: 'start', rootDir })
+  nuxtApp = app
   const cache =
     env.DOCS_CACHE === '0'
       ? null
@@ -185,10 +188,13 @@ const main = async () => {
   log(`serving ${env.SITE_ORIGIN || `http://${host}:${port}`}`)
 }
 
+// Nuxt closes first, so its modules finish their shutdown work, such as
+// removing the preview target, before the process exits.
 for (const signal of ['SIGINT', 'SIGTERM']) {
-  process.on(signal, () => {
-    server.close(() => process.exit(0))
+  process.on(signal, async () => {
     setTimeout(() => process.exit(0), 10000).unref()
+    if (nuxtApp) await nuxtApp.close().catch(() => {})
+    server.close(() => process.exit(0))
   })
 }
 
