@@ -98,4 +98,74 @@ final class ConsumerPreviewTargetsLastSeenTest extends KernelTestBase {
     self::assertStringStartsWith('The preview targets columns were already', druxtjsorg_deploy_preview_targets_last_seen());
   }
 
+  /**
+   * A site with neither column takes the module's update, then the hook.
+   *
+   * As a deployment runs them: the module's update adds the expires column
+   * and records the field as installed, and the hook then adds the last seen
+   * column that update leaves out.
+   */
+  public function testTheUpdateThenTheHookAddBothColumns(): void {
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('workspace');
+    $this->installEntitySchema('consumer');
+    $module_handler = $this->container->get('module_handler');
+    $module_handler->loadInclude('druxtjsorg', 'php', 'druxtjsorg.deploy');
+    $module_handler->loadInclude('consumer_node_preview', 'install');
+    $manager = $this->container->get('entity.definition_update_manager');
+    $storage = $this->container->get('entity_type.manager')->getStorage('consumer');
+    $mapping = $storage->getTableMapping();
+    $table = $mapping->getFieldTableName('preview_targets');
+    $definition = $manager->getFieldStorageDefinition('preview_targets', 'consumer');
+    $columns = [
+      $mapping->getFieldColumnName($definition, 'last_seen'),
+      $mapping->getFieldColumnName($definition, 'expires'),
+    ];
+
+    $consumer = $storage->create([
+      'client_id' => 'frontend',
+      'label' => 'Frontend',
+      'preview_targets' => [
+        [
+          'label' => 'druxtjs.org',
+          'url' => 'https://druxtjs.org/druxt/node/preview#[jsonapi_node_preview_path]',
+        ],
+      ],
+    ]);
+    $consumer->save();
+
+    // The database as the development snapshot before 1.0.0-beta1 left it.
+    $schema = $this->container->get('database')->schema();
+    $key_value = $this->container->get('keyvalue')->get('entity.storage_schema.sql');
+    $stored = $key_value->get('consumer.field_schema_data.preview_targets');
+    foreach ($columns as $column) {
+      $schema->dropField($table, $column);
+      unset($stored[$table]['fields'][$column]);
+    }
+    $key_value->set('consumer.field_schema_data.preview_targets', $stored);
+
+    self::assertSame("Added $columns[1] to $table.", consumer_node_preview_update_10001());
+    self::assertFalse($schema->fieldExists($table, $columns[0]), 'the update leaves last seen out');
+    self::assertSame("Added $table.$columns[0].", druxtjsorg_deploy_preview_targets_last_seen());
+    foreach ($columns as $column) {
+      self::assertTrue($schema->fieldExists($table, $column), $column);
+    }
+    self::assertEmpty($manager->getChangeSummary()['consumer'] ?? [], 'core sees nothing left to change');
+    self::assertSame('The expires column is already in place.', consumer_node_preview_update_10001());
+
+    // The stored target is kept, and a target saves with both times.
+    $consumer = $storage->loadUnchanged($consumer->id());
+    self::assertSame('druxtjs.org', $consumer->get('preview_targets')->get(0)->get('label')->getValue());
+    $consumer->get('preview_targets')->appendItem([
+      'label' => 'Test',
+      'url' => 'https://test.trycloudflare.com/druxt/node/preview#[jsonapi_node_preview_path]',
+      'last_seen' => 1794300000,
+      'expires' => 1794300120,
+    ]);
+    $consumer->save();
+    $item = $storage->loadUnchanged($consumer->id())->get('preview_targets')->get(1);
+    self::assertSame(1794300000, (int) $item->get('last_seen')->getValue());
+    self::assertSame(1794300120, (int) $item->get('expires')->getValue());
+  }
+
 }

@@ -19,11 +19,12 @@ Druxt 1.0.0.
 
 ### Changed
 
-- Consumer Node Preview 1.0.0-beta1, from a development snapshot. Preview
+- Consumer Node Preview 1.0.0-rc1, from a development snapshot. Preview
   tokens last 15 minutes, and go only to targets on the site's own frontend
-  hosts and Cloudflare's quick tunnels. A deploy hook adds the column the
-  release gives stored preview targets, because the release doesn't include
-  an update for it.
+  hosts and Cloudflare's quick tunnels. A registered target can carry its own
+  expiry, and saving a target no longer signs editors out of open previews.
+  A deploy hook adds the last seen column to stored preview targets, because
+  the release's update adds only the expiry column.
 
 ### Fixed
 

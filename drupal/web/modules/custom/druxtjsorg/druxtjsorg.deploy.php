@@ -279,14 +279,15 @@ function druxtjsorg_deploy_consumer_preview_layouts(): string {
 }
 
 /**
- * Adds the columns consumer_node_preview 1.0.0-beta1 gives preview targets.
+ * Adds the columns consumer_node_preview 1.0.0-rc1 gives preview targets.
  *
- * The release adds a last seen time to each preview target, with no update
- * for a site that ran an earlier copy. Drupal changes a field's columns only
- * while it holds no data, and a site that registers its frontend has targets
- * stored, so the missing columns are added here, with the rows left as they
- * are. Their last seen time stays empty, as for a target added by hand. A
- * deploy hook for the same reason as the paragraph field above.
+ * The release adds a last seen time to each preview target, and its update
+ * for a site that ran an earlier copy adds only the expiry column. Drupal
+ * changes a field's columns only while it holds no data, and a site that
+ * registers its frontend has targets stored, so the missing columns are added
+ * here, with the rows left as they are. Their last seen time stays empty, as
+ * for a target added by hand. A deploy hook for the same reason as the
+ * paragraph field above.
  */
 function druxtjsorg_deploy_preview_targets_last_seen(): string {
   $manager = \Drupal::entityDefinitionUpdateManager();
