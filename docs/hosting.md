@@ -238,15 +238,16 @@ Drupal session the editor has on the frontend's own site. An editor signed
 in to Drupal only has none there. A target with a preview token needs none.
 Consumer Node Preview puts a short-lived token for the editor in the frame's
 URL, and the frontend asks for the preview with it, through its own proxy.
-Turn it on with one more variable, for the `nuxt` container:
+The frontend registers its target with a token wherever it registers one. To
+turn the token off in an environment, set one more variable, for the `nuxt`
+container:
 
 ```sh
 lagoon add variable -p druxtjs-org -e main -N DRUXT_NODE_PREVIEW_REGISTER_TOKEN \
-  -V true -S runtime
+  -V false -S runtime
 ```
 
-It needs a release of `@druxt-contrib/node-preview` with token targets. Every
-rollout gives the consumer the authorization code grant as well, which
+Every rollout gives the consumer the authorization code grant as well, which
 Consumer Node Preview issues tokens to, with the sign-in consumer's scopes. A
 token has only the roles its editor holds.
 

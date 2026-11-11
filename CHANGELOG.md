@@ -13,9 +13,9 @@ Druxt 1.0.0.
 
 - Previews with a token. The frontend's preview consumer can now issue an
   editor's preview token, so the frame reads the preview without the editor's
-  Drupal session on the frontend's site. Turn it on with
-  `DRUXT_NODE_PREVIEW_REGISTER_TOKEN`, once a release of
-  `@druxt-contrib/node-preview` has token targets.
+  Drupal session on the frontend's site. The frontend registers its target
+  with a token wherever it registers one. `DRUXT_NODE_PREVIEW_REGISTER_TOKEN`
+  set to `false` turns the token off.
 
 ### Changed
 
