@@ -231,6 +231,11 @@ lagoon add variable -p druxtjs-org -e main -N DRUXT_NODE_PREVIEW_CLIENT_SECRET \
 
 A new variable reaches the containers on the next deployment.
 
+`DRUXT_NODE_PREVIEW_CLIENT_SECRET` set on the project instead of one
+environment turns registration on for every environment. A copied database
+drops production's registered target along with its secrets, so each
+environment's picker lists that environment's frontend alone.
+
 ### Previews with a token
 
 The frame reads the editor's preview through the frontend's proxy, with a
@@ -268,11 +273,6 @@ A host added on the settings form lasts until the next rollout, which imports
 the list again. Add a host for good in `drupal/config/sync`. A Cloudflare tunnel
 with its own host name is one example: it needs a domain whose DNS Cloudflare
 runs, and `druxtjs.org`'s doesn't.
-
-Set on the project instead of one environment, it turns registration on for
-every environment. A copied database drops production's registered target
-along with its secrets, so each environment's picker lists that environment's
-frontend alone.
 
 ## Documentation server
 
