@@ -108,7 +108,32 @@ final class IssueHooksTest extends KernelTestBase {
    */
   public function testTheAliasIsTheTitleByPathautosRules(): void {
     $issue = $this->issue('CORS errors in `nuxt dev`');
-    self::assertSame('/how-to/troubleshooting/cors-errors-nuxt-dev', $this->alias($issue));
+    self::assertSame('/how-to/troubleshooting/cors-errors-in-nuxt-dev', $this->alias($issue));
+  }
+
+  /**
+   * A colon, slash, period or underscore in a title separates words.
+   *
+   * Removed, they would run an error code or a version into its neighbours.
+   */
+  public function testPunctuationInATitleSeparatesWords(): void {
+    $titles = [
+      'error:0308010C:digital envelope routines' => 'error-0308010c-digital-envelope-routines',
+      'Drupal/Druxt 1.3.0 is not found' => 'drupal-druxt-1-3-0-is-not-found',
+      'The druxt_hand theme is missing' => 'the-druxt-hand-theme-is-missing',
+    ];
+    foreach ($titles as $title => $slug) {
+      self::assertSame('/how-to/troubleshooting/' . $slug, $this->alias($this->issue($title)));
+    }
+  }
+
+  /**
+   * Only issues have a pattern, so a doc page's hand-set alias is never
+   * replaced by one made from its title.
+   */
+  public function testOnlyIssuesHaveAPattern(): void {
+    $patterns = glob(DRUPAL_ROOT . '/../config/sync/pathauto.pattern.*.yml');
+    self::assertSame(['pathauto.pattern.docs_issue.yml'], array_map('basename', $patterns));
   }
 
   /**
