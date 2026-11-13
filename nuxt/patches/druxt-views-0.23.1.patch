@@ -1,5 +1,5 @@
 diff --git a/dist/components/DruxtView.vue b/dist/components/DruxtView.vue
-index 3230678..591be73 100644
+index 3230678..50f7f0e 100644
 --- a/dist/components/DruxtView.vue
 +++ b/dist/components/DruxtView.vue
 @@ -127,7 +127,21 @@ export default {
@@ -25,7 +25,7 @@ index 3230678..591be73 100644
    },
  
    /**
-@@ -136,10 +150,12 @@ export default {
+@@ -136,16 +150,19 @@ export default {
     * @property {object} view - The View JSON:API resource.
     */
    data() {
@@ -40,7 +40,14 @@ index 3230678..591be73 100644
        model: {
          filter: model.filter || {},
          page: parseInt(model.page) || null,
-@@ -295,6 +311,8 @@ export default {
+         sort: model.sort || null,
+       },
+       resource: null,
++      sentFilter: JSON.stringify(model.filter || {}),
+       view: false
+     }
+   },
+@@ -295,6 +312,8 @@ export default {
  
    watch: {
      '$route.query'(to) {
@@ -49,7 +56,7 @@ index 3230678..591be73 100644
        if (!Object.entries(to || {}).length) {
          this.model = {
            filter: {},
-@@ -304,6 +322,23 @@ export default {
+@@ -304,6 +323,23 @@ export default {
        }
      },
  
@@ -73,13 +80,17 @@ index 3230678..591be73 100644
      arguments() {
        this.$fetch()
      },
-@@ -318,19 +353,24 @@ export default {
+@@ -318,19 +354,28 @@ export default {
          if (!Object.entries(to || {}).length && !Object.entries(from || {}).length) {
            return
          }
 -        this.$fetch()
-+        // A new object with the same filters is not a change.
-+        if (JSON.stringify(to) === JSON.stringify(from)) return
++        // A new object with the same filters is not a change. The filters
++        // are compared with the ones last sent, because an edit in place
++        // gives this watcher the same object as both arguments.
++        const filter = JSON.stringify(to || {})
++        if (filter === this.sentFilter) return
++        this.sentFilter = filter
 +        this.emitModel()
 +        this.refetch()
        },
@@ -101,7 +112,7 @@ index 3230678..591be73 100644
        }
      },
  
-@@ -408,6 +448,29 @@ export default {
+@@ -408,6 +453,29 @@ export default {
        return query
      },
  
@@ -131,7 +142,7 @@ index 3230678..591be73 100644
      /**
       * Filters update event handler.
       */
-@@ -506,6 +569,8 @@ export default {
+@@ -506,6 +574,8 @@ export default {
        mode: vm.mode,
        pager: vm.pager,
        results: vm.results,

@@ -3,7 +3,9 @@
 // are. The issue's route is a child of the troubleshooting page, and
 // pages/how-to.vue asks Nuxt to scroll to the top on every route below it.
 // The Issues list scrolls to an issue itself when the URL, not a click,
-// opened it.
+// opened it. A link to a place on the page, an area's heading among them,
+// still scrolls there, and at once: the page is already rendered, and Nuxt
+// triggers no scroll for a change of child route that it could wait for.
 import { getMatchedComponents, setScrollRestoration } from './utils'
 import { onIssuesPage } from '~/utils/issues'
 
@@ -25,6 +27,18 @@ if (process.client) {
   }
 }
 
+function positionOf(hash) {
+  try {
+    const id = decodeURIComponent(hash.slice(1))
+    const el = id && document.getElementById(id)
+    if (!el) return false
+    const y = Number(getComputedStyle(el)['scroll-margin-top']?.replace('px', ''))
+    return { selector: '#' + window.CSS.escape(id), ...(y ? { offset: { y } } : {}) }
+  } catch (e) {
+    return false
+  }
+}
+
 function shouldScrollToTop(route) {
    const Pages = getMatchedComponents(route)
    if (Pages.length === 1) {
@@ -39,7 +53,9 @@ export default function (to, from, savedPosition) {
   let position = false
   const isRouteChanged = to !== from
 
-  if (isRouteChanged && !savedPosition && onIssuesPage(to.path) && onIssuesPage(from.path)) return false
+  if (isRouteChanged && !savedPosition && onIssuesPage(to.path) && onIssuesPage(from.path)) {
+    return positionOf(to.hash)
+  }
 
   // savedPosition is only available for popstate navigations (back button)
   if (savedPosition) {
