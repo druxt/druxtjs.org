@@ -9,6 +9,35 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Previews with a token. The frontend's preview consumer can now issue an
+  editor's preview token, so the frame reads the preview without the editor's
+  Drupal session on the frontend's site. The frontend registers its target
+  with a token wherever it registers one. `DRUXT_NODE_PREVIEW_REGISTER_TOKEN`
+  set to `false` turns the token off.
+
+### Changed
+
+- Consumer Node Preview 1.0.0-rc1, from a development snapshot. Preview
+  tokens last 15 minutes, and go only to targets on the site's own frontend
+  hosts and Cloudflare's quick tunnels. A registered target can carry its own
+  expiry, and saving a target no longer signs editors out of open previews.
+  A deploy hook adds the last seen column to stored preview targets, because
+  the release's update adds only the expiry column.
+- The frontend runs the released `@druxt-contrib/node-preview` 0.1.0, in place
+  of a patched snapshot. It writes its preview target again every six hours,
+  and on Lagoon leaves the target in place when it stops, so a rollout never
+  removes the target the new frontend just wrote.
+- The server closes Nuxt before it exits, so a frontend stopped off Lagoon
+  removes its preview target.
+
+### Fixed
+
+- Every rollout reset the preview consumer to the client credentials grant
+  alone, so a preview token target would have got an empty token after each
+  deployment.
+
 ## [0.18.0] - 2026-11-04
 
 ### Added
