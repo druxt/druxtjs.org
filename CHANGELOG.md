@@ -9,6 +9,18 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- The front page as a Canvas page. When Drupal has a Canvas page at `/home`,
+  the frontend renders `/` from it: the hero, the quickstart command, the
+  features, the showcase and the modules are components an editor arranges
+  and edits in Drupal Canvas. Without one, the front page is the built-in
+  one. `/home` redirects to `/`, and Canvas's editor is reached through the
+  site at `/canvas`.
+- The quickstart command's commands and starter kits are set in Canvas, a
+  line each.
+- Editors can create, edit, delete and publish Canvas pages.
+
 ## [0.19.0] - 2026-11-14
 
 ### Added
