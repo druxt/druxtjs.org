@@ -1,0 +1,46 @@
+uuid: cf28f549-c01f-4c6e-a2fa-628cdc8087a8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.docs_issue.field_content
+    - field.field.node.docs_issue.field_description
+    - field.field.node.docs_issue.field_issue_area
+    - field.field.node.docs_issue.field_issue_search_text
+    - field.field.node.docs_issue.field_weight
+    - node.type.docs_issue
+  module:
+    - layout_paragraphs
+    - options
+id: node.docs_issue.default
+targetEntityType: node
+bundle: docs_issue
+mode: default
+content:
+  field_content:
+    type: layout_paragraphs
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_description:
+    type: basic_string
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_issue_area:
+    type: list_key
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  field_issue_search_text: true
+  field_weight: true
+  links: true

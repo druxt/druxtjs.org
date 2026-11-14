@@ -1,0 +1,19 @@
+uuid: f7b50da3-1954-4646-be67-0a29bb932585
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_issue_search_text
+    - node.type.docs_issue
+id: node.docs_issue.field_issue_search_text
+field_name: field_issue_search_text
+entity_type: node
+bundle: docs_issue
+label: 'Search text'
+description: "Set on save from the title, summary and fix, for the troubleshooting page's search."
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

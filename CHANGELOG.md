@@ -16,6 +16,15 @@ Druxt 1.0.0.
   Drupal session on the frontend's site. The frontend registers its target
   with a token wherever it registers one. `DRUXT_NODE_PREVIEW_REGISTER_TOKEN`
   set to `false` turns the token off.
+- Troubleshooting issues as content of their own. Each issue is a node with a
+  title, an area, a one-line summary and its fix as Text and Code blocks, at
+  its own URL under `/how-to/troubleshooting/`. The troubleshooting page lists
+  them closed and grouped by area, with a search and an area filter that the
+  URL carries. Opening an issue changes the URL and keeps the reader on the
+  page, and a renamed issue's old URL redirects. The MCP server,
+  `llms-full.txt` and the sitemap have an entry per issue.
+- A workspace's review lists the troubleshooting issues it changed, beside
+  its pages.
 
 ### Changed
 

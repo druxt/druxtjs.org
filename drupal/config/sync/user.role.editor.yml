@@ -7,6 +7,7 @@ dependencies:
     - filter.format.docs_markdown
     - media.type.image
     - node.type.doc_page
+    - node.type.docs_issue
     - workflows.workflow.editorial
   module:
     - coffee
@@ -41,21 +42,28 @@ permissions:
   - 'administer node published status'
   - 'administer workspaces'
   - 'create doc_page content'
+  - 'create docs_issue content'
   - 'create image media'
   - 'create url aliases'
   - 'create workspace'
   - 'delete any doc_page content'
+  - 'delete any docs_issue content'
   - 'delete any image media'
   - 'delete doc_page revisions'
+  - 'delete docs_issue revisions'
   - 'delete own doc_page content'
+  - 'delete own docs_issue content'
   - 'delete own workspace'
   - 'edit any doc_page content'
+  - 'edit any docs_issue content'
   - 'edit any image media'
   - 'edit any workspace'
   - 'edit own doc_page content'
+  - 'edit own docs_issue content'
   - 'edit own image media'
   - 'grant simple_oauth codes'
   - 'revert doc_page revisions'
+  - 'revert docs_issue revisions'
   - 'schedule workspace releases'
   - 'use editorial transition archive'
   - 'use editorial transition archived_draft'
@@ -67,6 +75,7 @@ permissions:
   - 'view any unpublished content'
   - 'view any workspace'
   - 'view doc_page revisions'
+  - 'view docs_issue revisions'
   - 'view latest version'
   - 'view media'
   - 'view own unpublished content'

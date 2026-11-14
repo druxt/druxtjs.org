@@ -67,6 +67,7 @@
 <script>
 import { trapTab } from '~/utils/focus'
 import { badgeOf, titleOf } from '~/lib/version-badge'
+import { onIssuesPage } from '~/utils/issues'
 
 export default {
   data: () => ({
@@ -88,11 +89,14 @@ export default {
 
   watch: {
     // Nuxt's own scroll-to-top does not fire when a navigation crosses the
-    // isDocs boundary. Path-gated, so table of contents jumps still work.
+    // isDocs boundary. Path-gated, so table of contents jumps still work, and
+    // opening or closing a troubleshooting issue keeps the reader's place.
     $route(to, from) {
       this.sidebar = false
       this.searchOpen = false
-      if (to.path !== from.path) window.scrollTo({ top: 0, behavior: 'instant' })
+      if (to.path !== from.path && !(onIssuesPage(to.path) && onIssuesPage(from.path))) {
+        window.scrollTo({ top: 0, behavior: 'instant' })
+      }
     },
 
     /**

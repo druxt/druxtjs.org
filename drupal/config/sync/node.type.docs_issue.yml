@@ -1,0 +1,11 @@
+uuid: ec8bb07d-7a42-487b-a7d4-f7d1e1eb1a80
+langcode: en
+status: true
+dependencies: {  }
+name: 'Troubleshooting issue'
+type: docs_issue
+description: 'A problem readers hit and its fix, listed on the troubleshooting page and opened there from its own URL. It has no page of its own.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

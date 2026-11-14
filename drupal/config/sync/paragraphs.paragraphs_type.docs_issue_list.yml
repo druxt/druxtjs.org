@@ -1,0 +1,10 @@
+uuid: ff9b8f3d-235a-4277-89ca-ef9b643b468b
+langcode: en
+status: true
+dependencies: {  }
+id: docs_issue_list
+label: 'Issues list'
+icon_uuid: null
+icon_default: null
+description: 'Every troubleshooting issue, grouped by area, with a search and area filter. Add and edit issues as Troubleshooting issue content.'
+behavior_plugins: {  }

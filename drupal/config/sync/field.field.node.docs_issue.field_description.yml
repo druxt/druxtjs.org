@@ -1,0 +1,19 @@
+uuid: 94a5491b-eef6-42b0-8d00-9de3be26f018
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.docs_issue
+id: node.docs_issue.field_description
+field_name: field_description
+entity_type: node
+bundle: docs_issue
+label: Summary
+description: 'One line saying what the reader sees, shown under the title while the fix is closed.'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

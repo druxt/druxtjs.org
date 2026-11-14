@@ -2025,3 +2025,217 @@ del.v-diff-del--trailing {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Troubleshooting issues (the Issues list block): hairline rows under
+   small area headings, each closed to its title and one-line summary.
+   Scoped under .prose so the docs page's own heading and code styles stay
+   off them. */
+.issue-tools {
+  margin: 0 0 0.5rem;
+}
+
+.issue-search {
+  position: relative;
+  display: block;
+  margin: 0 0 0.75rem;
+}
+
+.issue-search svg {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: hsl(var(--bc) / 0.45);
+}
+
+.issue-search input {
+  width: 100%;
+  font-size: 0.95rem;
+  padding: 0.55rem 0.75rem 0.55rem 2.25rem;
+  border: 1px solid hsl(var(--bc) / 0.15);
+  border-radius: 0.5rem;
+  background: hsl(var(--b1));
+  color: hsl(var(--bc));
+}
+
+.issue-search input:focus-visible {
+  outline: 2px solid hsl(var(--pf));
+  outline-offset: 1px;
+  border-color: transparent;
+}
+
+.issue-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+/* The chips are links, so the selectors outrank the prose link styles. As
+   the module tabs do, a chip keeps one weight and changes colour when
+   picked, so picking one does not move the chips after it. */
+.issue-chips .issue-chip {
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  color: hsl(var(--bc) / 0.8);
+  text-decoration: none;
+  border: 0;
+  transition: background-color var(--motion-fast) var(--motion-ease), color var(--motion-fast) var(--motion-ease);
+}
+
+.issue-chips .issue-chip:hover {
+  color: hsl(var(--bc));
+}
+
+.issue-chips .issue-chip:focus-visible {
+  outline: 2px solid hsl(var(--p));
+  outline-offset: 2px;
+}
+
+.issue-chips .issue-chip.is-active {
+  background: hsl(var(--p) / 0.12);
+  color: hsl(var(--pf));
+}
+
+.issue-chip-count {
+  margin-left: 0.3rem;
+  color: hsl(var(--bc) / 0.7);
+  font-variant-numeric: tabular-nums;
+}
+
+.issue-chip.is-active .issue-chip-count {
+  color: inherit;
+}
+
+.issue-count {
+  font-size: 0.8rem;
+  color: hsl(var(--bc) / 0.7);
+  margin: 0.5rem 0 0;
+}
+
+.prose .issue-group-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: hsl(var(--bc) / 0.7);
+  margin: 1.75rem 0 0.25rem;
+}
+
+.issue {
+  border-top: 1px solid hsl(var(--bc) / 0.1);
+  /* Clear of the sticky header and breadcrumb bar when the URL opens one. */
+  scroll-margin-top: 7rem;
+}
+
+.issue-group .issue:last-of-type {
+  border-bottom: 1px solid hsl(var(--bc) / 0.1);
+}
+
+.issue > summary {
+  list-style: none;
+  cursor: pointer;
+  position: relative;
+  padding: 0.65rem 1.75rem 0.65rem 0;
+}
+
+.issue > summary::-webkit-details-marker {
+  display: none;
+}
+
+.issue > summary::after {
+  content: '';
+  position: absolute;
+  right: 0.4rem;
+  top: 1.05rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 1.5px solid hsl(var(--bc) / 0.5);
+  border-bottom: 1.5px solid hsl(var(--bc) / 0.5);
+  transform: rotate(45deg);
+}
+
+.issue[open] > summary::after {
+  transform: rotate(225deg);
+  top: 1.3rem;
+}
+
+.issue > summary:hover .issue-title {
+  color: hsl(var(--pf));
+}
+
+.issue-title {
+  display: block;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.prose .issue-title code {
+  font-size: 0.9em;
+}
+
+.issue-summary {
+  display: block;
+  font-size: 0.875rem;
+  color: hsl(var(--bc) / 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.issue[open] .issue-summary {
+  display: none;
+}
+
+.issue-fix {
+  padding: 0 0 0.9rem;
+}
+
+.prose .issue-fix > :first-child > :first-child {
+  margin-top: 0;
+}
+
+/* An issue's copy-link button: the docs' code copy button, on the page's
+   surface rather than the code's. Always shown, since nothing it sits over
+   needs the room. It reserves the wider label's width, so "Copied" does not
+   move it, and turns the copy button's success colour. */
+.prose .issue-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid hsl(var(--bc) / 0.15);
+  border-radius: 6px;
+  color: hsl(var(--bc) / 0.7);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-decoration: none;
+  transition: background-color var(--motion-fast) var(--motion-ease), color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease);
+}
+.prose .issue-copy:hover,
+.prose .issue-copy:focus-visible {
+  border-color: hsl(var(--bc) / 0.3);
+  background-color: hsl(var(--bc) / 0.05);
+  color: hsl(var(--bc));
+}
+.prose .issue-copy[data-state='copied'] {
+  border-color: hsl(var(--s) / 0.4);
+  color: hsl(var(--s));
+}
+.prose .issue-copy[data-state='failed'] {
+  border-color: hsl(var(--er) / 0.4);
+  color: hsl(var(--er));
+}
+.issue-copy-label {
+  display: inline-grid;
+}
+.issue-copy-label > span {
+  grid-area: 1 / 1;
+}
+
+.issue-empty {
+  color: hsl(var(--bc) / 0.7);
+}

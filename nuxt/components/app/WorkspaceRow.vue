@@ -55,7 +55,7 @@ export default {
     when: ({ page }) => whenOf(page.changed),
     // A new page has no live version, so its diff shows the whole page as
     // added, which still finds the blocks moved in from elsewhere.
-    diffHref: ({ page }) => (page.href ? `${page.href}?diff=1` : null),
+    diffHref: ({ page }) => (page.href && page.canDiff !== false ? `${page.href}?diff=1` : null),
   },
 }
 </script>
