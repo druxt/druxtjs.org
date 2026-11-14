@@ -80,6 +80,12 @@
 /** The parts of a line an editor writes as "one | two | three". */
 const parts = (line) => String(line).split('|').map((part) => part.trim())
 
+/** A command's line: its label, then the command, which may hold pipes of its own. */
+const labelled = (line) => {
+  const [label, ...command] = String(line).split('|')
+  return [label.trim(), command.join('|').trim()]
+}
+
 /**
  * The front page's quickstart command, with a panel that rewrites it for the
  * chosen starter kit and runner.
@@ -117,7 +123,7 @@ export default {
     // The commands a reader can run with: a label and a command each.
     runners: ({ commands }) =>
       commands
-        .map(parts)
+        .map(labelled)
         .filter(([label, command]) => label && command)
         .map(([label, command], value) => ({ value, label, command })),
 
