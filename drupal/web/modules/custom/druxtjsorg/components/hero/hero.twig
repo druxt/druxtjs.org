@@ -1,0 +1,9 @@
+<section>
+  <h1>{{ heading }}</h1>
+  {% if lead %}<p>{{ lead }}</p>{% endif %}
+  {% if note or (note_link_text and note_link_url) %}
+    <p><small>{{ note }} {% if note_link_text and note_link_url %}<a href="{{ note_link_url }}">{{ note_link_text }}</a>.{% endif %}</small></p>
+  {% endif %}
+  <div>{% block actions %}{% endblock %}</div>
+  <div>{% block content %}{% endblock %}</div>
+</section>

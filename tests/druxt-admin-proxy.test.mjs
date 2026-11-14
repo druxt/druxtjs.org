@@ -11,6 +11,10 @@ describe('shouldProxy', () => {
     assert.equal(shouldProxy('/wse-deploy/import/data/stage'), true)
     assert.equal(shouldProxy('/wse-deploy/status/ready/stage'), true)
     assert.equal(shouldProxy('/cores'), false)
+    // Canvas's editor and its API, and not a page whose path starts the same.
+    assert.equal(shouldProxy('/canvas'), true)
+    assert.equal(shouldProxy('/canvas/api/v0/content/canvas_page/1'), true)
+    assert.equal(shouldProxy('/canvases'), false)
     assert.equal(shouldProxy('/node/1'), false)
     // Every operation Drupal offers on a page, the JSON:API preview tab included.
     for (const operation of ['edit', 'delete', 'revisions', 'json-preview']) {

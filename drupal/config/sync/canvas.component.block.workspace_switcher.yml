@@ -1,0 +1,22 @@
+uuid: 3aad81bf-5ad7-47ae-bad8-06f3026909e9
+langcode: en
+status: false
+dependencies:
+  module:
+    - workspaces_ui
+active_version: d6f928cf96df90fd
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: workspace_switcher
+        label: 'Workspace switcher'
+        label_display: '0'
+        provider: workspaces_ui
+    fallback_metadata:
+      slot_definitions: null
+label: 'Workspace switcher'
+id: block.workspace_switcher
+provider: workspaces_ui
+source: block
+source_local_id: workspace_switcher

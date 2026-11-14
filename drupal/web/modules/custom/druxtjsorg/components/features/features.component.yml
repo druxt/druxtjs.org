@@ -1,0 +1,11 @@
+'$schema': 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Features
+description: A grid of features, four across on a wide screen.
+group: druxtjs.org
+props:
+  type: object
+  properties: {}
+slots:
+  items:
+    title: Features
+    description: The Feature components of the grid.

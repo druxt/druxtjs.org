@@ -1,0 +1,55 @@
+'$schema': 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Action
+description: A button that links to a page of the site, with an optional icon.
+group: druxtjs.org
+props:
+  type: object
+  required:
+    - label
+    - url
+  properties:
+    label:
+      type: string
+      title: Label
+      examples:
+        - Get started
+    url:
+      type: string
+      title: Link
+      format: uri-reference
+      examples:
+        - /tutorials/getting-started
+    variant:
+      type: string
+      title: Style
+      enum:
+        - primary
+        - ghost
+      meta:enum:
+        primary: Primary
+        ghost: Ghost
+      examples:
+        - ghost
+    icon:
+      type: string
+      title: Icon
+      enum:
+        - none
+        - tutorials
+        - modules
+        - playground
+        - how-to
+        - explanation
+        - api
+        - github
+      meta:enum:
+        none: No icon
+        tutorials: Tutorials
+        modules: Modules
+        playground: Playground
+        how-to: How-to guides
+        explanation: Explanation
+        api: API
+        github: GitHub
+      examples:
+        - none

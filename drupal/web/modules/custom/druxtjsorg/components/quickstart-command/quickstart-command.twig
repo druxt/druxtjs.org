@@ -1,0 +1,4 @@
+{# The first command, as the frontend shows it before a reader picks another. #}
+{% set kit = (starter_kits|default([])|first|default('quickstart'))|split('|')|first|trim %}
+{% set command = (commands|default([])|first|default(''))|split('|')|last|trim %}
+{% if command %}<p><code>{{ command|replace({'{repo}': kit}) }}</code></p>{% endif %}

@@ -1,0 +1,21 @@
+uuid: 38525aaf-9a44-443d-a5cc-7bcca97dc53f
+langcode: en
+status: true
+dependencies:
+  module:
+    - druxtjsorg
+active_version: 8e4412f6b23b442a
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions: {  }
+    fallback_metadata:
+      slot_definitions:
+        items:
+          title: Features
+          description: 'The Feature components of the grid.'
+label: Features
+id: sdc.druxtjsorg.features
+provider: druxtjsorg
+source: sdc
+source_local_id: 'druxtjsorg:features'
