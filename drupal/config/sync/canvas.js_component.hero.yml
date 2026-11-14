@@ -21,11 +21,25 @@ props:
   note:
     type: string
     title: Note
+    description: 'A smaller line under the lead. The note link follows it.'
     examples:
       - 'Built on the Nuxt 2 / Vue 2 line: see'
+  note_link_text:
+    type: string
+    title: 'Note link text'
+    examples:
+      - 'support and versioning'
+  note_link_url:
+    type: string
+    format: uri-reference
+    title: 'Note link'
+    examples:
+      - /explanation/support-and-versioning
 slots:
   actions:
     title: Actions
+    description: 'The buttons under the note.'
   content:
     title: Content
+    description: 'What follows the actions, such as the quickstart command.'
 dataDependencies: {  }

@@ -1,0 +1,19 @@
+<template>
+  <AppHomeShowcase v-bind="$props" />
+</template>
+
+<script>
+// Canvas passes each input in camel case. One an editor left empty is left
+// out, so the wrapped component's own default applies.
+export default {
+  props: {
+    heading: { type: String, default: undefined },
+    text: { type: String, default: undefined },
+    detail: { type: String, default: undefined },
+    linkText: { type: String, default: undefined },
+    linkUrl: { type: String, default: undefined },
+    imageSrc: { type: String, default: undefined },
+    imageAlt: { type: String, default: undefined },
+  },
+}
+</script>

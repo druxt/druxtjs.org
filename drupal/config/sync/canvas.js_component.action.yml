@@ -31,5 +31,28 @@ props:
     title: Style
     examples:
       - ghost
+  icon:
+    type: string
+    enum:
+      - none
+      - tutorials
+      - modules
+      - playground
+      - how-to
+      - explanation
+      - api
+      - github
+    'meta:enum':
+      none: 'No icon'
+      tutorials: Tutorials
+      modules: Modules
+      playground: Playground
+      how-to: 'How-to guides'
+      explanation: Explanation
+      api: API
+      github: GitHub
+    title: Icon
+    examples:
+      - none
 slots: {  }
 dataDependencies: {  }

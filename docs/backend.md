@@ -404,9 +404,12 @@ opens. Drupal's copy is tracked configuration: export it after adding or
 changing a component, and `tests/canvas-headless.test.mjs` fails when the
 two differ.
 
-A Canvas page built from these components renders at its own path,
-`/page/<id>`. The front page still renders the way the section above
-describes.
+The front page's seven components are there. With this on, the front page
+renders its Canvas page from them, through Canvas's content API, and the
+editor frames the front page itself. A page built from them does not render
+through `@druxt-contrib/canvas`, so move the front page's Canvas page to
+them only where this is on. Any other Canvas page built from them renders at
+its own path, `/page/<id>`.
 
 Framed by the editor, the page stands alone, without the site's header and
 footer, so an editor arranges the page and not the site around it. Anywhere

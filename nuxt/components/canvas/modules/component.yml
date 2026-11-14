@@ -1,0 +1,29 @@
+name: Modules
+machineName: modules
+status: true
+required:
+- heading
+props:
+  properties:
+    heading:
+      type: string
+      title: Heading
+      examples:
+      - Modules
+    text:
+      type: string
+      title: Text
+      examples:
+      - Adopt the whole framework, or only the parts you need.
+    link_text:
+      type: string
+      title: Link text
+      examples:
+      - All modules
+    link_url:
+      type: string
+      title: Link
+      format: uri-reference
+      examples:
+      - /modules
+slots: {}

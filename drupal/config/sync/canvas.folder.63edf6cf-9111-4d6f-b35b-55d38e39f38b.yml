@@ -4,7 +4,12 @@ status: true
 dependencies:
   config:
     - canvas.component.js.action
+    - canvas.component.js.feature
+    - canvas.component.js.features
     - canvas.component.js.hero
+    - canvas.component.js.modules
+    - canvas.component.js.quickstart-command
+    - canvas.component.js.showcase
     - canvas.component.marker.page_content
     - canvas.component.sdc.navigation.message
     - canvas.component.sdc.navigation.title
@@ -13,7 +18,12 @@ configEntityTypeId: component
 weight: 0
 items:
   - js.action
+  - js.feature
+  - js.features
   - js.hero
+  - js.modules
+  - js.quickstart-command
+  - js.showcase
   - marker.page_content
   - sdc.navigation.message
   - sdc.navigation.title

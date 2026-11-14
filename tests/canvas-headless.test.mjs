@@ -16,6 +16,7 @@ const { cookies, serialise } = createRequire(import.meta.url)(
 )
 
 const names = readdirSync(COMPONENTS)
+const camel = (name) => name.replace(/_+([a-z0-9])/g, (m, c) => c.toUpperCase())
 
 // The keys one level under a line, read by indentation: the definitions are
 // plain enough that a YAML parser is not needed.
@@ -38,16 +39,17 @@ describe('Canvas Headless components', () => {
   for (const name of names) {
     const yml = readFileSync(`${COMPONENTS}/${name}/component.yml`, 'utf8')
     const vue = readFileSync(`${COMPONENTS}/${name}/index.vue`, 'utf8')
-    const props = keysUnder(yml, 'properties', 4)
+    // A component with no inputs writes `properties: {}`.
+    const props = yml.includes('\n  properties: {}') ? [] : keysUnder(yml, 'properties', 4)
     const slots = yml.includes('\nslots: {}') ? [] : keysUnder(yml, 'slots', 2)
 
     test(`${name} is named for its directory, which the renderer finds it by`, () => {
       assert.match(yml, new RegExp(`^machineName: ${name}$`, 'm'))
     })
 
-    test(`${name} declares each input as a prop of the same name`, () => {
-      assert.ok(props && props.length > 0, 'no properties were read')
-      for (const prop of props) assert.match(vue, new RegExp(`^ {4}${prop}: \\{`, 'm'), prop)
+    test(`${name} declares each input as a prop, in camel case as Canvas passes it`, () => {
+      assert.ok(props, 'no properties were read')
+      for (const prop of props) assert.match(vue, new RegExp(`^ {4}${camel(prop)}: \\{`, 'm'), prop)
     })
 
     test(`${name} renders each slot`, () => {
@@ -60,7 +62,7 @@ describe('Canvas Headless components', () => {
       assert.ok(existsSync(file), `${file} is missing: sync it in Canvas and export the config`)
       const config = readFileSync(file, 'utf8')
       assert.match(config, /^type: external$/m)
-      assert.deepEqual(keysUnder(config, 'props', 2), props)
+      assert.deepEqual(config.includes('\nprops: {  }') ? [] : keysUnder(config, 'props', 2), props)
       assert.deepEqual(config.includes('\nslots: {  }') ? [] : keysUnder(config, 'slots', 2), slots)
     })
   }

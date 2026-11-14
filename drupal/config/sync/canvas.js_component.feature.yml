@@ -1,0 +1,55 @@
+uuid: 925df593-4447-489b-a76f-64e839db8dd5
+langcode: en
+status: true
+dependencies: {  }
+machineName: feature
+name: Feature
+type: external
+required:
+  - heading
+  - text
+props:
+  icon:
+    type: string
+    enum:
+      - none
+      - api
+      - modules
+      - globe
+      - lock
+      - components
+      - playground
+    'meta:enum':
+      none: 'No icon'
+      api: API
+      modules: Modules
+      globe: Globe
+      lock: Lock
+      components: Components
+      playground: Playground
+    title: Icon
+    examples:
+      - api
+  heading:
+    type: string
+    title: Heading
+    examples:
+      - 'JSON:API client and store'
+  text:
+    type: string
+    title: Text
+    examples:
+      - 'A JSON:API client and Vuex store modules keep Drupal entities, resources and relationships in sync on the frontend.'
+  link_text:
+    type: string
+    title: 'Link text'
+    examples:
+      - 'Add a login flow.'
+  link_url:
+    type: string
+    format: uri-reference
+    title: Link
+    examples:
+      - /tutorials/authentication
+slots: {  }
+dataDependencies: {  }

@@ -1,0 +1,14 @@
+uuid: 8dc3808b-a5a3-43e2-952a-a42c5158e81a
+langcode: en
+status: true
+dependencies: {  }
+machineName: features
+name: Features
+type: external
+required: {  }
+props: {  }
+slots:
+  items:
+    title: Features
+    description: 'The Feature components of the grid.'
+dataDependencies: {  }
