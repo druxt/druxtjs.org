@@ -9,8 +9,8 @@
   // test:coverage script, and nuxt/'s packages the tests reach through
   // nuxt/: the diff package through nuxt/lib/diff.js, druxt-auth through
   // nuxt/server/page-cache.js, the remark parser through
-  // nuxt/lib/llms-full-txt.js and the Drupal mock through
-  // nuxt/utils/mock-backend.js. All belong to nuxt/'s manifest.
+  // nuxt/lib/llms-full-txt.js, the Drupal mock through
+  // nuxt/utils/mock-backend.js and Prism through nuxt/utils/highlight.js. All belong to nuxt/'s manifest.
   "ignoreDependencies": [
     "junit",
     "spec",
@@ -20,6 +20,7 @@
     "unified",
     "remark-parse",
     "unist-util-visit",
-    "mdast-util-to-string"
+    "mdast-util-to-string",
+    "prismjs"
   ]
 }
