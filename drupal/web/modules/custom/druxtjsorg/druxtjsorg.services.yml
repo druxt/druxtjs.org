@@ -4,7 +4,3 @@ services:
     arguments: ['@current_user']
     tags:
       - { name: event_subscriber }
-
-  # Canvas Headless asks for this class by name, and Custom Elements 3.5.0
-  # registers the service under its id only.
-  Drupal\custom_elements\RenderConverter\RenderConverter: '@custom_elements.render_converter'
