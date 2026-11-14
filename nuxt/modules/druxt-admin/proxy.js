@@ -59,6 +59,10 @@ export const BACKEND_PATHS = [
   // posts arrive at this site's URL, the one every environment is named by,
   // and each is signed with a token Drupal checks.
   '/wse-deploy',
+  // Canvas's editor and the API it calls while a page is open. The match is
+  // on the whole first segment, so a page whose path only starts the same
+  // way is not taken.
+  '/canvas',
 ]
 
 /**

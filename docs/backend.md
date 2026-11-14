@@ -358,3 +358,16 @@ Content is not exported. Production's database is the source of truth.
 Modules, API reference and Components pages from. Those pages have no Drupal
 representation. `npm run docs:fetch` checks the commit out into
 `.docs-source`, and `npm run docs:generate` builds the pages there.
+
+## Canvas
+
+Drupal Canvas is installed, and its editor is reached through the site at
+`/canvas`. The components it offers for the front page are the
+single-directory components under
+`drupal/web/modules/custom/druxtjsorg/components`.
+
+`drupal/composer.json` patches `drupal/canvas` for
+[#3592360](https://www.drupal.org/project/canvas/issues/3592360). With Canvas
+enabled, a JSON:API collection of configuration entities answers 500 to a
+page offset, which Druxt's schema build sends for any collection longer than
+one page. Drop the patch when a Canvas release includes the fix.

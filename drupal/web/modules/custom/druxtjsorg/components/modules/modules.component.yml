@@ -1,0 +1,30 @@
+'$schema': 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Modules
+description: The site's modules as cards, under a heading and a link to all of them. The frontend lists the modules.
+group: druxtjs.org
+props:
+  type: object
+  required:
+    - heading
+  properties:
+    heading:
+      type: string
+      title: Heading
+      examples:
+        - Modules
+    text:
+      type: string
+      title: Text
+      examples:
+        - Adopt the whole framework, or only the parts you need.
+    link_text:
+      type: string
+      title: Link text
+      examples:
+        - All modules
+    link_url:
+      type: string
+      title: Link
+      format: uri-reference
+      examples:
+        - /modules

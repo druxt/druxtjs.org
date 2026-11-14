@@ -1,0 +1,22 @@
+uuid: 43aab97d-19fa-47a1-b136-4f9e907bdfb2
+langcode: en
+status: true
+dependencies:
+  module:
+    - wse
+active_version: 039622ebf2118622
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: wse_switch_to_live
+        label: 'Switch To Live'
+        label_display: '0'
+        provider: wse
+    fallback_metadata:
+      slot_definitions: null
+label: 'Switch To Live'
+id: block.wse_switch_to_live
+provider: wse
+source: block
+source_local_id: wse_switch_to_live

@@ -9,6 +9,7 @@
         "composer/installers": "^2.3",
         "cweagans/composer-patches": "^2",
         "drupal/admin_audit_trail": "^1.0.12",
+        "drupal/canvas": "^1.12",
         "drupal/codemirror_editor": "^2.0",
         "drupal/coffee": "^2.0",
         "drupal/consumer_node_preview": "^1.0@rc",
@@ -154,6 +155,9 @@
             "drupal/core": {
                 "Issue #3626255: prefetch JSON:API resource object normalizations (MR 17265 at a9227f7b, vendored)": "patches/drupal-core-3626255-prefetch-normalizations-mr17265-a9227f7b.patch",
                 "Issue #3626255: inject the normalization cacher, which 11.x does not autowire": "patches/jsonapi-3626255-data-normalizer-argument.patch"
+            },
+            "drupal/canvas": {
+                "Issue #3592360: JSON:API config entity collections answer 500 when page[offset] is set": "https://github.com/Decipher/canvas/pull/1.diff"
             },
             "drupal/decoupled_settings": {
                 "Expose the theme's regions, and let a consumer select its theme": "https://github.com/Decipher/decoupled_settings/pull/15.diff"

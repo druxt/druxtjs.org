@@ -1,0 +1,27 @@
+uuid: 44324c67-8dc4-4085-9c90-6c485abc562a
+langcode: en
+status: false
+dependencies:
+  config:
+    - system.menu.docs
+  module:
+    - system
+active_version: 1953acf2f2f6dc08
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'system_menu_block:docs'
+        label: Documentation
+        label_display: '0'
+        provider: system
+        level: 1
+        depth: null
+        expand_all_items: false
+    fallback_metadata:
+      slot_definitions: null
+label: Documentation
+id: block.system_menu_block.docs
+provider: system
+source: block
+source_local_id: 'system_menu_block:docs'

@@ -1,0 +1,44 @@
+'$schema': 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Hero
+description: The front page's opening, with the logo, a heading, a lead, a note, a row of actions and what follows them.
+group: druxtjs.org
+props:
+  type: object
+  required:
+    - heading
+  properties:
+    heading:
+      type: string
+      title: Heading
+      examples:
+        - The Fully Decoupled Drupal Framework
+    lead:
+      type: string
+      title: Lead
+      examples:
+        - Druxt is a framework for building fully decoupled Drupal and Nuxt.js applications and sites.
+    note:
+      type: string
+      title: Note
+      description: A smaller line under the lead. The note link follows it.
+      examples:
+        - 'Built on the Nuxt 2 / Vue 2 line: see'
+    note_link_text:
+      type: string
+      title: Note link text
+      examples:
+        - support and versioning
+    note_link_url:
+      type: string
+      title: Note link
+      format: uri-reference
+      examples:
+        - /explanation/support-and-versioning
+
+slots:
+  actions:
+    title: Actions
+    description: The buttons under the note.
+  content:
+    title: Content
+    description: What follows the actions, such as the quickstart command.
