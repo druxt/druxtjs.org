@@ -3355,6 +3355,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@druxt-contrib/canvas@file:vendor/druxt-canvas::locator=druxtjs-org%40workspace%3A.":
+  version: 0.0.0
+  resolution: "@druxt-contrib/canvas@file:vendor/druxt-canvas#vendor/druxt-canvas::hash=802bc2&locator=druxtjs-org%40workspace%3A."
+  peerDependencies:
+    druxt: ^0.25.1
+    vuex: ^3.6.2
+  checksum: 0401cba914db9f0aea077f52abf67d1c99f7bedb4d4a6e9a8f52d2fb367db7e60882bd6535ddeb0168f5daf1c23e976b31a56262c3e3750b2f0c7e3301243033
+  languageName: node
+  linkType: hard
+
 "@druxt-contrib/diff@file:vendor/druxt-diff::locator=druxtjs-org%40workspace%3A.":
   version: 0.0.0
   resolution: "@druxt-contrib/diff@file:vendor/druxt-diff#vendor/druxt-diff::hash=831661&locator=druxtjs-org%40workspace%3A."
@@ -11183,6 +11193,7 @@ __metadata:
   dependencies:
     "@babel/plugin-proposal-private-property-in-object": ^7.21.11
     "@druxt-contrib/anchors": "file:vendor/druxt-anchors"
+    "@druxt-contrib/canvas": "file:vendor/druxt-canvas"
     "@druxt-contrib/diff": "file:vendor/druxt-diff"
     "@druxt-contrib/node-preview": ^0.1.0
     "@druxt-contrib/user": "file:vendor/druxt-user"

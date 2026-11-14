@@ -83,6 +83,8 @@ typings/
 
 # Nuxt generate
 dist
+# A vendored package's build is its source here.
+!vendor/*/dist
 
 # vuepress build output
 .vuepress/dist

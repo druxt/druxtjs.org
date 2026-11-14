@@ -1,163 +1,49 @@
 <template>
-  <div>
-    <!-- Hero -->
-    <section class="border-b border-base-300 bg-base-200">
-      <div class="max-w-5xl mx-auto px-6 py-24 sm:py-28 text-center flex flex-col items-center">
-        <AppLogo class="w-20 mb-7" title="DruxtJS" />
-        <h1 class="text-4xl sm:text-5xl font-bold tracking-tight" v-text="slogan" />
-        <p class="mt-4 text-lg text-base-content/70 max-w-xl">
-          Druxt is a framework for building fully decoupled Drupal and Nuxt.js applications and sites.
-        </p>
-        <p class="mt-2 text-sm text-base-content/60">
-          Built on the Nuxt 2 / Vue 2 line: see
-          <NuxtLink class="underline hover:text-primary-focus" to="/explanation/support-and-versioning">support and versioning</NuxtLink>.
-        </p>
-        <div class="mt-9 flex flex-wrap items-center justify-center gap-3">
-          <NuxtLink class="btn btn-primary gap-2" to="/tutorials/getting-started">
-            <AppIconTutorials class="w-5 h-5" /> Get started
-          </NuxtLink>
-          <NuxtLink class="btn btn-ghost gap-2" to="/modules">
-            <AppIconModules class="w-5 h-5" /> Browse modules
-          </NuxtLink>
-          <NuxtLink class="btn btn-ghost gap-2" to="/playground">
-            <AppIconPlayground class="w-5 h-5" /> Try the playground
-          </NuxtLink>
-        </div>
-        <!-- The advanced panel rewrites this command for the chosen starter kit and runner. -->
-        <div class="mt-8 w-full max-w-2xl">
-          <div class="flex items-center gap-2 rounded-btn bg-base-100 border border-base-300 px-4 py-2 text-left">
-            <code class="flex-1 min-w-0 overflow-x-auto text-sm font-mono whitespace-nowrap">{{ command }}</code>
-            <button
-              type="button"
-              class="btn btn-xs btn-ghost flex-shrink-0"
-              :aria-label="'Copy ' + command"
-              @click="copy"
-            >{{ copyLabel }}</button>
-          </div>
+  <!--
+    The front page is a Canvas page once Drupal has one at its path. It sits
+    inside this element because a component that fetches cannot be the root of
+    another that does: Nuxt keeps each one's fetch key on its root element.
+  -->
+  <div v-if="canvas">
+    <DruxtCanvas :uuid="canvas" />
+  </div>
 
-          <button
-            type="button"
-            class="mt-2 inline-flex items-center gap-1.5 text-sm text-base-content/70 hover:text-base-content"
-            :aria-expanded="advanced ? 'true' : 'false'"
-            aria-controls="quickstart-advanced"
-            @click="advanced = !advanced"
-          >
-            <span aria-hidden="true" class="inline-block w-3 text-center">{{ advanced ? '−' : '+' }}</span>
-            Advanced
-          </button>
+  <div v-else>
+    <AppHomeHero
+      :heading="slogan"
+      lead="Druxt is a framework for building fully decoupled Drupal and Nuxt.js applications and sites."
+      note="Built on the Nuxt 2 / Vue 2 line: see"
+      note-link-text="support and versioning"
+      note-link-url="/explanation/support-and-versioning"
+    >
+      <template #actions>
+        <AppHomeAction label="Get started" url="/tutorials/getting-started" variant="primary" icon="tutorials" />
+        <AppHomeAction label="Browse modules" url="/modules" icon="modules" />
+        <AppHomeAction label="Try the playground" url="/playground" icon="playground" />
+      </template>
+      <AppHomeQuickstartCommand />
+    </AppHomeHero>
 
-          <div
-            v-show="advanced"
-            id="quickstart-advanced"
-            class="mt-3 rounded-box border border-base-300 bg-base-100 p-4 text-left flex flex-col gap-4"
-          >
-            <!-- Hidden while only one starter kit is enabled. -->
-            <fieldset v-if="starterKits.length > 1">
-              <legend class="text-xs font-semibold uppercase tracking-wider text-base-content/70 mb-2">Starter kit</legend>
-              <div class="grid gap-2 sm:grid-cols-2">
-                <label
-                  v-for="option of starterKits"
-                  :key="option.repo"
-                  class="flex gap-3 items-start rounded-btn border p-3 cursor-pointer transition-colors"
-                  :class="repo === option.repo ? 'border-primary bg-base-200' : 'border-base-300 hover:border-primary'"
-                >
-                  <!-- Tailwind 2 spells this `flex-shrink-0`; `shrink-0` generates nothing. -->
-                  <input
-                    v-model="repo"
-                    type="radio"
-                    name="quickstart"
-                    class="radio radio-sm radio-primary mt-0.5 flex-shrink-0"
-                    :value="option.repo"
-                  >
-                  <span class="min-w-0">
-                    <span class="block text-sm font-medium">{{ option.title }}</span>
-                    <span class="block text-xs text-base-content/70">{{ option.description }}</span>
-                  </span>
-                </label>
-              </div>
-            </fieldset>
+    <AppHomeFeatures>
+      <AppHomeFeature v-for="feature of features" :key="feature.heading" v-bind="feature" />
+    </AppHomeFeatures>
 
-            <fieldset>
-              <legend class="text-xs font-semibold uppercase tracking-wider text-base-content/70 mb-2">Run with</legend>
-              <div class="flex flex-wrap gap-2">
-                <label
-                  v-for="option of runners"
-                  :key="option.value"
-                  class="flex items-center gap-2 rounded-btn border px-3 py-2 cursor-pointer text-sm transition-colors"
-                  :class="runner === option.value ? 'border-primary bg-base-200 font-medium' : 'border-base-300 hover:border-primary'"
-                >
-                  <input v-model="runner" type="radio" name="runner" class="radio radio-sm radio-primary flex-shrink-0" :value="option.value">
-                  {{ option.label }}
-                </label>
-              </div>
-            </fieldset>
+    <AppHomeShowcase
+      heading="Built with Druxt"
+      text="Four reference apps run against the same Drupal Umami demo content. The smallest is an eleven page pattern index. The largest is the Content Ops Console, above."
+      detail="Every edit it makes is an authenticated OAuth2 write back through JSON:API, and it filters for content with fields still missing."
+      link-text="Explore the example apps"
+      link-url="/how-to/example-apps"
+      image-src="/images/examples-content-ops-console.png"
+      image-alt="Content Ops Console: a dark sidebar and a dense editorial table with inline difficulty and prep time editing"
+    />
 
-            <p class="text-xs text-base-content/70">
-              Every quickstart is a template repository with Drupal and Nuxt in one tree.
-              <a :href="'https://github.com/druxt/' + repo" target="_blank" rel="noopener">View {{ repo }} on GitHub</a>.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Features -->
-    <section class="max-w-5xl mx-auto px-6 py-20 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-      <div v-for="feature of features" :key="feature.title">
-        <component :is="feature.icon" class="w-6 h-6 mb-3 text-primary-focus" />
-        <h2 class="text-lg font-semibold" v-text="feature.title" />
-        <p class="mt-2 text-sm text-base-content/70">
-          {{ feature.description }}
-          <NuxtLink v-if="feature.to" :to="feature.to" v-text="feature.linkText" />
-        </p>
-      </div>
-    </section>
-
-    <!-- Built with Druxt -->
-    <section class="border-t border-base-300 bg-base-200">
-      <div class="max-w-5xl mx-auto px-6 py-20 grid gap-12 items-center lg:grid-cols-[1fr,20rem]">
-        <NuxtLink to="/how-to/example-apps" class="block rounded-box border border-base-300 bg-base-100 overflow-hidden hover:border-primary hover:shadow-lg transition">
-          <picture>
-            <source srcset="/images/examples-content-ops-console.webp" type="image/webp">
-            <img
-              src="/images/examples-content-ops-console.png"
-              alt="Content Ops Console: a dark sidebar and a dense editorial table with inline difficulty and prep time editing"
-              class="block w-full h-auto"
-              width="1440"
-              height="900"
-            >
-          </picture>
-        </NuxtLink>
-
-        <div>
-          <h2 class="text-2xl font-semibold">Built with Druxt</h2>
-          <p class="mt-4 text-base-content/70">
-            Four reference apps run against the same Drupal Umami demo content. The smallest is an eleven page pattern index. The largest is the Content Ops Console, above.
-          </p>
-          <p class="mt-3 text-sm text-base-content/70">
-            Every edit it makes is an authenticated OAuth2 write back through JSON:API, and it filters for content with fields still missing.
-          </p>
-          <NuxtLink class="btn btn-primary btn-sm mt-6" to="/how-to/example-apps">Explore the example apps</NuxtLink>
-        </div>
-      </div>
-    </section>
-
-    <!-- Modules -->
-    <section v-if="modules.length" class="border-t border-base-300 bg-base-200">
-      <div class="max-w-5xl mx-auto px-6 py-20">
-        <div class="flex items-end justify-between gap-4 mb-8">
-          <div>
-            <h2 class="text-2xl font-semibold">Modules</h2>
-            <p class="mt-1 text-base-content/70">Adopt the whole framework, or only the parts you need.</p>
-          </div>
-          <NuxtLink class="btn btn-sm btn-ghost" to="/modules">All modules</NuxtLink>
-        </div>
-
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <AppModuleCard v-for="module of modules" :key="module.title" :module="module" />
-        </div>
-      </div>
-    </section>
+    <AppHomeModules
+      heading="Modules"
+      text="Adopt the whole framework, or only the parts you need."
+      link-text="All modules"
+      link-url="/modules"
+    />
   </div>
 </template>
 
@@ -165,55 +51,61 @@
 import { SITE_DESCRIPTION } from '~/lib/site'
 import { seoHead } from '~/utils/seo'
 
-export default {
+const CANVAS_PAGE = 'canvas_page--canvas_page'
+// The Drupal path of the front page's Canvas page. Drupal's own front page
+// stays its content list, which editors land on.
+const CANVAS_PATH = '/home'
 
+export default {
   data: () => ({
+    // The uuid of the front page's Canvas page, when there is one.
+    canvas: null,
     slogan: 'The Fully Decoupled Drupal Framework',
-    advanced: false,
-    copied: false,
-    copyFailed: false,
-    repo: 'quickstart',
-    runner: 'giget',
-    runners: [
-      { value: 'giget', label: 'giget' },
-      { value: 'devpod', label: 'DevPod' },
-    ],
-    // Only the entries marked `enabled` are offered; the rest wait here until
-    // they are ready again.
-    quickstarts: [
-      { repo: 'quickstart', title: 'Druxt Quickstart', description: 'Drupal 11, Nuxt 2 and Druxt in one repository.', enabled: true },
-      { repo: 'quickstart-druxt-site-tome', title: 'Tome', description: 'Databaseless: static Drupal via Tome.', enabled: false },
-      { repo: 'quickstart-druxt-serverless', title: 'Serverless', description: 'Serverless Druxt starter kit.', enabled: false },
-      { repo: 'quickstart-druxt-commerce', title: 'Commerce', description: 'Druxt against Commerce Kickstart, for decoupled commerce.', enabled: false },
-    ],
     features: [
       {
-        icon: 'app-icon-api',
-        title: 'JSON:API client and store',
-        description: 'A JSON:API client and Vuex store modules keep Drupal entities, resources and relationships in sync on the frontend.',
+        icon: 'api',
+        heading: 'JSON:API client and store',
+        text: 'A JSON:API client and Vuex store modules keep Drupal entities, resources and relationships in sync on the frontend.',
       },
       {
-        icon: 'app-icon-modules',
-        title: 'Themeable Vue components',
-        description: 'The DruxtWrapper pattern lets you override any component, down to a single field, without forking the library.',
+        icon: 'modules',
+        heading: 'Themeable Vue components',
+        text: 'The DruxtWrapper pattern lets you override any component, down to a single field, without forking the library.',
       },
       {
-        icon: 'app-icon-globe',
-        title: 'Multilingual and proxy support',
-        description: 'A langcode-aware client, store and components, plus a request proxy. Translated routes need one backend patch.',
+        icon: 'globe',
+        heading: 'Multilingual and proxy support',
+        text: 'A langcode-aware client, store and components, plus a request proxy. Translated routes need one backend patch.',
       },
       {
-        icon: 'app-icon-lock',
-        title: 'OAuth2 login flows',
-        description: 'druxt-auth handles Authorization Code with PKCE, token storage and authenticated requests.',
-        to: '/tutorials/authentication',
+        icon: 'lock',
+        heading: 'OAuth2 login flows',
+        text: 'druxt-auth handles Authorization Code with PKCE, token storage and authenticated requests.',
+        linkUrl: '/tutorials/authentication',
         linkText: 'Add a login flow.',
       },
     ],
   }),
+
+  /**
+   * Asks Drupal for the Canvas page. Until one is published at its path, the
+   * answer is an error, and the page below renders.
+   */
+  async fetch() {
+    try {
+      const { route } = (await this.$store.dispatch('druxtRouter/get', CANVAS_PATH)) || {}
+      const { type, uuid } = (route || {}).props || {}
+      this.canvas = type === CANVAS_PAGE ? uuid : null
+    } catch (e) {
+      this.canvas = null
+    }
+  },
+
   head() {
     return {
       // The homepage sets its own title: the site-wide suffix would repeat the name.
+      // A Canvas page's own title and description are not read: it lives at
+      // another path, and the front page's head stays the site's.
       titleTemplate: 'DruxtJS - The Fully Decoupled Drupal Framework',
       ...seoHead({
         title: null,
@@ -222,54 +114,6 @@ export default {
         type: 'website',
       }),
     }
-  },
-
-  computed: {
-    modules: ({ $store }) => $store.state.modules,
-
-    // The starter kits currently offered.
-    starterKits: ({ quickstarts }) => quickstarts.filter((o) => o.enabled),
-
-    // Copy button label.
-    copyLabel: ({ copied, copyFailed }) => {
-      if (copyFailed) return 'Copy failed'
-      return copied ? 'Copied' : 'Copy'
-    },
-
-    /**
-     * One command block, rewritten by the repo and runner pickers.
-     *
-     * `--install` matches the quickstart's own README; giget otherwise only
-     * downloads the tree.
-     */
-    command() {
-      return this.runner === 'devpod'
-        ? 'devpod up github.com/druxt/' + this.repo
-        : 'npx giget@1 gh:druxt/' + this.repo + '#develop my-druxt-site --install'
-    },
-  },
-
-  watch: {
-    command() {
-      this.copied = false
-      this.copyFailed = false
-    },
-  },
-
-  methods: {
-    async copy() {
-      try {
-        await navigator.clipboard.writeText(this.command)
-        this.copied = true
-        // gtag() is defined only by the production analytics snippet, so this
-        // is a no-op in dev, preview and SSR.
-        window.gtag?.('event', 'copy_quickstart_command', { repo: this.repo, runner: this.runner })
-      } catch (e) {
-        // navigator.clipboard is absent on non-secure origins, and can be denied.
-        this.copyFailed = true
-        setTimeout(() => { this.copyFailed = false }, 2000)
-      }
-    },
   },
 }
 </script>
