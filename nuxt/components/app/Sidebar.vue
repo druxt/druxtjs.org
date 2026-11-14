@@ -67,6 +67,7 @@
 
 <script>
 import { documentContext } from '~/utils/content'
+import { ISSUES_PATH, onIssuesPage } from '~/utils/issues'
 import { MAC_SHORTCUT, searchShortcut } from '~/utils/platform'
 
 export default {
@@ -80,8 +81,9 @@ export default {
 
   computed: {
     // Excludes the page you are on, which would always be the first entry.
+    // An open troubleshooting issue is still the troubleshooting page.
     recent: ({ $store, $route }) => $store.state.recent
-      .filter((o) => o.to !== $route.path)
+      .filter((o) => o.to !== (onIssuesPage($route.path) ? ISSUES_PATH : $route.path))
       .slice(0, 5),
   },
 

@@ -11,7 +11,7 @@
         "drupal/admin_audit_trail": "^1.0.12",
         "drupal/codemirror_editor": "^2.0",
         "drupal/coffee": "^2.0",
-        "drupal/consumer_node_preview": "1.0.x-dev#a5393d653ada7fe95d0589fa3b9b2a4b06e15811",
+        "drupal/consumer_node_preview": "^1.0@rc",
         "drupal/consumers": "^1.24",
         "drupal/core-composer-scaffold": "^11",
         "drupal/core-project-message": "^11",

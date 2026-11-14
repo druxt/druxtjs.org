@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - node.type.doc_page
+    - node.type.docs_issue
   module:
     - content_moderation
 id: editorial
@@ -62,4 +63,5 @@ type_settings:
   entity_types:
     node:
       - doc_page
+      - docs_issue
   default_moderation_state: draft

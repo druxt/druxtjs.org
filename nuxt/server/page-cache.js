@@ -179,6 +179,33 @@ const crawl = async ({ seeds, store, concurrency = 2, limit = 5000 }) => {
 }
 
 /**
+ * Query keys that make a page another page, by the path they belong to.
+ *
+ * The troubleshooting list keeps its area and search in the URL, as
+ * utils/issues.js's views page names them, so a shared filtered list shows
+ * what was shared. The issue a URL opens is part of its path, so this
+ * covers the page and each issue's URL alike.
+ */
+const LIVE_QUERY = {
+  '/how-to/troubleshooting': ['area', 'q'],
+}
+
+/**
+ * Whether a request's query string names a page the store does not hold.
+ *
+ * Such a page is rendered every time and never stored: a search is
+ * whatever a reader typed, and storing each one would fill the disk.
+ *
+ * @param {string} pathname - The request's path.
+ * @param {URLSearchParams} params - Its query.
+ * @returns {boolean} True to render it live.
+ */
+const liveQuery = (pathname, params) =>
+  Object.entries(LIVE_QUERY).some(
+    ([path, keys]) => (pathname === path || pathname.startsWith(`${path}/`)) && keys.some((key) => params.has(key))
+  )
+
+/**
  * Serve stored pages first and everything else live.
  *
  * @param {object} options - Options.
@@ -211,7 +238,7 @@ const createHandler =
       res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' })
       return res.end('Bad Request')
     }
-    const { pathname, search } = url
+    const { pathname, search, searchParams } = url
     // An old URL, or a package subdomain: sent on before anything is served.
     const elsewhere = redirectFor(req.headers.host, pathname, search)
     if (elsewhere) {
@@ -247,9 +274,10 @@ const createHandler =
       res.setHeader('Cache-Control', 'no-store')
       return live(req, res)
     }
-    // Only `live=1` renders past the store: any other query string, a campaign
-    // tag say, is the same page and gets the stored copy.
-    if (!cache || /(^\?|&)live=1(&|$)/.test(search)) return live(req, res)
+    // Only `live=1` and a page's own query keys render past the store: any
+    // other query string, a campaign tag say, is the same page and gets the
+    // stored copy.
+    if (!cache || /(^\?|&)live=1(&|$)/.test(search) || liveQuery(pathname, searchParams)) return live(req, res)
 
     const page = await cache.read(pathname, String(req.headers['accept-encoding'] || ''))
     if (!page) {
@@ -279,4 +307,4 @@ const createHandler =
   }
 
 module.exports = {
-  LLMS_LINK, SECURITY_HEADERS, createHandler, createPageCache, crawl, isPage }
+  LIVE_QUERY, LLMS_LINK, SECURITY_HEADERS, createHandler, createPageCache, crawl, isPage }

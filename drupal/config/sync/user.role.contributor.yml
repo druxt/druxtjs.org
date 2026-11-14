@@ -7,6 +7,7 @@ dependencies:
     - filter.format.docs_markdown
     - media.type.image
     - node.type.doc_page
+    - node.type.docs_issue
     - workflows.workflow.editorial
   module:
     - coffee
@@ -33,15 +34,18 @@ permissions:
   - 'access media overview'
   - 'access navigation'
   - 'create doc_page content'
+  - 'create docs_issue content'
   - 'create image media'
   - 'create url aliases'
   - 'edit own doc_page content'
+  - 'edit own docs_issue content'
   - 'edit own image media'
   - 'grant simple_oauth codes'
   - 'use editorial transition create_new_draft'
   - 'use text format basic_html'
   - 'use text format docs_markdown'
   - 'view doc_page revisions'
+  - 'view docs_issue revisions'
   - 'view latest version'
   - 'view media'
   - 'view own unpublished content'

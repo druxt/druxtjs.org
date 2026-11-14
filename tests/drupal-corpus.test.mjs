@@ -39,8 +39,16 @@ const get = (url) =>
     })
   })
 
-const page = (alias, { title = 'A page', weight = 0, content = [] } = {}) => ({
-  type: 'node--doc_page',
+// A reader that answers the issue collection with no issues, and everything
+// else as the test's own reader does, for tests about pages alone.
+const pagesOnly = (fetch) => async (url) =>
+  url.includes('/jsonapi/node/docs_issue') ? { data: [] } : fetch(url)
+
+const page = (
+  alias,
+  { title = 'A page', weight = 0, content = [], type = 'node--doc_page' } = {}
+) => ({
+  type,
   id: alias,
   attributes: {
     title,
@@ -163,6 +171,23 @@ describe('paragraphMarkdown', () => {
       assert.ok(url.searchParams.has(`fields[paragraph--${type}]`), type)
   })
 
+  test('writes an Issues list as a link to each issue, with its summary', () => {
+    const issues = [
+      {
+        route: '/how-to/troubleshooting/cors',
+        title: 'Blocked by CORS',
+        description: 'The browser refuses.',
+      },
+      { route: '/how-to/troubleshooting/stale', title: 'Old content', description: '' },
+    ]
+    assert.equal(
+      paragraphMarkdown({ type: 'paragraph--docs_issue_list', attributes: {} }, new Map(), issues),
+      '- [Blocked by CORS](/how-to/troubleshooting/cors): The browser refuses.\n' +
+        '- [Old content](/how-to/troubleshooting/stale)'
+    )
+    assert.equal(paragraphMarkdown({ type: 'paragraph--docs_issue_list', attributes: {} }), '')
+  })
+
   test('drops a layout section, which is presentation rather than content', () => {
     assert.equal(paragraphMarkdown({ type: 'paragraph--docs_layout_section', attributes: {} }), '')
   })
@@ -189,11 +214,11 @@ describe('fetchDrupalDocs', () => {
     }
     const docs = await fetchDrupalDocs('http://drupal', {
       log: () => {},
-      fetch: async (url) => {
+      fetch: pagesOnly(async (url) => {
         if (url.endsWith('/docs_text/old')) return { data: text('old', 'Second') }
         if (url.endsWith('/docs_text/gone')) throw new Error('403')
         return collection
-      },
+      }),
     })
     assert.equal(docs[0].content, 'Second\n\nThird')
   })
@@ -211,7 +236,7 @@ describe('fetchDrupalDocs', () => {
         { type: 'paragraph--docs_text', id: 'p1', attributes: { field_text: { value: 'Body.' } } },
       ],
     }
-    const docs = await fetchDrupalDocs('http://drupal', { fetch: async () => answer })
+    const docs = await fetchDrupalDocs('http://drupal', { fetch: pagesOnly(async () => answer) })
     assert.deepEqual(docs, [
       {
         route: '/how-to/proxy',
@@ -230,7 +255,9 @@ describe('fetchDrupalDocs', () => {
       { data: [page('/b')] },
     ]
     let call = 0
-    const docs = await fetchDrupalDocs('http://drupal', { fetch: async () => pages[call++] })
+    const docs = await fetchDrupalDocs('http://drupal', {
+      fetch: pagesOnly(async () => pages[call++]),
+    })
     assert.deepEqual(
       docs.map((doc) => doc.route),
       ['/a', '/b']
@@ -257,7 +284,11 @@ describe('fetchDrupalDocs', () => {
     const answers = [{ data: [page('/a')], links: { next: { href: 'http://drupal/next' } } }, null]
     let call = 0
     await assert.rejects(
-      () => fetchDrupalDocs('http://drupal', { fetch: async () => answers[call++], log: () => {} }),
+      () =>
+        fetchDrupalDocs('http://drupal', {
+          fetch: pagesOnly(async () => answers[call++]),
+          log: () => {},
+        }),
       /did not answer with a page of documents/
     )
   })
@@ -272,10 +303,10 @@ describe('fetchDrupalDocs', () => {
         fetchDrupalDocs('http://drupal', {
           log: (line) => lines.push(line),
           // Always another page, so the request limit is what ends it.
-          fetch: async () => ({
+          fetch: pagesOnly(async () => ({
             data: [page(`/how-to/page-${served++}`)],
             links: { next: { href: 'http://drupal/next' } },
-          }),
+          })),
         }),
       /more pages than/
     )
@@ -284,8 +315,72 @@ describe('fetchDrupalDocs', () => {
 
   test('skips a page with no usable alias', async () => {
     const broken = { type: 'node--doc_page', id: 'x', attributes: { title: 'No alias', path: {} } }
-    const docs = await fetchDrupalDocs('http://drupal', { fetch: async () => ({ data: [broken] }) })
+    const docs = await fetchDrupalDocs('http://drupal', {
+      fetch: pagesOnly(async () => ({ data: [broken] })),
+    })
     assert.deepEqual(docs, [])
+  })
+
+  // An issue has no page of its own, but it has its own URL, which opens
+  // the troubleshooting page at it. A question about an error message is
+  // best answered with that URL, so each issue is its own entry, and the
+  // page lists them where its Issues list is.
+  test('gives each issue its own entry, and links them from the page that lists them', async () => {
+    const urls = []
+    const docs = await fetchDrupalDocs('http://drupal', {
+      fetch: async (url) => {
+        urls.push(url)
+        if (url.includes('/jsonapi/node/docs_issue'))
+          return {
+            data: [
+              page('/how-to/troubleshooting/cors', {
+                type: 'node--docs_issue',
+                title: 'Blocked by CORS',
+                content: [{ type: 'paragraph--docs_text', id: 'fix' }],
+              }),
+            ],
+            included: [
+              {
+                type: 'paragraph--docs_text',
+                id: 'fix',
+                attributes: { field_text: { value: 'Allow the origin.' } },
+              },
+            ],
+          }
+        return {
+          data: [
+            page('/how-to/troubleshooting', {
+              title: 'Troubleshooting',
+              content: [{ type: 'paragraph--docs_issue_list', id: 'list' }],
+            }),
+          ],
+          included: [{ type: 'paragraph--docs_issue_list', id: 'list', attributes: {} }],
+        }
+      },
+    })
+    assert.deepEqual(
+      docs.map(({ route, content }) => [route, content]),
+      [
+        [
+          '/how-to/troubleshooting',
+          '- [Blocked by CORS](/how-to/troubleshooting/cors): About /how-to/troubleshooting/cors',
+        ],
+        ['/how-to/troubleshooting/cors', 'Allow the origin.'],
+      ]
+    )
+    assert.ok(new URL(urls[0]).searchParams.has('fields[node--docs_issue]'))
+  })
+
+  test('fails rather than leaving the issues out when they cannot be read', async () => {
+    await assert.rejects(
+      () =>
+        fetchDrupalDocs('http://drupal', {
+          fetch: async (url) =>
+            url.includes('/jsonapi/node/docs_issue') ? null : { data: [page('/a')] },
+          log: () => {},
+        }),
+      /did not answer with a page of documents/
+    )
   })
 })
 
@@ -449,7 +544,7 @@ describe('artefacts', () => {
         fetchDrupalDocs(url, {
           ...options,
           log: () => {},
-          fetch: async () => (drupalUp ? { data: [page('/how-to/proxy')] } : null),
+          fetch: pagesOnly(async () => (drupalUp ? { data: [page('/how-to/proxy')] } : null)),
         }),
     })
     const handler = createHandler({ cache: null, artefacts, live: (req, res) => res.end() })

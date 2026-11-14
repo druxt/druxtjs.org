@@ -10,6 +10,9 @@
     </AppProse>
     <AppNextSteps v-if="drupal && !document.isLanding" :next="nextSteps" :sibling="next" :prev="prev" />
     <AppDocFooter v-else :prev="prev" :next="next" />
+    <!-- A page with child routes, such as the troubleshooting page's issue
+         URLs, renders them here. They render nothing; a leaf page has none. -->
+    <NuxtChild />
   </article>
 </template>
 

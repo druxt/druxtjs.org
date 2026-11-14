@@ -1,7 +1,7 @@
 {
   "name": "druxtjs-org",
   "description": "The Fully Decoupled Drupal Framework",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "private": true,
   "scripts": {
     "cypress:open": "npx cypress open --project test",
@@ -15,7 +15,7 @@
   "dependencies": {
     "@druxt-contrib/anchors": "file:vendor/druxt-anchors",
     "@druxt-contrib/diff": "file:vendor/druxt-diff",
-    "@druxt-contrib/node-preview": "patch:@druxt-contrib/node-preview@npm%3A0.1.0-dev.20261030024907#./patches/druxt-node-preview-0.1.0-dev.20261030024907.patch",
+    "@druxt-contrib/node-preview": "^0.1.0",
     "@druxt-contrib/user": "file:vendor/druxt-user",
     "@nuxt/content": "1.15.1",
     "@nuxtjs/proxy": "2.1.0",
@@ -37,7 +37,7 @@
     "druxt-router": "0.32.1",
     "druxt-schema": "0.12.1",
     "druxt-site": "0.15.1",
-    "druxt-views": "0.23.1",
+    "druxt-views": "patch:druxt-views@npm%3A0.23.1#./patches/druxt-views-0.23.1.patch",
     "github-slugger": "1.5.0",
     "mdast-util-to-string": "^2.0.0",
     "mermaid": "8.14.0",
@@ -67,7 +67,7 @@
     "druxt-router": "0.32.1",
     "druxt-schema": "0.12.1",
     "druxt-site": "0.15.1",
-    "druxt-views": "0.23.1",
+    "druxt-views": "patch:druxt-views@npm%3A0.23.1#./patches/druxt-views-0.23.1.patch",
     "vue-template-compiler": "2.7.16",
     "ws": "7.5.11"
   },

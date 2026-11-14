@@ -72,6 +72,7 @@
 
 <script>
 import { modulePkgs } from './icon/module'
+import { ISSUES_PATH, onIssuesPage, storedIssue } from '~/utils/issues'
 
 const SHORT_VIEWPORT = 800
 
@@ -195,11 +196,19 @@ export default {
         return this.close(trail)
       }
 
+      // An issue opens inside the troubleshooting page, so the page stays in
+      // the trail and the issue ends it, by its title rather than its slug.
+      const issue = parts.length > 2 && onIssuesPage(this.$route.path)
       trail.push({
         key: 'page',
-        label: this.leafTitle,
+        label: issue ? this.titleOf(ISSUES_PATH) || 'Troubleshooting' : this.leafTitle,
+        to: issue ? ISSUES_PATH : undefined,
         items: this.sectionDocItems.length ? this.sectionDocItems : undefined,
       })
+      if (issue) {
+        const stored = storedIssue(this.$store.state.druxt, this.$route.path.replace(/\/$/, ''))
+        trail.push({ key: 'issue', label: (stored || {}).title || this.leafTitle })
+      }
       return this.close(trail)
     },
 
@@ -218,9 +227,7 @@ export default {
      * records itself into. The route segment is the fallback.
      */
     leafTitle() {
-      const path = this.$route.path.replace(/\/$/, '')
-      const recent = (this.$store.state.recent || []).find((r) => (r.to || '').replace(/\/$/, '') === path)
-      return (recent || {}).text || this.prettify(this.parts[this.parts.length - 1] || '')
+      return this.titleOf(this.$route.path.replace(/\/$/, '')) || this.prettify(this.parts[this.parts.length - 1] || '')
     },
 
     headings() {
@@ -294,6 +301,12 @@ export default {
      * @param {string} segment - A route path segment.
      * @returns {string} The segment with dashes as spaces and a capital first letter.
      */
+    /** A page's title, from the pages the reader has opened. */
+    titleOf(path) {
+      const recent = (this.$store.state.recent || []).find((r) => (r.to || '').replace(/\/$/, '') === path)
+      return (recent || {}).text || ''
+    },
+
     prettify(segment) {
       const words = segment.replace(/[-_]+/g, ' ').trim()
       return words.charAt(0).toUpperCase() + words.slice(1)

@@ -288,8 +288,19 @@ export default {
       // consumer when it starts, so no one keeps a URL in Drupal by hand.
       // Only where the consumer's secret is set: settings.lagoon.php keeps
       // its own target everywhere else, and leaves it out here.
+      // On Lagoon the target stays when the server stops: a rollout stops
+      // the old pod after the new one has registered the same target, so
+      // removing it would leave Drupal with none until the next heartbeat.
+      // The target carries an editor's preview token, so the frame needs no
+      // Drupal session on the frontend's site. DRUXT_NODE_PREVIEW_REGISTER_TOKEN
+      // set to false turns that off.
       register: process.env.DRUXT_NODE_PREVIEW_CLIENT_SECRET
-        ? { url: resolveOrigin(process.env), consumer: 'druxtjs_org_preview' }
+        ? {
+            url: resolveOrigin(process.env),
+            consumer: 'druxtjs_org_preview',
+            token: true,
+            cleanup: process.env.LAGOON_ENVIRONMENT_TYPE ? false : undefined,
+          }
         : false,
     },
     // Menus ask for the fields a menu needs, not every attribute of a link.
@@ -301,7 +312,7 @@ export default {
     // Display schemas, view and form, for what this site renders. Generated
     // when the app builds, then again on the server after each cache clear.
     schema: {
-      filter: ['node--doc_page--.*', 'paragraph--docs_.*', 'media--image--.*'],
+      filter: ['node--doc_page--.*', 'node--docs_issue--.*', 'paragraph--docs_.*', 'media--image--.*'],
       refresh: true,
     },
     // The JSON:API index and the menus are the same for every anonymous reader,

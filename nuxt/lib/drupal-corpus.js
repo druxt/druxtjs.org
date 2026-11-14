@@ -26,6 +26,7 @@ const PARAGRAPH_TYPES = [
   'docs_code',
   'docs_diagram',
   'docs_image',
+  'docs_issue_list',
   'docs_layout_section',
   'docs_live_example',
   'docs_rich_text',
@@ -39,16 +40,17 @@ const PAGE_SIZE = 50
 const MAX_REQUESTS = 50
 
 /**
- * The collection URL: published pages, with their body paragraphs included.
+ * The collection URL: published nodes, with their body paragraphs included.
  *
  * Sparse fieldsets keep this to what the indexes actually use. The body is
  * needed because `llms-full.txt` carries the whole page.
  *
  * @param {string} baseUrl - Drupal's base URL.
+ * @param {string} [bundle] - The node type.
  * @returns {string} The absolute URL.
  */
-const collectionUrl = (baseUrl) => {
-  const url = new URL('/jsonapi/node/doc_page', baseUrl)
+const collectionUrl = (baseUrl, bundle = 'doc_page') => {
+  const url = new URL(`/jsonapi/node/${bundle}`, baseUrl)
   const params = url.searchParams
   params.set('filter[status]', '1')
   params.set('sort', 'field_weight,title')
@@ -56,7 +58,7 @@ const collectionUrl = (baseUrl) => {
   // The media is included for an image's alt text alone, which is the only
   // part of an image that reads as text in llms-full.txt.
   params.set('include', 'field_content,field_content.field_media,field_content.field_media.field_media_image')
-  params.set('fields[node--doc_page]', 'title,path,field_description,field_weight,field_content')
+  params.set(`fields[node--${bundle}]`, 'title,path,field_description,field_weight,field_content')
   params.set('fields[media--image]', 'field_media_image')
   params.set('fields[file--file]', 'uri')
   params.set('fields[paragraph--docs_text]', 'field_text')
@@ -66,6 +68,7 @@ const collectionUrl = (baseUrl) => {
   params.set('fields[paragraph--docs_diagram]', 'field_diagram,field_syntax')
   params.set('fields[paragraph--docs_image]', 'field_media')
   params.set('fields[paragraph--docs_live_example]', 'field_example')
+  params.set('fields[paragraph--docs_issue_list]', 'drupal_internal__id')
   params.set('fields[paragraph--docs_layout_section]', 'behavior_settings')
   return url.href
 }
@@ -104,9 +107,11 @@ const fenced = (code, info) => {
  * keeps a page's entry the same whether it came from Drupal or from a file.
  *
  * @param {object} paragraph - The included paragraph resource.
+ * @param {Map<string, object>} [byId] - The included resources.
+ * @param {Array<object>} [issues] - The troubleshooting issues' documents.
  * @returns {string} The markdown, or an empty string for a structural paragraph.
  */
-const paragraphMarkdown = (paragraph, byId = new Map()) => {
+const paragraphMarkdown = (paragraph, byId = new Map(), issues = []) => {
   const type = String(paragraph.type || '').replace(/^paragraph--/, '')
   const attributes = paragraph.attributes || {}
 
@@ -152,6 +157,13 @@ const paragraphMarkdown = (paragraph, byId = new Map()) => {
       return query ? `[Live example: \`<${query.component}>\`](${exampleHref(query)})` : ''
     }
 
+    // The Issues list renders every troubleshooting issue. Each has its own
+    // entry with its fix, so here it is a link to that entry and its summary.
+    case 'docs_issue_list':
+      return issues
+        .map(({ route, title, description }) => `- [${title}](${route})${description ? `: ${description}` : ''}`)
+        .join('\n')
+
     // A section is a layout, not content. Its children are listed beside it.
     case 'docs_layout_section':
       return ''
@@ -180,14 +192,15 @@ const indexIncluded = (included) => {
  *
  * @param {object} page - The node resource.
  * @param {Map<string, object>} byId - The included resources.
+ * @param {Array<object>} issues - The troubleshooting issues' documents.
  * @returns {string} The body markdown.
  */
-const bodyOf = (page, byId) => {
+const bodyOf = (page, byId, issues) => {
   const references = ((page.relationships || {}).field_content || {}).data || []
   return references
     .map((reference) => byId.get(`${reference.type}:${reference.id}`))
     .filter(Boolean)
-    .map((paragraph) => paragraphMarkdown(paragraph, byId))
+    .map((paragraph) => paragraphMarkdown(paragraph, byId, issues))
     .filter((markdown) => markdown !== '')
     .join('\n\n')
 }
@@ -197,9 +210,10 @@ const bodyOf = (page, byId) => {
  *
  * @param {object} page - The node resource.
  * @param {Map<string, object>} byId - The included resources.
+ * @param {Array<object>} [issues] - The troubleshooting issues' documents.
  * @returns {object|null} The document, or null without a usable alias.
  */
-const documentOf = (page, byId) => {
+const documentOf = (page, byId, issues = []) => {
   const attributes = page.attributes || {}
   const alias = attributes.path && attributes.path.alias
   if (typeof alias !== 'string' || !alias.startsWith('/')) return null
@@ -210,7 +224,7 @@ const documentOf = (page, byId) => {
     description: attributes.field_description || '',
     weight: typeof attributes.field_weight === 'number' ? attributes.field_weight : 0,
     section: alias.split('/').filter(Boolean)[0] || null,
-    content: bodyOf(page, byId),
+    content: bodyOf(page, byId, issues),
   }
 }
 
@@ -263,9 +277,21 @@ const readOmitted = async (baseUrl, page, byId, { fetch, log }) => {
   }
 }
 
-const fetchDrupalDocs = async (baseUrl, { fetch = getJson, log = () => {} } = {}) => {
+/**
+ * Every published node of one type, as index documents.
+ *
+ * @param {string} baseUrl - Drupal's base URL.
+ * @param {string} bundle - The node type.
+ * @param {Array<object>} issues - The troubleshooting issues' documents.
+ * @param {object} options - Options.
+ * @param {Function} options.fetch - Fetches a JSON document.
+ * @param {Function} options.log - Logs a line.
+ * @throws {Error} When Drupal cannot be read, or answers something unusable.
+ * @returns {Promise<Array<object>>} The documents.
+ */
+const fetchCollection = async (baseUrl, bundle, issues, { fetch, log }) => {
   const documents = []
-  let next = collectionUrl(baseUrl)
+  let next = collectionUrl(baseUrl, bundle)
   let requests = 0
 
   while (next && requests < MAX_REQUESTS) {
@@ -279,7 +305,7 @@ const fetchDrupalDocs = async (baseUrl, { fetch = getJson, log = () => {} } = {}
     const byId = indexIncluded(body.included)
     for (const page of body.data) {
       await readOmitted(baseUrl, page, byId, { fetch, log })
-      const document = documentOf(page, byId)
+      const document = documentOf(page, byId, issues)
       if (document) documents.push(document)
     }
 
@@ -297,6 +323,15 @@ const fetchDrupalDocs = async (baseUrl, { fetch = getJson, log = () => {} } = {}
   }
 
   return documents
+}
+
+// Documentation pages, and troubleshooting issues, which have no page of
+// their own but do have their own URL. Issues first, so the page their list
+// is on can link each one.
+const fetchDrupalDocs = async (baseUrl, { fetch = getJson, log = () => {} } = {}) => {
+  const issues = await fetchCollection(baseUrl, 'docs_issue', [], { fetch, log })
+  const pages = await fetchCollection(baseUrl, 'doc_page', issues, { fetch, log })
+  return [...pages, ...issues]
 }
 
 /**
