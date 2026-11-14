@@ -1,0 +1,44 @@
+{
+  "name": "@druxt-contrib/canvas",
+  "version": "0.0.0",
+  "description": "Drupal Canvas pages for Druxt.",
+  "keywords": [
+    "canvas",
+    "drupal",
+    "druxt",
+    "module",
+    "nuxt"
+  ],
+  "homepage": "https://github.com/druxt-contrib/druxt-canvas#readme",
+  "bugs": {
+    "url": "https://github.com/druxt-contrib/druxt-canvas/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/druxt-contrib/druxt-canvas.git"
+  },
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "require": "./dist/index.ssr.js",
+      "import": "./dist/index.esm.js"
+    },
+    "./components/*": "./dist/components/*"
+  },
+  "main": "dist/index.ssr.js",
+  "module": "dist/index.esm.js",
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "druxt": "^0.25.1",
+    "vuex": "^3.6.2"
+  },
+  "packageManager": "npm@8.19.4",
+  "engines": {
+    "node": ">=16.20.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

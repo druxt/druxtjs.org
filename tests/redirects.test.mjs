@@ -34,6 +34,13 @@ describe('redirectFor', () => {
     assert.equal(redirectFor('WWW.DRUXTJS.ORG', '/modules'), 'https://druxtjs.org/modules')
   })
 
+  test("sends the front page's Drupal path to the root", () => {
+    assert.equal(redirectFor('druxtjs.org', '/home'), '/')
+    assert.equal(redirectFor('druxtjs.org', '/home/'), '/')
+    assert.equal(redirectFor('www.druxtjs.org', '/home'), 'https://druxtjs.org/')
+    assert.equal(redirectFor('druxtjs.org', '/homepage'), null)
+  })
+
   test('keeps the query string', () => {
     assert.equal(
       redirectFor('druxtjs.org', '/guide/theming', '?utm_source=x'),
@@ -73,6 +80,8 @@ describe('redirectFor', () => {
       ...Object.values(HOST_PATHS).flatMap((o) => Object.values(o)),
     ]
     for (const to of targets) {
+      // The root is the front page.
+      if (to === '/') continue
       assert.match(to, /^\/[a-z]/, to)
       assert.doesNotMatch(to, /\.html$|\/$/, to)
     }
