@@ -9,6 +9,8 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-11-14
+
 ### Added
 
 - Previews with a token. The frontend's preview consumer can now issue an
@@ -46,6 +48,14 @@ Druxt 1.0.0.
 - Every rollout reset the preview consumer to the client credentials grant
   alone, so a preview token target would have got an empty token after each
   deployment.
+
+### Security
+
+- Simple OAuth 6.1.4, for SA-CONTRIB-2026-296 (access bypass). The module
+  signs editors in.
+- Drupal core 11.4.12, which brings the Symfony 7.4.22 and 7.4.23 releases
+  for their advisories in the HTTP foundation, the serializer and six other
+  components.
 
 ## [0.18.0] - 2026-11-04
 
