@@ -9,6 +9,13 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- A live example in a docs page names its backend. It offered the
+  playground's backend picker, and another backend could not show what the
+  page was describing. The example's "Open in the playground" link is where a
+  reader tries another backend.
+
 ### Fixed
 
 - Code inside a text block is highlighted. A fenced code block in a page's
