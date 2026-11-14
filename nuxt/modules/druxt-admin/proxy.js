@@ -63,6 +63,9 @@ export const BACKEND_PATHS = [
   // on the whole first segment, so a page whose path only starts the same
   // way is not taken.
   '/canvas',
+  // Canvas Headless: the editor asks Drupal here for the credential a draft
+  // session on this site starts from, and to renew one.
+  '/canvas-headless',
 ]
 
 /**

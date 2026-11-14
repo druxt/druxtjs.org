@@ -1,0 +1,58 @@
+uuid: 6d618238-2532-4efe-91fa-6e4eee8e3007
+langcode: en
+status: true
+dependencies:
+  config:
+    - canvas.js_component.hero
+active_version: 5f764a9e9b70782c
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        heading:
+          required: true
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'The Fully Decoupled Drupal Framework'
+          expression: ℹ︎string␟value
+          derived_schema_metadata:
+            string_shape: {  }
+        lead:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Druxt is a framework for building fully decoupled Drupal and Nuxt.js applications and sites.'
+          expression: ℹ︎string␟value
+          derived_schema_metadata:
+            string_shape: {  }
+        note:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Built on the Nuxt 2 / Vue 2 line: see'
+          expression: ℹ︎string␟value
+          derived_schema_metadata:
+            string_shape: {  }
+    fallback_metadata:
+      slot_definitions:
+        actions:
+          title: Actions
+        content:
+          title: Content
+label: Hero
+id: js.hero
+provider: null
+source: js
+source_local_id: hero

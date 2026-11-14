@@ -16,6 +16,7 @@ module:
   block: 0
   breakpoint: 0
   canvas: 0
+  canvas_headless: 0
   ckeditor5: 0
   codemirror_editor: 0
   coffee: 0
@@ -23,6 +24,7 @@ module:
   consumers: 0
   content_moderation: 0
   contextual: 0
+  custom_elements: 0
   custom_formatters: 0
   datetime: 0
   dblog: 0

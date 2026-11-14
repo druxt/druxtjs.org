@@ -1,0 +1,27 @@
+name: Hero
+machineName: hero
+status: true
+required:
+  - heading
+props:
+  properties:
+    heading:
+      type: string
+      title: Heading
+      examples:
+        - The Fully Decoupled Drupal Framework
+    lead:
+      type: string
+      title: Lead
+      examples:
+        - Druxt is a framework for building fully decoupled Drupal and Nuxt.js applications and sites.
+    note:
+      type: string
+      title: Note
+      examples:
+        - 'Built on the Nuxt 2 / Vue 2 line: see'
+slots:
+  actions:
+    title: Actions
+  content:
+    title: Content

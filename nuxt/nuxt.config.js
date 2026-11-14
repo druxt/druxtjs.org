@@ -234,6 +234,8 @@ export default {
   },
 
   modules: [
+    // Canvas's editor previews through this site. On when CANVAS_SITE_URL is set.
+    '~/modules/canvas-headless',
     '@nuxt/content',
     'druxt',
     'druxt-router/nuxt',

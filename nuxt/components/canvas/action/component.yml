@@ -1,0 +1,31 @@
+name: Action
+machineName: action
+status: true
+required:
+  - label
+  - url
+props:
+  properties:
+    label:
+      type: string
+      title: Label
+      examples:
+        - Get started
+    url:
+      type: string
+      title: Link
+      format: uri-reference
+      examples:
+        - /tutorials/getting-started
+    variant:
+      type: string
+      title: Style
+      enum:
+        - primary
+        - ghost
+      meta:enum:
+        primary: Primary
+        ghost: Ghost
+      examples:
+        - ghost
+slots: {}
