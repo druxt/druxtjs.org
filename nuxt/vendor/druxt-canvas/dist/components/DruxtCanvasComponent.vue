@@ -131,14 +131,20 @@ export default {
       for (const [name, children] of Object.entries(
         (this.item || {}).slots || {}
       )) {
-        slots[name] = (attrs) =>
-          children.map((child) =>
-            h('DruxtCanvasComponent', {
-              attrs,
-              key: child.uuid,
-              props: { item: child, langcode: this.langcode },
-            })
-          )
+        // Defined, not assigned, so a slot named `__proto__` is a slot too.
+        Object.defineProperty(slots, name, {
+          configurable: true,
+          enumerable: true,
+          value: (attrs) =>
+            children.map((child) =>
+              h('DruxtCanvasComponent', {
+                attrs,
+                key: child.uuid,
+                props: { item: child, langcode: this.langcode },
+              })
+            ),
+          writable: true,
+        })
       }
 
       const names = Object.keys(slots)

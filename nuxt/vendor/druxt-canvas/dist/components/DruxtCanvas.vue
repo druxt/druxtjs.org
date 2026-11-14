@@ -5,6 +5,22 @@ import { mapActions } from 'vuex'
 import { buildCanvasTree, getHead } from '@druxt-contrib/canvas'
 
 /**
+ * The error for a page the store answered without.
+ *
+ * @param {object} request - The page's uuid, prefix and type.
+ * @param {object} [resource] - The store's answer.
+ * @returns {Error} The error, with the status code when the store gave one.
+ */
+const notLoaded = ({ id }, resource) => {
+  const { message, statusCode } = (resource || {}).error || {}
+  const error = new Error(
+    message || `The Canvas page ${id} could not be loaded.`
+  )
+  if (statusCode) error.statusCode = statusCode
+  return error
+}
+
+/**
  * The DruxtCanvas component renders a Drupal Canvas page from its JSON:API
  * resource.
  *
@@ -210,23 +226,35 @@ export default {
      *
      * Nuxt runs one fetch at a time and answers a second `$fetch()` with the
      * one already running, so a uuid that changes mid-request is fetched here
-     * once that request ends. A response for a uuid, language or type that is
-     * no longer current is dropped, and so is any response once a `value`
-     * has arrived.
+     * once that request ends. A response or a failure for a uuid, language or
+     * type that is no longer current is dropped, and so is either once a
+     * `value` has arrived.
+     *
+     * The store answers a failed request without rejecting, with an empty
+     * object or with an `error`, so an answer without the page's data is a
+     * failure here too.
      */
     async fetchData() {
       for (;;) {
         if (this.value || !this.uuid) return
 
         const request = { id: this.uuid, prefix: this.lang, type: this.type }
-        const resource = await this.getResource(request)
+        let resource
+        let failure
+        try {
+          resource = await this.getResource(request)
+          if (!(resource || {}).data) throw notLoaded(request, resource)
+        } catch (error) {
+          failure = error
+        }
         if (this.value) return
         if (
           request.id === this.uuid &&
           request.prefix === this.lang &&
           request.type === this.type
         ) {
-          this.model = JSON.parse(JSON.stringify((resource || {}).data || {}))
+          if (failure) throw failure
+          this.model = JSON.parse(JSON.stringify(resource.data))
           return
         }
       }

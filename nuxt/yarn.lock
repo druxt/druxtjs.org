@@ -3357,11 +3357,11 @@ __metadata:
 
 "@druxt-contrib/canvas@file:vendor/druxt-canvas::locator=druxtjs-org%40workspace%3A.":
   version: 0.0.0
-  resolution: "@druxt-contrib/canvas@file:vendor/druxt-canvas#vendor/druxt-canvas::hash=802bc2&locator=druxtjs-org%40workspace%3A."
+  resolution: "@druxt-contrib/canvas@file:vendor/druxt-canvas#vendor/druxt-canvas::hash=6abce0&locator=druxtjs-org%40workspace%3A."
   peerDependencies:
     druxt: ^0.25.1
     vuex: ^3.6.2
-  checksum: 0401cba914db9f0aea077f52abf67d1c99f7bedb4d4a6e9a8f52d2fb367db7e60882bd6535ddeb0168f5daf1c23e976b31a56262c3e3750b2f0c7e3301243033
+  checksum: b8060805d7194e928e0d67161bcc8110cb427d1b872fa8cebe5099ecefd3f67da1bcf59aaf9bec67d448429739f1ee8cb236e199224f85ba4e0907588c97b709
   languageName: node
   linkType: hard
 

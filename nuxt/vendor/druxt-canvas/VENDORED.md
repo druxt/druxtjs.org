@@ -7,7 +7,7 @@ development dependencies, the licence and the README.
 | | |
 | --- | --- |
 | Package | `@druxt-contrib/canvas` |
-| Commit | `3194858` |
+| Commit | `318646a` |
 
 Replace `file:vendor/druxt-canvas` in `package.json` with the published version
 once it is on npm, and delete this directory.
