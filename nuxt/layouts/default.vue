@@ -81,8 +81,10 @@ export default {
     /** The version badge: a development build names its tag, with the build time in the title. */
     badge: ({ $config }) => badgeOf($config.druxtVersion),
     versionTitle: ({ $config }) => titleOf($config.druxtVersion),
-    /** Home, sign-in and the OAuth callback are full-bleed; everything else is documentation. */
-    isDocs: ({ $route }) => !['/', '/login', '/callback'].includes($route.path.replace(/(.)\/$/, '$1')),
+    /** Home, sign-in, the OAuth callback and a Canvas page are full-bleed; everything else is documentation. */
+    isDocs: ({ $route }) =>
+      $route.name !== 'canvas-headless-page' &&
+      !['/', '/login', '/callback'].includes($route.path.replace(/(.)\/$/, '$1')),
     /** The playground has no prose to cap and no headings to list. */
     wide: ({ $route }) => $route.path.replace(/\/$/, '') === '/playground',
   },

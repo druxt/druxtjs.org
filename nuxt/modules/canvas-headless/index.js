@@ -14,6 +14,7 @@ module.exports = function canvasHeadless() {
   if (!process.env.CANVAS_SITE_URL) return
   this.addServerMiddleware(createServer({ rootDir: this.options.rootDir }))
   this.addPlugin({ src: path.join(__dirname, 'plugin.js'), fileName: 'canvas-headless.js' })
+  this.addLayout({ src: path.join(__dirname, 'layout.vue') }, 'canvas-headless')
   // A Canvas page at its own path, which is where the editor opens one.
   this.extendRoutes((routes) => {
     routes.unshift({ name: 'canvas-headless-page', path: '/page/:id', component: path.join(__dirname, 'page.vue') })

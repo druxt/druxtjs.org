@@ -33,8 +33,20 @@ const load = async (path, req) => {
   return { page, session: session || { enabled: false } }
 }
 
+// The layouts a `layout` query parameter may name: the page alone, or the
+// page in the site's own layout.
+const LAYOUTS = { page: 'canvas-headless', site: 'default' }
+
 export default {
   components: { CanvasComponentTree },
+
+  // Framed, as Canvas's editor shows it, the page stands alone. Anywhere else
+  // it has the site around it. `?layout=site` or `?layout=page` picks either.
+  layout({ query, req }) {
+    if (LAYOUTS[query.layout]) return LAYOUTS[query.layout]
+    const framed = req ? req.headers['sec-fetch-dest'] === 'iframe' : window.self !== window.top
+    return framed ? LAYOUTS.page : LAYOUTS.site
+  },
 
   async asyncData({ route, req, error }) {
     const data = await load(route.fullPath.split('#')[0], req)

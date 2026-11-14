@@ -408,6 +408,11 @@ A Canvas page built from these components renders at its own path,
 `/page/<id>`. The front page still renders the way the section above
 describes.
 
+Framed by the editor, the page stands alone, without the site's header and
+footer, so an editor arranges the page and not the site around it. Anywhere
+else it has the site's layout. `?layout=site` or `?layout=page` on the
+page's address picks either.
+
 With Canvas 1.12.0 and Custom Elements 3.5.0, Drupal needs the following,
 and each can go when a release no longer needs it:
 
