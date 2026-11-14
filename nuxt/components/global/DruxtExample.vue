@@ -23,7 +23,7 @@
       </label>
 
       <!-- Right on a wide band; left under the picker when the band wraps. -->
-      <label v-if="live" class="sm:ml-auto flex items-center gap-2 text-sm">
+      <label v-if="live && !link" class="sm:ml-auto flex items-center gap-2 text-sm">
         <span class="text-base-content/70">Backend</span>
         <select data-testid="backend" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md text-base lg:text-sm" :value="customOpen ? 'other' : backend" @change="pickBackend($event.target.value)">
           <!-- Short, so the reason never widens the select on a phone; the reason is said below. -->
@@ -33,6 +33,11 @@
           <option value="other">Your own Drupal</option>
         </select>
       </label>
+      <!-- In a docs page the example is written for one backend, so it is named, not offered. -->
+      <p v-else-if="live" data-testid="backend-fixed" class="sm:ml-auto flex items-center gap-2 text-sm">
+        <span class="text-base-content/70">Backend</span>
+        <span>{{ backends[backend].label }}</span>
+      </p>
     </div>
 
     <!-- A reader's Drupal: its origin, checked for what it offers before it is used. -->
@@ -44,7 +49,7 @@
       </p>
     </form>
     <!-- Why a backend is greyed out: the option's title, said in text. -->
-    <p v-if="live && unavailable" class="px-3.5 pb-2 -mt-1 text-[11.5px] text-base-content/70">{{ unavailable }}</p>
+    <p v-if="live && unavailable && !link" class="px-3.5 pb-2 -mt-1 text-[11.5px] text-base-content/70">{{ unavailable }}</p>
 
     <!-- A component that is not live on its own: one line, and a way in. -->
     <div v-if="name && !live" class="border-t border-base-300 bg-base-100 px-3.5 py-3 text-sm">
@@ -289,7 +294,7 @@ export default {
     component: { type: String, default: '' },
     /** On a module page: the picker offers that package's components only. */
     pkg: { type: String, default: '' },
-    /** In a docs page: the playground link its editor pasted, which fixes the component and sets the card up. */
+    /** In a docs page: the playground link its editor pasted, which fixes the component and the backend, and sets the card up. */
     link: { type: String, default: '' },
   },
 
