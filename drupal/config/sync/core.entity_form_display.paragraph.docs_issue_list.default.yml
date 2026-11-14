@@ -1,0 +1,14 @@
+uuid: dc478b80-336c-4f99-9c79-ed6609914824
+langcode: en
+status: true
+dependencies:
+  config:
+    - paragraphs.paragraphs_type.docs_issue_list
+id: paragraph.docs_issue_list.default
+targetEntityType: paragraph
+bundle: docs_issue_list
+mode: default
+content: {  }
+hidden:
+  created: true
+  status: true

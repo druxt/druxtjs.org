@@ -28,6 +28,9 @@ const SORTS = {
 /** Whether a page is new to live or a change to a page live has. */
 const STATUSES = { new: 'New', changed: 'Changed' }
 
+/** A troubleshooting issue's JSON:API type. */
+const ISSUE_TYPE = 'node--docs_issue'
+
 /** The sections in reading order, then pages outside them. */
 const SECTION_ORDER = ['tutorials', 'how-to', 'explanation', 'modules', 'api', 'other']
 
@@ -43,11 +46,12 @@ const NO_FILTERS = Object.freeze({ text: '', status: '', section: '', author: ''
  * author and log come along, for the row and its filters.
  *
  * @param {string} id - The workspace's machine name.
+ * @param {string} [bundle] - The node type to list: pages, or troubleshooting issues.
  * @returns {object} The query parameters.
  */
-const changesQuery = (id) => ({
+const changesQuery = (id, bundle = 'doc_page') => ({
   'filter[workspace.meta.drupal_internal__target_id]': id,
-  'fields[node--doc_page]': 'title,path,changed,drupal_internal__nid,revision_uid,revision_log',
+  [`fields[node--${bundle}]`]: 'title,path,changed,drupal_internal__nid,revision_uid,revision_log',
   'fields[user--user]': 'display_name',
   include: 'revision_uid',
   sort: '-changed',
@@ -81,7 +85,7 @@ const changesFrom = (document, created = []) => {
       .map(({ id, attributes = {} }) => [id, attributes.display_name])
   )
   const isNew = new Set(created)
-  return ((document && document.data) || []).map(({ id, attributes = {}, relationships = {} }) => {
+  return ((document && document.data) || []).map(({ id, type, attributes = {}, relationships = {} }) => {
     const path = (attributes.path || {}).alias || null
     const nid = attributes.drupal_internal__nid
     const author = ((relationships.revision_uid || {}).data || {}).id
@@ -96,6 +100,9 @@ const changesFrom = (document, created = []) => {
       path,
       // The site routes pages by alias; a page without one has nowhere to open.
       href: path,
+      // The diff drawn on a page compares that page. An issue opens inside
+      // the troubleshooting page, whose diff is not the issue's.
+      canDiff: type !== ISSUE_TYPE,
       section,
       sectionLabel: section === 'other' ? 'Other' : SECTIONS[section].label,
       status: isNew.has(id) ? 'new' : 'changed',

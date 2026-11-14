@@ -9,6 +9,54 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-11-14
+
+### Added
+
+- Previews with a token. The frontend's preview consumer can now issue an
+  editor's preview token, so the frame reads the preview without the editor's
+  Drupal session on the frontend's site. The frontend registers its target
+  with a token wherever it registers one. `DRUXT_NODE_PREVIEW_REGISTER_TOKEN`
+  set to `false` turns the token off.
+- Troubleshooting issues as content of their own. Each issue is a node with a
+  title, an area, a one-line summary and its fix as Text and Code blocks, at
+  its own URL under `/how-to/troubleshooting/`. The troubleshooting page lists
+  them closed and grouped by area, with a search and an area filter that the
+  URL carries. Opening an issue changes the URL and keeps the reader on the
+  page, and a renamed issue's old URL redirects. The MCP server,
+  `llms-full.txt` and the sitemap have an entry per issue.
+- A workspace's review lists the troubleshooting issues it changed, beside
+  its pages.
+
+### Changed
+
+- Consumer Node Preview 1.0.0-rc1, from a development snapshot. Preview
+  tokens last 15 minutes, and go only to targets on the site's own frontend
+  hosts and Cloudflare's quick tunnels. A registered target can carry its own
+  expiry, and saving a target no longer signs editors out of open previews.
+  A deploy hook adds the last seen column to stored preview targets, because
+  the release's update adds only the expiry column.
+- The frontend runs the released `@druxt-contrib/node-preview` 0.1.0, in place
+  of a patched snapshot. It writes its preview target again every six hours,
+  and on Lagoon leaves the target in place when it stops, so a rollout never
+  removes the target the new frontend just wrote.
+- The server closes Nuxt before it exits, so a frontend stopped off Lagoon
+  removes its preview target.
+
+### Fixed
+
+- Every rollout reset the preview consumer to the client credentials grant
+  alone, so a preview token target would have got an empty token after each
+  deployment.
+
+### Security
+
+- Simple OAuth 6.1.4, for SA-CONTRIB-2026-296 (access bypass). The module
+  signs editors in.
+- Drupal core 11.4.12, which brings the Symfony 7.4.22 and 7.4.23 releases
+  for their advisories in the HTTP foundation, the serializer and six other
+  components.
+
 ## [0.18.0] - 2026-11-04
 
 ### Added

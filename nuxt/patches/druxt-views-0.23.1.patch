@@ -1,0 +1,695 @@
+diff --git a/dist/components/DruxtView.vue b/dist/components/DruxtView.vue
+index 3230678..82790b2 100644
+--- a/dist/components/DruxtView.vue
++++ b/dist/components/DruxtView.vue
+@@ -127,7 +127,21 @@ export default {
+     viewId: {
+       type: String,
+       default: null,
+-    }
++    },
++
++    /**
++     * The model, when a parent writes the route, as a Views page does:
++     * `{ filter, page, sort }`. Without it the model comes from the route.
++     *
++     * @type {object}
++     *
++     * @example
++     * <DruxtView view-id="products" :value="{ filter: { brand: '3' }, page: null, sort: null }" @input="onInput" />
++     */
++    value: {
++      type: Object,
++      default: null,
++    },
+   },
+ 
+   /**
+@@ -136,16 +150,19 @@ export default {
+    * @property {object} view - The View JSON:API resource.
+    */
+   data() {
+-    // Stringify and parse the query object to fix nested objects.
+-    const model = parse(stringify(this.$route.query))
++    // A parent that writes the route gives the model. Otherwise the query is
++    // stringified and parsed to fix nested objects.
++    const model = this.value || parse(stringify(this.$route.query))
+ 
+     return {
++      emitting: false,
+       model: {
+         filter: model.filter || {},
+         page: parseInt(model.page) || null,
+         sort: model.sort || null,
+       },
+       resource: null,
++      sentFilter: JSON.stringify(model.filter || {}),
+       view: false
+     }
+   },
+@@ -295,6 +312,8 @@ export default {
+ 
+   watch: {
+     '$route.query'(to) {
++      // A parent that writes the route sets `value` instead.
++      if (this.value) return
+       if (!Object.entries(to || {}).length) {
+         this.model = {
+           filter: {},
+@@ -304,6 +323,23 @@ export default {
+       }
+     },
+ 
++    value: {
++      deep: true,
++      handler(to) {
++        if (!to) return
++        const next = {
++          filter: to.filter || {},
++          page: parseInt(to.page) || null,
++          sort: to.sort || null,
++        }
++        // DruxtModule's own watcher has set `model` to the prop object by
++        // now; a copy keeps later edits off the parent's value.
++        if (this.model === to || JSON.stringify(next) !== JSON.stringify(this.model)) {
++          this.model = next
++        }
++      },
++    },
++
+     arguments() {
+       this.$fetch()
+     },
+@@ -314,23 +350,30 @@ export default {
+ 
+     'model.filter': {
+       deep: true,
+-      handler(to, from) {
+-        if (!Object.entries(to || {}).length && !Object.entries(from || {}).length) {
+-          return
+-        }
+-        this.$fetch()
++      handler(to) {
++        // A new object with the same filters is not a change. The filters
++        // are compared with the ones last sent, because an edit in place,
++        // removing the last filter among them, gives this watcher the same
++        // object as both arguments.
++        const filter = JSON.stringify(to || {})
++        if (filter === this.sentFilter) return
++        this.sentFilter = filter
++        this.emitModel()
++        this.refetch()
+       },
+     },
+ 
+     'model.page'(to, from) {
+       if (to !== from) {
+-        this.$fetch()
++        this.emitModel()
++        this.refetch()
+       }
+     },
+ 
+     'model.sort'(to, from) {
+       if (to !== from) {
+-        this.$fetch()
++        this.emitModel()
++        this.refetch()
+       }
+     },
+ 
+@@ -408,6 +451,29 @@ export default {
+       return query
+     },
+ 
++    /**
++     * The model, copied, for a parent that writes the route. One emit per
++     * tick, because a replaced model fires every model watcher at once, and
++     * a page that wrote the route for each would cancel its own route changes.
++     */
++    emitModel() {
++      if (this.emitting) return
++      this.emitting = true
++      this.$nextTick(() => {
++        this.emitting = false
++        this.$emit('input', JSON.parse(JSON.stringify(this.model)))
++      })
++    },
++
++    /**
++     * Fetch again, after a running fetch: Nuxt 2's $fetch returns the running
++     * promise, so a second call during one is lost.
++     */
++    async refetch() {
++      if (this._fetchPromise) await this._fetchPromise
++      this.$fetch()
++    },
++
+     /**
+      * Filters update event handler.
+      */
+@@ -506,6 +572,8 @@ export default {
+       mode: vm.mode,
+       pager: vm.pager,
+       results: vm.results,
++      // The model, which DruxtViewsViewMixin takes as `value` and emits back.
++      value: vm.model,
+       view: vm.view
+     }),
+ 
+diff --git a/dist/components/DruxtViewsPage.vue b/dist/components/DruxtViewsPage.vue
+new file mode 100644
+index 0000000..a97ee21
+--- /dev/null
++++ b/dist/components/DruxtViewsPage.vue
+@@ -0,0 +1,59 @@
++<script>
++
++import { DruxtViewsPageMixin } from 'druxt-views'
++
++/**
++ * A Views page whose URL is its state.
++ *
++ * Registered by the Nuxt module for each pattern in `druxt.views.pages`. The
++ * route gives the view its arguments, filter, page and sort through the
++ * page's config, DruxtView fetches, and every change the view reports is
++ * written back to the URL through the router, so back and forward replay as
++ * model changes and nothing reloads.
++ *
++ * Inside a page the site routes itself, the `page` prop gives the same config
++ * with the pattern that page's route matches.
++ *
++ * @example @lang js
++ * // nuxt.config.js
++ * export default {
++ *   druxt: {
++ *     views: {
++ *       pages: {
++ *         '/shop/:collection?': {
++ *           viewId: 'products',
++ *           displayId: 'page_1',
++ *           arguments: ['collection'],
++ *           filters: { brand: { query: 'brand' } },
++ *           aliases: { collection: { women: '12' } },
++ *         },
++ *       },
++ *     },
++ *   },
++ * }
++ *
++ * @example @lang vue
++ * <DruxtViewsPage :page="{
++ *   pattern: '/how-to/troubleshooting/:issue?',
++ *   viewId: 'docs_issues',
++ *   filters: { area: { query: 'area' } },
++ * }" />
++ */
++export default {
++  name: 'DruxtViewsPage',
++
++  mixins: [DruxtViewsPageMixin],
++
++  render(h) {
++    if (!this.config) {
++      return h('DruxtDebug', { props: { summary: 'No Views page for this route.' } }, [
++        h('p', `Add the pattern ${this.pattern || this.$route.path} to druxt.views.pages.`),
++      ])
++    }
++    return h('DruxtView', {
++      props: this.viewProps,
++      on: { input: this.onInput },
++    })
++  },
++}
++</script>
+diff --git a/dist/components/DruxtViewsPager.vue b/dist/components/DruxtViewsPager.vue
+index bc3d41f..9d26a74 100644
+--- a/dist/components/DruxtViewsPager.vue
++++ b/dist/components/DruxtViewsPager.vue
+@@ -10,6 +10,11 @@ export default {
+ 
+   extends: DruxtModule,
+ 
++  /** A Views page that writes the route provides its links. */
++  inject: {
++    druxtViewsPage: { default: null },
++  },
++
+   /** */
+   props: {
+     /**
+@@ -93,6 +98,7 @@ export default {
+      */
+     getRoute(link) {
+       const query = this.getQuery(link)
++      if (this.druxtViewsPage) return this.druxtViewsPage.link({ page: query.page })
+       return { query: { ...this.$route.query, page: query.page } }
+     },
+ 
+diff --git a/dist/druxt-views.esm.js b/dist/druxt-views.esm.js
+index 193fe35..39474c0 100644
+--- a/dist/druxt-views.esm.js
++++ b/dist/druxt-views.esm.js
+@@ -50,6 +50,112 @@ async function DruxtViewsStorybook({ stories }) {
+   stories.push(resolve(options.buildDir, "./stories/druxt-views.*.stories.js"));
+ }
+ 
++const normalizePage = (pattern, page = {}) => ({
++  pattern,
++  viewId: page.viewId,
++  displayId: page.displayId || "default",
++  arguments: page.arguments || [],
++  filters: page.filters || {},
++  page: page.page || "page",
++  sort: page.sort || "sort",
++  history: page.history === "push" ? "push" : "replace",
++  aliases: page.aliases || {}
++});
++const fromAlias = (config, name, word) => {
++  const map = config.aliases[name] || {};
++  return Object.prototype.hasOwnProperty.call(map, word) ? String(map[word]) : word;
++};
++const toAlias = (config, name, id) => {
++  const map = config.aliases[name] || {};
++  const found = Object.keys(map).find((word) => String(map[word]) === String(id));
++  return found === void 0 ? String(id) : found;
++};
++const mapValue = (fn, value) => Array.isArray(value) ? value.map(fn) : fn(value);
++const MULTI = "+";
++const place = (config, identifier) => {
++  const where = config.filters[identifier] || {};
++  const multiple = !!where.multiple;
++  return where.param ? { param: where.param, multiple } : { query: where.query || identifier, multiple };
++};
++const paramNames = (pattern) => [...pattern.matchAll(/\/:([A-Za-z0-9_]+)\??/g)].map((m) => m[1]);
++const empty = (value) => value === void 0 || value === null || value === "" || Array.isArray(value) && !value.length;
++const routeToModel = (config, route) => {
++  const params = route.params || {};
++  const query = route.query || {};
++  const args = config.arguments.map((name) => empty(params[name]) ? "all" : fromAlias(config, name, params[name]));
++  const filter = {};
++  for (const identifier of Object.keys(config.filters)) {
++    const at = place(config, identifier);
++    let raw = at.param ? params[at.param] : query[at.query];
++    if (at.param && raw === "all")
++      raw = void 0;
++    if (at.param && at.multiple && typeof raw === "string")
++      raw = raw.split(MULTI);
++    if (empty(raw))
++      continue;
++    const values = mapValue((v) => fromAlias(config, identifier, v), raw);
++    filter[identifier] = at.multiple ? [].concat(values) : values;
++  }
++  return {
++    arguments: args,
++    filter,
++    page: parseInt(query[config.page]) || null,
++    sort: query[config.sort] || null
++  };
++};
++const modelToLocation = (config, pattern, model, route = {}) => {
++  const params = {};
++  config.arguments.forEach((name, i) => {
++    const value = (model.arguments || [])[i];
++    if (!empty(value) && value !== "all")
++      params[name] = toAlias(config, name, value);
++  });
++  const owned = new Set([config.page, config.sort]);
++  const query = {};
++  for (const identifier of Object.keys(config.filters)) {
++    const at = place(config, identifier);
++    const value = (model.filter || {})[identifier];
++    if (at.param) {
++      if (!empty(value)) {
++        params[at.param] = [].concat(value).map((v) => toAlias(config, identifier, v)).join(MULTI);
++      }
++      continue;
++    }
++    owned.add(at.query);
++    if (!empty(value))
++      query[at.query] = mapValue((v) => toAlias(config, identifier, v), value);
++  }
++  if (model.page)
++    query[config.page] = String(model.page);
++  if (model.sort)
++    query[config.sort] = model.sort;
++  for (const [key, value] of Object.entries(route.query || {})) {
++    if (!owned.has(key) && !(key in query))
++      query[key] = value;
++  }
++  const ownedParams = new Set([
++    ...config.arguments,
++    ...Object.keys(config.filters).map((identifier) => place(config, identifier).param).filter(Boolean)
++  ]);
++  for (const name of paramNames(pattern)) {
++    const value = (route.params || {})[name];
++    if (!ownedParams.has(name) && !empty(value))
++      params[name] = value;
++  }
++  const names = paramNames(pattern);
++  const last = names.reduce((found, name, i) => params[name] === void 0 ? found : i, -1);
++  names.forEach((name, i) => {
++    if (i < last && params[name] === void 0)
++      params[name] = "all";
++  });
++  const path = pattern.replace(/\/:([A-Za-z0-9_]+)\??/g, (match, name) => params[name] === void 0 ? "" : `/${encodeURIComponent(params[name]).replace(/%2B/g, MULTI)}`).replace(/\/+$/, "") || "/";
++  return { path, query };
++};
++const routeName = (pattern) => {
++  const slug = pattern.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
++  return `druxt-views-page-${slug || "index"}`;
++};
++
+ const extendComponent = (component) => ({ ...component, isAsync: false });
+ const DruxtViewsNuxtModule = async function(moduleOptions = {}) {
+   const options = {
+@@ -70,6 +176,27 @@ const DruxtViewsNuxtModule = async function(moduleOptions = {}) {
+   for (const module of modules) {
+     await this.addModule([module, { baseUrl: options.baseUrl }]);
+   }
++  const pages = options.views.pages || {};
++  if (Object.keys(pages).length) {
++    this.extendRoutes((routes) => {
++      for (const pattern of Object.keys(pages).reverse()) {
++        if (routes.some((route) => route.name === routeName(pattern)))
++          continue;
++        routes.unshift({
++          name: routeName(pattern),
++          path: pattern,
++          component: resolve(__dirname, "components/DruxtViewsPage.vue"),
++          chunkName: "druxt-views-page",
++          meta: { druxtViewsPage: pattern }
++        });
++      }
++    });
++  }
++  this.addPlugin({
++    src: resolve(__dirname, "../templates/pages.js"),
++    fileName: "druxt-views-pages.js",
++    options: { pages }
++  });
+   this.addPlugin({
+     src: resolve(__dirname, "../templates/store.js"),
+     fileName: "store/druxt-views.js",
+@@ -203,6 +330,62 @@ const DruxtViewsFiltersMixin = {
+   }
+ };
+ 
++const DruxtViewsPageMixin = {
++  props: {
++    page: {
++      type: Object,
++      default: null
++    }
++  },
++  data: () => ({
++    pending: ""
++  }),
++  computed: {
++    pattern: ({ page, $route }) => page ? page.pattern : (($route || {}).meta || {}).druxtViewsPage,
++    config: ({ page, pattern, $druxtViewsPages }) => {
++      const found = page || pattern && ($druxtViewsPages || {})[pattern];
++      return found ? normalizePage(pattern, found) : null;
++    },
++    model: ({ config, $route }) => config ? routeToModel(config, $route) : null,
++    viewProps: ({ config, model }) => config ? {
++      viewId: config.viewId,
++      displayId: config.displayId,
++      arguments: model.arguments,
++      value: { filter: model.filter, page: model.page, sort: model.sort }
++    } : null
++  },
++  watch: {
++    $route() {
++      this.pending = "";
++    }
++  },
++  provide() {
++    return { druxtViewsPage: { link: this.link } };
++  },
++  methods: {
++    locationFor(model) {
++      return modelToLocation(this.config, this.pattern, model, this.$route);
++    },
++    link({ page }) {
++      return this.locationFor({ ...this.model, page });
++    },
++    onInput(value) {
++      const location = this.locationFor({ ...this.model, ...value });
++      const same = location.path === this.$route.path && JSON.stringify(location.query) === JSON.stringify(this.$route.query || {});
++      if (same)
++        return;
++      const key = JSON.stringify(location);
++      if (key === this.pending)
++        return;
++      this.pending = key;
++      const navigation = this.$router[this.config.history](location);
++      if (navigation && navigation.catch)
++        navigation.catch(() => {
++        });
++    }
++  }
++};
++
+ const DruxtViewsPagerMixin = {
+   props: {
+     count: {
+@@ -333,4 +516,4 @@ const DruxtViewsViewMixin = {
+ 
+ DruxtViewsNuxtModule.meta = require("../package.json");
+ 
+-export { DruxtViewsFilterMixin, DruxtViewsFiltersMixin, DruxtViewsPagerMixin, DruxtViewsSortsMixin, DruxtViewsStore, DruxtViewsViewMixin, DruxtViewsNuxtModule as default };
++export { DruxtViewsFilterMixin, DruxtViewsFiltersMixin, DruxtViewsPageMixin, DruxtViewsPagerMixin, DruxtViewsSortsMixin, DruxtViewsStore, DruxtViewsViewMixin, DruxtViewsNuxtModule as default, modelToLocation, normalizePage, routeToModel };
+diff --git a/dist/druxt-views.ssr.js b/dist/druxt-views.ssr.js
+index 1b4cb31..f503bef 100644
+--- a/dist/druxt-views.ssr.js
++++ b/dist/druxt-views.ssr.js
+@@ -60,6 +60,112 @@ async function DruxtViewsStorybook({ stories }) {
+   stories.push(path.resolve(options.buildDir, "./stories/druxt-views.*.stories.js"));
+ }
+ 
++const normalizePage = (pattern, page = {}) => ({
++  pattern,
++  viewId: page.viewId,
++  displayId: page.displayId || "default",
++  arguments: page.arguments || [],
++  filters: page.filters || {},
++  page: page.page || "page",
++  sort: page.sort || "sort",
++  history: page.history === "push" ? "push" : "replace",
++  aliases: page.aliases || {}
++});
++const fromAlias = (config, name, word) => {
++  const map = config.aliases[name] || {};
++  return Object.prototype.hasOwnProperty.call(map, word) ? String(map[word]) : word;
++};
++const toAlias = (config, name, id) => {
++  const map = config.aliases[name] || {};
++  const found = Object.keys(map).find((word) => String(map[word]) === String(id));
++  return found === void 0 ? String(id) : found;
++};
++const mapValue = (fn, value) => Array.isArray(value) ? value.map(fn) : fn(value);
++const MULTI = "+";
++const place = (config, identifier) => {
++  const where = config.filters[identifier] || {};
++  const multiple = !!where.multiple;
++  return where.param ? { param: where.param, multiple } : { query: where.query || identifier, multiple };
++};
++const paramNames = (pattern) => [...pattern.matchAll(/\/:([A-Za-z0-9_]+)\??/g)].map((m) => m[1]);
++const empty = (value) => value === void 0 || value === null || value === "" || Array.isArray(value) && !value.length;
++const routeToModel = (config, route) => {
++  const params = route.params || {};
++  const query = route.query || {};
++  const args = config.arguments.map((name) => empty(params[name]) ? "all" : fromAlias(config, name, params[name]));
++  const filter = {};
++  for (const identifier of Object.keys(config.filters)) {
++    const at = place(config, identifier);
++    let raw = at.param ? params[at.param] : query[at.query];
++    if (at.param && raw === "all")
++      raw = void 0;
++    if (at.param && at.multiple && typeof raw === "string")
++      raw = raw.split(MULTI);
++    if (empty(raw))
++      continue;
++    const values = mapValue((v) => fromAlias(config, identifier, v), raw);
++    filter[identifier] = at.multiple ? [].concat(values) : values;
++  }
++  return {
++    arguments: args,
++    filter,
++    page: parseInt(query[config.page]) || null,
++    sort: query[config.sort] || null
++  };
++};
++const modelToLocation = (config, pattern, model, route = {}) => {
++  const params = {};
++  config.arguments.forEach((name, i) => {
++    const value = (model.arguments || [])[i];
++    if (!empty(value) && value !== "all")
++      params[name] = toAlias(config, name, value);
++  });
++  const owned = new Set([config.page, config.sort]);
++  const query = {};
++  for (const identifier of Object.keys(config.filters)) {
++    const at = place(config, identifier);
++    const value = (model.filter || {})[identifier];
++    if (at.param) {
++      if (!empty(value)) {
++        params[at.param] = [].concat(value).map((v) => toAlias(config, identifier, v)).join(MULTI);
++      }
++      continue;
++    }
++    owned.add(at.query);
++    if (!empty(value))
++      query[at.query] = mapValue((v) => toAlias(config, identifier, v), value);
++  }
++  if (model.page)
++    query[config.page] = String(model.page);
++  if (model.sort)
++    query[config.sort] = model.sort;
++  for (const [key, value] of Object.entries(route.query || {})) {
++    if (!owned.has(key) && !(key in query))
++      query[key] = value;
++  }
++  const ownedParams = new Set([
++    ...config.arguments,
++    ...Object.keys(config.filters).map((identifier) => place(config, identifier).param).filter(Boolean)
++  ]);
++  for (const name of paramNames(pattern)) {
++    const value = (route.params || {})[name];
++    if (!ownedParams.has(name) && !empty(value))
++      params[name] = value;
++  }
++  const names = paramNames(pattern);
++  const last = names.reduce((found, name, i) => params[name] === void 0 ? found : i, -1);
++  names.forEach((name, i) => {
++    if (i < last && params[name] === void 0)
++      params[name] = "all";
++  });
++  const path = pattern.replace(/\/:([A-Za-z0-9_]+)\??/g, (match, name) => params[name] === void 0 ? "" : `/${encodeURIComponent(params[name]).replace(/%2B/g, MULTI)}`).replace(/\/+$/, "") || "/";
++  return { path, query };
++};
++const routeName = (pattern) => {
++  const slug = pattern.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
++  return `druxt-views-page-${slug || "index"}`;
++};
++
+ const extendComponent = (component) => ({ ...component, isAsync: false });
+ const DruxtViewsNuxtModule = async function(moduleOptions = {}) {
+   const options = {
+@@ -80,6 +186,27 @@ const DruxtViewsNuxtModule = async function(moduleOptions = {}) {
+   for (const module of modules) {
+     await this.addModule([module, { baseUrl: options.baseUrl }]);
+   }
++  const pages = options.views.pages || {};
++  if (Object.keys(pages).length) {
++    this.extendRoutes((routes) => {
++      for (const pattern of Object.keys(pages).reverse()) {
++        if (routes.some((route) => route.name === routeName(pattern)))
++          continue;
++        routes.unshift({
++          name: routeName(pattern),
++          path: pattern,
++          component: path.resolve(__dirname, "components/DruxtViewsPage.vue"),
++          chunkName: "druxt-views-page",
++          meta: { druxtViewsPage: pattern }
++        });
++      }
++    });
++  }
++  this.addPlugin({
++    src: path.resolve(__dirname, "../templates/pages.js"),
++    fileName: "druxt-views-pages.js",
++    options: { pages }
++  });
+   this.addPlugin({
+     src: path.resolve(__dirname, "../templates/store.js"),
+     fileName: "store/druxt-views.js",
+@@ -213,6 +340,62 @@ const DruxtViewsFiltersMixin = {
+   }
+ };
+ 
++const DruxtViewsPageMixin = {
++  props: {
++    page: {
++      type: Object,
++      default: null
++    }
++  },
++  data: () => ({
++    pending: ""
++  }),
++  computed: {
++    pattern: ({ page, $route }) => page ? page.pattern : (($route || {}).meta || {}).druxtViewsPage,
++    config: ({ page, pattern, $druxtViewsPages }) => {
++      const found = page || pattern && ($druxtViewsPages || {})[pattern];
++      return found ? normalizePage(pattern, found) : null;
++    },
++    model: ({ config, $route }) => config ? routeToModel(config, $route) : null,
++    viewProps: ({ config, model }) => config ? {
++      viewId: config.viewId,
++      displayId: config.displayId,
++      arguments: model.arguments,
++      value: { filter: model.filter, page: model.page, sort: model.sort }
++    } : null
++  },
++  watch: {
++    $route() {
++      this.pending = "";
++    }
++  },
++  provide() {
++    return { druxtViewsPage: { link: this.link } };
++  },
++  methods: {
++    locationFor(model) {
++      return modelToLocation(this.config, this.pattern, model, this.$route);
++    },
++    link({ page }) {
++      return this.locationFor({ ...this.model, page });
++    },
++    onInput(value) {
++      const location = this.locationFor({ ...this.model, ...value });
++      const same = location.path === this.$route.path && JSON.stringify(location.query) === JSON.stringify(this.$route.query || {});
++      if (same)
++        return;
++      const key = JSON.stringify(location);
++      if (key === this.pending)
++        return;
++      this.pending = key;
++      const navigation = this.$router[this.config.history](location);
++      if (navigation && navigation.catch)
++        navigation.catch(() => {
++        });
++    }
++  }
++};
++
+ const DruxtViewsPagerMixin = {
+   props: {
+     count: {
+@@ -345,8 +528,12 @@ DruxtViewsNuxtModule.meta = require("../package.json");
+ 
+ exports.DruxtViewsFilterMixin = DruxtViewsFilterMixin;
+ exports.DruxtViewsFiltersMixin = DruxtViewsFiltersMixin;
++exports.DruxtViewsPageMixin = DruxtViewsPageMixin;
+ exports.DruxtViewsPagerMixin = DruxtViewsPagerMixin;
+ exports.DruxtViewsSortsMixin = DruxtViewsSortsMixin;
+ exports.DruxtViewsStore = DruxtViewsStore;
+ exports.DruxtViewsViewMixin = DruxtViewsViewMixin;
+ exports["default"] = DruxtViewsNuxtModule;
++exports.modelToLocation = modelToLocation;
++exports.normalizePage = normalizePage;
++exports.routeToModel = routeToModel;
+diff --git a/templates/pages.js b/templates/pages.js
+new file mode 100644
+index 0000000..0a20df7
+--- /dev/null
++++ b/templates/pages.js
+@@ -0,0 +1,6 @@
++// The Views pages from `druxt.views.pages`, for DruxtViewsPage at runtime.
++const pages = <%= JSON.stringify(options.pages || {}) %>
++
++export default (context, inject) => {
++  inject('druxtViewsPages', pages)
++}

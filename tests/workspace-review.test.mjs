@@ -48,6 +48,45 @@ const document = {
 const pages = changesFrom(document, ['c'])
 const ids = (rows) => rows.map(({ id }) => id)
 
+describe('a troubleshooting issue', () => {
+  test('is asked for by its own node type', () => {
+    const query = changesQuery('stage', 'docs_issue')
+    assert.equal(
+      query['fields[node--docs_issue]'],
+      'title,path,changed,drupal_internal__nid,revision_uid,revision_log'
+    )
+    assert.equal(query['fields[node--doc_page]'], undefined)
+  })
+
+  test('opens at its own URL and offers no diff, which a page does', () => {
+    const [issue, page] = changesFrom(
+      {
+        data: [
+          {
+            type: 'node--docs_issue',
+            id: 'i',
+            attributes: {
+              title: 'Builds fail',
+              path: { alias: '/how-to/troubleshooting/builds-fail' },
+            },
+          },
+          {
+            type: 'node--doc_page',
+            id: 'p',
+            attributes: { title: 'Troubleshooting', path: { alias: '/how-to/troubleshooting' } },
+          },
+        ],
+      },
+      ['i']
+    )
+    assert.equal(issue.href, '/how-to/troubleshooting/builds-fail')
+    assert.equal(issue.section, 'how-to')
+    assert.equal(issue.status, 'new')
+    assert.equal(issue.canDiff, false)
+    assert.equal(page.canDiff, true)
+  })
+})
+
 describe('the query', () => {
   test('asks for the pages whose revision was made in that workspace, with author and log', () => {
     assert.deepEqual(changesQuery('stage'), {

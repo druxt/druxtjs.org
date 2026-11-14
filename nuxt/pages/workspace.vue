@@ -133,11 +133,15 @@ export default {
         throw error
       }
     }
-    const [list, created] = await Promise.all([
+    const [list, issues, created] = await Promise.all([
       ask("this workspace's pages", () => this.$druxt.axios.get('/jsonapi/node/doc_page', { params: changesQuery(this.workspace) })),
+      ask("this workspace's troubleshooting issues", () =>
+        this.$druxt.axios.get('/jsonapi/node/docs_issue', { params: changesQuery(this.workspace, 'docs_issue') })
+      ),
       ask('the pages this workspace created', () => this.$druxt.axios.get(createdPath(this.workspace))),
     ])
-    this.pages = changesFrom(list.data, (created.data || {}).data || [])
+    const isNew = (created.data || {}).data || []
+    this.pages = [...changesFrom(list.data, isNew), ...changesFrom(issues.data, isNew)]
   },
 
   fetchOnServer: false,

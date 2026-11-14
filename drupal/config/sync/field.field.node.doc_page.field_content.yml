@@ -9,6 +9,7 @@ dependencies:
     - paragraphs.paragraphs_type.docs_code
     - paragraphs.paragraphs_type.docs_diagram
     - paragraphs.paragraphs_type.docs_image
+    - paragraphs.paragraphs_type.docs_issue_list
     - paragraphs.paragraphs_type.docs_layout_section
     - paragraphs.paragraphs_type.docs_live_example
     - paragraphs.paragraphs_type.docs_mcp_install
@@ -41,6 +42,7 @@ settings:
       docs_section_list: docs_section_list
       docs_mcp_install: docs_mcp_install
       docs_live_example: docs_live_example
+      docs_issue_list: docs_issue_list
     target_bundles_drag_drop:
       docs_callout:
         weight: 4
@@ -54,20 +56,23 @@ settings:
       docs_image:
         weight: 3
         enabled: true
+      docs_issue_list:
+        weight: 11
+        enabled: true
       docs_layout_section:
         weight: 8
+        enabled: true
+      docs_live_example:
+        weight: 10
+        enabled: true
+      docs_mcp_install:
+        weight: 9
         enabled: true
       docs_rich_text:
         weight: 6
         enabled: true
       docs_section_list:
         weight: 7
-        enabled: true
-      docs_mcp_install:
-        weight: 9
-        enabled: true
-      docs_live_example:
-        weight: 10
         enabled: true
       docs_text:
         weight: 1

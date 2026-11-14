@@ -1,0 +1,21 @@
+uuid: 220bdea0-9caf-4a37-9002-c90dec91273c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_issue_area
+    - node.type.docs_issue
+  module:
+    - options
+id: node.docs_issue.field_issue_area
+field_name: field_issue_area
+entity_type: node
+bundle: docs_issue
+label: Area
+description: 'Which group of issues on the troubleshooting page this one is listed under.'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

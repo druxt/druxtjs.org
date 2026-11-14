@@ -3367,25 +3367,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@druxt-contrib/node-preview@npm:0.1.0-dev.20261030024907":
-  version: 0.1.0-dev.20261030024907
-  resolution: "@druxt-contrib/node-preview@npm:0.1.0-dev.20261030024907"
+"@druxt-contrib/node-preview@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "@druxt-contrib/node-preview@npm:0.1.0"
   peerDependencies:
     druxt: ">=0.25.0 <1"
     druxt-entity: ">=0.29.0 <1"
     vue: ^2.7.14
-  checksum: 89eea356ddbe1e686bd729338a78900c128eea9ba25efa556cde16bbae43e0bd0bc700e1c8420f5f2e898f5d9cfcaf254d6ff635eea124fa7b1e423eee5437db
-  languageName: node
-  linkType: hard
-
-"@druxt-contrib/node-preview@patch:@druxt-contrib/node-preview@npm%3A0.1.0-dev.20261030024907#./patches/druxt-node-preview-0.1.0-dev.20261030024907.patch::locator=druxtjs-org%40workspace%3A.":
-  version: 0.1.0-dev.20261030024907
-  resolution: "@druxt-contrib/node-preview@patch:@druxt-contrib/node-preview@npm%3A0.1.0-dev.20261030024907#./patches/druxt-node-preview-0.1.0-dev.20261030024907.patch::version=0.1.0-dev.20261030024907&hash=dd49bf&locator=druxtjs-org%40workspace%3A."
-  peerDependencies:
-    druxt: ">=0.25.0 <1"
-    druxt-entity: ">=0.29.0 <1"
-    vue: ^2.7.14
-  checksum: 9cefe2ec5affc189e53d30a5e93d12002aeaefc25aa38542b10ed034bdd1be354fdeaa16e5ab349561649eecb21279586284ad97a54cf47866e7e5456a6752f6
+  checksum: 46a3f81783972bd6639aafbd068b3ebbb974e98c3cc304ad1de1f55698afa51bc636b3989132a7840f9b121ed0e042e24baafdc3ccae54d270e82295933f8a46
   languageName: node
   linkType: hard
 
@@ -11141,6 +11130,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"druxt-views@patch:druxt-views@npm%3A0.23.1#./patches/druxt-views-0.23.1.patch::locator=druxtjs-org%40workspace%3A.":
+  version: 0.23.1
+  resolution: "druxt-views@patch:druxt-views@npm%3A0.23.1#./patches/druxt-views-0.23.1.patch::version=0.23.1&hash=c24cec&locator=druxtjs-org%40workspace%3A."
+  dependencies:
+    axios: 0.34.0
+    deepmerge: ^4.3.1
+    drupal-jsonapi-params: ^2.3.2
+    druxt: ^0.25.1
+    druxt-blocks: ^0.18.1
+    druxt-entity: ^0.29.1
+    druxt-router: ^0.32.1
+    md5: ^2.3.0
+  peerDependencies:
+    vue: ^2.7.14
+    vuex: ^3.6.2
+  checksum: c882692df8903cd00242a6f233cbe8eac2cad7cdd5ea78e7f1f1006ac6470006f0d62d1774889de23d0b5560abfec427463a40baac8b0f04162e04f2c10cb484
+  languageName: node
+  linkType: hard
+
 "druxt@npm:0.25.1":
   version: 0.25.1
   resolution: "druxt@npm:0.25.1"
@@ -11176,7 +11184,7 @@ __metadata:
     "@babel/plugin-proposal-private-property-in-object": ^7.21.11
     "@druxt-contrib/anchors": "file:vendor/druxt-anchors"
     "@druxt-contrib/diff": "file:vendor/druxt-diff"
-    "@druxt-contrib/node-preview": "patch:@druxt-contrib/node-preview@npm%3A0.1.0-dev.20261030024907#./patches/druxt-node-preview-0.1.0-dev.20261030024907.patch"
+    "@druxt-contrib/node-preview": ^0.1.0
     "@druxt-contrib/user": "file:vendor/druxt-user"
     "@nuxt/content": 1.15.1
     "@nuxt/postcss8": 1.1.3
@@ -11204,7 +11212,7 @@ __metadata:
     druxt-router: 0.32.1
     druxt-schema: 0.12.1
     druxt-site: 0.15.1
-    druxt-views: 0.23.1
+    druxt-views: "patch:druxt-views@npm%3A0.23.1#./patches/druxt-views-0.23.1.patch"
     github-slugger: 1.5.0
     mdast-util-to-string: ^2.0.0
     mermaid: 8.14.0

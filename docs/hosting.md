@@ -198,15 +198,21 @@ one keeps its URL in Drupal by hand. It is on in an environment that has
 `DRUXT_NODE_PREVIEW_CLIENT_SECRET`:
 
 - The rollout runs `drush druxtjsorg:preview-registrar`. It makes the
-  `druxtjs_org_preview` consumer, a confidential client with only the client
-  credentials grant, and the `frontend_registrar` user it acts as and that
-  owns it. The user's one role may change that consumer's preview targets
-  and nothing else. The consumer's secret is set from the variable on every
-  rollout, because a copied database holds a sanitised one.
+  `druxtjs_org_preview` consumer, a confidential client, and the
+  `frontend_registrar` user it acts as and that owns it. With the client
+  credentials grant the consumer signs in as that user, whose one role may
+  change the consumer's preview targets and nothing else. The consumer's
+  secret is set from the variable on every rollout, because a copied
+  database holds a sanitised one.
 - The frontend, as it builds and again as it starts, signs in as that
   consumer and writes its own target to it, labelled with its host. The
   build log says `Registered the preview target`, or that it is up to date.
   A failure only logs a warning, and the frontend still starts.
+- The running frontend writes its target again every six hours. On Lagoon
+  it leaves the target in place when it stops, because a rollout stops the
+  old `nuxt` pod after the new one has written the same target. Off Lagoon,
+  a frontend that stops removes its target, on a Consumer Node Preview
+  version that can remove one.
 - `settings.lagoon.php` leaves its own target out, so the picker shows the
   frontend once, as **druxtjs.org** in the **Frontend** group on production.
 
@@ -225,10 +231,48 @@ lagoon add variable -p druxtjs-org -e main -N DRUXT_NODE_PREVIEW_CLIENT_SECRET \
 
 A new variable reaches the containers on the next deployment.
 
-Set on the project instead of one environment, it turns registration on for
-every environment. A copied database drops production's registered target
-along with its secrets, so each environment's picker lists that environment's
-frontend alone.
+`DRUXT_NODE_PREVIEW_CLIENT_SECRET` set on the project instead of one
+environment turns registration on for every environment. A copied database
+drops production's registered target along with its secrets, so each
+environment's picker lists that environment's frontend alone.
+
+### Previews with a token
+
+The frame reads the editor's preview through the frontend's proxy, with a
+Drupal session the editor has on the frontend's own site. An editor signed
+in to Drupal only has none there. A target with a preview token needs none.
+Consumer Node Preview puts a short-lived token for the editor in the frame's
+URL, and the frontend asks for the preview with it, through its own proxy.
+The frontend registers its target with a token wherever it registers one. To
+turn the token off in an environment, set one more variable, for the `nuxt`
+container:
+
+```sh
+lagoon add variable -p druxtjs-org -e main -N DRUXT_NODE_PREVIEW_REGISTER_TOKEN \
+  -V false -S runtime
+```
+
+Every rollout gives the consumer the authorization code grant as well, which
+Consumer Node Preview issues tokens to, with the sign-in consumer's scopes. A
+token has only the roles its editor holds.
+
+The target's endpoint is a path, so the frame's request for the preview goes
+to the frontend, which proxies the API to Drupal. Drupal doesn't need a CORS
+setting for it.
+
+Consumer Node Preview gives a token only to a target on a host it allows,
+listed in `consumer_node_preview.settings` (**Configuration → Web services →
+Consumer Node Preview**):
+
+- `druxtjs.org` and `www.druxtjs.org`, production's frontend
+- `*.druxtjs-org.au2.amazee.io`, the other environments' frontends
+- `*.trycloudflare.com`, Cloudflare's quick tunnels, for testing a local
+  frontend against a deployed Drupal
+
+A host added on the settings form lasts until the next rollout, which imports
+the list again. Add a host for good in `drupal/config/sync`. A Cloudflare tunnel
+with its own host name is one example: it needs a domain whose DNS Cloudflare
+runs, and `druxtjs.org`'s doesn't.
 
 ## Documentation server
 

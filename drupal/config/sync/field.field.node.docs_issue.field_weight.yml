@@ -1,0 +1,23 @@
+uuid: dae71d50-235e-406e-9b07-2480ff1b9d41
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_weight
+    - node.type.docs_issue
+id: node.docs_issue.field_weight
+field_name: field_weight
+entity_type: node
+bundle: docs_issue
+label: Weight
+description: 'Order within the area: lower comes first, then by title.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer
