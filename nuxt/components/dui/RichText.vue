@@ -3,6 +3,8 @@
 </template>
 
 <script>
+import { highlightHtml } from '~/utils/highlight'
+
 const HEADING = /<h([1-6])([^>]*)>([\s\S]*?)<\/h\1>/g
 
 const text = (html) =>
@@ -16,8 +18,9 @@ const text = (html) =>
     .trim()
 
 /**
- * Formatted HTML. Given `headingId`, each heading gets that id and an anchor,
- * the markup the table of contents scroll-spies against.
+ * Formatted HTML, with its fenced code blocks highlighted. Given `headingId`,
+ * each heading gets that id and an anchor, the markup the table of contents
+ * scroll-spies against.
  */
 export default {
   props: {
@@ -26,8 +29,9 @@ export default {
   },
   computed: {
     rendered() {
-      if (!this.headingId) return this.html
-      return this.html.replace(HEADING, (match, depth, attributes, inner) => {
+      const html = highlightHtml(this.html)
+      if (!this.headingId) return html
+      return html.replace(HEADING, (match, depth, attributes, inner) => {
         const id = this.headingId(text(inner))
         return `<h${depth}${attributes} id="${id}"><a href="#${id}" aria-hidden="true" tabindex="-1"><span class="icon icon-link"></span></a>${inner}</h${depth}>`
       })
