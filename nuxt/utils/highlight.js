@@ -4,6 +4,11 @@ import 'prismjs/components/prism-json.js'
 import 'prismjs/components/prism-yaml.js'
 import 'prismjs/components/prism-nginx.js'
 
+// Prism highlights every code element on the page when it loads, by the
+// language in its class, and writes plain text where it has no grammar of
+// that name. Its own aliases cover the rest of the names below.
+Prism.languages.vue = Prism.languages.markup
+
 /** The Prism grammar for each language a code block can declare. */
 const GRAMMARS = {
   js: 'javascript',

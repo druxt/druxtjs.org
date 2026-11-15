@@ -5,6 +5,7 @@
 
 import { describe, test } from 'node:test'
 import assert from 'node:assert/strict'
+import { createRequire } from 'node:module'
 
 const { highlight, highlightHtml } = await import('../nuxt/utils/highlight.js')
 
@@ -19,6 +20,28 @@ describe('highlight', () => {
   test('escapes a language it has none for', () => {
     assert.equal(highlight('<b> & </b>', 'text'), '&lt;b&gt; &amp; &lt;/b&gt;')
   })
+})
+
+describe('the language names a block can carry in its class', () => {
+  const Prism = createRequire(new URL('../nuxt/package.json', import.meta.url))('prismjs')
+
+  for (const name of [
+    'js',
+    'javascript',
+    'sh',
+    'bash',
+    'shell',
+    'vue',
+    'html',
+    'json',
+    'yaml',
+    'yml',
+    'nginx',
+  ]) {
+    test(`${name} is a grammar Prism finds when it scans the page`, () => {
+      assert.ok(Prism.languages[name], `Prism has no grammar named ${name}`)
+    })
+  }
 })
 
 describe('highlightHtml', () => {
