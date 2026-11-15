@@ -6,7 +6,7 @@
       <p v-if="lead" class="mt-4 text-lg text-base-content/70 max-w-xl" v-text="lead" />
       <p v-if="note || noteLinkText" class="mt-2 text-sm text-base-content/60">
         {{ note }}
-        <NuxtLink v-if="noteLinkText && noteLinkUrl" class="underline hover:text-primary-focus" :to="noteLinkUrl">{{ noteLinkText }}</NuxtLink><template v-if="noteLinkText">.</template>
+        <AppLink v-if="noteLinkText && noteLinkUrl" class="underline hover:text-primary-focus" :to="noteLinkUrl">{{ noteLinkText }}</AppLink><template v-if="noteLinkText">.</template>
       </p>
       <div v-if="$slots.actions" class="mt-9 flex flex-wrap items-center justify-center gap-3">
         <slot name="actions" />

@@ -15,7 +15,7 @@
       type="button"
       class="mt-2 inline-flex items-center gap-1.5 text-sm text-base-content/70 hover:text-base-content"
       :aria-expanded="advanced ? 'true' : 'false'"
-      aria-controls="quickstart-advanced"
+      :aria-controls="`quickstart-advanced-${_uid}`"
       @click="advanced = !advanced"
     >
       <span aria-hidden="true" class="inline-block w-3 text-center">{{ advanced ? '−' : '+' }}</span>
@@ -24,7 +24,7 @@
 
     <div
       v-show="advanced"
-      id="quickstart-advanced"
+      :id="`quickstart-advanced-${_uid}`"
       class="mt-3 rounded-box border border-base-300 bg-base-100 p-4 text-left flex flex-col gap-4"
     >
       <!-- Hidden while only one starter kit is enabled. -->
@@ -41,7 +41,7 @@
             <input
               v-model="repo"
               type="radio"
-              name="quickstart"
+              :name="`quickstart-${_uid}`"
               class="radio radio-sm radio-primary mt-0.5 flex-shrink-0"
               :value="option.repo"
             >
@@ -62,7 +62,7 @@
             class="flex items-center gap-2 rounded-btn border px-3 py-2 cursor-pointer text-sm transition-colors"
             :class="runner === option.value ? 'border-primary bg-base-200 font-medium' : 'border-base-300 hover:border-primary'"
           >
-            <input v-model="runner" type="radio" name="runner" class="radio radio-sm radio-primary flex-shrink-0" :value="option.value">
+            <input v-model="runner" type="radio" :name="`runner-${_uid}`" class="radio radio-sm radio-primary flex-shrink-0" :value="option.value">
             {{ option.label }}
           </label>
         </div>
@@ -160,14 +160,18 @@ export default {
 
   methods: {
     async copy() {
+      const command = this.command
       try {
-        await navigator.clipboard.writeText(this.command)
+        await navigator.clipboard.writeText(command)
+        // The reader picked another command while this one was being copied.
+        if (command !== this.command) return
         this.copied = true
         // gtag() is defined only by the production analytics snippet, so this
         // is a no-op in dev, preview and SSR.
         window.gtag?.('event', 'copy_quickstart_command', { repo: this.repo, runner: ((this.runners[this.runner] || {}).label || '').toLowerCase() })
       } catch (e) {
         // navigator.clipboard is absent on non-secure origins, and can be denied.
+        if (command !== this.command) return
         this.copyFailed = true
         setTimeout(() => { this.copyFailed = false }, 2000)
       }

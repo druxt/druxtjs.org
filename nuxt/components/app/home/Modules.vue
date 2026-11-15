@@ -6,7 +6,7 @@
           <h2 class="text-2xl font-semibold" v-text="heading" />
           <p v-if="text" class="mt-1 text-base-content/70" v-text="text" />
         </div>
-        <NuxtLink v-if="linkText" class="btn btn-sm btn-ghost" :to="linkUrl">{{ linkText }}</NuxtLink>
+        <AppLink v-if="linkText" class="btn btn-sm btn-ghost" :to="linkUrl">{{ linkText }}</AppLink>
       </div>
 
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

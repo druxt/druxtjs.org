@@ -5,7 +5,7 @@
     another that does: Nuxt keeps each one's fetch key on its root element.
   -->
   <div v-if="canvas">
-    <DruxtCanvas :uuid="canvas" />
+    <DruxtCanvas :value="canvas" />
   </div>
 
   <div v-else>
@@ -58,7 +58,7 @@ const CANVAS_PATH = '/home'
 
 export default {
   data: () => ({
-    // The uuid of the front page's Canvas page, when there is one.
+    // The front page's Canvas page, when Drupal has one that loads.
     canvas: null,
     slogan: 'The Fully Decoupled Drupal Framework',
     features: [
@@ -89,13 +89,16 @@ export default {
 
   /**
    * Asks Drupal for the Canvas page. Until one is published at its path, the
-   * answer is an error, and the page below renders.
+   * answer is an error, and the page below renders. It renders too when the
+   * page itself does not load, which is why the page is fetched here and
+   * handed to the component: the store answers a failure without rejecting.
    */
   async fetch() {
     try {
       const { route } = (await this.$store.dispatch('druxtRouter/get', CANVAS_PATH)) || {}
       const { type, uuid } = (route || {}).props || {}
-      this.canvas = type === CANVAS_PAGE ? uuid : null
+      const resource = type === CANVAS_PAGE ? await this.$store.dispatch('druxt/getResource', { type, id: uuid }) : null
+      this.canvas = (resource || {}).data || null
     } catch (e) {
       this.canvas = null
     }

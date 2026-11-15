@@ -4,7 +4,7 @@
     <h2 class="text-lg font-semibold" v-text="heading" />
     <p class="mt-2 text-sm text-base-content/70">
       {{ text }}
-      <NuxtLink v-if="linkUrl && linkText" :to="linkUrl" v-text="linkText" />
+      <AppLink v-if="linkUrl && linkText" :to="linkUrl">{{ linkText }}</AppLink>
     </p>
   </div>
 </template>
