@@ -1,0 +1,15 @@
+uuid: 63edf6cf-9111-4d6f-b35b-55d38e39f38b
+langcode: en
+status: true
+dependencies:
+  config:
+    - canvas.component.marker.page_content
+    - canvas.component.sdc.navigation.message
+    - canvas.component.sdc.navigation.title
+name: Other
+configEntityTypeId: component
+weight: 0
+items:
+  - marker.page_content
+  - sdc.navigation.message
+  - sdc.navigation.title

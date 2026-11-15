@@ -1,5 +1,5 @@
 {
-    "_hash": "212152985982cf516f23bafe9074c4e9666a5038a97f5b60dde0f35373b83a7d",
+    "_hash": "b08a3231d73b47a7d2f7c825c12c99f326415b132c91e3c344750b72f8cb12ce",
     "patches": {
         "drupal/core": [
             {
@@ -18,6 +18,18 @@
                 "url": "patches/jsonapi-3626255-data-normalizer-argument.patch",
                 "sha256": "578caf52d23e10cedc67480d62204ed45f794883d07e1fdef26c7918996bf26c",
                 "depth": 2,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ],
+        "drupal/canvas": [
+            {
+                "package": "drupal/canvas",
+                "description": "Issue #3592360: JSON:API config entity collections answer 500 when page[offset] is set",
+                "url": "https://github.com/Decipher/canvas/pull/1.diff",
+                "sha256": "db16b2e5df750c97eeb7e0b1f9c5aec46bf7f9e6dce9b85fd9855c76bd8a8a87",
+                "depth": 1,
                 "extra": {
                     "provenance": "root"
                 }

@@ -1,0 +1,52 @@
+'$schema': 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: Feature
+description: One feature of a Features grid, with an icon, a heading, a sentence and an optional link.
+group: druxtjs.org
+props:
+  type: object
+  required:
+    - heading
+    - text
+  properties:
+    icon:
+      type: string
+      title: Icon
+      enum:
+        - none
+        - api
+        - modules
+        - globe
+        - lock
+        - components
+        - playground
+      meta:enum:
+        none: No icon
+        api: API
+        modules: Modules
+        globe: Globe
+        lock: Lock
+        components: Components
+        playground: Playground
+      examples:
+        - api
+    heading:
+      type: string
+      title: Heading
+      examples:
+        - JSON:API client and store
+    text:
+      type: string
+      title: Text
+      examples:
+        - A JSON:API client and Vuex store modules keep Drupal entities, resources and relationships in sync on the frontend.
+    link_text:
+      type: string
+      title: Link text
+      examples:
+        - Add a login flow.
+    link_url:
+      type: string
+      title: Link
+      format: uri-reference
+      examples:
+        - /tutorials/authentication

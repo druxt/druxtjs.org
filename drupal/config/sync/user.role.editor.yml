@@ -10,6 +10,7 @@ dependencies:
     - node.type.docs_issue
     - workflows.workflow.editorial
   module:
+    - canvas
     - coffee
     - content_moderation
     - environment_indicator
@@ -41,6 +42,7 @@ permissions:
   - 'access navigation'
   - 'administer node published status'
   - 'administer workspaces'
+  - 'create canvas_page'
   - 'create doc_page content'
   - 'create docs_issue content'
   - 'create image media'
@@ -49,6 +51,7 @@ permissions:
   - 'delete any doc_page content'
   - 'delete any docs_issue content'
   - 'delete any image media'
+  - 'delete canvas_page'
   - 'delete doc_page revisions'
   - 'delete docs_issue revisions'
   - 'delete own doc_page content'
@@ -58,10 +61,12 @@ permissions:
   - 'edit any docs_issue content'
   - 'edit any image media'
   - 'edit any workspace'
+  - 'edit canvas_page'
   - 'edit own doc_page content'
   - 'edit own docs_issue content'
   - 'edit own image media'
   - 'grant simple_oauth codes'
+  - 'publish auto-saves'
   - 'revert doc_page revisions'
   - 'revert docs_issue revisions'
   - 'schedule workspace releases'

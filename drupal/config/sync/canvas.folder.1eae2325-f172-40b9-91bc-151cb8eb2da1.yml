@@ -1,0 +1,11 @@
+uuid: 1eae2325-f172-40b9-91bc-151cb8eb2da1
+langcode: en
+status: true
+dependencies:
+  config:
+    - canvas.component.block.workspace_switcher
+name: Workspace
+configEntityTypeId: component
+weight: 0
+items:
+  - block.workspace_switcher

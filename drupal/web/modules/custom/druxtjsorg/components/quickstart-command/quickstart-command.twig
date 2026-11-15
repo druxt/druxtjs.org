@@ -1,0 +1,6 @@
+{# The first command, as the frontend shows it before a reader picks another. #}
+{% set kit = (starter_kits|default([])|first|default('quickstart'))|split('|')|first|trim %}
+{# A line is "Label | command", and the command may hold pipes of its own. #}
+{% set line = (commands|default([])|first|default(''))|split('|', 2) %}
+{% set command = line|length > 1 ? line[1]|trim : '' %}
+{% if command %}<p><code>{{ command|replace({'{repo}': kit}) }}</code></p>{% endif %}
