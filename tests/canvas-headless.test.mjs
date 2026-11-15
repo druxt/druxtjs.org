@@ -132,3 +132,35 @@ describe("Canvas Headless and the editor's workspace", () => {
     assert.match(plugin, /document\.createElement\(ELEMENT\)/)
   })
 })
+
+describe("Canvas Headless and the page's layout", async () => {
+  const { default: layout } = await import('../nuxt/modules/canvas-headless/layout.js')
+  const framed = (referer) => ({
+    query: {},
+    req: { headers: { 'sec-fetch-dest': 'iframe', referer } },
+  })
+
+  test('the editor frames the page alone', () => {
+    assert.equal(layout(framed('https://site.test/canvas/editor/canvas_page/1')), 'canvas-headless')
+    assert.equal(layout(framed(undefined)), 'canvas-headless')
+  })
+
+  test("Canvas's preview frames the page in the site's layout", () => {
+    assert.equal(layout(framed('https://site.test/canvas/preview/canvas_page/1/full')), 'default')
+  })
+
+  test('a page that is not framed has the site around it', () => {
+    assert.equal(layout({ query: {}, req: { headers: {} } }), 'default')
+  })
+
+  test('the layout parameter picks either', () => {
+    assert.equal(
+      layout({ ...framed('https://site.test/canvas/preview/x'), query: { layout: 'page' } }),
+      'canvas-headless'
+    )
+    assert.equal(
+      layout({ ...framed('https://site.test/canvas/editor/x'), query: { layout: 'site' } }),
+      'default'
+    )
+  })
+})
