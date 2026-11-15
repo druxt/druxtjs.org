@@ -81,6 +81,10 @@ describe('Canvas Headless cookies', () => {
     assert.deepEqual(cookies({ headers: {} }), {})
   })
 
+  test('a cookie that is not valid percent-encoding is kept as sent', () => {
+    assert.deepEqual(cookies({ headers: { cookie: 'tracking=%; a=1' } }), { tracking: '%', a: '1' })
+  })
+
   test('a draft cookie keeps the attributes a framed, cross-site session needs', () => {
     const cookie = {
       name: 'n',
@@ -162,5 +166,20 @@ describe("Canvas Headless and the page's layout", async () => {
       layout({ ...framed('https://site.test/canvas/editor/x'), query: { layout: 'site' } }),
       'default'
     )
+  })
+})
+
+describe('Canvas Headless page results', () => {
+  const read = (file) =>
+    readFileSync(new URL(`../nuxt/modules/canvas-headless/${file}`, import.meta.url), 'utf8')
+
+  test('a path Drupal redirects is followed, not drawn', () => {
+    assert.match(read('page.vue'), /if \(data\.page\.redirect\) return redirect\(/)
+  })
+
+  test('a refresh that fails or redirects keeps the page as it was', () => {
+    const source = read('CanvasPage.vue')
+    assert.match(source, /load\(this\.path\)\.catch\(/)
+    assert.match(source, /if \(page && !page\.redirect\) this\.refreshed = page/)
   })
 })

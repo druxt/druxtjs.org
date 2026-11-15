@@ -17,13 +17,22 @@ const sdk = () =>
     import('@drupal-canvas/headless'),
   ]).then(([server, endpoint, core]) => ({ server, endpoint, core }))
 
+// A value that is not valid percent-encoding is kept as it was sent.
+const decode = (value) => {
+  try {
+    return decodeURIComponent(value)
+  } catch (error) {
+    return value
+  }
+}
+
 const cookies = (req) =>
   Object.fromEntries(
     String(req.headers.cookie || '')
       .split(';')
       .map((pair) => pair.trim().split(/=(.*)/s))
       .filter(([name]) => name)
-      .map(([name, value]) => [name, decodeURIComponent(value || '')])
+      .map(([name, value]) => [name, decode(value || '')])
   )
 
 /**

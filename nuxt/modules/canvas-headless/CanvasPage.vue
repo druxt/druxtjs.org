@@ -52,8 +52,9 @@ export default {
   mounted() {
     this.refresh = async (event) => {
       event.preventDefault()
-      const { page } = await load(this.path)
-      if (page) this.refreshed = page
+      // A read that fails, or finds no content, leaves the page as it was.
+      const { page } = await load(this.path).catch(() => ({}))
+      if (page && !page.redirect) this.refreshed = page
     }
     document.addEventListener(REFRESH, this.refresh)
   },
