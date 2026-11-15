@@ -1,0 +1,46 @@
+uuid: 5366a4a7-0f74-44ba-b8e6-5cda2a4dee4f
+langcode: en
+status: true
+dependencies:
+  config:
+    - canvas.js_component.quickstart-command
+active_version: 3567946ffed5b526
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        commands:
+          required: false
+          field_type: string
+          cardinality: -1
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'giget | npx giget@1 gh:druxt/{repo}#develop my-druxt-site --install'
+            -
+              value: 'DevPod | devpod up github.com/druxt/{repo}'
+          expression: ℹ︎string␟value
+          derived_schema_metadata:
+            string_shape: {  }
+        starter_kits:
+          required: false
+          field_type: string
+          cardinality: -1
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'quickstart | Druxt Quickstart | Drupal 11, Nuxt 2 and Druxt in one repository.'
+          expression: ℹ︎string␟value
+          derived_schema_metadata:
+            string_shape: {  }
+    fallback_metadata:
+      slot_definitions: {  }
+label: 'Quickstart command'
+id: js.quickstart-command
+provider: null
+source: js
+source_local_id: quickstart-command

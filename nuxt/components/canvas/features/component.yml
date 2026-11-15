@@ -1,0 +1,10 @@
+name: Features
+machineName: features
+status: true
+required: []
+props:
+  properties: {}
+slots:
+  items:
+    title: Features
+    description: The Feature components of the grid.

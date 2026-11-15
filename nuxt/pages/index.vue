@@ -4,7 +4,11 @@
     inside this element because a component that fetches cannot be the root of
     another that does: Nuxt keeps each one's fetch key on its root element.
   -->
-  <div v-if="canvas">
+  <div v-if="headless">
+    <CanvasPage :path="headless.path" :page="headless.page" :session="headless.session" />
+  </div>
+
+  <div v-else-if="canvas">
     <DruxtCanvas :value="canvas" />
   </div>
 
@@ -48,6 +52,9 @@
 </template>
 
 <script>
+import CanvasPage from '~/modules/canvas-headless/CanvasPage'
+import load from '~/modules/canvas-headless/load'
+import layout from '~/modules/canvas-headless/layout'
 import { SITE_DESCRIPTION } from '~/lib/site'
 import { seoHead } from '~/utils/seo'
 
@@ -57,6 +64,20 @@ const CANVAS_PAGE = 'canvas_page--canvas_page'
 const CANVAS_PATH = '/home'
 
 export default {
+  components: { CanvasPage },
+
+  layout: (context) => (context.$config.canvasHeadless ? layout(context) : 'default'),
+
+  // With Canvas Headless on, the front page's Canvas page comes from Canvas's
+  // content API, built from the site's own components, and Canvas's editor
+  // frames this page to preview it. Without a Canvas page, the page below
+  // renders either way.
+  async asyncData({ $config, req }) {
+    if (!$config.canvasHeadless) return { headless: null }
+    const { page, session } = await load(CANVAS_PATH, req).catch(() => ({}))
+    return { headless: page && page.content ? { path: CANVAS_PATH, page, session } : null }
+  },
+
   data: () => ({
     // The front page's Canvas page, when Drupal has one that loads.
     canvas: null,
@@ -94,6 +115,7 @@ export default {
    * handed to the component: the store answers a failure without rejecting.
    */
   async fetch() {
+    if (this.headless) return
     try {
       const { route } = (await this.$store.dispatch('druxtRouter/get', CANVAS_PATH)) || {}
       const { type, uuid } = (route || {}).props || {}

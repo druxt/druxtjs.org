@@ -1,0 +1,30 @@
+uuid: 1d3ff455-3c47-4ef1-9774-276d7c9dbb01
+langcode: en
+status: true
+dependencies: {  }
+machineName: quickstart-command
+name: 'Quickstart command'
+type: external
+required: {  }
+props:
+  commands:
+    type: array
+    items:
+      type: string
+    title: Commands
+    description: 'One per line, as "Label | command". The first is shown until a reader picks another. {repo} stands for the chosen starter kit.'
+    examples:
+      -
+        - 'giget | npx giget@1 gh:druxt/{repo}#develop my-druxt-site --install'
+        - 'DevPod | devpod up github.com/druxt/{repo}'
+  starter_kits:
+    type: array
+    items:
+      type: string
+    title: 'Starter kits'
+    description: 'One per line, as "repository | Title | Description", the repository being its name under github.com/druxt. With one starter kit, the reader is not asked to choose.'
+    examples:
+      -
+        - 'quickstart | Druxt Quickstart | Drupal 11, Nuxt 2 and Druxt in one repository.'
+slots: {  }
+dataDependencies: {  }

@@ -20,6 +20,11 @@ Druxt 1.0.0.
 - The quickstart command's commands and starter kits are set in Canvas, a
   line each.
 - Editors can create, edit, delete and publish Canvas pages.
+- Canvas's editor can preview through the site, off by default. With
+  `CANVAS_SITE_URL` set and the site added under Headless frontends in
+  Canvas, the editor shows a draft as the site renders it, and an editor
+  places the Vue components under `nuxt/components/canvas`, which hold the
+  front page's seven. It is experimental and needs Node 22.19 or later.
 
 ## [0.19.0] - 2026-11-14
 
