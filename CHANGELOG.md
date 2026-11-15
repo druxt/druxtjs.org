@@ -26,6 +26,12 @@ Druxt 1.0.0.
   places the Vue components under `nuxt/components/canvas`, which hold the
   front page's seven. It is experimental and needs Node 22.19 or later.
 
+### Fixed
+
+- Code inside a text block is highlighted. A fenced code block in a page's
+  markdown, such as one indented under a list item, rendered as plain text;
+  it now gets the same highlighting as a code block of its own.
+
 ## [0.19.0] - 2026-11-14
 
 ### Added
