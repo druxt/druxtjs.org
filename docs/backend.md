@@ -361,10 +361,18 @@ representation. `npm run docs:fetch` checks the commit out into
 
 ## Canvas
 
-Drupal Canvas is installed, and its editor is reached through the site at
-`/canvas`. The components it offers for the front page are the
-single-directory components under
-`drupal/web/modules/custom/druxtjsorg/components`.
+The front page is a Canvas page once one is published at `/home`. The
+frontend asks Drupal's router for that path and renders the page with
+`@druxt-contrib/canvas`, which is vendored under `nuxt/vendor/druxt-canvas`
+until it is published. Without a Canvas page, the frontend renders its
+built-in front page. `/home` redirects to `/`, and Canvas's editor is
+reached through the site at `/canvas`.
+
+The page's components are the single-directory components under
+`drupal/web/modules/custom/druxtjsorg/components`. Each has a wrapper of the
+same name under `nuxt/components/druxt/canvas/sdc/druxtjsorg`, and
+`tests/canvas-components.test.mjs` fails when one is missing or does not
+declare an input.
 
 `drupal/composer.json` patches `drupal/canvas` for
 [#3592360](https://www.drupal.org/project/canvas/issues/3592360). With Canvas

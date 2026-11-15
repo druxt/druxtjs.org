@@ -12,6 +12,9 @@ const SUBDOMAINS = ['blocks', 'breadcrumb', 'entity', 'menu', 'router', 'schema'
 
 /** An old path, without its trailing slash, and the page it became. */
 const PATHS = {
+  // The Drupal path of the front page's Canvas page, which pages/index.vue
+  // renders at the site's root.
+  '/home': '/',
   '/guide': '/tutorials',
   '/guide/getting-started': '/tutorials/getting-started',
   '/guide/getting-started.html': '/tutorials/getting-started',
