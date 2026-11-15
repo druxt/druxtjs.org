@@ -153,27 +153,37 @@ export default {
 
   watch: {
     command() {
+      this.operation++
       this.copied = false
       this.copyFailed = false
     },
   },
 
+  created() {
+    // Counts copies and changes of command, so that a copy which ends after
+    // either reports nothing. It is not rendered, so it is not in data.
+    this.operation = 0
+  },
+
   methods: {
     async copy() {
-      const command = this.command
+      const operation = ++this.operation
       try {
-        await navigator.clipboard.writeText(command)
-        // The reader picked another command while this one was being copied.
-        if (command !== this.command) return
+        await navigator.clipboard.writeText(this.command)
+        // The reader picked another command, or copied again, in the meantime.
+        if (operation !== this.operation) return
         this.copied = true
+        this.copyFailed = false
         // gtag() is defined only by the production analytics snippet, so this
         // is a no-op in dev, preview and SSR.
         window.gtag?.('event', 'copy_quickstart_command', { repo: this.repo, runner: ((this.runners[this.runner] || {}).label || '').toLowerCase() })
       } catch (e) {
         // navigator.clipboard is absent on non-secure origins, and can be denied.
-        if (command !== this.command) return
+        if (operation !== this.operation) return
         this.copyFailed = true
-        setTimeout(() => { this.copyFailed = false }, 2000)
+        setTimeout(() => {
+          if (operation === this.operation) this.copyFailed = false
+        }, 2000)
       }
     },
   },

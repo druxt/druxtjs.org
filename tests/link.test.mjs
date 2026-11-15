@@ -69,4 +69,11 @@ describe('the quickstart command', () => {
     assert.doesNotMatch(source, /\sid="/)
     assert.equal(source.match(/:name="`[a-z-]+-\$\{_uid\}`"/g).length, 2)
   })
+
+  test('reports a copy only while it is the latest one for the command shown', () => {
+    // A copy that ends late must not label a command picked, or copied again, since.
+    assert.match(source, /const operation = \+\+this\.operation/)
+    assert.equal(source.match(/operation !== this\.operation\) return/g).length, 2)
+    assert.match(source, /command\(\) \{\s+this\.operation\+\+/)
+  })
 })
