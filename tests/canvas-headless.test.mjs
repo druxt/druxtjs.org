@@ -177,9 +177,12 @@ describe('Canvas Headless page results', () => {
     assert.match(read('page.vue'), /if \(data\.page\.redirect\) return redirect\(/)
   })
 
-  test('a refresh that fails or redirects keeps the page as it was', () => {
+  test('a refresh that fails or redirects reloads the document', () => {
     const source = read('CanvasPage.vue')
     assert.match(source, /load\(this\.path\)\.catch\(/)
-    assert.match(source, /if \(page && !page\.redirect\) this\.refreshed = page/)
+    assert.match(
+      source,
+      /if \(page && !page\.redirect\) this\.refreshed = page\s+else window\.location\.reload\(\)/
+    )
   })
 })

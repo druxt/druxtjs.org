@@ -52,9 +52,11 @@ export default {
   mounted() {
     this.refresh = async (event) => {
       event.preventDefault()
-      // A read that fails, or finds no content, leaves the page as it was.
+      // A read that fails, or finds no content, reloads the document, as the
+      // session element does on its own: the reload shows what went wrong.
       const { page } = await load(this.path).catch(() => ({}))
       if (page && !page.redirect) this.refreshed = page
+      else window.location.reload()
     }
     document.addEventListener(REFRESH, this.refresh)
   },
