@@ -11,7 +11,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 
 const COMPONENTS = 'nuxt/components/canvas'
 const CONFIG = 'drupal/config/sync'
-const { cookies, serialise } = createRequire(import.meta.url)(
+const { cookies, serialise, workspaceFetch } = createRequire(import.meta.url)(
   '../nuxt/modules/canvas-headless/server.js'
 )
 
@@ -96,5 +96,39 @@ describe('Canvas Headless cookies', () => {
       serialise({ ...cookie, value: '', expires: new Date(0) }),
       /Expires=Thu, 01 Jan 1970 00:00:00 GMT/
     )
+  })
+})
+
+describe("Canvas Headless and the editor's workspace", () => {
+  const sent = async (workspace, headers) => {
+    let seen
+    await workspaceFetch(workspace, async (url, init) => {
+      seen = init.headers
+    })('http://drupal.test/canvas/content-api', { headers })
+    return seen.get('X-Druxt-Workspace')
+  }
+
+  test("a session's request names the workspace", async () => {
+    assert.equal(await sent('stage', { Authorization: 'Bearer token' }), 'stage')
+  })
+
+  test('a request without the token names none, and live names none', async () => {
+    assert.equal(await sent('stage', { Accept: 'application/json' }), null)
+    assert.equal(await sent(null, { Authorization: 'Bearer token' }), null)
+  })
+
+  test('Drupal lets the preview token view a workspace', () => {
+    const hook = readFileSync(
+      'drupal/web/modules/custom/druxtjsorg/src/Hook/CanvasHeadlessHooks.php',
+      'utf8'
+    )
+    assert.match(hook, /#\[Hook\('canvas_headless_safe_permissions'\)\]/)
+    assert.match(hook, /'view any workspace'/)
+  })
+
+  test('a framed page without a session element is given one', () => {
+    const plugin = readFileSync('nuxt/modules/canvas-headless/plugin.js', 'utf8')
+    assert.match(plugin, /window\.self === window\.top\) return/)
+    assert.match(plugin, /document\.createElement\(ELEMENT\)/)
   })
 })

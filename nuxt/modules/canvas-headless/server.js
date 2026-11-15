@@ -6,6 +6,7 @@
  * request and response turned into the web ones the SDK takes.
  */
 const path = require('path')
+const { HEADER: WORKSPACE_HEADER, readWorkspace } = require('../../lib/workspace')
 
 const DRAFT_FLAG = 'canvas_headless_draft_mode'
 
@@ -24,6 +25,21 @@ const cookies = (req) =>
       .filter(([name]) => name)
       .map(([name, value]) => [name, decodeURIComponent(value || '')])
   )
+
+/**
+ * A fetch that names a workspace on the requests that carry a session's token.
+ *
+ * @param {string|null} workspace - The workspace's id, or null for live.
+ * @param {Function} [send] - The fetch to send with.
+ * @returns {Function} A fetch.
+ */
+const workspaceFetch =
+  (workspace, send = fetch) =>
+  (url, init = {}) => {
+    const headers = new Headers(init.headers)
+    if (workspace && headers.has('authorization')) headers.set(WORKSPACE_HEADER, workspace)
+    return send(url, { ...init, headers })
+  }
 
 const serialise = ({ name, value, httpOnly, path, sameSite, secure, partitioned, expires }) =>
   [
@@ -112,7 +128,11 @@ module.exports = ({ rootDir }) => {
   const draftServer = async (req, res) => {
     const { server } = await sdk()
     const jar = cookies(req)
+    // The workspace the editor reads the site in goes with the session's own
+    // requests to Drupal, so a page that exists only in a workspace is found.
+    // Drupal ignores the header from anyone not signed in.
     return server.createDraftServer({
+      fetchImpl: workspaceFetch(readWorkspace(req.headers.cookie)),
       adapter: {
         getRequestUrl: async () => requestUrl(req),
         getCookie: async (name) => (name in jar ? jar[name] : null),
@@ -208,3 +228,4 @@ module.exports = ({ rootDir }) => {
 
 module.exports.cookies = cookies
 module.exports.serialise = serialise
+module.exports.workspaceFetch = workspaceFetch
