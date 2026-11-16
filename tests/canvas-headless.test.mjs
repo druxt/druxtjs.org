@@ -186,3 +186,66 @@ describe('Canvas Headless page results', () => {
     )
   })
 })
+
+describe("the front page's Canvas page", () => {
+  const front = () => import('../nuxt/modules/canvas-headless/front.js')
+  const own = {
+    element: 'renderless-container',
+    slots: { default: [{ element: 'js-hero', slots: { actions: [{ element: 'js-action' }] } }] },
+  }
+  const drupal = {
+    element: 'renderless-container',
+    slots: {
+      default: [
+        { element: 'js-hero' },
+        { element: 'drupal-markup', slots: { default: '<p>Hero</p>' } },
+      ],
+    },
+  }
+
+  test("a tree of the site's own components can be drawn", async () => {
+    const { drawable } = await front()
+    assert.equal(drawable(own), true)
+  })
+
+  test("a tree with Drupal's markup anywhere in it cannot, and neither can no tree", async () => {
+    const { drawable } = await front()
+    assert.equal(drawable(drupal), false)
+    assert.equal(
+      drawable({ element: 'js-hero', slots: { content: { element: 'drupal-markup' } } }),
+      false
+    )
+    assert.equal(drawable(null), false)
+  })
+
+  test("a JSON:API page says whether it holds the site's own components", async () => {
+    const { usesOwnComponents } = await front()
+    const page = (...ids) => ({
+      attributes: { components: ids.map((id) => ({ component_id: id })) },
+    })
+    assert.equal(usesOwnComponents(page('sdc.druxtjsorg.hero', 'sdc.druxtjsorg.action')), false)
+    assert.equal(usesOwnComponents(page('sdc.druxtjsorg.hero', 'js.action')), true)
+    assert.equal(usesOwnComponents(null), false)
+  })
+
+  test('the front page draws from the content API only a tree it can draw', () => {
+    const page = readFileSync('nuxt/pages/index.vue', 'utf8')
+    assert.match(page, /page && drawable\(page\.content\)/)
+    assert.match(page, /page && !usesOwnComponents\(page\) \? page : null/)
+  })
+
+  test("Lagoon names the site as Canvas's frontend, with every component the site has", () => {
+    const settings = readFileSync('drupal/web/sites/default/settings.lagoon.php', 'utf8')
+    assert.match(
+      settings,
+      /if \(\$frontend && getenv\('CANVAS_SITE_URL'\)\) \{\s+\$config\['canvas_headless\.settings'\]\['frontends'\]/
+    )
+    const block = settings.slice(
+      settings.indexOf("$config['canvas_headless.settings']['frontends']")
+    )
+    const listed = [...block.slice(0, block.indexOf('];')).matchAll(/'(js\.[a-z-]+)'/g)].map(
+      (match) => match[1]
+    )
+    assert.deepEqual(listed, names.map((name) => `js.${name}`).sort())
+  })
+})
