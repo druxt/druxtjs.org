@@ -1,0 +1,21 @@
+uuid: 67bf7d29-22ef-4e32-b1b3-449eb900db08
+langcode: en
+status: true
+dependencies:
+  config:
+    - canvas.js_component.features
+active_version: 8e4412f6b23b442a
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions: {  }
+    fallback_metadata:
+      slot_definitions:
+        items:
+          title: Features
+          description: 'The Feature components of the grid.'
+label: Features
+id: js.features
+provider: null
+source: js
+source_local_id: features

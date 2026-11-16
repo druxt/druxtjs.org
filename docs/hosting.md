@@ -17,7 +17,7 @@ services, and `.lagoon.yml` adds the post-rollout task.
 
 | Service     | Built from                             | What it does                                                                 |
 | ----------- | -------------------------------------- | ---------------------------------------------------------------------------- |
-| `nuxt`      | `lagoon/nuxt.dockerfile`, Node 16      | Serves the site, and proxies Drupal's API and files                          |
+| `nuxt`      | `lagoon/nuxt.dockerfile`, Node 24      | Serves the site, and proxies Drupal's API and files                          |
 | `storybook` | `lagoon/storybook.dockerfile`, Node 16 | Storybook for the site's components and Druxt's, started once Drupal answers |
 | `nginx`     | `lagoon/nginx.dockerfile`              | Serves Drupal, including its admin pages                                     |
 | `php`       | `lagoon/php.dockerfile`, PHP 8.3       | Runs Drupal for `nginx`, in the same pod                                     |

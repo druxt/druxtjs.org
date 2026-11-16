@@ -1,0 +1,51 @@
+uuid: fef3387f-c0cd-417c-b1af-8915825fa967
+langcode: en
+status: true
+dependencies:
+  module:
+    - druxtjsorg
+active_version: 3567946ffed5b526
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        commands:
+          required: false
+          field_type: string
+          cardinality: -1
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'giget | npx giget@1 gh:druxt/{repo}#develop my-druxt-site --install'
+            -
+              value: 'DevPod | devpod up github.com/druxt/{repo}'
+          expression: ℹ︎string␟value
+          derived_schema_metadata:
+            string_shape: {  }
+        starter_kits:
+          required: false
+          field_type: string
+          cardinality: -1
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'quickstart | Druxt Quickstart | Drupal 11, Nuxt 2 and Druxt in one repository.'
+          expression: ℹ︎string␟value
+          derived_schema_metadata:
+            string_shape: {  }
+    fallback_metadata:
+      slot_definitions: {  }
+  8fe3be948e0194e1:
+    settings:
+      prop_field_definitions: {  }
+    fallback_metadata:
+      slot_definitions: {  }
+label: 'Quickstart command'
+id: sdc.druxtjsorg.quickstart-command
+provider: druxtjsorg
+source: sdc
+source_local_id: 'druxtjsorg:quickstart-command'

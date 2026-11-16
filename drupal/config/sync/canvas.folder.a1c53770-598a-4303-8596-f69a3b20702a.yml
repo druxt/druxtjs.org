@@ -1,0 +1,23 @@
+uuid: a1c53770-598a-4303-8596-f69a3b20702a
+langcode: en
+status: true
+dependencies:
+  config:
+    - canvas.component.sdc.druxtjsorg.action
+    - canvas.component.sdc.druxtjsorg.feature
+    - canvas.component.sdc.druxtjsorg.features
+    - canvas.component.sdc.druxtjsorg.hero
+    - canvas.component.sdc.druxtjsorg.modules
+    - canvas.component.sdc.druxtjsorg.quickstart-command
+    - canvas.component.sdc.druxtjsorg.showcase
+name: druxtjs.org
+configEntityTypeId: component
+weight: 0
+items:
+  - sdc.druxtjsorg.action
+  - sdc.druxtjsorg.feature
+  - sdc.druxtjsorg.features
+  - sdc.druxtjsorg.hero
+  - sdc.druxtjsorg.modules
+  - sdc.druxtjsorg.quickstart-command
+  - sdc.druxtjsorg.showcase

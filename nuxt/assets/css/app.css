@@ -1136,8 +1136,11 @@ html.sign-in-open body {
   color: #ffb547;
 }
 
-/* The pill at the foot of the page while a draft or old revision is shown. */
-body.has-editor-bar main {
+/* Room for the editor's bar at the foot of the page, so it never covers the
+   page's last line. In the footer, which is the foot of every page and has a
+   colour of its own: room in the page's content left a band of the page's
+   background above the footer on a full-width page. */
+body.has-editor-bar .site-footer {
   padding-bottom: 4.5rem;
 }
 /* The editor's floating bar: what the reader is on, and what Drupal offers

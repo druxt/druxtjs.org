@@ -100,3 +100,5 @@ nonword
 Vuex
 commonmark
 trycloudflare
+quickstart
+giget

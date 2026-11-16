@@ -15,6 +15,8 @@ module:
   admin_audit_trail_user_roles: 0
   block: 0
   breakpoint: 0
+  canvas: 0
+  canvas_headless: 0
   ckeditor5: 0
   codemirror_editor: 0
   coffee: 0
@@ -22,7 +24,9 @@ module:
   consumers: 0
   content_moderation: 0
   contextual: 0
+  custom_elements: 0
   custom_formatters: 0
+  datetime: 0
   dblog: 0
   decoupled_router: 0
   decoupled_settings: 0
@@ -106,4 +110,5 @@ theme:
   druxtjs: 0
   claro: 0
   gin: 0
+  canvas_stark: 0
 profile: minimal

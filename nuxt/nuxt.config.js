@@ -234,6 +234,8 @@ export default {
   },
 
   modules: [
+    // Canvas's editor previews through this site. On when CANVAS_SITE_URL is set.
+    '~/modules/canvas-headless',
     '@nuxt/content',
     'druxt',
     'druxt-router/nuxt',
@@ -258,6 +260,9 @@ export default {
     // A Drupal user, by uuid, by the number a path carries, or whoever is
     // signed in. The profile pages use it.
     '@druxt-contrib/user',
+    // Drupal Canvas pages: each Canvas component renders through a wrapper
+    // in components/druxt/canvas, and a page renders at its own path.
+    '@druxt-contrib/canvas',
     // The consumer's decoupled settings and theme manifest, baked in at build.
     // A copy of the unreleased @druxt-contrib/decoupled-settings module.
     '~/modules/decoupled-settings',
