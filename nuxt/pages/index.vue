@@ -55,13 +55,14 @@
 import CanvasPage from '~/modules/canvas-headless/CanvasPage'
 import load from '~/modules/canvas-headless/load'
 import layout from '~/modules/canvas-headless/layout'
+import { FRONT_PATH, drawable, usesOwnComponents } from '~/modules/canvas-headless/front'
 import { SITE_DESCRIPTION } from '~/lib/site'
 import { seoHead } from '~/utils/seo'
 
 const CANVAS_PAGE = 'canvas_page--canvas_page'
-// The Drupal path of the front page's Canvas page. Drupal's own front page
-// stays its content list, which editors land on.
-const CANVAS_PATH = '/home'
+// Drupal's own front page stays its content list, which editors land on, so
+// the front page's Canvas page has a path of its own there.
+const CANVAS_PATH = FRONT_PATH
 
 export default {
   components: { CanvasPage },
@@ -71,11 +72,12 @@ export default {
   // With Canvas Headless on, the front page's Canvas page comes from Canvas's
   // content API, built from the site's own components, and Canvas's editor
   // frames this page to preview it. Without a Canvas page, the page below
-  // renders either way.
+  // renders either way. A Canvas page built from Drupal's components is left
+  // to the JSON:API rendering, which draws those.
   async asyncData({ $config, req }) {
     if (!$config.canvasHeadless) return { headless: null }
     const { page, session } = await load(CANVAS_PATH, req).catch(() => ({}))
-    return { headless: page && page.content ? { path: CANVAS_PATH, page, session } : null }
+    return { headless: page && drawable(page.content) ? { path: CANVAS_PATH, page, session } : null }
   },
 
   data: () => ({
@@ -120,7 +122,10 @@ export default {
       const { route } = (await this.$store.dispatch('druxtRouter/get', CANVAS_PATH)) || {}
       const { type, uuid } = (route || {}).props || {}
       const resource = type === CANVAS_PAGE ? await this.$store.dispatch('druxt/getResource', { type, id: uuid }) : null
-      this.canvas = (resource || {}).data || null
+      const page = (resource || {}).data || null
+      // A page built from the site's own components is drawn from the content
+      // API's tree, with Canvas Headless on. Without it, the page below renders.
+      this.canvas = page && !usesOwnComponents(page) ? page : null
     } catch (e) {
       this.canvas = null
     }

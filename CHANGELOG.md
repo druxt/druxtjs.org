@@ -9,6 +9,20 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- Canvas's preview through the site is set up by one variable on Lagoon.
+  With `CANVAS_SITE_URL` set on an environment, Drupal names the site as
+  Canvas's headless frontend on every rollout, where a rollout used to
+  remove it.
+
+### Fixed
+
+- The front page renders whichever way its Canvas page can be drawn. With
+  the preview on, a page built from Drupal's components was drawn as plain
+  text, and with it off a page built from the site's components was not
+  drawn. Each now falls back to a rendering that works.
+
 ## [0.20.2] - 2026-11-20
 
 ### Security
