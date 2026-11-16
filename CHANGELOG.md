@@ -32,6 +32,9 @@ Druxt 1.0.0.
   playground's backend picker, and another backend could not show what the
   page was describing. The example's "Open in the playground" link is where a
   reader tries another backend.
+- The hosted frontend is installed, built and served on Node 24, where it was
+  Node 16. Canvas's preview through the site needs it. Local development and
+  Storybook stay on Node 16.
 
 ### Fixed
 
