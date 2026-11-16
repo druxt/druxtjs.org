@@ -3,7 +3,7 @@
     The site-wide footer; AppDocFooter is the per-document one. Colours come
     from theme tokens, so a palette change carries through here.
   -->
-  <footer class="border-t border-base-300 bg-base-200 text-base-content">
+  <footer class="site-footer border-t border-base-300 bg-base-200 text-base-content">
     <div class="max-w-[110rem] mx-auto px-4 sm:px-6 py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
       <div>
         <NuxtLink to="/" class="flex items-center gap-2 w-max rounded-btn hover:opacity-80">
