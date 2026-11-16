@@ -1,0 +1,58 @@
+uuid: 9fb21fc8-05e7-452f-99b9-b1490fa01f27
+langcode: en
+status: true
+dependencies: {  }
+machineName: action
+name: Action
+type: external
+required:
+  - label
+  - url
+props:
+  label:
+    type: string
+    title: Label
+    examples:
+      - 'Get started'
+  url:
+    type: string
+    format: uri-reference
+    title: Link
+    examples:
+      - /tutorials/getting-started
+  variant:
+    type: string
+    enum:
+      - primary
+      - ghost
+    'meta:enum':
+      primary: Primary
+      ghost: Ghost
+    title: Style
+    examples:
+      - ghost
+  icon:
+    type: string
+    enum:
+      - none
+      - tutorials
+      - modules
+      - playground
+      - how-to
+      - explanation
+      - api
+      - github
+    'meta:enum':
+      none: 'No icon'
+      tutorials: Tutorials
+      modules: Modules
+      playground: Playground
+      how-to: 'How-to guides'
+      explanation: Explanation
+      api: API
+      github: GitHub
+    title: Icon
+    examples:
+      - none
+slots: {  }
+dataDependencies: {  }

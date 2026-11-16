@@ -28,14 +28,16 @@ RUN mkdir /manifests && cd /nuxt \
     if [ -d "$dir" ]; then mkdir -p "/manifests/$(dirname "$dir")" && cp -R "$dir" "/manifests/$dir"; fi; \
   done
 
-FROM amazeeio/node:16-builder@sha256:4dd9a540c732a011258fec4ef1465bda8641c91c77939ca9e494c53a2ff7ef1c AS deps
+# Node 24 from here on: the app is installed for, built on and served by it.
+# The stages above only fetch and generate, and druxt.js builds on Node 16.
+FROM uselagoon/node-24-builder:26.10.0@sha256:c4eb5e17f8950c553fd28c2f06886d201d4962e64a17249aa6f3f04a6af4899f AS deps
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 COPY --from=manifests /manifests /app
 RUN corepack enable && yarn install --immutable
 
 # Dependencies first, as a layer of their own that a code change leaves as it
 # was. Owned by Lagoon's runtime user, so the build at start can write to /app.
-FROM amazeeio/node:16@sha256:11f2d4ce2e741dbdc87cf4929e3a30f0d06ece1e137b33073aa291154d067316
+FROM uselagoon/node-24:26.10.0@sha256:0c3cc28bd7eebc7b9d44182e80812270ae1dcf0fbbf0f40547f34f1275f997ec
 COPY --from=deps --chown=10000:0 /app /app
 COPY --chown=10000:0 nuxt /app
 # nuxt.config.js reads the docgen commit from the file beside the nuxt tree.

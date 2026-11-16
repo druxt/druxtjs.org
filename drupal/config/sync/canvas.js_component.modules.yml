@@ -1,0 +1,33 @@
+uuid: fad8b638-f4ea-4504-949e-6e412b97ad81
+langcode: en
+status: true
+dependencies: {  }
+machineName: modules
+name: Modules
+type: external
+required:
+  - heading
+props:
+  heading:
+    type: string
+    title: Heading
+    examples:
+      - Modules
+  text:
+    type: string
+    title: Text
+    examples:
+      - 'Adopt the whole framework, or only the parts you need.'
+  link_text:
+    type: string
+    title: 'Link text'
+    examples:
+      - 'All modules'
+  link_url:
+    type: string
+    format: uri-reference
+    title: Link
+    examples:
+      - /modules
+slots: {  }
+dataDependencies: {  }

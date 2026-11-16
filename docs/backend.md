@@ -358,3 +358,71 @@ Content is not exported. Production's database is the source of truth.
 Modules, API reference and Components pages from. Those pages have no Drupal
 representation. `npm run docs:fetch` checks the commit out into
 `.docs-source`, and `npm run docs:generate` builds the pages there.
+
+## Canvas
+
+The front page is a Canvas page once one is published at `/home`. The
+frontend asks Drupal's router for that path and renders the page with
+`@druxt-contrib/canvas`, which is vendored under `nuxt/vendor/druxt-canvas`
+until it is published. Without a Canvas page, the frontend renders its
+built-in front page. `/home` redirects to `/`, and Canvas's editor is
+reached through the site at `/canvas`.
+
+The page's components are the single-directory components under
+`drupal/web/modules/custom/druxtjsorg/components`. Each has a wrapper of the
+same name under `nuxt/components/druxt/canvas/sdc/druxtjsorg`, and
+`tests/canvas-components.test.mjs` fails when one is missing or does not
+declare an input.
+
+`drupal/composer.json` patches `drupal/canvas` for
+[#3592360](https://www.drupal.org/project/canvas/issues/3592360). With Canvas
+enabled, a JSON:API collection of configuration entities answers 500 to a
+page offset, which Druxt's schema build sends for any collection longer than
+one page. Drop the patch when a Canvas release includes the fix.
+
+### Previewing in Canvas through the site
+
+Canvas's editor can show a page as this site renders it, with the site's own
+Vue components as the ones an editor places. Canvas calls this Canvas
+Headless and provides it for Nuxt 4. `nuxt/modules/canvas-headless` is the same
+adapter for Nuxt 2, around `@drupal-canvas/headless`, the framework-free core
+of Canvas's SDK. It is experimental, as the Drupal module is.
+
+It is off by default. To turn it on:
+
+1. Set `CANVAS_SITE_URL` on the frontend to the address it reaches Drupal
+   at, and run the frontend on Node 22.19 or later, which the SDK needs.
+2. In Canvas, open Headless frontends and add the site's own URL. The editor
+   is reached through the site at `/canvas`, so the editor and the preview
+   share one origin.
+
+From then on every Canvas editing session previews through the site. A
+component is a directory under `nuxt/components/canvas`, named for its
+machine name, with an `index.vue` and a `component.yml` that declares its
+inputs and slots. Canvas reads them from the site each time the editor
+opens. Drupal's copy is tracked configuration: export it after adding or
+changing a component, and `tests/canvas-headless.test.mjs` fails when the
+two differ.
+
+The front page's seven components are there. With this on, the front page
+renders its Canvas page from them, through Canvas's content API, and the
+editor frames the front page itself. A page built from them does not render
+through `@druxt-contrib/canvas`, so move the front page's Canvas page to
+them only where this is on. Any other Canvas page built from them renders at
+its own path, `/page/<id>`.
+
+Framed by the editor, the page stands alone, without the site's header and
+footer, so an editor arranges the page and not the site around it. Anywhere
+else it has the site's layout. `?layout=site` or `?layout=page` on the
+page's address picks either.
+
+With Canvas 1.12.0 and Custom Elements 3.5.0, Drupal needs the following,
+and each can go when a release no longer needs it:
+
+- `DruxtjsorgServiceProvider` aliases a service class that Canvas Headless
+  asks for by name and Custom Elements registers by id only. It does so
+  only once Custom Elements is installed, so a site can still start in
+  order to install it.
+- `drupal/patches/canvas-headless-component-uuid.patch` keeps each
+  component's instance id in the tree. Without it nothing in the editor can
+  be selected.

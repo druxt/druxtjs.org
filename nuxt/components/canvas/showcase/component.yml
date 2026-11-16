@@ -1,0 +1,49 @@
+name: Showcase
+machineName: showcase
+status: true
+required:
+- heading
+- link_url
+- image_src
+- image_alt
+props:
+  properties:
+    heading:
+      type: string
+      title: Heading
+      examples:
+      - Built with Druxt
+    text:
+      type: string
+      title: Text
+      examples:
+      - Four reference apps run against the same Drupal Umami demo content.
+    detail:
+      type: string
+      title: Detail
+      description: A smaller second paragraph.
+      examples:
+      - 'Every edit it makes is an authenticated OAuth2 write back through JSON:API.'
+    link_text:
+      type: string
+      title: Button text
+      examples:
+      - Explore the example apps
+    link_url:
+      type: string
+      title: Link
+      format: uri-reference
+      examples:
+      - /how-to/example-apps
+    image_src:
+      type: string
+      title: Image path
+      description: The path of one of the frontend's own images, such as /images/examples-content-ops-console.png.
+      examples:
+      - /images/examples-content-ops-console.png
+    image_alt:
+      type: string
+      title: Image description
+      examples:
+      - 'Content Ops Console: a dark sidebar and a dense editorial table'
+slots: {}

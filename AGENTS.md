@@ -45,7 +45,9 @@ Nuxt application.
 - **Patches are public upstream diffs.** `drupal/composer.json` points each one
   at a drupal.org merge request or GitHub pull request `.diff` URL, and installs
   the patched package from source (`preferred-install`), so a diff that touches
-  files the dist archive leaves out still applies. Commit
+  files the dist archive leaves out still applies. `drupal/canvas` is the
+  exception: its repository has no built editor, so it installs from the
+  archive, and its patches touch only files the archive has. Commit
   `drupal/patches.lock.json` with it. composer-patches prints every patch
   description during `composer install`, so a description is public text too.
   A core patch is the exception: it is vendored into `drupal/patches/` with

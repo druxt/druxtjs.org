@@ -9,6 +9,44 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-11-16
+
+### Added
+
+- The front page as a Canvas page. When Drupal has a Canvas page at `/home`,
+  the frontend renders `/` from it: the hero, the quickstart command, the
+  features, the showcase and the modules are components an editor arranges
+  and edits in Drupal Canvas. Without one, the front page is the built-in
+  one. `/home` redirects to `/`, and Canvas's editor is reached through the
+  site at `/canvas`.
+- The quickstart command's commands and starter kits are set in Canvas, a
+  line each.
+- Editors can create, edit, delete and publish Canvas pages.
+- Canvas's editor can preview through the site, off by default. With
+  `CANVAS_SITE_URL` set and the site added under Headless frontends in
+  Canvas, the editor shows a draft as the site renders it, and an editor
+  places the Vue components under `nuxt/components/canvas`, which hold the
+  front page's seven. It is experimental and needs Node 18 or later. A full
+  editing session has only run on Node 24.
+
+### Changed
+
+- A live example in a docs page names its backend. It offered the
+  playground's backend picker, and another backend could not show what the
+  page was describing. The example's "Open in the playground" link is where a
+  reader tries another backend.
+- The hosted frontend is installed, built and served on Node 24, where it was
+  Node 16. Canvas's preview through the site needs it. Local development and
+  Storybook stay on Node 16.
+
+### Fixed
+
+- Code inside a text block is highlighted. A fenced code block in a page's
+  markdown, such as one indented under a list item, rendered as plain text;
+  it now gets the same highlighting as a code block of its own.
+- The front page has no white band above the footer for a signed-in editor.
+  The room the page keeps for the editor's bar is now in the footer.
+
 ## [0.19.0] - 2026-11-14
 
 ### Added

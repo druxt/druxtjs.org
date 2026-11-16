@@ -1,7 +1,7 @@
 {
   "name": "druxtjs-org",
   "description": "The Fully Decoupled Drupal Framework",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "private": true,
   "scripts": {
     "cypress:open": "npx cypress open --project test",
@@ -13,7 +13,9 @@
     "storybook": "nuxt storybook"
   },
   "dependencies": {
+    "@drupal-canvas/headless": "0.11.0",
     "@druxt-contrib/anchors": "file:vendor/druxt-anchors",
+    "@druxt-contrib/canvas": "file:vendor/druxt-canvas",
     "@druxt-contrib/diff": "file:vendor/druxt-diff",
     "@druxt-contrib/node-preview": "^0.1.0",
     "@druxt-contrib/user": "file:vendor/druxt-user",
@@ -38,6 +40,7 @@
     "druxt-schema": "0.12.1",
     "druxt-site": "0.15.1",
     "druxt-views": "patch:druxt-views@npm%3A0.23.1#./patches/druxt-views-0.23.1.patch",
+    "esbuild": "0.20.2",
     "github-slugger": "1.5.0",
     "mdast-util-to-string": "^2.0.0",
     "mermaid": "8.14.0",
@@ -73,6 +76,6 @@
   },
   "packageManager": "yarn@3.8.7",
   "engines": {
-    "node": "16.20.1"
+    "node": "16.20.1 || >=24"
   }
 }

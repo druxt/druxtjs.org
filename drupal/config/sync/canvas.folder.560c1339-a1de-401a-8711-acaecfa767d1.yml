@@ -1,0 +1,11 @@
+uuid: 560c1339-a1de-401a-8711-acaecfa767d1
+langcode: en
+status: true
+dependencies:
+  config:
+    - canvas.component.block.wse_switch_to_live
+name: Workspaces
+configEntityTypeId: component
+weight: 0
+items:
+  - block.wse_switch_to_live
