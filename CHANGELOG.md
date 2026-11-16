@@ -9,6 +9,8 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-11-16
+
 ### Added
 
 - The front page as a Canvas page. When Drupal has a Canvas page at `/home`,
@@ -24,7 +26,8 @@ Druxt 1.0.0.
   `CANVAS_SITE_URL` set and the site added under Headless frontends in
   Canvas, the editor shows a draft as the site renders it, and an editor
   places the Vue components under `nuxt/components/canvas`, which hold the
-  front page's seven. It is experimental and needs Node 22.19 or later.
+  front page's seven. It is experimental and needs Node 18 or later. A full
+  editing session has only run on Node 24.
 
 ### Changed
 
