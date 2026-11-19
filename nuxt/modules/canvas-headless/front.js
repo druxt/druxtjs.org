@@ -6,34 +6,37 @@
 /** The Drupal path of the front page's Canvas page. The site answers it at `/`. */
 export const FRONT_PATH = '/home'
 
-/** How the content API names a component Drupal rendered for itself. */
-const DRUPAL_MARKUP = 'drupal-markup'
+/** How the content API's tree names one of the site's own components. */
+const OWN_ELEMENT = 'js-'
 
-/** The component Canvas prefixes with this is one of the site's own. */
+/** How Canvas names one in a page's component list. */
 const OWN = 'js.'
 
 const children = (node) =>
   Object.values((node && node.slots) || {}).flatMap((slot) => (Array.isArray(slot) ? slot : [slot]))
 
 /**
- * Whether a content API tree is made of the site's own components.
+ * Whether a content API tree holds any of the site's own components.
  *
- * A page built from Drupal's components arrives as Drupal's markup, which is
- * not the page a visitor should get: the JSON:API rendering draws that page.
+ * Such a page is drawn from the tree: the renderer draws the site's
+ * components, and what Drupal rendered in the same tree as Drupal's markup.
+ * A page with none is Drupal's alone, which the JSON:API rendering draws.
  *
  * @param {object|null} tree - A page's `content`.
- * @returns {boolean} True when there is a tree and none of it is Drupal's markup.
+ * @returns {boolean} True when any element of the tree is the site's own.
  */
-export const drawable = (tree) => {
-  if (!tree || typeof tree !== 'object') return false
+export const hasOwnComponents = (tree) => {
   const walk = (node) =>
-    !node || typeof node !== 'object' || (node.element !== DRUPAL_MARKUP && children(node).every(walk))
+    Boolean(node) &&
+    typeof node === 'object' &&
+    (String(node.element || '').startsWith(OWN_ELEMENT) || children(node).some(walk))
   return walk(tree)
 }
 
 /**
  * Whether a JSON:API Canvas page holds any of the site's own components,
- * which only the content API's tree can draw.
+ * which only the content API's tree can draw. The same question as
+ * hasOwnComponents(), asked of the other representation of a page.
  *
  * @param {object|null} resource - A `canvas_page` resource object.
  * @returns {boolean} True when a component of the page is the site's own.

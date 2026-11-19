@@ -389,8 +389,8 @@ adapter for Nuxt 2, around `@drupal-canvas/headless`, the framework-free core
 of Canvas's SDK. It is experimental, as the Drupal module is.
 
 It is off by default. `CANVAS_SITE_URL`, the address the frontend reaches
-Drupal at, turns it on. The frontend needs Node 18 or later for it, and a
-full editing session has only run on Node 24, which the hosted image runs.
+Drupal at, turns it on. The frontend needs Node 24 for it, which the hosted
+image runs and `nuxt/package.json` names among its engines.
 
 - On Lagoon, set `CANVAS_SITE_URL` on the environment, so the frontend and
   Drupal both read it. `settings.lagoon.php` then names the site's own URL
@@ -420,10 +420,11 @@ Drupal redirects its `/page/<id>` to `/home`, and the site redirects that to
 The front page renders whichever way its Canvas page can be drawn, so
 turning this on or off never leaves it broken:
 
-- A page built from Drupal's components renders through
+- A page with none of the site's components renders through
   `@druxt-contrib/canvas`, with this on or off.
-- A page built from the site's components renders through the content API
-  with this on. With it off, the built-in front page renders.
+- A page with any of the site's components renders through the content API
+  with this on. A component of Drupal's on the same page shows as Drupal's
+  markup. With this off, the built-in front page renders.
 
 So turn this on first, and move the front page's Canvas page to the site's
 components afterwards.
