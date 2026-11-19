@@ -186,3 +186,104 @@ describe('Canvas Headless page results', () => {
     )
   })
 })
+
+describe("the front page's Canvas page", () => {
+  const front = () => import('../nuxt/modules/canvas-headless/front.js')
+  const own = {
+    element: 'renderless-container',
+    slots: { default: [{ element: 'js-hero', slots: { actions: [{ element: 'js-action' }] } }] },
+  }
+  const drupal = {
+    element: 'renderless-container',
+    slots: {
+      default: [
+        { element: 'js-hero' },
+        { element: 'drupal-markup', slots: { default: '<p>Hero</p>' } },
+      ],
+    },
+  }
+
+  test("a tree with any of the site's own components is drawn from the tree", async () => {
+    const { hasOwnComponents } = await front()
+    assert.equal(hasOwnComponents(own), true)
+    // Drupal's markup beside them, a mixed page or an empty slot's default, changes nothing.
+    assert.equal(hasOwnComponents(drupal), true)
+    assert.equal(
+      hasOwnComponents({
+        element: 'renderless-container',
+        slots: { default: { element: 'js-hero' } },
+      }),
+      true
+    )
+  })
+
+  test("a tree of Drupal's markup alone is not, and neither is no tree", async () => {
+    const { hasOwnComponents } = await front()
+    const markup = { element: 'drupal-markup', slots: { default: '<p>Hero</p>' } }
+    assert.equal(
+      hasOwnComponents({ element: 'renderless-container', slots: { default: [markup, markup] } }),
+      false
+    )
+    assert.equal(hasOwnComponents(null), false)
+    assert.equal(hasOwnComponents('<p>Hero</p>'), false)
+  })
+
+  test('the tree and the JSON:API page agree on whose a page is', async () => {
+    const { hasOwnComponents, usesOwnComponents } = await front()
+    const page = (...ids) => ({
+      attributes: { components: ids.map((id) => ({ component_id: id })) },
+    })
+    const tree = (...elements) => ({
+      element: 'renderless-container',
+      slots: { default: elements.map((element) => ({ element })) },
+    })
+    for (const [ids, elements] of [
+      [
+        ['js.hero', 'js.modules'],
+        ['js-hero', 'js-modules'],
+      ],
+      [
+        ['sdc.druxtjsorg.hero', 'js.modules'],
+        ['drupal-markup', 'js-modules'],
+      ],
+      [['sdc.druxtjsorg.hero'], ['drupal-markup']],
+    ]) {
+      assert.equal(
+        hasOwnComponents(tree(...elements)),
+        usesOwnComponents(page(...ids)),
+        ids.join(' ')
+      )
+    }
+  })
+
+  test("a JSON:API page says whether it holds the site's own components", async () => {
+    const { usesOwnComponents } = await front()
+    const page = (...ids) => ({
+      attributes: { components: ids.map((id) => ({ component_id: id })) },
+    })
+    assert.equal(usesOwnComponents(page('sdc.druxtjsorg.hero', 'sdc.druxtjsorg.action')), false)
+    assert.equal(usesOwnComponents(page('sdc.druxtjsorg.hero', 'js.action')), true)
+    assert.equal(usesOwnComponents(null), false)
+  })
+
+  test("the front page draws from the content API only a tree with the site's components", () => {
+    const page = readFileSync('nuxt/pages/index.vue', 'utf8')
+    assert.match(page, /page && hasOwnComponents\(page\.content\)/)
+    assert.match(page, /page && !usesOwnComponents\(page\) \? page : null/)
+  })
+
+  test("Lagoon names the site as Canvas's frontend, with every component the site has", () => {
+    const settings = readFileSync('drupal/web/sites/default/settings.lagoon.php', 'utf8')
+    assert.match(
+      settings,
+      /if \(\$frontend && getenv\('CANVAS_SITE_URL'\)\) \{\s+\$config\['canvas_headless\.settings'\]\['frontends'\]/
+    )
+    const block = settings.slice(
+      settings.indexOf("$config['canvas_headless.settings']['frontends']")
+    )
+    const listed = [...block.slice(0, block.indexOf('];')).matchAll(/'(js\.[a-z-]+)'/g)].map(
+      (match) => match[1]
+    )
+    assert.deepEqual(listed, names.map((name) => `js.${name}`).sort())
+  })
+})
