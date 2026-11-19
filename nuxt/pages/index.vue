@@ -55,7 +55,7 @@
 import CanvasPage from '~/modules/canvas-headless/CanvasPage'
 import load from '~/modules/canvas-headless/load'
 import layout from '~/modules/canvas-headless/layout'
-import { FRONT_PATH, drawable, usesOwnComponents } from '~/modules/canvas-headless/front'
+import { FRONT_PATH, hasOwnComponents, usesOwnComponents } from '~/modules/canvas-headless/front'
 import { SITE_DESCRIPTION } from '~/lib/site'
 import { seoHead } from '~/utils/seo'
 
@@ -72,12 +72,12 @@ export default {
   // With Canvas Headless on, the front page's Canvas page comes from Canvas's
   // content API, built from the site's own components, and Canvas's editor
   // frames this page to preview it. Without a Canvas page, the page below
-  // renders either way. A Canvas page built from Drupal's components is left
-  // to the JSON:API rendering, which draws those.
+  // renders either way. A Canvas page with none of the site's components is
+  // left to the JSON:API rendering, which draws Drupal's.
   async asyncData({ $config, req }) {
     if (!$config.canvasHeadless) return { headless: null }
     const { page, session } = await load(CANVAS_PATH, req).catch(() => ({}))
-    return { headless: page && drawable(page.content) ? { path: CANVAS_PATH, page, session } : null }
+    return { headless: page && hasOwnComponents(page.content) ? { path: CANVAS_PATH, page, session } : null }
   },
 
   data: () => ({
@@ -123,7 +123,7 @@ export default {
       const { type, uuid } = (route || {}).props || {}
       const resource = type === CANVAS_PAGE ? await this.$store.dispatch('druxt/getResource', { type, id: uuid }) : null
       const page = (resource || {}).data || null
-      // A page built from the site's own components is drawn from the content
+      // A page with any of the site's own components is drawn from the content
       // API's tree, with Canvas Headless on. Without it, the page below renders.
       this.canvas = page && !usesOwnComponents(page) ? page : null
     } catch (e) {

@@ -203,19 +203,57 @@ describe("the front page's Canvas page", () => {
     },
   }
 
-  test("a tree of the site's own components can be drawn", async () => {
-    const { drawable } = await front()
-    assert.equal(drawable(own), true)
+  test("a tree with any of the site's own components is drawn from the tree", async () => {
+    const { hasOwnComponents } = await front()
+    assert.equal(hasOwnComponents(own), true)
+    // Drupal's markup beside them, a mixed page or an empty slot's default, changes nothing.
+    assert.equal(hasOwnComponents(drupal), true)
+    assert.equal(
+      hasOwnComponents({
+        element: 'renderless-container',
+        slots: { default: { element: 'js-hero' } },
+      }),
+      true
+    )
   })
 
-  test("a tree with Drupal's markup anywhere in it cannot, and neither can no tree", async () => {
-    const { drawable } = await front()
-    assert.equal(drawable(drupal), false)
+  test("a tree of Drupal's markup alone is not, and neither is no tree", async () => {
+    const { hasOwnComponents } = await front()
+    const markup = { element: 'drupal-markup', slots: { default: '<p>Hero</p>' } }
     assert.equal(
-      drawable({ element: 'js-hero', slots: { content: { element: 'drupal-markup' } } }),
+      hasOwnComponents({ element: 'renderless-container', slots: { default: [markup, markup] } }),
       false
     )
-    assert.equal(drawable(null), false)
+    assert.equal(hasOwnComponents(null), false)
+    assert.equal(hasOwnComponents('<p>Hero</p>'), false)
+  })
+
+  test('the tree and the JSON:API page agree on whose a page is', async () => {
+    const { hasOwnComponents, usesOwnComponents } = await front()
+    const page = (...ids) => ({
+      attributes: { components: ids.map((id) => ({ component_id: id })) },
+    })
+    const tree = (...elements) => ({
+      element: 'renderless-container',
+      slots: { default: elements.map((element) => ({ element })) },
+    })
+    for (const [ids, elements] of [
+      [
+        ['js.hero', 'js.modules'],
+        ['js-hero', 'js-modules'],
+      ],
+      [
+        ['sdc.druxtjsorg.hero', 'js.modules'],
+        ['drupal-markup', 'js-modules'],
+      ],
+      [['sdc.druxtjsorg.hero'], ['drupal-markup']],
+    ]) {
+      assert.equal(
+        hasOwnComponents(tree(...elements)),
+        usesOwnComponents(page(...ids)),
+        ids.join(' ')
+      )
+    }
   })
 
   test("a JSON:API page says whether it holds the site's own components", async () => {
@@ -228,9 +266,9 @@ describe("the front page's Canvas page", () => {
     assert.equal(usesOwnComponents(null), false)
   })
 
-  test('the front page draws from the content API only a tree it can draw', () => {
+  test("the front page draws from the content API only a tree with the site's components", () => {
     const page = readFileSync('nuxt/pages/index.vue', 'utf8')
-    assert.match(page, /page && drawable\(page\.content\)/)
+    assert.match(page, /page && hasOwnComponents\(page\.content\)/)
     assert.match(page, /page && !usesOwnComponents\(page\) \? page : null/)
   })
 
