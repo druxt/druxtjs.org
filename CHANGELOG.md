@@ -9,6 +9,11 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+### Security
+
+- Drupal core 11.4.13, for SA-CORE-2026-017 (critical, remote code execution
+  through the installer) and SA-CORE-2026-018 (a gadget chain).
+
 ## [0.20.0] - 2026-11-16
 
 ### Added
