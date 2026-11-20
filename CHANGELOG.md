@@ -9,6 +9,14 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.20.2] - 2026-11-20
+
+### Security
+
+- PHP 8.3.37, through Lagoon's 26.11.4 images for PHP, the CLI and nginx. It
+  fixes PHP's advisories of 19 November 2026, among them CVE-2026-129289
+  (critical, a request smuggled to PHP-FPM over a reused connection).
+
 ## [0.20.1] - 2026-11-19
 
 ### Security
