@@ -7819,6 +7819,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:0.35.0":
+  version: 0.35.0
+  resolution: "axios@npm:0.35.0"
+  dependencies:
+    follow-redirects: ^1.15.4
+    form-data: ^4.0.4
+    proxy-from-env: ^1.1.0
+  checksum: 8ea50d742025371943f2dbe9b4a556245942fe5ec8fdceb43541f312148d9405259e4d531c0e29482ecca2904498b30fc4bb5b1e2e57bb53235303e49fbfff88
+  languageName: node
+  linkType: hard
+
 "axios@npm:^0.21.1":
   version: 0.21.4
   resolution: "axios@npm:0.21.4"
@@ -11348,17 +11359,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"druxt-blocks@npm:0.18.1":
-  version: 0.18.1
-  resolution: "druxt-blocks@npm:0.18.1"
+"druxt-blocks@file:./vendor/druxt-dev/druxt-blocks-0.18.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A.":
+  version: 0.18.2-dev.20261120034438
+  resolution: "druxt-blocks@file:./vendor/druxt-dev/druxt-blocks-0.18.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A."
   dependencies:
-    axios: 0.34.0
+    axios: 0.35.0
     drupal-jsonapi-params: ^2.3.2
-    druxt: ^0.25.1
+    druxt: 0.25.2-dev.20261120034438
   peerDependencies:
     vue: ^2.7.14
     vuex: ^3.6.2
-  checksum: 7284f5b829bf1bf5f9445bc0353877b120a28082d1923fe895f180ead7b14fbaf7ff3b1125aa0c28e0299726a566c881a3e43c97e910342be866a2508ca3cb21
+  checksum: 742623dac8c939aec2ac361b4d6067b619de9d3266a8a27a7617be69258d787b3d2f8c7a75c87b874bce956a72196aadef783f92881da77f39012200d709c057
   languageName: node
   linkType: hard
 
@@ -11376,16 +11387,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"druxt-entity@npm:0.29.1":
-  version: 0.29.1
-  resolution: "druxt-entity@npm:0.29.1"
+"druxt-entity@file:./vendor/druxt-dev/druxt-entity-0.29.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A.":
+  version: 0.29.2-dev.20261120034438
+  resolution: "druxt-entity@file:./vendor/druxt-dev/druxt-entity-0.29.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A."
   dependencies:
     deepmerge: ^4.3.1
     drupal-jsonapi-params: ^2.3.2
-    druxt: ^0.25.1
-    druxt-router: ^0.32.1
-    druxt-schema: ^0.12.1
-  checksum: 50cf8822a6e70ec6629e07eae4c46d11adb1b2c40d5733b24ceb1ddf735ebccb445198b8e7fb7e87eb3d9fbf24a458df469d86c95cd5e688da0542ab9065287e
+    druxt: 0.25.2-dev.20261120034438
+    druxt-router: 0.32.2-dev.20261120034438
+    druxt-schema: 0.12.2-dev.20261120034438
+  checksum: be1c601ce743afbf4567d63d95afab3a83cbd8d4a9b0d670d5ab7946bd3c1f61ebbc597bb22274737b7c00948b9b2645fefd0c332dd5a152c1e9fe1e0d46efb9
   languageName: node
   linkType: hard
 
@@ -11396,66 +11407,66 @@ __metadata:
   languageName: node
   linkType: hard
 
-"druxt-menu@npm:0.22.1":
-  version: 0.22.1
-  resolution: "druxt-menu@npm:0.22.1"
+"druxt-menu@file:./vendor/druxt-dev/druxt-menu-0.22.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A.":
+  version: 0.22.2-dev.20261120034438
+  resolution: "druxt-menu@file:./vendor/druxt-dev/druxt-menu-0.22.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A."
   dependencies:
     deepmerge: ^4.3.1
     drupal-jsonapi-params: ^2.3.2
-    druxt: ^0.25.1
-    druxt-blocks: ^0.18.1
+    druxt: 0.25.2-dev.20261120034438
+    druxt-blocks: 0.18.2-dev.20261120034438
   peerDependencies:
     vue: ^2.7.14
     vuex: ^3.6.2
-  checksum: a632b7cdea55cf5c9e629a0bae77f06556d0b9aaaa032d9e28fe471f29b9e5523e60727f417b47bae1a6d3692e858633997115a38919f0be38ef3dabb1f73158
+  checksum: 0b9f840c8734b9b163852ba70e368ad985ba2ff91e06eadc0290f726536c987ae82f61d65708c2e393dfd5437838e4dd932fb914e1e4d3a1517dd26aa0ae30e1
   languageName: node
   linkType: hard
 
-"druxt-router@npm:0.32.1":
-  version: 0.32.1
-  resolution: "druxt-router@npm:0.32.1"
+"druxt-router@file:./vendor/druxt-dev/druxt-router-0.32.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A.":
+  version: 0.32.2-dev.20261120034438
+  resolution: "druxt-router@file:./vendor/druxt-dev/druxt-router-0.32.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A."
   dependencies:
     drupal-jsonapi-params: ^2.3.2
-    druxt: ^0.25.1
+    druxt: 0.25.2-dev.20261120034438
     url-parse: ^1.5.10
   peerDependencies:
     vue: ^2.7.14
     vuex: ^3.6.2
-  checksum: 28e6af61d55f6629744f6d58002e56070547361501f26d49aa06af2a56522d6b7884a6bb551e66041d6c3334eae5b60c8ca4018c06885a26c2070cba4b9eea60
+  checksum: 496065bed791a2dd07527d69fc0dc336e86ea81c785431e2785634c20c6525f3dd81efc96e4490c1bb3fb50a80056b7bff70cc15e12e516e7221572b7d6523b8
   languageName: node
   linkType: hard
 
-"druxt-schema@npm:0.12.1":
-  version: 0.12.1
-  resolution: "druxt-schema@npm:0.12.1"
+"druxt-schema@file:./vendor/druxt-dev/druxt-schema-0.12.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A.":
+  version: 0.12.2-dev.20261120034438
+  resolution: "druxt-schema@file:./vendor/druxt-dev/druxt-schema-0.12.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A."
   dependencies:
     consola: ^2.15.3
     drupal-jsonapi-params: ^2.3.2
-    druxt: ^0.25.1
+    druxt: 0.25.2-dev.20261120034438
   peerDependencies:
     vue: ^2.7.14
     vuex: ^3.6.2
-  checksum: c7fad9400348a8e38de33f750c187f37ac395a03698b0fccd405390a128d19f9ac43e5ae9bf7f37aeb15fc3545793765adcba995c503281a0c269fb954dbe9d3
+  checksum: ec9dc615042277b4b0edd424c22a3a58bc7951ce12f92e241ce32a3f78d0dd27144c7002359dd76693047b45d177ee93d77e78d54f24b870c1f7f3da1893b578
   languageName: node
   linkType: hard
 
-"druxt-site@npm:0.15.1":
-  version: 0.15.1
-  resolution: "druxt-site@npm:0.15.1"
+"druxt-site@file:./vendor/druxt-dev/druxt-site-0.15.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A.":
+  version: 0.15.2-dev.20261120034438
+  resolution: "druxt-site@file:./vendor/druxt-dev/druxt-site-0.15.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A."
   dependencies:
     drupal-jsonapi-params: ^2.3.2
-    druxt: ^0.25.1
-    druxt-blocks: ^0.18.1
+    druxt: 0.25.2-dev.20261120034438
+    druxt-blocks: 0.18.2-dev.20261120034438
     druxt-breadcrumb: ^0.18.0
-    druxt-entity: ^0.29.1
-    druxt-menu: ^0.22.1
-    druxt-router: ^0.32.1
-    druxt-schema: ^0.12.1
-    druxt-views: ^0.23.1
+    druxt-entity: 0.29.2-dev.20261120034438
+    druxt-menu: 0.22.2-dev.20261120034438
+    druxt-router: 0.32.2-dev.20261120034438
+    druxt-schema: 0.12.2-dev.20261120034438
+    druxt-views: 0.23.2-dev.20261120034438
   peerDependencies:
     vue: ^2.7.14
     vuex: ^3.6.2
-  checksum: a9e5e3fd0c1f86d8cfa04044aea10aedd8e6452357f526c2c291eb9b7aec6a971c9d86807154e357f5f9743c53de43cccb29d124dc3e89e15cf687bc5522ad42
+  checksum: 9d98693c770be998cc235d5e424cf16e586652fa15444e82d9333cb6545a7bacce2cfa7d291e2b10aaa63ddabb53b3a64f30be0531ab8a8b76e3c7fdd8e66c44
   languageName: node
   linkType: hard
 
@@ -11497,9 +11508,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"druxt@npm:0.25.1":
-  version: 0.25.1
-  resolution: "druxt@npm:0.25.1"
+"druxt@file:./vendor/druxt-dev/druxt-0.25.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A.":
+  version: 0.25.2-dev.20261120034438
+  resolution: "druxt@file:./vendor/druxt-dev/druxt-0.25.2-dev.20261120034438.tgz::locator=druxtjs-org%40workspace%3A."
   dependencies:
     "@nuxtjs/axios": ^5.13.6
     "@nuxtjs/proxy": ^2.1.0
@@ -11521,7 +11532,7 @@ __metadata:
   dependenciesMeta:
     core-js:
       optional: true
-  checksum: e5d440cd7f924420f4e9e97135247871ce94c7682f60147a89cc641e6cf5c1577adfc9c8224f75b3003c1465904806eab1e124aa8d298f95d263a6f7b464710c
+  checksum: b5dbb6a8dd6eecc19e6c2a1815380a4502bd6013ea756aa0d3dd154e870dc8d75cdcf065b9d500de5b258238697e9fb6e3bd836fe254b42d9f5e4601ca62e9bb
   languageName: node
   linkType: hard
 
@@ -11552,16 +11563,16 @@ __metadata:
     decoupled-drupal-mock: 1.0.0-alpha.2
     decoupled-drupal-mock-umami: 1.0.0-alpha.2
     drupal-jsonapi-params: 2.3.2
-    druxt: 0.25.1
+    druxt: "file:./vendor/druxt-dev/druxt-0.25.2-dev.20261120034438.tgz"
     druxt-auth: "patch:druxt-auth@npm%3A0.5.1#./patches/druxt-auth-0.5.1.patch"
-    druxt-blocks: 0.18.1
+    druxt-blocks: "file:./vendor/druxt-dev/druxt-blocks-0.18.2-dev.20261120034438.tgz"
     druxt-breadcrumb: 0.18.0
-    druxt-entity: 0.29.1
+    druxt-entity: "file:./vendor/druxt-dev/druxt-entity-0.29.2-dev.20261120034438.tgz"
     druxt-layout-paragraphs: 0.4.1
-    druxt-menu: 0.22.1
-    druxt-router: 0.32.1
-    druxt-schema: 0.12.1
-    druxt-site: 0.15.1
+    druxt-menu: "file:./vendor/druxt-dev/druxt-menu-0.22.2-dev.20261120034438.tgz"
+    druxt-router: "file:./vendor/druxt-dev/druxt-router-0.32.2-dev.20261120034438.tgz"
+    druxt-schema: "file:./vendor/druxt-dev/druxt-schema-0.12.2-dev.20261120034438.tgz"
+    druxt-site: "file:./vendor/druxt-dev/druxt-site-0.15.2-dev.20261120034438.tgz"
     druxt-views: "patch:druxt-views@npm%3A0.23.1#./patches/druxt-views-0.23.1.patch"
     esbuild: 0.20.2
     github-slugger: 1.5.0

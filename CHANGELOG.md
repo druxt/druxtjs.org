@@ -9,6 +9,14 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+### Changed
+
+- The site runs a pre-release build of Druxt 0.25.2, to try it before it is
+  published. The build is the release line with the fix for credentials a
+  request interceptor adds
+  ([druxt/druxt.js#1042](https://github.com/druxt/druxt.js/pull/1042)), packed
+  into `nuxt/vendor/druxt-dev`. druxt-views stays on its patched 0.23.1.
+
 ## [0.20.2] - 2026-11-20
 
 ### Security
