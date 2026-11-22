@@ -15,6 +15,9 @@ Druxt 1.0.0.
   With `CANVAS_SITE_URL` set on an environment, Drupal names the site as
   Canvas's headless frontend on every rollout, where a rollout used to
   remove it.
+- The front page's Canvas page moves to the site's own components on the
+  first rollout with `CANVAS_SITE_URL` set, so Canvas's editor shows it as
+  the site draws it. An unsaved draft of the page is dropped.
 
 ### Fixed
 

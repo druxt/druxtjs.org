@@ -11,6 +11,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Utility\UpdateException;
 use Drupal\druxtjsorg\CalloutText;
 use Drupal\druxtjsorg\NextSteps;
+use Drupal\druxtjsorg\SiteComponents;
 use Drupal\druxtjsorg\TopicUuid;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
@@ -351,4 +352,58 @@ function druxtjsorg_deploy_prune_published_associations(): string {
     Cache::invalidateTags(['workspace_list']);
   }
   return $pruned ? "Dropped $pruned workspace tracking row(s) whose revision is already live." : 'No workspace tracking row points at a live revision.';
+}
+
+/**
+ * Moves every Canvas page to the site's own components.
+ *
+ * Canvas's editor previews through the site where CANVAS_SITE_URL is set,
+ * and draws only the site's components as the site does: a page built from
+ * this module's shows there as bare markup. Each such page gets a new
+ * revision with its components moved to their twins, and its unsaved draft
+ * is dropped, since that draft still holds the old ones. Runs again without
+ * effect. An environment without the variable is left alone, because only
+ * the preview can draw the site's components.
+ */
+function druxtjsorg_deploy_canvas_site_components(): string {
+  if (!getenv('CANVAS_SITE_URL')) {
+    return 'Canvas does not preview through the site here; no page was moved.';
+  }
+  $entity_type_manager = \Drupal::entityTypeManager();
+  if (!$entity_type_manager->hasDefinition('canvas_page') || !$entity_type_manager->hasDefinition('component')) {
+    return 'Canvas is not installed; nothing to move.';
+  }
+  $versions = [];
+  foreach ($entity_type_manager->getStorage('component')->loadMultiple() as $id => $component) {
+    if (str_starts_with((string) $id, 'js.') && $component->status()) {
+      $versions[$id] = $component->getActiveVersion();
+    }
+  }
+  $auto_save = \Drupal::hasService('Drupal\canvas\AutoSave\AutoSaveManager')
+    ? \Drupal::service('Drupal\canvas\AutoSave\AutoSaveManager')
+    : NULL;
+  $pages = 0;
+  $components = 0;
+  $left = [];
+  foreach ($entity_type_manager->getStorage('canvas_page')->loadMultiple() as $page) {
+    [$items, $moved, $unmoved] = SiteComponents::move($page->get('components')->getValue(), $versions);
+    $left = array_merge($left, $unmoved);
+    if (!$moved) {
+      continue;
+    }
+    $page->set('components', $items);
+    $violations = $page->validate();
+    if (count($violations)) {
+      throw new UpdateException(sprintf('Canvas page %s does not validate on the site\'s components: %s', $page->id(), $violations->get(0)->getMessage()));
+    }
+    $page->setNewRevision(TRUE);
+    $page->setRevisionLogMessage("Moved to the site's own components.");
+    $page->save();
+    $auto_save?->delete($page);
+    $pages++;
+    $components += $moved;
+  }
+  $left = array_values(array_unique($left));
+  return sprintf('Moved %d components on %d Canvas pages.', $components, $pages)
+    . ($left ? ' Left, for want of a twin at their version: ' . implode(', ', $left) . '.' : '');
 }

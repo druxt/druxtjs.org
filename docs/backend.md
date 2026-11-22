@@ -428,8 +428,13 @@ turning this on or off never leaves it broken:
   with this on. A component of Drupal's on the same page shows as Drupal's
   markup. With this off, the built-in front page renders.
 
-So turn this on first, and move the front page's Canvas page to the site's
-components afterwards.
+A page built from Drupal's components shows in the editor as bare markup,
+because only the site's components are drawn there as the site draws them.
+So a rollout with `CANVAS_SITE_URL` set moves every Canvas page to the
+site's components once, through the `canvas_site_components` deploy hook. A
+component moves only when the site's one of the same name is at the same
+version, and the page's unsaved draft is dropped. Turning this off
+afterwards leaves the built-in front page.
 
 Framed by the editor, the page stands alone, without the site's header and
 footer, so an editor arranges the page and not the site around it. Anywhere
