@@ -421,7 +421,9 @@ The front page renders whichever way its Canvas page can be drawn, so
 turning this on or off never leaves it broken:
 
 - A page with none of the site's components renders through
-  `@druxt-contrib/canvas`, with this on or off.
+  `@druxt-contrib/canvas`, with this on or off. In Canvas's editor it renders
+  through the content API instead, as Drupal's markup without the site's
+  styles: only that rendering shows a draft and can be selected.
 - A page with any of the site's components renders through the content API
   with this on. A component of Drupal's on the same page shows as Drupal's
   markup. With this off, the built-in front page renders.

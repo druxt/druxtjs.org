@@ -22,6 +22,9 @@ Druxt 1.0.0.
   the preview on, a page built from Drupal's components was drawn as plain
   text, and with it off a page built from the site's components was not
   drawn. Each now falls back to a rendering that works.
+- Canvas's editor shows the draft of a front page built from Drupal's
+  components, and its sections can be selected. It shows them as Drupal's
+  markup, without the site's styles.
 
 ## [0.20.2] - 2026-11-20
 

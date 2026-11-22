@@ -34,6 +34,21 @@ export const hasOwnComponents = (tree) => {
 }
 
 /**
+ * Whether a page is drawn from the content API's tree, with Canvas Headless on.
+ *
+ * In a draft session it always is: only the tree is the editor's draft, and
+ * only its elements can be selected in the editor. A page of Drupal's
+ * components is then Drupal's markup, without the site's styles. Outside a
+ * session, a page is drawn from the tree when it holds any of the site's own.
+ *
+ * @param {object|null} page - The page as the content API answered.
+ * @param {object} [session] - The request's draft session state.
+ * @returns {boolean} True when the tree draws the page.
+ */
+export const drawnFromTree = (page, session) =>
+  Boolean(page && page.content) && (Boolean(session && session.enabled) || hasOwnComponents(page.content))
+
+/**
  * Whether a JSON:API Canvas page holds any of the site's own components,
  * which only the content API's tree can draw. The same question as
  * hasOwnComponents(), asked of the other representation of a page.

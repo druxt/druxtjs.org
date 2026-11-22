@@ -55,7 +55,7 @@
 import CanvasPage from '~/modules/canvas-headless/CanvasPage'
 import load from '~/modules/canvas-headless/load'
 import layout from '~/modules/canvas-headless/layout'
-import { FRONT_PATH, hasOwnComponents, usesOwnComponents } from '~/modules/canvas-headless/front'
+import { FRONT_PATH, drawnFromTree, usesOwnComponents } from '~/modules/canvas-headless/front'
 import { SITE_DESCRIPTION } from '~/lib/site'
 import { seoHead } from '~/utils/seo'
 
@@ -73,11 +73,12 @@ export default {
   // content API, built from the site's own components, and Canvas's editor
   // frames this page to preview it. Without a Canvas page, the page below
   // renders either way. A Canvas page with none of the site's components is
-  // left to the JSON:API rendering, which draws Drupal's.
+  // left to the JSON:API rendering, which draws Drupal's, except in a draft
+  // session: the editor needs the draft, and elements it can select.
   async asyncData({ $config, req }) {
     if (!$config.canvasHeadless) return { headless: null }
     const { page, session } = await load(CANVAS_PATH, req).catch(() => ({}))
-    return { headless: page && hasOwnComponents(page.content) ? { path: CANVAS_PATH, page, session } : null }
+    return { headless: drawnFromTree(page, session) ? { path: CANVAS_PATH, page, session } : null }
   },
 
   data: () => ({

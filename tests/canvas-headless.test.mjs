@@ -266,9 +266,23 @@ describe("the front page's Canvas page", () => {
     assert.equal(usesOwnComponents(null), false)
   })
 
-  test("the front page draws from the content API only a tree with the site's components", () => {
+  test("a draft session draws any page from the tree, Drupal's components included", async () => {
+    const { drawnFromTree } = await front()
+    const markup = { element: 'drupal-markup', slots: { default: '<p>Hero</p>' } }
+    const theirs = { content: { element: 'renderless-container', slots: { default: [markup] } } }
+    assert.equal(drawnFromTree(theirs, { enabled: false }), false)
+    assert.equal(drawnFromTree(theirs, undefined), false)
+    // The editor's frame: only the tree is the draft, and can be selected.
+    assert.equal(drawnFromTree(theirs, { enabled: true }), true)
+    assert.equal(drawnFromTree({ content: own }, { enabled: false }), true)
+    // Nothing to draw, in a session or out of one.
+    assert.equal(drawnFromTree(null, { enabled: true }), false)
+    assert.equal(drawnFromTree({ redirect: '/elsewhere' }, { enabled: true }), false)
+  })
+
+  test('the front page asks the one rule which rendering draws it', () => {
     const page = readFileSync('nuxt/pages/index.vue', 'utf8')
-    assert.match(page, /page && hasOwnComponents\(page\.content\)/)
+    assert.match(page, /headless: drawnFromTree\(page, session\)/)
     assert.match(page, /page && !usesOwnComponents\(page\) \? page : null/)
   })
 
