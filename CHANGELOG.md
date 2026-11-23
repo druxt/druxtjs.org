@@ -9,6 +9,8 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-11-23
+
 ### Changed
 
 - Canvas's preview through the site is set up by one variable on Lagoon.
