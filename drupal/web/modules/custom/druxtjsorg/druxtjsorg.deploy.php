@@ -361,9 +361,12 @@ function druxtjsorg_deploy_prune_published_associations(): string {
  * and draws only the site's components as the site does: a page built from
  * this module's shows there as bare markup. Each such page gets a new
  * revision with its components moved to their twins, and its unsaved draft
- * is dropped, since that draft still holds the old ones. Runs again without
- * effect. An environment without the variable is left alone, because only
- * the preview can draw the site's components.
+ * is dropped, since that draft still holds the old ones. A page a workspace
+ * is editing can only be saved in that workspace, so it is moved there,
+ * and the live page follows when the workspace publishes. A page that does
+ * not validate is left as it is and logged, so a rollout is never stopped by
+ * one page. Runs again without effect. An environment without the variable
+ * is left alone, because only the preview can draw the site's components.
  */
 function druxtjsorg_deploy_canvas_site_components(): string {
   if (!getenv('CANVAS_SITE_URL')) {
@@ -379,31 +382,59 @@ function druxtjsorg_deploy_canvas_site_components(): string {
       $versions[$id] = $component->getActiveVersion();
     }
   }
-  $auto_save = \Drupal::hasService('Drupal\canvas\AutoSave\AutoSaveManager')
-    ? \Drupal::service('Drupal\canvas\AutoSave\AutoSaveManager')
-    : NULL;
+  $storage = $entity_type_manager->getStorage('canvas_page');
+  $tracker = \Drupal::hasService('workspaces.tracker') ? \Drupal::service('workspaces.tracker')
+    : (\Drupal::hasService('workspaces.association') ? \Drupal::service('workspaces.association') : NULL);
+  $workspace_manager = \Drupal::hasService('workspaces.manager') ? \Drupal::service('workspaces.manager') : NULL;
   $pages = 0;
   $components = 0;
   $left = [];
-  foreach ($entity_type_manager->getStorage('canvas_page')->loadMultiple() as $page) {
+  $in_workspaces = [];
+  $skipped = [];
+  $move = function ($page) use ($versions, &$pages, &$components, &$left, &$skipped): void {
     [$items, $moved, $unmoved] = SiteComponents::move($page->get('components')->getValue(), $versions);
     $left = array_merge($left, $unmoved);
     if (!$moved) {
-      continue;
+      return;
     }
     $page->set('components', $items);
     $violations = $page->validate();
     if (count($violations)) {
-      throw new UpdateException(sprintf('Canvas page %s does not validate on the site\'s components: %s', $page->id(), $violations->get(0)->getMessage()));
+      $message = sprintf('Canvas page %s was left on its components, it does not validate on the site\'s: %s', $page->id(), strip_tags((string) $violations->get(0)->getMessage()));
+      \Drupal::logger('druxtjsorg')->error($message);
+      $skipped[] = $message;
+      return;
     }
     $page->setNewRevision(TRUE);
     $page->setRevisionLogMessage("Moved to the site's own components.");
     $page->save();
-    $auto_save?->delete($page);
+    if (\Drupal::hasService('Drupal\\canvas\\AutoSave\\AutoSaveManager')) {
+      \Drupal::service('Drupal\\canvas\\AutoSave\\AutoSaveManager')->delete($page);
+    }
     $pages++;
     $components += $moved;
+  };
+  foreach ($storage->loadMultiple() as $id => $page) {
+    $tracking = $tracker && $workspace_manager ? $tracker->getEntityTrackingWorkspaceIds($page) : [];
+    if ($tracking) {
+      // The workspace's own revision of the page, saved in that workspace.
+      $workspace_id = reset($tracking);
+      $before = $pages;
+      $workspace_manager->executeInWorkspace($workspace_id, function () use ($storage, $id, $move): void {
+        $move($storage->load($id));
+      });
+      if ($pages > $before) {
+        $workspace = $entity_type_manager->getStorage('workspace')->load($workspace_id);
+        $in_workspaces[] = $workspace ? $workspace->label() : $workspace_id;
+      }
+      continue;
+    }
+    $move($page);
   }
   $left = array_values(array_unique($left));
+  $in_workspaces = array_values(array_unique($in_workspaces));
   return sprintf('Moved %d components on %d Canvas pages.', $components, $pages)
-    . ($left ? ' Left, for want of a twin at their version: ' . implode(', ', $left) . '.' : '');
+    . ($in_workspaces ? sprintf(' Moved inside the workspaces editing them, where the live page follows their publish: %s.', implode(', ', $in_workspaces)) : '')
+    . ($left ? ' Left, for want of a twin at their version: ' . implode(', ', $left) . '.' : '')
+    . ($skipped ? ' ' . implode(' ', $skipped) : '');
 }
