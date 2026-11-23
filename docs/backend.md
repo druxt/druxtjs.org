@@ -388,13 +388,19 @@ Headless and provides it for Nuxt 4. `nuxt/modules/canvas-headless` is the same
 adapter for Nuxt 2, around `@drupal-canvas/headless`, the framework-free core
 of Canvas's SDK. It is experimental, as the Drupal module is.
 
-It is off by default. To turn it on:
+It is off by default. `CANVAS_SITE_URL`, the address the frontend reaches
+Drupal at, turns it on. The frontend needs Node 24 for it, which the hosted
+image runs and `nuxt/package.json` names among its engines.
 
-1. Set `CANVAS_SITE_URL` on the frontend to the address it reaches Drupal
-   at, and run the frontend on Node 22.19 or later, which the SDK needs.
-2. In Canvas, open Headless frontends and add the site's own URL. The editor
-   is reached through the site at `/canvas`, so the editor and the preview
-   share one origin.
+- On Lagoon, set `CANVAS_SITE_URL` on the environment, so the frontend and
+  Drupal both read it. `settings.lagoon.php` then names the site's own URL
+  as Canvas's headless frontend, with the site's components, on every
+  rollout.
+- Anywhere else, set it on the frontend, and in Canvas open Headless
+  frontends and add the site's own URL.
+
+The editor is reached through the site at `/canvas`, so the editor and the
+preview share one origin.
 
 From then on every Canvas editing session previews through the site. A
 component is a directory under `nuxt/components/canvas`, named for its
@@ -406,10 +412,29 @@ two differ.
 
 The front page's seven components are there. With this on, the front page
 renders its Canvas page from them, through Canvas's content API, and the
-editor frames the front page itself. A page built from them does not render
-through `@druxt-contrib/canvas`, so move the front page's Canvas page to
-them only where this is on. Any other Canvas page built from them renders at
-its own path, `/page/<id>`.
+editor frames the front page itself. Any other Canvas page built from them
+renders at its own path, `/page/<id>`. The front page's own does not:
+Drupal redirects its `/page/<id>` to `/home`, and the site redirects that to
+`/`.
+
+The front page renders whichever way its Canvas page can be drawn, so
+turning this on or off never leaves it broken:
+
+- A page with none of the site's components renders through
+  `@druxt-contrib/canvas`, with this on or off. In Canvas's editor it renders
+  through the content API instead, as Drupal's markup without the site's
+  styles: only that rendering shows a draft and can be selected.
+- A page with any of the site's components renders through the content API
+  with this on. A component of Drupal's on the same page shows as Drupal's
+  markup. With this off, the built-in front page renders.
+
+A page built from Drupal's components shows in the editor as bare markup,
+because only the site's components are drawn there as the site draws them.
+So a rollout with `CANVAS_SITE_URL` set moves every Canvas page to the
+site's components once, through the `canvas_site_components` deploy hook. A
+component moves only when the site's one of the same name is at the same
+version, and the page's unsaved draft is dropped. Turning this off
+afterwards leaves the built-in front page.
 
 Framed by the editor, the page stands alone, without the site's header and
 footer, so an editor arranges the page and not the site around it. Anywhere

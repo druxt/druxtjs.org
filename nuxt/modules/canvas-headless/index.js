@@ -5,7 +5,7 @@
  *
  * Canvas provides this for Nuxt 4. This is the same adapter for Nuxt 2, around
  * the framework-free core of its SDK. It is off unless CANVAS_SITE_URL names
- * the Drupal site, and the SDK needs Node 22.19 or later.
+ * the Drupal site, and it runs on Node 24, which the hosted frontend runs.
  */
 const path = require('path')
 const createServer = require('./server')
