@@ -6,19 +6,59 @@
  * on its own. The card reads nothing else.
  */
 
-import { MOCK_ORIGIN, MOCK_ROOT, isMockUrl, mockFetch } from './mock-backend.js'
+import { isMockUrl, mockFetch, mockOrigin, mockRoot } from './mock-backend.js'
+
+/** The backend select's groups, in order: each backend names one. */
+export const BACKEND_GROUPS = {
+  live: 'Live Drupal',
+  mock: 'Mocked in your browser',
+}
+
+/**
+ * A mock: its requests are answered in the browser by decoupled-drupal-mock,
+ * and its files are served from this site.
+ *
+ * @param {string} preset - The preset, as mock-backend.js names it.
+ * @param {object} backend - The rest of the backend: its labels, content and preferences.
+ * @returns {object} A backend like the others in BACKENDS.
+ */
+const mockBackend = (preset, backend) => ({
+  group: 'mock',
+  api: `${mockOrigin(preset)}/jsonapi`,
+  baseUrl: mockOrigin(preset),
+  proxyRoot: mockOrigin(preset),
+  filesRoot: mockRoot(preset),
+  mock: preset,
+  ...backend,
+})
+
+// What a Drupal CMS site template demos best, where the site's own choice is
+// not on it. Keyed by component, then by the select's name.
+const drupalCms = (prefer) => ({
+  drupalCms: true,
+  canvasPages: true,
+  prefer: {
+    DruxtEntity: { entityType: 'node', ...prefer.entity },
+    DruxtEntityForm: { ...prefer.entity },
+    DruxtMenu: { name: 'main' },
+    DruxtView: { viewId: prefer.view },
+    DruxtBreadcrumb: { path: prefer.path },
+    ...(prefer.router === false ? {} : { DruxtRouter: { path: prefer.path } }),
+  },
+})
 
 /**
  * Backends the card can render against. The first two are proxied onto this
  * origin: `api` is where the option lists come from; a runtime's client is
  * told the backend's own `baseUrl` (this site's when unset) and sends through
- * `proxyRoot`. The mock never leaves the browser: its requests are answered
- * by decoupled-drupal-mock, and its files are served from `filesRoot`.
+ * `proxyRoot`. The mocks never leave the browser. `label` names a backend on
+ * its own; `short` names it inside its group in the select.
  */
 export const BACKENDS = {
   // Its Storybook is the environment's own, read from the runtime config.
-  site: { label: 'Druxtjs.org', api: '/jsonapi', baseUrl: null, proxyRoot: '', nodeBundles: ['doc_page'], storybookLabel: 'Druxtjs.org' },
+  site: { group: 'live', label: 'Druxtjs.org', api: '/jsonapi', baseUrl: null, proxyRoot: '', nodeBundles: ['doc_page'], storybookLabel: 'Druxtjs.org' },
   umami: {
+    group: 'live',
     label: 'Umami demo',
     api: '/umami/jsonapi',
     baseUrl: 'https://api.umami.demo.druxtjs.org',
@@ -28,23 +68,73 @@ export const BACKENDS = {
     storybookLabel: 'Umami',
     umami: true,
   },
-  mock: {
+  mock: mockBackend('umami', {
     label: 'Umami mock, in your browser',
-    api: `${MOCK_ORIGIN}/jsonapi`,
-    baseUrl: MOCK_ORIGIN,
-    proxyRoot: MOCK_ORIGIN,
-    filesRoot: MOCK_ROOT,
-    mock: true,
+    short: 'Umami',
     umami: true,
     nodeBundles: ['recipe', 'article', 'page'],
-  },
+  }),
+  dashi: mockBackend('dashi', {
+    label: 'Dashi mock (Drupal CMS), in your browser',
+    short: 'Dashi (Drupal CMS)',
+    nodeBundles: ['recipe', 'article'],
+    ...drupalCms({ entity: { bundle: 'recipe', uuid: /Deep mediterranean quiche/ }, view: 'recipes', path: /\/recipes\/deep-mediterranean-quiche/ }),
+  }),
+  haven: mockBackend('haven', {
+    label: 'Haven mock (Drupal CMS), in your browser',
+    short: 'Haven (Drupal CMS)',
+    nodeBundles: ['blog', 'project', 'person_profile', 'page'],
+    ...drupalCms({ entity: { bundle: 'project', uuid: /Restoring the outer reef/ }, view: 'projects', path: /\/projects\/.*restoring-outer-reef/ }),
+  }),
+  mercury: mockBackend('mercury', {
+    label: 'Mercury mock (Drupal CMS), in your browser',
+    short: 'Mercury (Drupal CMS)',
+    // Its one node is unpublished: its content is Canvas pages.
+    nodeBundles: [],
+    ...drupalCms({ entity: { entityType: 'media', bundle: 'image' }, path: /\/card-components/, router: false }),
+  }),
 }
+
+/**
+ * The backends a select offers, a group at a time.
+ *
+ * @param {object} backends - BACKENDS, with a reader's own when there is one.
+ * @returns {{ key: string, label: string, backends: string[] }[]} Each group and its backends' keys.
+ */
+export const groupBackends = (backends) =>
+  Object.entries(BACKEND_GROUPS)
+    .map(([key, label]) => ({ key, label, backends: Object.keys(backends).filter((k) => (backends[k].group || 'live') === key) }))
+    .filter((g) => g.backends.length)
 
 const get = async (api, path) => {
   const send = isMockUrl(api) ? mockFetch : fetch
   const response = await send(`${api}${path}`, { headers: { Accept: 'application/vnd.api+json' } })
   if (!response.ok) throw new Error(`${response.status} from ${path}`)
   return response.json()
+}
+
+/**
+ * Every page of a collection: JSON:API answers 50 at a time, and a Drupal
+ * CMS site has more view displays than that.
+ *
+ * @param {string} api - The backend's JSON:API root.
+ * @param {string} path - The collection, with its query.
+ * @param {number} [most] - The pages to read at most.
+ * @returns {Promise<{ data: object[] }>} The collection, every page in one.
+ */
+const getAll = async (api, path, most = 10) => {
+  const first = await get(api, path)
+  const data = [...first.data]
+  let next = (first.links || {}).next
+  for (let i = 1; next && i < most; i++) {
+    // The link is the backend's own URL: keep what follows its JSON:API root,
+    // and ask through this card's root for it, proxied or mocked.
+    const href = next.href || next
+    const page = await get(api, href.slice(href.indexOf('/jsonapi/') + '/jsonapi'.length))
+    data.push(...page.data)
+    next = (page.links || {}).next
+  }
+  return { data }
 }
 
 /**
@@ -162,13 +252,13 @@ export const SOURCES = {
 
   // Entity types, then bundles, from the enabled view displays.
   entityTypes: async (api) => {
-    const { data } = await get(api, '/entity_view_display/entity_view_display?filter%5Bstatus%5D=1&fields%5Bentity_view_display--entity_view_display%5D=targetEntityType')
+    const { data } = await getAll(api, '/entity_view_display/entity_view_display?filter%5Bstatus%5D=1&fields%5Bentity_view_display--entity_view_display%5D=targetEntityType')
     return [...new Set(data.map((o) => o.attributes.targetEntityType))].sort().map((t) => ({ value: t, label: t }))
   },
 
   bundles: async (api, { entityType }) => {
     if (!entityType) return []
-    const { data } = await get(api, `/entity_view_display/entity_view_display?filter%5Bstatus%5D=1&filter%5BtargetEntityType%5D=${entityType}&fields%5Bentity_view_display--entity_view_display%5D=bundle`)
+    const { data } = await getAll(api, `/entity_view_display/entity_view_display?filter%5Bstatus%5D=1&filter%5BtargetEntityType%5D=${entityType}&fields%5Bentity_view_display--entity_view_display%5D=bundle`)
     return [...new Set(data.map((o) => o.attributes.bundle))].sort().map((b) => ({ value: b, label: b }))
   },
 
@@ -216,14 +306,23 @@ export const SOURCES = {
     return data.filter((o) => !o.attributes.locked).map((o) => ({ value: o.attributes.drupal_internal__id, label: `${o.attributes.label} (${o.attributes.drupal_internal__id})` }))
   },
 
-  // Paths the router can resolve: this backend's content, by title, a group per content type.
+  // Paths the router can resolve: this backend's content, by title, a group
+  // per content type. A Drupal CMS site's Canvas pages are a group of their own.
   paths: async (api, deps, backend) => {
-    const bundles = (backend || {}).nodeBundles || ['page']
-    const lists = await Promise.all(bundles.map((bundle) => get(api, `/node/${bundle}?page%5Blimit%5D=50&sort=title&fields%5Bnode--${bundle}%5D=title,path`).catch(() => ({ data: [] }))))
+    const { nodeBundles, canvasPages } = backend || {}
+    const types = [
+      ...(nodeBundles || ['page']).map((bundle) => ({ path: `node/${bundle}`, group: bundle })),
+      ...(canvasPages ? [{ path: 'canvas_page/canvas_page', group: 'Canvas page' }] : []),
+    ]
+    const lists = await Promise.all(types.map(({ path }) => get(api, `/${path}?page%5Blimit%5D=50&sort=title&fields%5B${path.replace('/', '--')}%5D=title,path`).catch(() => ({ data: [] }))))
     return lists.flatMap(({ data }, i) => data
       .filter((o) => (o.attributes.path || {}).alias)
-      .map((o) => ({ value: o.attributes.path.alias, label: `${o.attributes.title} (${o.attributes.path.alias})`, ...(bundles.length > 1 ? { group: bundles[i] } : {}) })))
+      .map((o) => ({ value: o.attributes.path.alias, label: `${o.attributes.title} (${o.attributes.path.alias})`, ...(types.length > 1 ? { group: types[i].group } : {}) })))
   },
+
+  // Paths DruxtRouter renders: content only. A Canvas page renders through it
+  // with its fields and none of its components, which shows nothing.
+  contentPaths: (api, deps, backend) => SOURCES.paths(api, deps, { ...backend, canvasPages: false }),
 
   displays: async (api, { viewId }) => {
     if (!viewId) return []
@@ -232,6 +331,23 @@ export const SOURCES = {
     return Object.keys(displays).map((d) => ({ value: d, label: d }))
   },
 }
+
+/**
+ * What a backend prefers for one of a component's selects, over the
+ * component's own preference: a Drupal CMS mock's content is not this site's
+ * or Umami's.
+ *
+ * @param {object} backend - One of BACKENDS.
+ * @param {string} component - The component's name.
+ * @param {string} name - The select's name.
+ * @returns {*} The preference, or undefined for none.
+ */
+export const backendPreference = (backend, component, name) => (((backend || {}).prefer || {})[component] || {})[name]
+
+// A Drupal CMS site template lays its pages out with Canvas, and places
+// blocks only in its admin themes, which nothing here renders.
+const CANVAS_LAYOUT = 'lays its pages out with Canvas, so it has blocks only for its admin themes'
+const BLOCKS = { site: true, umami: true, mock: true, dashi: CANVAS_LAYOUT, haven: CANVAS_LAYOUT, mercury: CANVAS_LAYOUT }
 
 /** Whether the card is on Umami's content: the live demo or the mock of it. */
 const isUmami = (card) => !!(BACKENDS[card.backend] || {}).umami
@@ -266,6 +382,7 @@ export const COMPONENTS = {
   DruxtBlock: {
     story: 'druxt-blocks-druxtblock--default',
     args: ['id', 'uuid'],
+    backends: BLOCKS,
     props: [
       { name: 'uuid', type: 'string', control: 'select', source: 'blocks', required: true, prefer: perBackend(/branding/, /umami_banner_recipes/), description: 'The block entity UUID.' },
     ],
@@ -274,6 +391,7 @@ export const COMPONENTS = {
   DruxtBlockRegion: {
     story: 'druxt-blocks-druxtblockregion--default',
     args: [],
+    backends: BLOCKS,
     chain: {
       label: 'theme, region',
       description: 'Each one narrows the next.',
@@ -339,9 +457,17 @@ export const COMPONENTS = {
   DruxtView: {
     story: 'druxt-views-druxtview--default',
     args: [],
-    // JSON:API Views is not on this site's Drupal yet. The mock has each
-    // view's first page only, as its preset recorded them.
-    backends: { umami: true, site: 'needs JSON:API Views on that Drupal', mock: 'has only the first page of each view, so its pager would fail' },
+    // JSON:API Views is not on this site's Drupal yet. The Umami mock has
+    // each view's first page only, as its preset recorded them; every view on
+    // Dashi and Haven fits on its first page. Mercury's are not of content.
+    backends: {
+      umami: true,
+      site: 'needs JSON:API Views on that Drupal',
+      mock: 'has only the first page of each view, so its pager would fail',
+      dashi: true,
+      haven: true,
+      mercury: 'has no views of content',
+    },
     chain: {
       label: 'viewId, displayId',
       description: 'Each one narrows the next.',
@@ -367,15 +493,24 @@ export const COMPONENTS = {
   DruxtRouter: {
     story: 'druxt-router-druxtrouter--default',
     args: [],
+    backends: {
+      site: true,
+      umami: true,
+      mock: true,
+      dashi: true,
+      haven: true,
+      mercury: 'has Canvas pages only, which DruxtRouter renders without their components',
+    },
     props: [
       // A short page: the card shows the router resolving a path, not a long read.
-      { name: 'path', type: 'string', control: 'select', source: 'paths', required: true, prefer: perBackend('/explanation/drupal-for-nuxt-developers', '/about-umami'), description: 'The path to resolve; the current route when unset.' },
+      { name: 'path', type: 'string', control: 'select', source: 'contentPaths', required: true, prefer: perBackend('/explanation/drupal-for-nuxt-developers', '/about-umami'), description: 'The path to resolve; the current route when unset.' },
     ],
   },
 
   DruxtSite: {
     story: 'druxt-site-druxtsite--default',
     args: [],
+    backends: BLOCKS,
     props: [
       { name: 'theme', type: 'string', control: 'select', source: 'themes', required: true, prefer: siteTheme, description: 'The Drupal theme whose regions render.' },
     ],

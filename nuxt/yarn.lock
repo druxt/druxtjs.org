@@ -10823,21 +10823,56 @@ __metadata:
   languageName: node
   linkType: hard
 
-"decoupled-drupal-mock-umami@npm:1.0.0-alpha.2":
-  version: 1.0.0-alpha.2
-  resolution: "decoupled-drupal-mock-umami@npm:1.0.0-alpha.2"
+"decoupled-drupal-mock-dashi@npm:1.0.0-alpha.4":
+  version: 1.0.0-alpha.4
+  resolution: "decoupled-drupal-mock-dashi@npm:1.0.0-alpha.4"
   peerDependencies:
-    decoupled-drupal-mock: ^1.0.0-alpha.2
-  checksum: 969167c67e6b13748adf026532888ec0d1fce00288f5d5121c77263c09b85dabceca30679923b0eb57819663dc41e343f9d4b647d433a5c7a2fbd7bf30a1e009
+    decoupled-drupal-mock: ^1.0.0-alpha.4
+  bin:
+    decoupled-drupal-mock-dashi: bin.js
+  checksum: 062cab43d6e250386710be79b1d2b1d6853259e8346e6b49570e8d2c7fa49af0d36652607995f401aea049805ce34b9b491f49816e1ecf190c45e8e7b74ead61
   languageName: node
   linkType: hard
 
-"decoupled-drupal-mock@npm:1.0.0-alpha.2":
-  version: 1.0.0-alpha.2
-  resolution: "decoupled-drupal-mock@npm:1.0.0-alpha.2"
+"decoupled-drupal-mock-haven@npm:1.0.0-alpha.4":
+  version: 1.0.0-alpha.4
+  resolution: "decoupled-drupal-mock-haven@npm:1.0.0-alpha.4"
+  peerDependencies:
+    decoupled-drupal-mock: ^1.0.0-alpha.4
+  bin:
+    decoupled-drupal-mock-haven: bin.js
+  checksum: ba65b94e88f0d4f077bc9dd28b35019a4d65a3ccd04d0d203d2fab676607b2f05536f3b5ee978125ac71c6b71008335d9f6656392795ebf6a90497539a350233
+  languageName: node
+  linkType: hard
+
+"decoupled-drupal-mock-mercury@npm:1.0.0-alpha.4":
+  version: 1.0.0-alpha.4
+  resolution: "decoupled-drupal-mock-mercury@npm:1.0.0-alpha.4"
+  peerDependencies:
+    decoupled-drupal-mock: ^1.0.0-alpha.4
+  bin:
+    decoupled-drupal-mock-mercury: bin.js
+  checksum: 21b34cc76816b824544c7e38ddbbf99395c83c26117cf731dc909b42f9fe12d73f2a0354f710e4540d3f5ce55efac848a1c5721dbe3cba6674e4e886190e67a0
+  languageName: node
+  linkType: hard
+
+"decoupled-drupal-mock-umami@npm:1.0.0-alpha.4":
+  version: 1.0.0-alpha.4
+  resolution: "decoupled-drupal-mock-umami@npm:1.0.0-alpha.4"
+  peerDependencies:
+    decoupled-drupal-mock: ^1.0.0-alpha.4
+  bin:
+    decoupled-drupal-mock-umami: bin.js
+  checksum: 5e9efa286f85a2f1f5f7947816bb5edf26487d4e730bc34027d837b74b92350099101c5ddcb340e93212804ff3684fd41eb4abca76268913d75d6619add278fd
+  languageName: node
+  linkType: hard
+
+"decoupled-drupal-mock@npm:1.0.0-alpha.4":
+  version: 1.0.0-alpha.4
+  resolution: "decoupled-drupal-mock@npm:1.0.0-alpha.4"
   bin:
     decoupled-drupal-mock: dist/cli.js
-  checksum: 03cb2edb25137b7b30dab05d31336fef64a1b36220674d7303edd2e7a1632ca0fdf0ab5cac30d6fdccbfb3372fa98d1033c065ba130981d06c8c856dec13faed
+  checksum: 3dbd4540e9aaffde18a9d98b7f3ba06798d9ab3cdd60da1a1570d3411620e4324f49f6f5569f44a0db9d6bd5d36eca11c6cdfb27ca2a1b9767b213df1f320274
   languageName: node
   linkType: hard
 
@@ -11549,8 +11584,11 @@ __metadata:
     consola: 2.15.3
     core-js: 3.50.0
     daisyui: 1.25.4
-    decoupled-drupal-mock: 1.0.0-alpha.2
-    decoupled-drupal-mock-umami: 1.0.0-alpha.2
+    decoupled-drupal-mock: 1.0.0-alpha.4
+    decoupled-drupal-mock-dashi: 1.0.0-alpha.4
+    decoupled-drupal-mock-haven: 1.0.0-alpha.4
+    decoupled-drupal-mock-mercury: 1.0.0-alpha.4
+    decoupled-drupal-mock-umami: 1.0.0-alpha.4
     drupal-jsonapi-params: 2.3.2
     druxt: 0.25.1
     druxt-auth: "patch:druxt-auth@npm%3A0.5.1#./patches/druxt-auth-0.5.1.patch"

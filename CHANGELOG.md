@@ -9,6 +9,15 @@ Druxt 1.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- The playground renders against three more Drupal sites in the browser:
+  Drupal CMS's Dashi, Haven and Mercury site templates, mocked by
+  decoupled-drupal-mock. The backend select groups the live Drupal sites
+  and the mocks apart. A component a mock cannot serve says why: the
+  block components on all three, and views and the router on Mercury,
+  whose pages are all Canvas pages.
+
 ### Changed
 
 - Canvas's preview through the site is set up by one variable on Lagoon.

@@ -27,10 +27,12 @@
         <span class="text-base-content/70">Backend</span>
         <select data-testid="backend" class="select select-sm select-bordered h-[30px] min-h-0 rounded-md text-base lg:text-sm" :value="customOpen ? 'other' : backend" @change="pickBackend($event.target.value)">
           <!-- Short, so the reason never widens the select on a phone; the reason is said below. -->
-          <option v-for="(b, key) in backends" :key="key" :value="key" :disabled="!available(key)">
-            {{ b.label }}{{ available(key) ? '' : ' (n/a)' }}
-          </option>
-          <option value="other">Your own Drupal</option>
+          <optgroup v-for="g in backendGroups" :key="g.key" :label="g.label">
+            <option v-for="key in g.backends" :key="key" :value="key" :disabled="!available(key)">
+              {{ backends[key].short || backends[key].label }}{{ available(key) ? '' : ' (n/a)' }}
+            </option>
+            <option v-if="g.key === 'live'" value="other">Your own Drupal</option>
+          </optgroup>
         </select>
       </label>
       <!-- In a docs page the example is written for one backend, so it is named, not offered. -->
@@ -251,6 +253,8 @@ import {
   SHIPPED_WRAPPERS,
   SOURCES,
   WRAPPER_PROP,
+  backendPreference,
+  groupBackends,
   liveComponentsOf,
   packageOf,
   pageFor,
@@ -327,6 +331,8 @@ export default {
 
   computed: {
     backends: ({ custom }) => (custom ? { ...BACKENDS, custom } : BACKENDS),
+    /** The backend select's groups: live Drupal sites, then the mocks. */
+    backendGroups: ({ backends }) => groupBackends(backends),
     /** The backend in a URL: its key, or a reader's origin. */
     backendId: ({ backend, custom }) => (backend === 'custom' && custom ? custom.baseUrl : backend),
     copyStates: () => COPY_STATES,
@@ -706,7 +712,8 @@ export default {
     /** What a select prefers on its own: `prefer` (a value, or a function of the card), else its documented default. */
     preferred(prop) {
       if (this.initial[prop.name] !== undefined) return this.initial[prop.name]
-      const want = prop.prefer !== undefined ? prop.prefer : prop.default
+      const own = backendPreference(this.backends[this.backend], this.name, prop.name)
+      const want = own !== undefined ? own : prop.prefer !== undefined ? prop.prefer : prop.default
       return typeof want === 'function' ? want(this) : want
     },
 
@@ -820,7 +827,7 @@ export default {
         const own = new Set(['druxt', 'druxtRouter', 'druxtSchema', 'druxtMenu', 'druxtViews'])
         const state = Object.fromEntries(Object.entries(this.$store.state).filter(([k]) => !own.has(k)))
         // The mock answers in the browser, so its runtime gets the mock's adapter instead of the network.
-        const adapter = b.mock ? await mockAdapter() : undefined
+        const adapter = b.mock ? await mockAdapter(b.mock) : undefined
         if (key !== this.renderKey) return
         const runtime = createRuntime({ baseUrl: b.baseUrl || settings.baseUrl || window.location.origin, proxyRoot: b.proxyRoot, filesRoot: b.filesRoot, adapter, settings, state, mutations })
         runtime.axios.interceptors.request.use((config) => {
