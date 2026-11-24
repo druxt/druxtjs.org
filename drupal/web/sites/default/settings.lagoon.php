@@ -104,6 +104,26 @@ if (!$frontend && getenv('LAGOON_ENVIRONMENT_TYPE') === 'production') {
 if ($frontend) {
   $settings['druxt_docs_frontend_url'] = rtrim($frontend, '/');
 }
+// Canvas's preview through the site. CANVAS_SITE_URL turns the frontend's
+// side of it on, and this is Drupal's: the frontend Canvas embeds, and the
+// site's components an editor places. Set here because the exported settings
+// name no frontend, and every rollout imports those.
+if ($frontend && getenv('CANVAS_SITE_URL')) {
+  $config['canvas_headless.settings']['frontends'] = [
+    [
+      'url' => rtrim($frontend, '/'),
+      'components' => [
+        'js.action',
+        'js.feature',
+        'js.features',
+        'js.hero',
+        'js.modules',
+        'js.quickstart-command',
+        'js.showcase',
+      ],
+    ],
+  ];
+}
 // The Frontend tab of a page's preview, a Consumer Node Preview target:
 // this site's preview page, handed the JSON:API Node Preview document's
 // path in the fragment. The path is relative, so the page fetches it on
