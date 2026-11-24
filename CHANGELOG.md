@@ -13,6 +13,13 @@ Druxt 1.0.0.
 
 ### Changed
 
+- The site runs on Druxt 0.25.2, every package at its release except
+  druxt-router and druxt-breadcrumb, which had no changes, and axios 0.35.0,
+  the version Druxt 0.25.2 asks for. The API reference and the package
+  changelogs are generated from the 0.25.2 release commit.
+- The views pages patch to druxt-views is rebuilt for 0.23.2. The
+  troubleshooting page's search and area filters, and an issue opened at its
+  own URL, work as before.
 - Canvas's preview through the site is set up by one variable on Lagoon.
   With `CANVAS_SITE_URL` set on an environment, Drupal names the site as
   Canvas's headless frontend on every rollout, where a rollout used to
@@ -30,6 +37,10 @@ Druxt 1.0.0.
 - Canvas's editor shows the draft of a front page built from Drupal's
   components, and its sections can be selected. It shows them as Drupal's
   markup, without the site's styles.
+- A rollout no longer stops when a workspace is editing a Canvas page. The
+  page moves to the site's components inside that workspace, and the live
+  page follows when it publishes. A page that does not validate is left as
+  it is and logged.
 
 ## [0.20.2] - 2026-11-20
 

@@ -1,5 +1,5 @@
 diff --git a/dist/components/DruxtView.vue b/dist/components/DruxtView.vue
-index 3230678..82790b2 100644
+index bf6106e..212280d 100644
 --- a/dist/components/DruxtView.vue
 +++ b/dist/components/DruxtView.vue
 @@ -127,7 +127,21 @@ export default {
@@ -25,7 +25,7 @@ index 3230678..82790b2 100644
    },
  
    /**
-@@ -136,16 +150,19 @@ export default {
+@@ -136,12 +150,16 @@ export default {
     * @property {object} view - The View JSON:API resource.
     */
    data() {
@@ -38,25 +38,24 @@ index 3230678..82790b2 100644
      return {
 +      emitting: false,
        model: {
-         filter: model.filter || {},
+-        filter: model.filter || {},
++        // A copy, so a parent editing its filter in place changes the value
++        // the view compares against, not the view's model with it.
++        filter: JSON.parse(JSON.stringify(model.filter || {})),
          page: parseInt(model.page) || null,
          sort: model.sort || null,
        },
-       resource: null,
-+      sentFilter: JSON.stringify(model.filter || {}),
-       view: false
-     }
-   },
-@@ -295,6 +312,8 @@ export default {
+@@ -295,6 +313,9 @@ export default {
  
    watch: {
-     '$route.query'(to) {
+     '$route.query'(to, from) {
 +      // A parent that writes the route sets `value` instead.
 +      if (this.value) return
-       if (!Object.entries(to || {}).length) {
-         this.model = {
-           filter: {},
-@@ -304,6 +323,23 @@ export default {
++
+       // A URL the view wrote itself is not a reset. The marker covers the next
+       // change only, which is either that navigation or one that replaced it.
+       const own = stringify(to || {}) === this.routeQuery
+@@ -314,6 +335,31 @@ export default {
        }
      },
  
@@ -65,13 +64,21 @@ index 3230678..82790b2 100644
 +      handler(to) {
 +        if (!to) return
 +        const next = {
-+          filter: to.filter || {},
++          filter: JSON.parse(JSON.stringify(to.filter || {})),
 +          page: parseInt(to.page) || null,
 +          sort: to.sort || null,
 +        }
 +        // DruxtModule's own watcher has set `model` to the prop object by
-+        // now; a copy keeps later edits off the parent's value.
-+        if (this.model === to || JSON.stringify(next) !== JSON.stringify(this.model)) {
++        // now; a copy keeps later edits off the parent's value. DruxtModule
++        // emits that copy, and a parent with v-model hands it back: the same
++        // value again is not copied, or the two would trade copies for ever.
++        const key = JSON.stringify(next)
++        if (key === this.lastValue && this.model === to) return
++        this.lastValue = key
++        if (this.model === to || key !== JSON.stringify(this.model)) {
++          // A filter the parent sets comes with its own page, as the URL it
++          // came from says, so the filter watcher keeps that page.
++          this.fromValue = JSON.stringify(next.filter) !== this.lastFilter
 +          this.model = next
 +        }
 +      },
@@ -80,48 +87,60 @@ index 3230678..82790b2 100644
      arguments() {
        this.$fetch()
      },
-@@ -314,23 +350,30 @@ export default {
+@@ -330,27 +376,29 @@ export default {
+         const filter = JSON.stringify(to || {})
+         if (filter === this.lastFilter) return
+         this.lastFilter = filter
++        const fromValue = this.fromValue
++        this.fromValue = false
  
-     'model.filter': {
-       deep: true,
--      handler(to, from) {
--        if (!Object.entries(to || {}).length && !Object.entries(from || {}).length) {
--          return
--        }
+         // A filter change goes back to the first page, as a Drupal-rendered
+-        // view does when its exposed form is submitted. The page watcher's
+-        // $fetch() then joins this one.
+-        this.model.page = null
+-        this.updateRoute()
 -        this.$fetch()
-+      handler(to) {
-+        // A new object with the same filters is not a change. The filters
-+        // are compared with the ones last sent, because an edit in place,
-+        // removing the last filter among them, gives this watcher the same
-+        // object as both arguments.
-+        const filter = JSON.stringify(to || {})
-+        if (filter === this.sentFilter) return
-+        this.sentFilter = filter
-+        this.emitModel()
-+        this.refetch()
++        // view does when its exposed form is submitted. The page watcher then
++        // writes the change and fetches.
++        if (!fromValue && this.model.page) {
++          this.model.page = null
++          return
++        }
++        this.changed()
        },
      },
  
      'model.page'(to, from) {
        if (to !== from) {
+-        this.updateRoute()
 -        this.$fetch()
-+        this.emitModel()
-+        this.refetch()
++        this.changed()
        }
      },
  
      'model.sort'(to, from) {
        if (to !== from) {
+-        this.updateRoute()
 -        this.$fetch()
-+        this.emitModel()
-+        this.refetch()
++        this.changed()
        }
      },
  
-@@ -408,6 +451,29 @@ export default {
+@@ -466,6 +514,40 @@ export default {
        return query
      },
  
++    /**
++     * Hands a model change on and fetches again. A parent that writes the
++     * route gets a copy of the model to write it from. Otherwise the view
++     * keeps the URL's keys current, and DruxtModule emits a replaced model.
++     */
++    changed() {
++      if (this.value) this.emitModel()
++      else this.updateRoute()
++      this.refetch()
++    },
++
 +    /**
 +     * The model, copied, for a parent that writes the route. One emit per
 +     * tick, because a replaced model fires every model watcher at once, and
@@ -148,7 +167,7 @@ index 3230678..82790b2 100644
      /**
       * Filters update event handler.
       */
-@@ -506,6 +572,8 @@ export default {
+@@ -564,6 +646,8 @@ export default {
        mode: vm.mode,
        pager: vm.pager,
        results: vm.results,
@@ -247,7 +266,7 @@ index bc3d41f..9d26a74 100644
      },
  
 diff --git a/dist/druxt-views.esm.js b/dist/druxt-views.esm.js
-index 193fe35..39474c0 100644
+index 8ef5a72..d70fe35 100644
 --- a/dist/druxt-views.esm.js
 +++ b/dist/druxt-views.esm.js
 @@ -50,6 +50,112 @@ async function DruxtViewsStorybook({ stories }) {
@@ -461,7 +480,7 @@ index 193fe35..39474c0 100644
 -export { DruxtViewsFilterMixin, DruxtViewsFiltersMixin, DruxtViewsPagerMixin, DruxtViewsSortsMixin, DruxtViewsStore, DruxtViewsViewMixin, DruxtViewsNuxtModule as default };
 +export { DruxtViewsFilterMixin, DruxtViewsFiltersMixin, DruxtViewsPageMixin, DruxtViewsPagerMixin, DruxtViewsSortsMixin, DruxtViewsStore, DruxtViewsViewMixin, DruxtViewsNuxtModule as default, modelToLocation, normalizePage, routeToModel };
 diff --git a/dist/druxt-views.ssr.js b/dist/druxt-views.ssr.js
-index 1b4cb31..f503bef 100644
+index 96ed6b0..541ade3 100644
 --- a/dist/druxt-views.ssr.js
 +++ b/dist/druxt-views.ssr.js
 @@ -60,6 +60,112 @@ async function DruxtViewsStorybook({ stories }) {
