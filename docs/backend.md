@@ -433,8 +433,11 @@ because only the site's components are drawn there as the site draws them.
 So a rollout with `CANVAS_SITE_URL` set moves every Canvas page to the
 site's components once, through the `canvas_site_components` deploy hook. A
 component moves only when the site's one of the same name is at the same
-version, and the page's unsaved draft is dropped. Turning this off
-afterwards leaves the built-in front page.
+version, and the page's unsaved draft is dropped. A page a workspace is
+editing moves inside that workspace instead, and the live page follows
+when the workspace publishes. A page that does not validate is left as it
+is and logged, and the rollout goes on. Turning this off afterwards leaves
+the built-in front page.
 
 Framed by the editor, the page stands alone, without the site's header and
 footer, so an editor arranges the page and not the site around it. Anywhere

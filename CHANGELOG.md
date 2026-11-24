@@ -35,6 +35,10 @@ Druxt 1.0.0.
 - Canvas's editor shows the draft of a front page built from Drupal's
   components, and its sections can be selected. It shows them as Drupal's
   markup, without the site's styles.
+- A rollout no longer stops when a workspace is editing a Canvas page. The
+  page moves to the site's components inside that workspace, and the live
+  page follows when it publishes. A page that does not validate is left as
+  it is and logged.
 
 ## [0.20.2] - 2026-11-20
 
