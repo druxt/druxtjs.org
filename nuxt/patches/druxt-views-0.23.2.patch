@@ -1,5 +1,5 @@
 diff --git a/dist/components/DruxtView.vue b/dist/components/DruxtView.vue
-index bf6106e..212280d 100644
+index bf6106e..ee06376 100644
 --- a/dist/components/DruxtView.vue
 +++ b/dist/components/DruxtView.vue
 @@ -127,7 +127,21 @@ export default {
@@ -55,7 +55,7 @@ index bf6106e..212280d 100644
        // A URL the view wrote itself is not a reset. The marker covers the next
        // change only, which is either that navigation or one that replaced it.
        const own = stringify(to || {}) === this.routeQuery
-@@ -314,6 +335,31 @@ export default {
+@@ -314,6 +335,39 @@ export default {
        }
      },
  
@@ -70,10 +70,18 @@ index bf6106e..212280d 100644
 +        }
 +        // DruxtModule's own watcher has set `model` to the prop object by
 +        // now; a copy keeps later edits off the parent's value. DruxtModule
-+        // emits that copy, and a parent with v-model hands it back: the same
-+        // value again is not copied, or the two would trade copies for ever.
++        // emits that copy, and a parent with v-model hands it back. That echo
++        // is copied too, or the view's next edit would change the parent's
++        // value and pass for the parent's own. It is marked as the value
++        // DruxtModule emitted, so it is not emitted again: re-emitting would
++        // have the two trade copies for ever.
 +        const key = JSON.stringify(next)
-+        if (key === this.lastValue && this.model === to) return
++        if (key === this.lastValue && this.model === to) {
++          this.hasEmittedInput = true
++          this.emittedInput = next
++          this.model = next
++          return
++        }
 +        this.lastValue = key
 +        if (this.model === to || key !== JSON.stringify(this.model)) {
 +          // A filter the parent sets comes with its own page, as the URL it
@@ -87,7 +95,7 @@ index bf6106e..212280d 100644
      arguments() {
        this.$fetch()
      },
-@@ -330,27 +376,29 @@ export default {
+@@ -330,27 +384,29 @@ export default {
          const filter = JSON.stringify(to || {})
          if (filter === this.lastFilter) return
          this.lastFilter = filter
@@ -126,7 +134,7 @@ index bf6106e..212280d 100644
        }
      },
  
-@@ -466,6 +514,40 @@ export default {
+@@ -466,6 +522,40 @@ export default {
        return query
      },
  
@@ -167,7 +175,7 @@ index bf6106e..212280d 100644
      /**
       * Filters update event handler.
       */
-@@ -564,6 +646,8 @@ export default {
+@@ -564,6 +654,8 @@ export default {
        mode: vm.mode,
        pager: vm.pager,
        results: vm.results,
