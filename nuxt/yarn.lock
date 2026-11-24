@@ -11469,7 +11469,7 @@ __metadata:
 
 "druxt-views@patch:druxt-views@npm%3A0.23.2#./patches/druxt-views-0.23.2.patch::locator=druxtjs-org%40workspace%3A.":
   version: 0.23.2
-  resolution: "druxt-views@patch:druxt-views@npm%3A0.23.2#./patches/druxt-views-0.23.2.patch::version=0.23.2&hash=56b822&locator=druxtjs-org%40workspace%3A."
+  resolution: "druxt-views@patch:druxt-views@npm%3A0.23.2#./patches/druxt-views-0.23.2.patch::version=0.23.2&hash=198b84&locator=druxtjs-org%40workspace%3A."
   dependencies:
     axios: 0.35.0
     deepmerge: ^4.3.1
@@ -11482,7 +11482,7 @@ __metadata:
   peerDependencies:
     vue: ^2.7.14
     vuex: ^3.6.2
-  checksum: e97fb6136c28ac50e600ec79bb6711c16ad00120a9eba222a7fe80fbc8034ab14a4521b21410b1b8db3a18084042e38f95c6db36fa492712fb016c41e4d3b626
+  checksum: 88f723ef9226dfab184c31901cb6d78ab6f381b7c217f410ead9b873cdc0086f72bb574ba3851ea36fc82fe199b98c7fb1b5744721c287919fa7b6dde92f5bf1
   languageName: node
   linkType: hard
 

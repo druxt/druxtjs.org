@@ -1,5 +1,5 @@
 diff --git a/dist/components/DruxtView.vue b/dist/components/DruxtView.vue
-index bf6106e..4ee3be5 100644
+index bf6106e..212280d 100644
 --- a/dist/components/DruxtView.vue
 +++ b/dist/components/DruxtView.vue
 @@ -127,7 +127,21 @@ export default {
@@ -25,7 +25,7 @@ index bf6106e..4ee3be5 100644
    },
  
    /**
-@@ -136,10 +150,12 @@ export default {
+@@ -136,12 +150,16 @@ export default {
     * @property {object} view - The View JSON:API resource.
     */
    data() {
@@ -38,9 +38,14 @@ index bf6106e..4ee3be5 100644
      return {
 +      emitting: false,
        model: {
-         filter: model.filter || {},
+-        filter: model.filter || {},
++        // A copy, so a parent editing its filter in place changes the value
++        // the view compares against, not the view's model with it.
++        filter: JSON.parse(JSON.stringify(model.filter || {})),
          page: parseInt(model.page) || null,
-@@ -295,6 +311,9 @@ export default {
+         sort: model.sort || null,
+       },
+@@ -295,6 +313,9 @@ export default {
  
    watch: {
      '$route.query'(to, from) {
@@ -50,7 +55,7 @@ index bf6106e..4ee3be5 100644
        // A URL the view wrote itself is not a reset. The marker covers the next
        // change only, which is either that navigation or one that replaced it.
        const own = stringify(to || {}) === this.routeQuery
-@@ -314,6 +333,31 @@ export default {
+@@ -314,6 +335,31 @@ export default {
        }
      },
  
@@ -59,7 +64,7 @@ index bf6106e..4ee3be5 100644
 +      handler(to) {
 +        if (!to) return
 +        const next = {
-+          filter: to.filter || {},
++          filter: JSON.parse(JSON.stringify(to.filter || {})),
 +          page: parseInt(to.page) || null,
 +          sort: to.sort || null,
 +        }
@@ -82,7 +87,7 @@ index bf6106e..4ee3be5 100644
      arguments() {
        this.$fetch()
      },
-@@ -330,27 +374,29 @@ export default {
+@@ -330,27 +376,29 @@ export default {
          const filter = JSON.stringify(to || {})
          if (filter === this.lastFilter) return
          this.lastFilter = filter
@@ -121,7 +126,7 @@ index bf6106e..4ee3be5 100644
        }
      },
  
-@@ -466,6 +512,40 @@ export default {
+@@ -466,6 +514,40 @@ export default {
        return query
      },
  
@@ -162,7 +167,7 @@ index bf6106e..4ee3be5 100644
      /**
       * Filters update event handler.
       */
-@@ -564,6 +644,8 @@ export default {
+@@ -564,6 +646,8 @@ export default {
        mode: vm.mode,
        pager: vm.pager,
        results: vm.results,
