@@ -280,7 +280,7 @@ describe('discovery', () => {
 describe('the registry entry', () => {
   const entry = JSON.parse(readFileSync(new URL('../server.json', import.meta.url)))
 
-  test('the card describes the version and icon server.json publishes', () => {
+  test('the card repeats every field server.json publishes', () => {
     let text
     const res = { writeHead: () => {}, end: (body) => (text = body) }
     createMcpDiscovery('https://druxtjs.org').handle(
@@ -291,6 +291,13 @@ describe('the registry entry', () => {
     const card = JSON.parse(text)
     assert.equal(card.version, entry.version)
     assert.deepEqual(card.icons, entry.icons)
+    // The card and the registry entry are written out separately, so a field
+    // changed in one and not the other would otherwise go unnoticed until a
+    // directory showed the two descriptions side by side.
+    assert.equal(card.title, entry.title)
+    assert.equal(card.description, entry.description)
+    assert.equal(card.websiteUrl, entry.websiteUrl)
+    assert.deepEqual(card.repository, entry.repository)
   })
 
   test('the server reports the version server.json publishes', () => {
