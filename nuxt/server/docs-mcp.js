@@ -38,6 +38,7 @@ const UNSTATED_VERSION = '2025-03-26'
 /** The `_meta` keys the current revision carries a request and a result by. */
 const META_VERSION = 'io.modelcontextprotocol/protocolVersion'
 const META_SERVER_INFO = 'io.modelcontextprotocol/serverInfo'
+const META_CAPABILITIES = 'io.modelcontextprotocol/clientCapabilities'
 /** The headers and the body disagree, or a required header is missing. */
 const HEADER_MISMATCH = -32020
 const UNSUPPORTED_VERSION = -32022
@@ -334,6 +335,13 @@ const negotiate = (req, message) => {
     if (name === undefined || decodeHeaderValue(name) !== (message.params || {}).name) {
       return mismatch("Mcp-Name is required for tools/call, and must match the tool's name.")
     }
+  }
+  // The revision has a client state its capabilities on every request, as `{}`
+  // when it has none. This server reads none of them, but a request without
+  // the field is not one the revision describes.
+  const capabilities = meta[META_CAPABILITIES]
+  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
+    return invalid(`_meta ${META_CAPABILITIES} is required, as {} for a client with none.`)
   }
   return { version }
 }

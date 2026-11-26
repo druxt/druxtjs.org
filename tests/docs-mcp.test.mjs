@@ -270,21 +270,34 @@ describe('the current revision', () => {
     assert.equal((await post({ jsonrpc: '2.0', id: 2, method: 'ping' })).status, 200)
   })
 
-  test('a request without client capabilities is still answered', async () => {
-    // The revision asks a client to state its capabilities on every request,
-    // and this server asks nothing of a client: no sampling, no elicitation,
-    // no roots. Turning a readable request away over a field that is never
-    // read would cost a reader the docs and buy nothing. A feature that needs
-    // a client capability would have to require the field.
+  test('a request without client capabilities is refused, and nothing is answered from it', async () => {
+    // The revision has a client state its capabilities on every request, as
+    // {} when it has none. A field missing, or not an object, is a request the
+    // revision does not describe.
+    const headers = { 'MCP-Protocol-Version': VERSION, 'Mcp-Method': 'tools/list' }
+    for (const capabilities of [undefined, null, 'none', []]) {
+      const { status, body } = await post(
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/list',
+          params: { _meta: { [META_VERSION]: VERSION, [META_CAPABILITIES]: capabilities } },
+        },
+        false,
+        headers
+      )
+      assert.equal(status, 400)
+      assert.equal(body.error.code, -32602)
+      assert.equal(body.result, undefined)
+    }
+  })
+
+  test('an older client is not asked for its capabilities', async () => {
+    // Before 2026-07-28 a client stated them once, in its handshake.
     const { status, body } = await post(
-      {
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'tools/list',
-        params: { _meta: { [META_VERSION]: VERSION } },
-      },
+      { jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} },
       false,
-      { 'MCP-Protocol-Version': VERSION, 'Mcp-Method': 'tools/list' }
+      { 'MCP-Protocol-Version': '2025-06-18' }
     )
     assert.equal(status, 200)
     assert.equal(body.result.tools.length, 3)
