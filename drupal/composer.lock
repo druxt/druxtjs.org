@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1909e51bd05b0f071b3d7a2b049448f4",
+    "content-hash": "affb7f936b235960d1f824f049171b0d",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1342,17 +1342,17 @@
         },
         {
             "name": "drupal/canvas",
-            "version": "1.12.0",
+            "version": "1.13.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/canvas.git",
-                "reference": "1.12.0"
+                "reference": "1.13.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/canvas-1.12.0.zip",
-                "reference": "1.12.0",
-                "shasum": "7b42c6c17329c90612aa15e5187941ff1371bc9e"
+                "url": "https://ftp.drupal.org/files/projects/canvas-1.13.0.zip",
+                "reference": "1.13.0",
+                "shasum": "93d80cd41386cc1034ce729320b44ce83ea72fc5"
             },
             "require": {
                 "drupal/core": "^11.3",
@@ -1366,7 +1366,7 @@
                 "drupal/canvas_ai": "*",
                 "drupal/coder": "^8",
                 "drupal/consumers": "*",
-                "drupal/custom_elements": "^3.4",
+                "drupal/custom_elements": "^3.5.0",
                 "drupal/jsonapi_menu_items": "^1.2.8",
                 "drupal/metatag": "^2.1",
                 "drupal/pathauto": "^1.13",
@@ -1378,15 +1378,16 @@
                 "league/openapi-psr7-validator": "^0.22.0",
                 "mglaman/phpstan-drupal": "2.0.15",
                 "phpat/phpat": "0.12.4",
-                "phpstan/phpstan": "2.2.3",
+                "phpstan/phpstan": "2.2.16",
+                "phpstan/phpstan-phpunit": "2.0.21",
                 "phpstan/phpstan-strict-rules": "2.0.11",
                 "shipmonk/dead-code-detector": "1.2.0"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "1.12.0",
-                    "datestamp": "1790579327",
+                    "version": "1.13.0",
+                    "datestamp": "1795080949",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -1468,6 +1469,10 @@
                 {
                     "name": "f.mazeikis",
                     "homepage": "https://www.drupal.org/user/3513671"
+                },
+                {
+                    "name": "gábor hojtsy",
+                    "homepage": "https://www.drupal.org/user/4166"
                 },
                 {
                     "name": "harjot.singh@acquia.com",
