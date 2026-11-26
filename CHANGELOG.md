@@ -18,6 +18,8 @@ Druxt 1.0.0.
   block components on all three, and views and the router on Mercury,
   whose pages are all Canvas pages.
 
+## [0.21.0] - 2026-11-24
+
 ### Changed
 
 - The site runs on Druxt 0.25.2, every package at its release except
