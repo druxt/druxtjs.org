@@ -18,6 +18,12 @@ Druxt 1.0.0.
   block components on all three, and views and the router on Mercury,
   whose pages are all Canvas pages.
 
+### Fixed
+
+- A module's deprecations page renders from Drupal, like the other authored
+  docs, instead of from the markdown it was migrated from. Edits to it now show
+  on the site, and an editor gets its revisions and diff.
+
 ## [0.21.0] - 2026-11-24
 
 ### Changed
