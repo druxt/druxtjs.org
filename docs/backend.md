@@ -443,14 +443,3 @@ Framed by the editor, the page stands alone, without the site's header and
 footer, so an editor arranges the page and not the site around it. Anywhere
 else it has the site's layout. `?layout=site` or `?layout=page` on the
 page's address picks either.
-
-With Canvas 1.12.0 and Custom Elements 3.5.0, Drupal needs the following,
-and each can go when a release no longer needs it:
-
-- `DruxtjsorgServiceProvider` aliases a service class that Canvas Headless
-  asks for by name and Custom Elements registers by id only. It does so
-  only once Custom Elements is installed, so a site can still start in
-  order to install it.
-- `drupal/patches/canvas-headless-component-uuid.patch` keeps each
-  component's instance id in the tree. Without it nothing in the editor can
-  be selected.

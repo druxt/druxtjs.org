@@ -73,27 +73,11 @@ final class DruxtjsorgServiceProvider extends ServiceProviderBase {
       $container->getDefinition('jsonapi.version_negotiator')->setClass(WorkspaceVersionNegotiator::class);
     }
     $this->swapFieldItemNormalizer($container);
-    $this->aliasRenderConverter($container);
     if (!$container->hasParameter('simple_oauth.openid.claims')) {
       return;
     }
     $claims = $container->getParameter('simple_oauth.openid.claims');
     $container->setParameter('simple_oauth.openid.claims', array_values(array_unique([...$claims, ...self::CLAIMS])));
-  }
-
-  /**
-   * Names Custom Elements' render converter by its class, for Canvas Headless.
-   *
-   * Canvas Headless 1.12.0 asks for it by class name, and Custom Elements
-   * 3.5.0 registers it by id only. Added here and not in the services file,
-   * because a site that has not installed Custom Elements yet has no such
-   * service to alias.
-   */
-  private function aliasRenderConverter(ContainerBuilder $container): void {
-    $class = 'Drupal\\custom_elements\\RenderConverter\\RenderConverter';
-    if ($container->hasDefinition('custom_elements.render_converter') && !$container->has($class)) {
-      $container->setAlias($class, 'custom_elements.render_converter');
-    }
   }
 
   /**

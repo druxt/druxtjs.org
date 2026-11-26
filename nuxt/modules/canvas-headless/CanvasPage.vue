@@ -9,7 +9,7 @@
       renew-endpoint="/api/draft/renew"
       :path="$route.fullPath.split('#')[0]"
     />
-    <CanvasComponentTree :tree="current ? current.content : null" />
+    <CanvasComponentTree :tree="current ? current.content : null" :preview="Boolean(current && current.isPreview)" />
   </div>
 </template>
 

@@ -18,6 +18,23 @@ Druxt 1.0.0.
   block components on all three, and views and the router on Mercury,
   whose pages are all Canvas pages.
 
+### Changed
+
+- Drupal runs Canvas 1.13.0. The patch that kept each component's id for
+  Canvas's editor, and the service alias Canvas Headless 1.12.0 needed, are
+  gone: 1.13.0 does both itself.
+- The frontend's Canvas Headless adapter runs on version 0.13 of Canvas's
+  SDK. A Canvas page drawn from the site's components now arrives as a
+  json-render document, which the adapter checks on the server and draws
+  with the same markers for the editor.
+
+### Fixed
+
+- A fresh install of the Drupal site from its config works again. Since
+  Canvas Headless arrived, the install stopped because Canvas asked for a
+  service that only the site's own module named, and that module is not
+  installed yet at that point.
+
 ## [0.21.0] - 2026-11-24
 
 ### Changed

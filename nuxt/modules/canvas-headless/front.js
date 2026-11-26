@@ -2,36 +2,26 @@
  * The front page's Canvas page: where Drupal keeps it, and whether this site
  * can draw it.
  */
+import { hasOwn } from './tree.js'
 
 /** The Drupal path of the front page's Canvas page. The site answers it at `/`. */
 export const FRONT_PATH = '/home'
 
-/** How the content API's tree names one of the site's own components. */
-const OWN_ELEMENT = 'js-'
-
-/** How Canvas names one in a page's component list. */
+/** How Canvas names one of the site's own components in a page's list. */
 const OWN = 'js.'
 
-const children = (node) =>
-  Object.values((node && node.slots) || {}).flatMap((slot) => (Array.isArray(slot) ? slot : [slot]))
-
 /**
- * Whether a content API tree holds any of the site's own components.
+ * Whether a content API document holds any of the site's own components.
  *
- * Such a page is drawn from the tree: the renderer draws the site's
- * components, and what Drupal rendered in the same tree as Drupal's markup.
- * A page with none is Drupal's alone, which the JSON:API rendering draws.
+ * Such a page is drawn from the document: the renderer draws the site's
+ * components, and what Drupal rendered in the same document as Drupal's
+ * markup. A page with none is Drupal's alone, which the JSON:API rendering
+ * draws.
  *
- * @param {object|null} tree - A page's `content`.
- * @returns {boolean} True when any element of the tree is the site's own.
+ * @param {object|null} tree - A page's `content`, a json-render document.
+ * @returns {boolean} True when any element of the document is the site's own.
  */
-export const hasOwnComponents = (tree) => {
-  const walk = (node) =>
-    Boolean(node) &&
-    typeof node === 'object' &&
-    (String(node.element || '').startsWith(OWN_ELEMENT) || children(node).some(walk))
-  return walk(tree)
-}
+export const hasOwnComponents = (tree) => hasOwn(tree)
 
 /**
  * Whether a page is drawn from the content API's tree, with Canvas Headless on.

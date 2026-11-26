@@ -15,7 +15,8 @@ const sdk = () =>
     import('@drupal-canvas/headless/server'),
     import('@drupal-canvas/headless/components-endpoint'),
     import('@drupal-canvas/headless'),
-  ]).then(([server, endpoint, core]) => ({ server, endpoint, core }))
+    import('@drupal-canvas/headless/json-render'),
+  ]).then(([server, endpoint, core, jsonRender]) => ({ server, endpoint, core, jsonRender }))
 
 // A value that is not valid percent-encoding is kept as it was sent.
 const decode = (value) => {
@@ -133,6 +134,25 @@ const assets = {
   },
 }
 
+/**
+ * A page's content as a json-render document, which the renderer draws.
+ *
+ * Canvas before 1.13 answers in Custom Elements' format, whatever the request
+ * says it can read: that is converted. A document that does not match
+ * Canvas's schema throws here, on the server, so the browser is never handed
+ * one, and the schema stays out of the browser's bundle.
+ *
+ * @param {object|null} content - The content API's `content`.
+ * @param {object} sdk - The SDK's core and json-render modules, and a function
+ *   returning the site's components by machine name.
+ * @returns {object|null} The document, or null for a page without content.
+ */
+const toDocument = (content, { core, jsonRender, own }) => {
+  if (!content) return null
+  const tree = 'element' in content ? core.convertLegacyCustomElementsFormat(content, own()) : content
+  return jsonRender.CanvasComponentTreeSchema.parse(tree)
+}
+
 module.exports = ({ rootDir }) => {
   const draftServer = async (req, res) => {
     const { server } = await sdk()
@@ -171,12 +191,22 @@ module.exports = ({ rootDir }) => {
     }
   }
 
+  // The site's components by machine name, for reading an older answer.
+  const own = () =>
+    Object.fromEntries(
+      require('fs')
+        .readdirSync(path.join(rootDir, 'components/canvas'), { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => [entry.name, true])
+    )
+
   // The page at a path, as the content API answers this request's session.
   const page = async (req, res, path) => {
-    const { server } = await sdk()
+    const { server, core, jsonRender } = await sdk()
     const found = await (await draftServer(req, res)).fetchPage(path)
     if (!found) return null
-    return server.isPageRedirect(found) ? { redirect: found.redirect } : found
+    if (server.isPageRedirect(found)) return { redirect: found.redirect }
+    return { ...found, content: toDocument(found.content, { core, jsonRender, own }) }
   }
 
   let metadata
@@ -238,3 +268,4 @@ module.exports = ({ rootDir }) => {
 module.exports.cookies = cookies
 module.exports.serialise = serialise
 module.exports.workspaceFetch = workspaceFetch
+module.exports.toDocument = toDocument

@@ -13,7 +13,7 @@
     "storybook": "nuxt storybook"
   },
   "dependencies": {
-    "@drupal-canvas/headless": "0.11.0",
+    "@drupal-canvas/headless": "0.13.1",
     "@druxt-contrib/anchors": "file:vendor/druxt-anchors",
     "@druxt-contrib/canvas": "file:vendor/druxt-canvas",
     "@druxt-contrib/diff": "file:vendor/druxt-diff",
