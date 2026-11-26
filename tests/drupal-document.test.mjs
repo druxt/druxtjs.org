@@ -9,7 +9,7 @@ import assert from 'node:assert/strict'
 
 import { readdirSync } from 'node:fs'
 
-const { PARAGRAPH_TYPES, fetchDrupalPage, nextSteps, pageQuery, sectionOf } = await import(
+const { PARAGRAPH_TYPES, fetchDrupalPage, nextSteps, pageQuery, refusal, sectionOf } = await import(
   '../nuxt/lib/drupal-document.js'
 )
 
@@ -88,6 +88,44 @@ describe('fetchDrupalPage', () => {
     assert.equal(
       await fetchDrupalPage(store({ entity: { type: 'taxonomy_term' } }), '/tags/x'),
       null
+    )
+  })
+
+  test("answers Drupal's refusal of the path with its status, not as a missing page", async () => {
+    // The router's route when Drupal refuses an expired sign-in's request.
+    const expired = { error: { statusCode: 401, message: 'Unauthorized' } }
+    assert.deepEqual(await fetchDrupalPage(store(expired), '/how-to/proxy'), {
+      error: { statusCode: 401, message: 'Unauthorized' },
+    })
+    const forbidden = { error: { statusCode: 403, message: 'Forbidden' } }
+    assert.equal((await fetchDrupalPage(store(forbidden), '/how-to/proxy')).error.statusCode, 403)
+    // A path Drupal has no page for is still not found.
+    assert.equal(
+      await fetchDrupalPage(store({ error: { statusCode: 404, message: 'Not Found' } }), '/nope'),
+      null
+    )
+  })
+
+  test("answers a refused read of the page with the store's error", async () => {
+    const refused = { error: { statusCode: 401, message: 'The access token is invalid' } }
+    assert.deepEqual(
+      await fetchDrupalPage(store(page, false, refused), '/tutorials/getting-started'),
+      {
+        error: { statusCode: 401, message: 'The access token is invalid' },
+      }
+    )
+  })
+
+  test('still throws for a read that failed for any other reason, and names the failure', async () => {
+    const down = { error: { statusCode: 500, message: 'connect ECONNREFUSED' } }
+    await assert.rejects(
+      fetchDrupalPage(store(page, false, down), '/tutorials/getting-started'),
+      /Drupal returned no node--doc_page for \/tutorials\/getting-started: 500 connect ECONNREFUSED/
+    )
+    // An empty resource, with no error to name.
+    await assert.rejects(
+      fetchDrupalPage(store(page, false, {}), '/tutorials/getting-started'),
+      /Drupal returned no node--doc_page/
     )
   })
 
@@ -266,9 +304,9 @@ describe('fetchDrupalPage, signed in, moving between pages', () => {
 })
 
 // A contributor may read only their own unpublished work, so Drupal refuses
-// the latest revision of somebody else's draft. The Druxt store turns that
-// refusal into an empty resource, which read as "no such page" and sent the
-// reader to the error page instead of the published page that is right there.
+// the latest revision of somebody else's draft. The Druxt store answers that
+// refusal with no data, which read as "no such page" and sent the reader to
+// the error page instead of the published page that is right there.
 describe('fetchDrupalPage, when the working copy is refused', () => {
   const denied = (uuid, editor, calls = []) => ({
     $druxtSchema: schema,
@@ -354,5 +392,15 @@ describe('sectionOf', () => {
   test('is the first segment', () => {
     assert.equal(sectionOf('/how-to/proxy'), 'how-to')
     assert.equal(sectionOf('/'), '')
+  })
+})
+
+describe('refusal', () => {
+  test('is the error for a 401 or 403, and null for anything else', () => {
+    assert.deepEqual(refusal({ statusCode: 401, message: 'x' }), { statusCode: 401, message: 'x' })
+    assert.deepEqual(refusal({ statusCode: '403' }), { statusCode: 403, message: '' })
+    for (const error of [undefined, null, {}, { statusCode: 404 }, { statusCode: 500 }, true]) {
+      assert.equal(refusal(error), null, JSON.stringify(error))
+    }
   })
 })

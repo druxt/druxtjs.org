@@ -3,6 +3,8 @@
 </template>
 
 <script>
+import { errorState } from '~/lib/error-states'
+
 /**
  * Error page.
  *
@@ -17,7 +19,7 @@ export default {
 
   head() {
     return {
-      title: this.statusCode === 404 ? 'Page not found' : 'Something went wrong',
+      title: errorState(this.statusCode).heading,
       meta: [
         { hid: 'robots', name: 'robots', content: 'noindex, follow' },
       ],

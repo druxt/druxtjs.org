@@ -47,6 +47,9 @@ export default {
       }
       const document = await fetchDrupalPage(store, path)
       if (!document) return error({ statusCode: 404, message: 'Document not found' })
+      // Drupal refused the request: an expired sign-in, or a page this
+      // account may not read. Its status, not "not found".
+      if (document.error) return error(document.error)
       // Drupal matches aliases in any case; one spelling is the page.
       if (document.redirect) return redirect(301, document.redirect, route.query)
       // Siblings in the docs menu's order, the section landing first.

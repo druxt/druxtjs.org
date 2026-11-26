@@ -18,6 +18,13 @@ Druxt 1.0.0.
   block components on all three, and views and the router on Mercury,
   whose pages are all Canvas pages.
 
+### Fixed
+
+- A signed-in reader whose sign-in Drupal no longer accepts sees "Your
+  sign-in has expired", with a 401, rather than "Page not found". A page
+  their account may not read says so, with a 403. A page that doesn't exist
+  is still a 404.
+
 ## [0.21.0] - 2026-11-24
 
 ### Changed
