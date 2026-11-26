@@ -11,7 +11,7 @@ const http = require('http')
 const path = require('path')
 const { execFileSync, spawn } = require('child_process')
 const { deploymentReady, resolveOrigin, waitForBackend } = require('./backend')
-const { createHandler, createPageCache, LLMS_LINK } = require('./page-cache')
+const { createHandler, createPageCache, LLMS_LINK, renderForStore } = require('./page-cache')
 const { createArtefacts } = require('./artefacts')
 const { createDocsMcp, createMcpDiscovery } = require('./docs-mcp')
 const { createStartingHandler } = require('./starting')
@@ -129,7 +129,7 @@ const main = async () => {
       : createPageCache({
           dir: env.DOCS_CACHE_DIR || path.join(rootDir, '.cache', 'pages'),
           ttl: (Number(env.DOCS_CACHE_TTL) || 300) * 1000,
-          render: (route) => app.server.renderRoute(route),
+          render: renderForStore((route, context) => app.server.renderRoute(route, context)),
           log,
         })
   // Every page the site knows: the authored corpus the indexes describe, so a

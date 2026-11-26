@@ -20,7 +20,9 @@ const {
   createHandler,
   createPageCache,
   crawl,
+  forbidsStore,
   isPage,
+  renderForStore,
 } = require('../nuxt/server/page-cache.js')
 const {
   backendOrigin,
@@ -99,6 +101,61 @@ describe('isPage', () => {
       assert.equal(isPage('GET', pathname), false, pathname)
     }
     assert.equal(isPage('POST', '/'), false)
+  })
+})
+
+describe('forbidsStore', () => {
+  test('is true for no-store or private, in any case or position', () => {
+    for (const value of [
+      'no-store',
+      'private',
+      'Private, max-age=0',
+      'max-age=0, no-store',
+      'private="set-cookie"',
+      ['public', 'no-store'],
+    ]) {
+      assert.equal(forbidsStore(value), true, JSON.stringify(value))
+    }
+  })
+
+  test('is false for a header that lets a cache keep the page', () => {
+    for (const value of [
+      undefined,
+      '',
+      'no-cache',
+      'public, max-age=300',
+      'must-revalidate',
+      'no-storey',
+      'x-private',
+    ]) {
+      assert.equal(forbidsStore(value), false, JSON.stringify(value))
+    }
+  })
+})
+
+describe('renderForStore', () => {
+  test('gives the render a response, and returns the Cache-Control the page set', async () => {
+    const render = renderForStore(async (route, { res }) => {
+      res.setHeader('Cache-Control', 'no-store')
+      return { html: `<p>${route}</p>` }
+    })
+    assert.deepEqual(await render('/druxt/node/preview'), {
+      html: '<p>/druxt/node/preview</p>',
+      cacheControl: 'no-store',
+    })
+  })
+
+  test('takes the redirect a page writes, and sends nothing', async () => {
+    const render = renderForStore(async (route, { res }) => {
+      res.writeHead(301, { Location: '/new' })
+      res.end()
+      return { html: '', redirected: { path: '/new', status: 301 } }
+    })
+    assert.deepEqual(await render('/old'), {
+      html: '',
+      redirected: { path: '/new', status: 301 },
+      cacheControl: undefined,
+    })
   })
 })
 
@@ -516,6 +573,53 @@ describe('createHandler', () => {
       })
       await withServer(createHandler({ cache, live: live(404) }), async (base) => {
         assert.equal((await request(`${base}/nowhere`)).status, 404)
+        await new Promise((resolve) => setTimeout(resolve, 50))
+        assert.equal(renders, 0)
+      })
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  test('never stores a page that asks not to be kept, and drops a copy it had', async () => {
+    const dir = tempDir()
+    try {
+      const logged = []
+      let cacheControl
+      const cache = createPageCache({
+        dir,
+        ttl: 60000,
+        render: async () => ({ html: '<p>draft</p>', cacheControl }),
+        log: (line) => logged.push(line),
+      })
+      // A copy stored before the page said so, as a previous build may leave.
+      assert.equal(await cache.store('/druxt/node/preview'), '<p>draft</p>')
+      cacheControl = 'no-store'
+      assert.equal(await cache.store('/druxt/node/preview'), null)
+      assert.equal(existsSync(path.join(dir, 'druxt', 'node', 'preview', 'index.html')), false)
+      assert.ok(logged.includes('cache: /druxt/node/preview not stored: no-store'))
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  test('renders a page that asks not to be kept live, and never stores it', async () => {
+    const dir = tempDir()
+    try {
+      let renders = 0
+      const cache = createPageCache({
+        dir,
+        ttl: 60000,
+        render: async () => ({ html: `${++renders}` }),
+      })
+      const preview = (req, res) => {
+        res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' })
+        res.end('draft')
+      }
+      await withServer(createHandler({ cache, live: preview }), async (base) => {
+        const res = await request(`${base}/druxt/node/preview`)
+        assert.equal(res.status, 200)
+        assert.equal(res.headers['x-docs-cache'], 'MISS')
         await new Promise((resolve) => setTimeout(resolve, 50))
         assert.equal(renders, 0)
       })
