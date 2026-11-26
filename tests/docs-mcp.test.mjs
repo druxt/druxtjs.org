@@ -44,9 +44,9 @@ const docs = [
 let server
 let url
 // node:http, not fetch: the site's floor is Node 16, which has no global fetch.
-const request = (method, body) =>
+const request = (method, body, headers = {}) =>
   new Promise((resolve, reject) => {
-    const req = http.request(url, { method }, (res) => {
+    const req = http.request(url, { method, headers }, (res) => {
       let text = ''
       res.on('data', (chunk) => (text += chunk))
       res.on('end', () => resolve({ status: res.statusCode, text }))
@@ -54,9 +54,28 @@ const request = (method, body) =>
     req.on('error', reject)
     req.end(body)
   })
-const post = async (body, raw = false) => {
-  const { status, text } = await request('POST', raw ? body : JSON.stringify(body))
+const post = async (body, raw = false, headers = {}) => {
+  const { status, text } = await request('POST', raw ? body : JSON.stringify(body), headers)
   return { status, body: text ? JSON.parse(text) : null }
+}
+const VERSION = '2026-07-28'
+const META_VERSION = 'io.modelcontextprotocol/protocolVersion'
+const META_CAPABILITIES = 'io.modelcontextprotocol/clientCapabilities'
+const SERVER_INFO = 'io.modelcontextprotocol/serverInfo'
+// A request as the current revision sends one: the version in `_meta`, and the
+// headers that repeat what the body says. A test that needs one of those wrong
+// builds its own headers instead.
+const current = (message, headers = {}) => {
+  const params = {
+    ...(message.params || {}),
+    _meta: { [META_VERSION]: VERSION, [META_CAPABILITIES]: {} },
+  }
+  return post({ ...message, params }, false, {
+    'MCP-Protocol-Version': VERSION,
+    'Mcp-Method': message.method,
+    ...(params.name ? { 'Mcp-Name': params.name } : {}),
+    ...headers,
+  })
 }
 const call = (name, args) =>
   post({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name, arguments: args } })
@@ -114,8 +133,203 @@ describe('the protocol', () => {
     assert.equal((await request('GET')).status, 405)
     assert.equal((await post('{', true)).body.error.code, -32700)
     assert.equal((await post([{ jsonrpc: '2.0', id: 1, method: 'ping' }])).status, 400)
-    assert.equal((await post({ jsonrpc: '2.0', id: 1, method: 'nope' })).body.error.code, -32601)
+    const unknown = await post({ jsonrpc: '2.0', id: 1, method: 'nope' })
+    assert.equal(unknown.body.error.code, -32601)
+    // A method the server doesn't have is 404, which a client reads apart from
+    // a 404 for a path that is no MCP endpoint by the error in the body.
+    assert.equal(unknown.status, 404)
     assert.equal((await post('x'.repeat(70000), true)).status, 413)
+  })
+})
+
+describe('the current revision', () => {
+  test('server/discover names the versions, the tools and how long to hold them', async () => {
+    const { status, body } = await current({ jsonrpc: '2.0', id: 1, method: 'server/discover' })
+    assert.equal(status, 200)
+    assert.equal(body.result.resultType, 'complete')
+    assert.equal(body.result.supportedVersions[0], VERSION)
+    assert.deepEqual(body.result.capabilities, { tools: {} })
+    assert.equal(body.result.cacheScope, 'public')
+    assert.ok(body.result.ttlMs > 0)
+    assert.equal(body.result._meta[SERVER_INFO].version, SERVER_VERSION)
+  })
+
+  test('tools/list comes back cacheable, in one order', async () => {
+    const { body } = await current({ jsonrpc: '2.0', id: 1, method: 'tools/list' })
+    assert.equal(body.result.cacheScope, 'public')
+    assert.ok(body.result.ttlMs > 0)
+    assert.deepEqual(
+      body.result.tools.map((t) => t.name),
+      ['search_docs', 'list_docs', 'get_doc']
+    )
+  })
+
+  test('a tool is called when the name in the header is the name in the body', async () => {
+    const message = {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: { name: 'get_doc', arguments: { path: '/how-to/proxy' } },
+    }
+    assert.match((await current(message)).body.result.content[0].text, /Proxy the backend/)
+    // A name that isn't plain ASCII arrives encoded, so an encoded one that
+    // decodes to the name in the body is the same request.
+    const encoded = `=?base64?${Buffer.from('get_doc').toString('base64')}?=`
+    const { body } = await current(message, { 'Mcp-Name': encoded })
+    assert.match(body.result.content[0].text, /Proxy the backend/)
+  })
+
+  test('an answer says what kind it is and who gave it', async () => {
+    const { body } = await current({ jsonrpc: '2.0', id: 1, method: 'tools/list' })
+    assert.equal(body.result.resultType, 'complete')
+    assert.deepEqual(body.result._meta[SERVER_INFO], {
+      name: createMcpDiscovery('https://example.test').name,
+      version: SERVER_VERSION,
+    })
+  })
+
+  test('a header that disagrees with the body is refused, and nothing is answered from it', async () => {
+    const list = {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/list',
+      params: { _meta: { [META_VERSION]: VERSION } },
+    }
+    const headerMismatch = async (message, headers) => {
+      const { status, body } = await post(message, false, headers)
+      assert.equal(status, 400)
+      assert.equal(body.error.code, -32020)
+      assert.equal(body.result, undefined)
+    }
+    // The version is stated in the body and nowhere in the headers.
+    await headerMismatch(list, { 'Mcp-Method': 'tools/list' })
+    // The two versions differ.
+    await headerMismatch(list, { 'MCP-Protocol-Version': '2025-06-18', 'Mcp-Method': 'tools/list' })
+    // Both are older revisions, and still not the same one.
+    await headerMismatch(
+      { ...list, params: { _meta: { [META_VERSION]: '2025-03-26' } } },
+      { 'MCP-Protocol-Version': '2025-06-18' }
+    )
+    // The method does not.
+    await headerMismatch(list, { 'MCP-Protocol-Version': VERSION, 'Mcp-Method': 'tools/call' })
+    await headerMismatch(list, { 'MCP-Protocol-Version': VERSION })
+    // A tool is called without naming it in the headers.
+    await headerMismatch(
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'tools/call',
+        params: { name: 'get_doc', arguments: {}, _meta: { [META_VERSION]: VERSION } },
+      },
+      { 'MCP-Protocol-Version': VERSION, 'Mcp-Method': 'tools/call' }
+    )
+    // A tool is named in the headers, and it is another tool, plain or encoded.
+    const getDoc = {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: { name: 'get_doc', arguments: {}, _meta: { [META_VERSION]: VERSION } },
+    }
+    const toolHeaders = { 'MCP-Protocol-Version': VERSION, 'Mcp-Method': 'tools/call' }
+    await headerMismatch(getDoc, { ...toolHeaders, 'Mcp-Name': 'search_docs' })
+    await headerMismatch(getDoc, {
+      ...toolHeaders,
+      'Mcp-Name': `=?base64?${Buffer.from('search_docs').toString('base64')}?=`,
+    })
+  })
+
+  test('a request that states its version to a proxy and not to the server is refused', async () => {
+    // The header reaches whatever routes the request. The body is what the
+    // server reads, and the revision requires the version in both.
+    const { status, body } = await post({ jsonrpc: '2.0', id: 1, method: 'tools/list' }, false, {
+      'MCP-Protocol-Version': VERSION,
+      'Mcp-Method': 'tools/list',
+    })
+    assert.equal(status, 400)
+    assert.equal(body.error.code, -32602)
+    assert.equal(body.result, undefined)
+  })
+
+  test('a version that is not a string is answered, not thrown', async () => {
+    // `{ toString: null }` cannot be read as a string at all, and a throw on
+    // the way into the answer would leave the request hanging and the process
+    // holding an unhandled rejection.
+    const { status, body } = await post(
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'tools/list',
+        params: { _meta: { [META_VERSION]: { toString: null } } },
+      },
+      false,
+      { 'Mcp-Method': 'tools/list' }
+    )
+    assert.equal(status, 400)
+    assert.equal(body.error.code, -32602)
+    // The server is still there afterwards.
+    assert.equal((await post({ jsonrpc: '2.0', id: 2, method: 'ping' })).status, 200)
+  })
+
+  test('a request without client capabilities is refused, and nothing is answered from it', async () => {
+    // The revision has a client state its capabilities on every request, as
+    // {} when it has none. A field missing, or not an object, is a request the
+    // revision does not describe.
+    const headers = { 'MCP-Protocol-Version': VERSION, 'Mcp-Method': 'tools/list' }
+    for (const capabilities of [undefined, null, 'none', []]) {
+      const { status, body } = await post(
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/list',
+          params: { _meta: { [META_VERSION]: VERSION, [META_CAPABILITIES]: capabilities } },
+        },
+        false,
+        headers
+      )
+      assert.equal(status, 400)
+      assert.equal(body.error.code, -32602)
+      assert.equal(body.result, undefined)
+    }
+  })
+
+  test('an older client is not asked for its capabilities', async () => {
+    // Before 2026-07-28 a client stated them once, in its handshake.
+    const { status, body } = await post(
+      { jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} },
+      false,
+      { 'MCP-Protocol-Version': '2025-06-18' }
+    )
+    assert.equal(status, 200)
+    assert.equal(body.result.tools.length, 3)
+  })
+
+  test('a revision it does not speak is told which ones it does', async () => {
+    const { status, body } = await post(
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'tools/list',
+        params: { _meta: { [META_VERSION]: '2025-11-25' } },
+      },
+      false,
+      { 'MCP-Protocol-Version': '2025-11-25', 'Mcp-Method': 'tools/list' }
+    )
+    assert.equal(status, 400)
+    assert.equal(body.error.code, -32022)
+    assert.equal(body.error.data.requested, '2025-11-25')
+    assert.ok(body.error.data.supported.includes(VERSION))
+  })
+
+  test('a client of an older revision is answered as before', async () => {
+    // The version header alone, no `_meta` and none of the headers the current
+    // revision requires: the shape every client sent until this one.
+    const { status, body } = await post({ jsonrpc: '2.0', id: 1, method: 'tools/list' }, false, {
+      'MCP-Protocol-Version': '2025-06-18',
+      'Mcp-Session-Id': 'ignored',
+    })
+    assert.equal(status, 200)
+    assert.equal(body.result.tools.length, 3)
+    assert.equal(body.result.resultType, 'complete')
   })
 })
 
@@ -289,6 +503,8 @@ describe('the registry entry', () => {
       '/mcp/server-card'
     )
     const card = JSON.parse(text)
+    // The registry publishes an entry by its name.
+    assert.equal(card.name, entry.name)
     assert.equal(card.version, entry.version)
     assert.deepEqual(card.icons, entry.icons)
     // The card and the registry entry are written out separately, so a field

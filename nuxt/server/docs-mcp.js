@@ -8,17 +8,54 @@
  * needs no credentials. It answers with JSON, which the Streamable HTTP
  * transport allows, and has nothing to push, so a client's GET is refused.
  * The same path is also a page: a browser's GET goes on to it.
+ *
+ * It answers the current revision, 2026-07-28, where a request carries its own
+ * version and no handshake opens the exchange, and it still answers the three
+ * revisions that do open with one.
  */
 
 const crypto = require('crypto')
 
 const { SECTION_ORDER, isChangelog, toAbsoluteUrls } = require('../lib/llms-full-txt')
 
-const PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05']
+/**
+ * The revisions this server answers, newest first.
+ *
+ * 2026-07-28 took the handshake out. A request states its own version in
+ * `_meta`, repeats that version, its method and a tool's name in headers, and
+ * `server/discover` says what `initialize` used to. The three older revisions
+ * still negotiate with `initialize`, so both ways in are kept.
+ */
+const PROTOCOL_VERSIONS = ['2026-07-28', '2025-06-18', '2025-03-26', '2024-11-05']
+const CURRENT_VERSION = PROTOCOL_VERSIONS[0]
+/** The revisions with a handshake. The first is the one `initialize` agrees on. */
+const HANDSHAKE_VERSIONS = PROTOCOL_VERSIONS.slice(1)
+/**
+ * What a request stating no version is read as: the transport lets a server
+ * that still answers clients older than the version header assume this one.
+ */
+const UNSTATED_VERSION = '2025-03-26'
+/** The `_meta` keys the current revision carries a request and a result by. */
+const META_VERSION = 'io.modelcontextprotocol/protocolVersion'
+const META_SERVER_INFO = 'io.modelcontextprotocol/serverInfo'
+const META_CAPABILITIES = 'io.modelcontextprotocol/clientCapabilities'
+/** The headers and the body disagree, or a required header is missing. */
+const HEADER_MISMATCH = -32020
+const UNSUPPORTED_VERSION = -32022
+const INVALID_PARAMS = -32602
+const METHOD_NOT_FOUND = -32601
+/**
+ * How long a list may be held, and by whom. These answers are the documents the
+ * site publishes to anyone, and they change when it deploys, so an hour in a
+ * shared cache is the same hour the discovery documents ask for.
+ */
+const CACHEABLE = { ttlMs: 60 * 60 * 1000, cacheScope: 'public' }
+const INSTRUCTIONS = 'Documentation for Druxt, the fully decoupled Drupal and Nuxt framework.'
 /** The server's one name: at runtime, on its card and in server.json. */
 const SERVER_NAME = 'org.druxtjs/docs'
 /** Raise it with server.json, which is what publishes it to the registry. */
-const SERVER_VERSION = '1.0.2'
+const SERVER_VERSION = '1.1.0'
+const SERVER_INFO = { name: SERVER_NAME, version: SERVER_VERSION }
 const MAX_BODY = 64 * 1024
 const MAX_RESULTS = 10
 const MAX_QUERY_WORDS = 20
@@ -27,7 +64,10 @@ const SNIPPET = 200
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Accept, MCP-Protocol-Version, Mcp-Session-Id',
+  // Mcp-Session-Id is allowed through for a browser client of an older
+  // revision; this server has never minted one and ignores it.
+  'Access-Control-Allow-Headers':
+    'Content-Type, Accept, MCP-Protocol-Version, Mcp-Method, Mcp-Name, Mcp-Session-Id',
 }
 
 const TOOLS = [
@@ -163,26 +203,46 @@ const callTool = (docs, origin, name, args = {}) => {
 const respond = async (message, { corpus, origin }) => {
   const { id, method, params = {} } = message
   if (id === undefined) return null
-  const result = (value) => ({ jsonrpc: '2.0', id, result: value })
+  // Every result says what kind it is and who answered, which the current
+  // revision asks for and an older client passes over.
+  const result = (value) => ({
+    jsonrpc: '2.0',
+    id,
+    result: { resultType: 'complete', ...value, _meta: { [META_SERVER_INFO]: SERVER_INFO } },
+  })
   const failure = (code, reason) => ({ jsonrpc: '2.0', id, error: { code, message: reason } })
 
-  if (method === 'initialize') {
+  if (method === 'server/discover') {
     return result({
-      protocolVersion: PROTOCOL_VERSIONS.includes(params.protocolVersion)
-        ? params.protocolVersion
-        : PROTOCOL_VERSIONS[0],
+      supportedVersions: PROTOCOL_VERSIONS,
       capabilities: { tools: {} },
-      serverInfo: { name: SERVER_NAME, version: SERVER_VERSION },
-      instructions: 'Documentation for Druxt, the fully decoupled Drupal and Nuxt framework.',
+      instructions: INSTRUCTIONS,
+      ...CACHEABLE,
     })
   }
+  if (method === 'initialize') {
+    // A handshake belongs to the revisions that have one, so it is answered
+    // with the newest of those rather than with the version above them.
+    return result({
+      protocolVersion: HANDSHAKE_VERSIONS.includes(params.protocolVersion)
+        ? params.protocolVersion
+        : HANDSHAKE_VERSIONS[0],
+      capabilities: { tools: {} },
+      serverInfo: SERVER_INFO,
+      instructions: INSTRUCTIONS,
+    })
+  }
+  // Dropped in the current revision, kept for a client that still sends it.
   if (method === 'ping') return result({})
-  if (method === 'tools/list') return result({ tools: TOOLS })
+  // The tools come back in the same order every time, so a client may cache them.
+  if (method === 'tools/list') return result({ tools: TOOLS, ...CACHEABLE })
   if (method === 'tools/call') {
-    if (!TOOLS.some((tool) => tool.name === params.name)) return failure(-32602, `Unknown tool: ${params.name}`)
+    if (!TOOLS.some((tool) => tool.name === params.name)) {
+      return failure(INVALID_PARAMS, `Unknown tool: ${params.name}`)
+    }
     return result(callTool(await corpus(), origin, params.name, params.arguments))
   }
-  return failure(-32601, `Unknown method: ${method}`)
+  return failure(METHOD_NOT_FOUND, `Unknown method: ${method}`)
 }
 
 /**
@@ -204,6 +264,87 @@ const readBody = (req) =>
     req.on('error', reject)
     req.on('aborted', () => reject(new Error('The client aborted the request.')))
   })
+
+/** One header, which Node hands over as a list when it arrives twice. */
+const headerOf = (req, name) => {
+  const value = req.headers[name]
+  return Array.isArray(value) ? value[0] : value
+}
+
+/** A header value a client had to encode because it is not plain ASCII. */
+const decodeHeaderValue = (value) => {
+  const encoded = /^=\?base64\?([A-Za-z0-9+/]*={0,2})\?=$/.exec(value)
+  return encoded ? Buffer.from(encoded[1], 'base64').toString('utf8') : value
+}
+
+/**
+ * The revision a request speaks, or the error that turns it away.
+ *
+ * The current revision repeats the version, the method and a tool's name in
+ * headers so that a proxy can route a request without reading its body. A
+ * server has to hold the two to each other: if a gateway acts on the header
+ * and the server acts on the body, a request that says one thing in each gets
+ * one decision from each. A request stating no version at all comes from a
+ * client older than the header and is read as the revision that brought in
+ * this transport.
+ *
+ * @param {object} req - The request, for its headers.
+ * @param {object} message - The parsed JSON-RPC request.
+ * @returns {object} Either the version, or the error to answer with.
+ */
+const negotiate = (req, message) => {
+  const meta = (message.params && message.params._meta) || {}
+  const stated = meta[META_VERSION]
+  const sent = headerOf(req, 'mcp-protocol-version')
+  const invalid = (reason) => ({ error: { code: INVALID_PARAMS, message: reason } })
+  // A version has to be a string to be compared with one, and a value such as
+  // `{ "toString": null }` has no string at all: reading one out of it throws.
+  if (stated !== undefined && typeof stated !== 'string') {
+    return invalid(`_meta ${META_VERSION} must be a string.`)
+  }
+  if (!stated && !sent) return { version: UNSTATED_VERSION }
+  const version = stated || sent
+  if (!PROTOCOL_VERSIONS.includes(version)) {
+    return {
+      error: {
+        code: UNSUPPORTED_VERSION,
+        message: `This server does not speak ${version}.`,
+        data: { requested: version, supported: PROTOCOL_VERSIONS },
+      },
+    }
+  }
+  const mismatch = (reason) => ({ error: { code: HEADER_MISMATCH, message: reason } })
+  if (version !== CURRENT_VERSION) {
+    // An older client sends the version as a header, after its handshake.
+    return stated && sent && stated !== sent
+      ? mismatch('The version in MCP-Protocol-Version and the one in _meta differ.')
+      : { version }
+  }
+  if (sent !== version) {
+    return mismatch('MCP-Protocol-Version is required, and must match the version in _meta.')
+  }
+  // The header is for whoever routes the request; the body is what this server
+  // reads. A request that states its version only in the header has told the
+  // proxy and not the server, and the field is required of it either way.
+  if (!stated) return invalid(`_meta is missing ${META_VERSION}.`)
+  if (headerOf(req, 'mcp-method') !== message.method) {
+    return mismatch('Mcp-Method is required, and must match the method in the body.')
+  }
+  if (message.method === 'tools/call') {
+    const name = headerOf(req, 'mcp-name')
+    if (name === undefined || decodeHeaderValue(name) !== (message.params || {}).name) {
+      return mismatch("Mcp-Name is required for tools/call, and must match the tool's name.")
+    }
+  }
+  // The revision has a client state its capabilities on every request, as `{}`
+  // when it has none. This server reads none of them, but a request without
+  // the field is not one the revision describes.
+  const capabilities = meta[META_CAPABILITIES]
+  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
+    return invalid(`_meta ${META_CAPABILITIES} is required, as {} for a client with none.`)
+  }
+  return { version }
+}
 
 /**
  * Whether a request is for the server, not the page at the same path.
@@ -262,8 +403,22 @@ const createDocsMcp = ({ corpus, origin, log = () => {} }) => async (req, res) =
     return rpcError(400, -32600, 'Send one JSON-RPC 2.0 message.')
   }
   try {
+    // Reading the request is inside the try with answering it, so that a
+    // malformed one cannot throw past the handler, where the rejection would
+    // take the process down and leave the request unanswered.
+    if (message.id !== undefined) {
+      const { error } = negotiate(req, message)
+      // A client of the current revision probes with a current request and
+      // reads the body of a 400 before it falls back: a protocol error in it
+      // says the server is current and the request wrong, not the server old.
+      if (error) return send(400, { jsonrpc: '2.0', id: message.id, error })
+    }
     const answer = await respond(message, { corpus, origin })
-    return answer ? send(200, answer) : send(202)
+    if (!answer) return send(202)
+    // A method this server does not have answers 404, so a client can tell it
+    // from a path that is no MCP endpoint at all.
+    const missing = answer.error && answer.error.code === METHOD_NOT_FOUND
+    return send(missing ? 404 : 200, answer)
   } catch (error) {
     log(`docs-mcp: ${error.message}`)
     return send(200, { jsonrpc: '2.0', id: message.id, error: { code: -32603, message: 'The documentation is not available right now.' } })
