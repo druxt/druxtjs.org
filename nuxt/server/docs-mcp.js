@@ -18,7 +18,7 @@ const PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05']
 /** The server's one name: at runtime, on its card and in server.json. */
 const SERVER_NAME = 'org.druxtjs/docs'
 /** Raise it with server.json, which is what publishes it to the registry. */
-const SERVER_VERSION = '1.0.1'
+const SERVER_VERSION = '1.0.2'
 const MAX_BODY = 64 * 1024
 const MAX_RESULTS = 10
 const MAX_QUERY_WORDS = 20
@@ -290,9 +290,9 @@ const createMcpDiscovery = (origin) => {
         name: SERVER_NAME,
         version: SERVER_VERSION,
         title: 'Druxt docs',
-        description: 'Search and read the Druxt documentation and API reference.',
+        description: 'Search and read the Druxt docs and API reference: Drupal and Nuxt, fully decoupled.',
         websiteUrl: `${origin}/mcp`,
-        repository: { url: 'https://github.com/druxt/druxtjs.org', source: 'github' },
+        repository: { url: 'https://github.com/druxt/druxtjs.org', source: 'github', subfolder: 'nuxt/server' },
         icons: [{ src: `${origin}/icon.png`, mimeType: 'image/png', sizes: ['480x480'] }],
         remotes: [{ type: 'streamable-http', url: `${origin}/mcp`, supportedProtocolVersions: PROTOCOL_VERSIONS }],
       },
