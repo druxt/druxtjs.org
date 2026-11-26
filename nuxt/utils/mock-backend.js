@@ -9,8 +9,9 @@
  * the page.
  */
 
-/** The presets, by the name each one's package ends with. */
-export const MOCK_PRESETS = ['umami', 'dashi', 'haven', 'mercury']
+import { MOCK_PRESETS } from './mock-presets.mjs'
+
+export { MOCK_PRESETS }
 
 /** The origin a preset answers for, written into its links. It never reaches the network. */
 export const mockOrigin = (preset) => `https://${preset}.mock.invalid`

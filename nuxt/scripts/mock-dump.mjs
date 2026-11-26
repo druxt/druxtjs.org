@@ -11,7 +11,7 @@
 import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
-import { MOCK_PRESETS } from '../utils/mock-backend.js'
+import { MOCK_PRESETS } from '../utils/mock-presets.mjs'
 
 const require = createRequire(import.meta.url)
 const root = path.join(process.argv[2] || 'static', '_mock')
