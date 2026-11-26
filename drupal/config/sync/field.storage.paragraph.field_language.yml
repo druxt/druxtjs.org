@@ -33,6 +33,9 @@ settings:
       value: nginx
       label: nginx
     -
+      value: php
+      label: PHP
+    -
       value: text
       label: 'Plain text'
   allowed_values_function: ''

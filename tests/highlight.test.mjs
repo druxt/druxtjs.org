@@ -1,5 +1,6 @@
-// Code highlighting: a code block's own, and the fenced blocks inside the
-// HTML Drupal renders from a text block's markdown.
+// Code highlighting: a code block's own, the fenced blocks inside the HTML
+// Drupal renders from a text block's markdown, and the site tools Prism's
+// bash grammar does not know on its own.
 //
 //   node --test "tests/*.test.mjs"
 
@@ -37,11 +38,34 @@ describe('the language names a block can carry in its class', () => {
     'yaml',
     'yml',
     'nginx',
+    'php',
   ]) {
     test(`${name} is a grammar Prism finds when it scans the page`, () => {
       assert.ok(Prism.languages[name], `Prism has no grammar named ${name}`)
     })
   }
+})
+
+describe('the site tools and PHP', () => {
+  const tool = (name) => `<span class="token tool function">${name}</span>`
+
+  test('colours drush and the other site tools as commands', () => {
+    for (const name of ['drush', 'ddev', 'lagoon', 'npx']) {
+      assert.ok(highlight(`${name} status`, 'sh').startsWith(tool(name)), name)
+    }
+  })
+
+  test('colours a tool after a pipe or a separator', () => {
+    assert.ok(highlight('ddev start && drush cr', 'sh').includes(tool('drush')))
+  })
+
+  test('leaves a tool name inside another word alone', () => {
+    assert.ok(!highlight('cd my-drush-docs', 'sh').includes('token tool'))
+  })
+
+  test('highlights PHP', () => {
+    assert.match(highlight("$config['x'] = getenv('Y');", 'php'), /token variable/)
+  })
 })
 
 describe('highlightHtml', () => {
