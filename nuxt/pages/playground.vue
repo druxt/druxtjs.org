@@ -2,9 +2,9 @@
   <div>
     <h1 class="text-3xl font-semibold tracking-tight mb-2">Live component playground</h1>
     <p class="text-base-content/70 mb-8 max-w-content">
-      Pick a Druxt component and render it against a Drupal: this site's, the Umami demo, a mock of
-      Umami that runs in your browser, or your own. Its props are the controls and its examples are
-      presets.
+      Pick a Druxt component and render it against a Drupal: this site's, the Umami demo, your own,
+      or one of four Drupal sites mocked in your browser. Its props are the controls and its
+      examples are presets.
     </p>
 
     <DruxtExample />
@@ -14,6 +14,14 @@
         Every change re-renders the component above. The requests list shows what it asked Drupal
         for, and the markup line is what you copy into your own site. Components marked as rendered
         by a parent, or as shipped wrappers, appear inside the component that owns them.
+      </p>
+      <p>
+        The mocked sites need no Drupal at all.
+        <a href="https://github.com/Decipher/decoupled-drupal-mock" class="link">Decoupled Drupal Mock</a>
+        replays JSON:API, Decoupled Router and menu responses recorded from Drupal's Umami demo and
+        from Drupal CMS's Dashi, Haven and Mercury site templates, and answers the component's
+        requests inside the page, so no request reaches a Drupal. A mock holds only what was
+        recorded, so a component that needs more is greyed out.
       </p>
       <p>
         To use your own Drupal, choose it in the backend list and paste its origin. The browser
@@ -26,7 +34,7 @@
       <p>
         What renders depends on the wrapper components in front of the backend. This site ships
         wrappers for its own pages, blocks, menus and views, so its content comes out themed. The
-        Umami demo, its mock and your own Drupal render through Druxt's default output, which is plain on
+        Umami demo, the mocks and your own Drupal render through Druxt's default output, which is plain on
         purpose: a list of fields for an entity, or a plain list for a menu. That is the starting
         point a wrapper component builds on.
         <NuxtLink to="/how-to/theming" class="link">Theming</NuxtLink> shows how.

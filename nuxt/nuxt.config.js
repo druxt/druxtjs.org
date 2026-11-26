@@ -440,8 +440,8 @@ export default {
 
   hooks: {
     /**
-     * Writes the Umami mock into static/, for the playground's in-browser
-     * backend. A child process, because the preset is an ES module.
+     * Writes the mocks into static/, for the playground's in-browser
+     * backends. A child process, because the presets are ES modules.
      *
      * @param {object} builder - The Nuxt builder.
      */

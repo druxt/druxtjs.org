@@ -1,31 +1,36 @@
 /**
- * Writes the Umami mock into static/_mock/umami/: the preset's dump as one
+ * Writes each mock into static/_mock/<preset>/: the preset's dump as one
  * JSON file, and its public files where the dump's file URLs point. The
- * playground's "Umami mock" backend loads them in the browser
+ * playground's mocked backends load them in the browser
  * (utils/mock-backend.js).
  *
- * Skipped when the files already match the installed preset's version.
+ * A preset is skipped when its files already match its installed version.
  *
  * Usage: node scripts/mock-dump.mjs <static dir>
  */
 import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
-import { dir, load } from 'decoupled-drupal-mock-umami'
+import { MOCK_PRESETS } from '../utils/mock-presets.mjs'
 
 const require = createRequire(import.meta.url)
-const { version } = require('decoupled-drupal-mock-umami/package.json')
+const root = path.join(process.argv[2] || 'static', '_mock')
 
-const out = path.join(process.argv[2] || 'static', '_mock', 'umami')
-const stamp = path.join(out, 'version.txt')
+for (const preset of MOCK_PRESETS) {
+  const name = `decoupled-drupal-mock-${preset}`
+  const { dir, load } = await import(name)
+  const { version } = require(`${name}/package.json`)
+  const out = path.join(root, preset)
+  const stamp = path.join(out, 'version.txt')
 
-if (fs.existsSync(stamp) && fs.readFileSync(stamp, 'utf8') === version) {
-  console.log(`Umami mock ${version} already in ${out}`)
-} else {
+  if (fs.existsSync(stamp) && fs.readFileSync(stamp, 'utf8') === version) {
+    console.log(`${preset} mock ${version} already in ${out}`)
+    continue
+  }
   fs.rmSync(out, { recursive: true, force: true })
   fs.mkdirSync(out, { recursive: true })
   fs.writeFileSync(path.join(out, 'dump.json'), JSON.stringify(load()))
   fs.cpSync(path.join(dir, 'files'), path.join(out, 'sites', 'default', 'files'), { recursive: true })
   fs.writeFileSync(stamp, version)
-  console.log(`Umami mock ${version} written to ${out}`)
+  console.log(`${preset} mock ${version} written to ${out}`)
 }

@@ -12,7 +12,7 @@
 const LIVE_COMPONENTS = ['DruxtBlock', 'DruxtBlockRegion', 'DruxtEntity', 'DruxtEntityForm', 'DruxtMenu', 'DruxtView', 'DruxtBreadcrumb', 'DruxtRouter', 'DruxtSite']
 
 /** The site's own backends, the keys of the playground's BACKENDS. */
-const BACKEND_IDS = ['site', 'umami', 'mock']
+const BACKEND_IDS = ['site', 'umami', 'mock', 'dashi', 'haven', 'mercury']
 
 /**
  * The card's state as the playground's query, or null when the link is not

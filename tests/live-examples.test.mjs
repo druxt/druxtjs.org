@@ -157,9 +157,11 @@ describe('COMPONENTS', () => {
   })
 
   test('the router and breadcrumb take their path from the backend content', () => {
-    for (const name of ['DruxtRouter', 'DruxtBreadcrumb']) {
+    // The router renders content only; a breadcrumb has a trail on any page.
+    const sources = { DruxtRouter: 'contentPaths', DruxtBreadcrumb: 'paths' }
+    for (const [name, source] of Object.entries(sources)) {
       const path = m.COMPONENTS[name].props.find((p) => p.name === 'path')
-      assert.equal(path.source, 'paths')
+      assert.equal(path.source, source)
       assert.equal(path.required, true)
     }
   })
