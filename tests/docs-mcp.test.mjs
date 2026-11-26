@@ -205,6 +205,11 @@ describe('the current revision', () => {
     await headerMismatch(list, { 'Mcp-Method': 'tools/list' })
     // The two versions differ.
     await headerMismatch(list, { 'MCP-Protocol-Version': '2025-06-18', 'Mcp-Method': 'tools/list' })
+    // Both are older revisions, and still not the same one.
+    await headerMismatch(
+      { ...list, params: { _meta: { [META_VERSION]: '2025-03-26' } } },
+      { 'MCP-Protocol-Version': '2025-06-18' }
+    )
     // The method does not.
     await headerMismatch(list, { 'MCP-Protocol-Version': VERSION, 'Mcp-Method': 'tools/call' })
     await headerMismatch(list, { 'MCP-Protocol-Version': VERSION })
@@ -218,6 +223,19 @@ describe('the current revision', () => {
       },
       { 'MCP-Protocol-Version': VERSION, 'Mcp-Method': 'tools/call' }
     )
+    // A tool is named in the headers, and it is another tool, plain or encoded.
+    const getDoc = {
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: { name: 'get_doc', arguments: {}, _meta: { [META_VERSION]: VERSION } },
+    }
+    const toolHeaders = { 'MCP-Protocol-Version': VERSION, 'Mcp-Method': 'tools/call' }
+    await headerMismatch(getDoc, { ...toolHeaders, 'Mcp-Name': 'search_docs' })
+    await headerMismatch(getDoc, {
+      ...toolHeaders,
+      'Mcp-Name': `=?base64?${Buffer.from('search_docs').toString('base64')}?=`,
+    })
   })
 
   test('a request that states its version to a proxy and not to the server is refused', async () => {
@@ -472,6 +490,8 @@ describe('the registry entry', () => {
       '/mcp/server-card'
     )
     const card = JSON.parse(text)
+    // The registry publishes an entry by its name.
+    assert.equal(card.name, entry.name)
     assert.equal(card.version, entry.version)
     assert.deepEqual(card.icons, entry.icons)
     // The card and the registry entry are written out separately, so a field
