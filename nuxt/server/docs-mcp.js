@@ -41,6 +41,7 @@ const META_SERVER_INFO = 'io.modelcontextprotocol/serverInfo'
 /** The headers and the body disagree, or a required header is missing. */
 const HEADER_MISMATCH = -32020
 const UNSUPPORTED_VERSION = -32022
+const INVALID_PARAMS = -32602
 const METHOD_NOT_FOUND = -32601
 /**
  * How long a list may be held, and by whom. These answers are the documents the
@@ -235,7 +236,9 @@ const respond = async (message, { corpus, origin }) => {
   // The tools come back in the same order every time, so a client may cache them.
   if (method === 'tools/list') return result({ tools: TOOLS, ...CACHEABLE })
   if (method === 'tools/call') {
-    if (!TOOLS.some((tool) => tool.name === params.name)) return failure(-32602, `Unknown tool: ${params.name}`)
+    if (!TOOLS.some((tool) => tool.name === params.name)) {
+      return failure(INVALID_PARAMS, `Unknown tool: ${params.name}`)
+    }
     return result(callTool(await corpus(), origin, params.name, params.arguments))
   }
   return failure(METHOD_NOT_FOUND, `Unknown method: ${method}`)
@@ -292,6 +295,12 @@ const negotiate = (req, message) => {
   const meta = (message.params && message.params._meta) || {}
   const stated = meta[META_VERSION]
   const sent = headerOf(req, 'mcp-protocol-version')
+  const invalid = (reason) => ({ error: { code: INVALID_PARAMS, message: reason } })
+  // A version has to be a string to be compared with one, and a value such as
+  // `{ "toString": null }` has no string at all: reading one out of it throws.
+  if (stated !== undefined && typeof stated !== 'string') {
+    return invalid(`_meta ${META_VERSION} must be a string.`)
+  }
   if (!stated && !sent) return { version: UNSTATED_VERSION }
   const version = stated || sent
   if (!PROTOCOL_VERSIONS.includes(version)) {
@@ -313,6 +322,10 @@ const negotiate = (req, message) => {
   if (sent !== version) {
     return mismatch('MCP-Protocol-Version is required, and must match the version in _meta.')
   }
+  // The header is for whoever routes the request; the body is what this server
+  // reads. A request that states its version only in the header has told the
+  // proxy and not the server, and the field is required of it either way.
+  if (!stated) return invalid(`_meta is missing ${META_VERSION}.`)
   if (headerOf(req, 'mcp-method') !== message.method) {
     return mismatch('Mcp-Method is required, and must match the method in the body.')
   }
@@ -381,14 +394,17 @@ const createDocsMcp = ({ corpus, origin, log = () => {} }) => async (req, res) =
   if (!message || Array.isArray(message) || message.jsonrpc !== '2.0') {
     return rpcError(400, -32600, 'Send one JSON-RPC 2.0 message.')
   }
-  if (message.id !== undefined) {
-    const { error } = negotiate(req, message)
-    // A client of the current revision probes with a current request and reads
-    // the body of a 400 before it falls back: a protocol error in it says the
-    // server is current and the request was wrong, not that the server is old.
-    if (error) return send(400, { jsonrpc: '2.0', id: message.id, error })
-  }
   try {
+    // Reading the request is inside the try with answering it, so that a
+    // malformed one cannot throw past the handler, where the rejection would
+    // take the process down and leave the request unanswered.
+    if (message.id !== undefined) {
+      const { error } = negotiate(req, message)
+      // A client of the current revision probes with a current request and
+      // reads the body of a 400 before it falls back: a protocol error in it
+      // says the server is current and the request wrong, not the server old.
+      if (error) return send(400, { jsonrpc: '2.0', id: message.id, error })
+    }
     const answer = await respond(message, { corpus, origin })
     if (!answer) return send(202)
     // A method this server does not have answers 404, so a client can tell it

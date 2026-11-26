@@ -60,12 +60,16 @@ const post = async (body, raw = false, headers = {}) => {
 }
 const VERSION = '2026-07-28'
 const META_VERSION = 'io.modelcontextprotocol/protocolVersion'
+const META_CAPABILITIES = 'io.modelcontextprotocol/clientCapabilities'
 const SERVER_INFO = 'io.modelcontextprotocol/serverInfo'
 // A request as the current revision sends one: the version in `_meta`, and the
 // headers that repeat what the body says. A test that needs one of those wrong
 // builds its own headers instead.
 const current = (message, headers = {}) => {
-  const params = { ...(message.params || {}), _meta: { [META_VERSION]: VERSION } }
+  const params = {
+    ...(message.params || {}),
+    _meta: { [META_VERSION]: VERSION, [META_CAPABILITIES]: {} },
+  }
   return post({ ...message, params }, false, {
     'MCP-Protocol-Version': VERSION,
     'Mcp-Method': message.method,
@@ -214,6 +218,58 @@ describe('the current revision', () => {
       },
       { 'MCP-Protocol-Version': VERSION, 'Mcp-Method': 'tools/call' }
     )
+  })
+
+  test('a request that states its version to a proxy and not to the server is refused', async () => {
+    // The header reaches whatever routes the request. The body is what the
+    // server reads, and the revision requires the version in both.
+    const { status, body } = await post({ jsonrpc: '2.0', id: 1, method: 'tools/list' }, false, {
+      'MCP-Protocol-Version': VERSION,
+      'Mcp-Method': 'tools/list',
+    })
+    assert.equal(status, 400)
+    assert.equal(body.error.code, -32602)
+    assert.equal(body.result, undefined)
+  })
+
+  test('a version that is not a string is answered, not thrown', async () => {
+    // `{ toString: null }` cannot be read as a string at all, and a throw on
+    // the way into the answer would leave the request hanging and the process
+    // holding an unhandled rejection.
+    const { status, body } = await post(
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'tools/list',
+        params: { _meta: { [META_VERSION]: { toString: null } } },
+      },
+      false,
+      { 'Mcp-Method': 'tools/list' }
+    )
+    assert.equal(status, 400)
+    assert.equal(body.error.code, -32602)
+    // The server is still there afterwards.
+    assert.equal((await post({ jsonrpc: '2.0', id: 2, method: 'ping' })).status, 200)
+  })
+
+  test('a request without client capabilities is still answered', async () => {
+    // The revision asks a client to state its capabilities on every request,
+    // and this server asks nothing of a client: no sampling, no elicitation,
+    // no roots. Turning a readable request away over a field that is never
+    // read would cost a reader the docs and buy nothing. A feature that needs
+    // a client capability would have to require the field.
+    const { status, body } = await post(
+      {
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'tools/list',
+        params: { _meta: { [META_VERSION]: VERSION } },
+      },
+      false,
+      { 'MCP-Protocol-Version': VERSION, 'Mcp-Method': 'tools/list' }
+    )
+    assert.equal(status, 200)
+    assert.equal(body.result.tools.length, 3)
   })
 
   test('a revision it does not speak is told which ones it does', async () => {
