@@ -1,52 +1,46 @@
 /**
- * Renders the component tree Canvas's content API answers with.
+ * Renders the json-render document Canvas's content API answers with.
  *
  * In a draft session each component, slot and region sits between two
  * comment markers, which the editor selects and drags by. Vue 2 has no
- * fragments, so the whole tree renders in one render function, where a list
- * of children may hold comment nodes beside the components.
+ * fragments, so the whole document renders in one render function, where a
+ * list of children may hold comment nodes beside the components.
+ *
+ * Canvas's own Vue renderer, @drupal-canvas/json-render-vue, is for Vue 3.
+ * This draws the same document the same way.
  */
-const MARKERS = {
-  component: ['canvas-start-', 'canvas-end-'],
-  slot: ['canvas-slot-start-', 'canvas-slot-end-'],
-  region: ['canvas-region-start-', 'canvas-region-end-'],
+import { MARKER, MARKUP, REGION, SLOT_PLACEHOLDER, areEmpty, hasRegion, isSlotEmpty, markerText, ownName, propsOf, slotsOf } from './tree.js'
+
+// Each of the site's components by its machine name: the directory it sits
+// in. Read on first use, so the renderer also runs outside webpack.
+let own
+const siteComponents = () => {
+  if (!own) {
+    const context = require.context('~/components/canvas', true, /\/index\.vue$/)
+    own = Object.fromEntries(context.keys().map((key) => [key.split('/').slice(-2)[0], context(key).default]))
+  }
+  return own
 }
-const REGION_ELEMENT = 'canvas-preview-content-region'
-
-// Each component by its machine name: the directory it sits in.
-const context = require.context('~/components/canvas', true, /\/index\.vue$/)
-const registry = Object.fromEntries(
-  context.keys().map((key) => [key.split('/').slice(-2)[0], context(key).default])
-)
-
-const children = (slot) =>
-  slot === undefined ? [] : Array.isArray(slot) ? slot.flatMap(children) : [slot]
-
-// A slot with nothing an editor placed: only markup Drupal rendered.
-const isDefault = (child) =>
-  typeof child === 'string' ||
-  (child.element === 'drupal-markup' &&
-    Object.values(child.slots || {}).every((slot) => children(slot).every(isDefault)))
-
-const hasRegion = (node) =>
-  !!node &&
-  (node.element === REGION_ELEMENT ||
-    Object.values(node.slots || {}).some((slot) =>
-      children(slot).some((child) => typeof child !== 'string' && hasRegion(child))
-    ))
 
 export default {
   name: 'CanvasComponentTree',
 
   props: {
+    /** The page's `content`: a json-render document, or null. */
     tree: { type: Object, default: null },
+    /** Whether to draw the editor's markers and drop areas. */
+    preview: { type: Boolean, default: false },
+    /** Components by machine name, in place of the site's own. */
+    components: { type: Object, default: null },
   },
 
   render(h) {
-    const editor = !!this.tree && this.tree.canvasDraftMode === true
+    const tree = this.tree && this.tree.root ? this.tree : null
+    const editor = this.preview
+    const registry = this.components || siteComponents()
     const marker = (type, end, id) => {
       const node = this._e()
-      node.text = ` ${MARKERS[type][end ? 1 : 0]}${id} `
+      node.text = ` ${markerText(type, end, id)} `
       return node
     }
     const placeholder = (type) =>
@@ -54,60 +48,70 @@ export default {
     const markup = (html, key) =>
       h('span', { key, style: { display: 'contents' }, domProps: { innerHTML: html } })
 
-    const render = (node, path) => {
-      const slots = Object.entries(node.slots || {}).map(([name, value]) => ({
-        name,
-        items: children(value),
-        empty: children(value).every(isDefault),
-      }))
-      const each = (items, name) =>
-        items.flatMap((child, index) =>
-          typeof child === 'string'
-            ? [markup(child, `${path}:${name}:${index}`)]
-            : render(child, `${path}:${name}:${index}`)
-        )
-      const structural = () => slots.flatMap(({ name, items }) => each(items, name))
+    const render = (key) => {
+      const node = tree.elements[key]
+      if (!node || node.type === SLOT_PLACEHOLDER) return []
+      const structural = () => slotsOf(node).flatMap(([, keys]) => keys.flatMap(render))
 
-      if (node.element === REGION_ELEMENT) {
+      if (node.type === REGION) {
+        if (!editor) return structural()
+        const keys = slotsOf(node).flatMap(([, children]) => children)
+        return [
+          marker('region', false, 'content'),
+          ...(areEmpty(tree, keys) ? [placeholder('region')] : []),
+          ...structural(),
+          marker('region', true, 'content'),
+        ]
+      }
+      if (node.type === MARKER) {
         return editor
-          ? [marker('region', false, 'content'), ...structural(), marker('region', true, 'content')]
+          ? [marker('component', false, key), ...structural(), marker('component', true, key)]
           : structural()
       }
-      const name = node.element.startsWith('js-') ? node.element.slice(3) : null
+      if (node.type === MARKUP) {
+        return typeof node.props.markup === 'string' ? [markup(node.props.markup, key)] : []
+      }
+      const name = ownName(node.type)
       if (!name) return structural()
 
       const component = registry[name]
       if (!component) {
-        console.error(`[canvas] Canvas component "${name}" is not registered; omitted at "${path}".`)
+        console.error(`[canvas] Canvas component "${name}" (instance "${key}") is not registered; omitted subtree at "elements.${key}".`)
         return []
       }
-      const { canvasUuid: uuid, ...props } = node.props || {}
       const scopedSlots = Object.fromEntries(
-        slots.map(({ name: slot, items, empty }) => [
-          slot,
-          () => {
-            const content = each(editor && empty ? [] : items, slot)
-            if (!editor || !uuid) return content
-            const id = `${uuid}/${slot}`
-            return [
-              marker('slot', false, id),
-              ...(empty ? [placeholder('slot')] : []),
-              ...content,
-              marker('slot', true, id),
-            ]
-          },
-        ])
+        slotsOf(node).map(([slot, keys]) => {
+          const empty = isSlotEmpty(tree, keys)
+          return [
+            slot,
+            () => {
+              const content = (editor && empty ? [] : keys).flatMap(render)
+              if (!editor) return content
+              const id = `${key}/${slot}`
+              return [
+                marker('slot', false, id),
+                ...(empty ? [placeholder('slot')] : []),
+                ...content,
+                marker('slot', true, id),
+              ]
+            },
+          ]
+        })
       )
-      const rendered = h(component, { key: uuid || path, props, attrs: props, scopedSlots })
-      return editor && uuid
-        ? [marker('component', false, uuid), rendered, marker('component', true, uuid)]
-        : [rendered]
+      const props = propsOf(node.props)
+      const rendered = h(component, { key, props, attrs: props, scopedSlots })
+      return editor ? [marker('component', false, key), rendered, marker('component', true, key)] : [rendered]
     }
 
-    const content = this.tree ? render(this.tree, 'tree') : []
+    const content = tree ? render(tree.root) : []
     const wrapped =
-      editor && !hasRegion(this.tree)
-        ? [marker('region', false, 'content'), ...(content.length ? [] : [placeholder('region')]), ...content, marker('region', true, 'content')]
+      editor && !hasRegion(tree)
+        ? [
+            marker('region', false, 'content'),
+            ...(tree && !areEmpty(tree, [tree.root]) ? [] : [placeholder('region')]),
+            ...content,
+            marker('region', true, 'content'),
+          ]
         : content
     return h('div', { class: 'canvas-component-tree' }, wrapped)
   },

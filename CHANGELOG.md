@@ -23,6 +23,10 @@ Druxt 1.0.0.
 - Drupal runs Canvas 1.13.0. The patch that kept each component's id for
   Canvas's editor, and the service alias Canvas Headless 1.12.0 needed, are
   gone: 1.13.0 does both itself.
+- The frontend's Canvas Headless adapter runs on version 0.13 of Canvas's
+  SDK. A Canvas page drawn from the site's components now arrives as a
+  json-render document, which the adapter checks on the server and draws
+  with the same markers for the editor.
 
 ### Fixed
 

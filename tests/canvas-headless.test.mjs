@@ -11,9 +11,10 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 
 const COMPONENTS = 'nuxt/components/canvas'
 const CONFIG = 'drupal/config/sync'
-const { cookies, serialise, workspaceFetch } = createRequire(import.meta.url)(
+const { cookies, serialise, toDocument, workspaceFetch } = createRequire(import.meta.url)(
   '../nuxt/modules/canvas-headless/server.js'
 )
+const nuxt = createRequire(new URL('../nuxt/package.json', import.meta.url))
 
 const names = readdirSync(COMPONENTS)
 const camel = (name) => name.replace(/_+([a-z0-9])/g, (m, c) => c.toUpperCase())
@@ -47,7 +48,7 @@ describe('Canvas Headless components', () => {
       assert.match(yml, new RegExp(`^machineName: ${name}$`, 'm'))
     })
 
-    test(`${name} declares each input as a prop, in camel case as Canvas passes it`, () => {
+    test(`${name} declares each input as a prop, in camel case as the renderer passes it`, () => {
       assert.ok(props, 'no properties were read')
       for (const prop of props) assert.match(vue, new RegExp(`^ {4}${camel(prop)}: \\{`, 'm'), prop)
     })
@@ -187,72 +188,75 @@ describe('Canvas Headless page results', () => {
   })
 })
 
+// A json-render document from elements given as [key, type, children, slots].
+const doc = (root, ...elements) => ({
+  root,
+  elements: Object.fromEntries(
+    elements.map(([key, type, children = [], slots, props = {}]) => [
+      key,
+      { type, props, children, ...(slots ? { slots } : {}) },
+    ])
+  ),
+})
+const markupOf = (key, markup = '<p>Hero</p>') => [key, 'drupal-markup', [], undefined, { markup }]
+
 describe("the front page's Canvas page", () => {
   const front = () => import('../nuxt/modules/canvas-headless/front.js')
-  const own = {
-    element: 'renderless-container',
-    slots: { default: [{ element: 'js-hero', slots: { actions: [{ element: 'js-action' }] } }] },
-  }
-  const drupal = {
-    element: 'renderless-container',
-    slots: {
-      default: [
-        { element: 'js-hero' },
-        { element: 'drupal-markup', slots: { default: '<p>Hero</p>' } },
-      ],
-    },
-  }
+  const own = doc(
+    'c',
+    ['c', 'renderless-container', ['hero']],
+    ['hero', 'js.hero', [], { actions: ['action'] }],
+    ['action', 'js.action']
+  )
 
-  test("a tree with any of the site's own components is drawn from the tree", async () => {
+  test("a document with any of the site's own components is drawn from it", async () => {
     const { hasOwnComponents } = await front()
     assert.equal(hasOwnComponents(own), true)
     // Drupal's markup beside them, a mixed page or an empty slot's default, changes nothing.
-    assert.equal(hasOwnComponents(drupal), true)
     assert.equal(
-      hasOwnComponents({
-        element: 'renderless-container',
-        slots: { default: { element: 'js-hero' } },
-      }),
+      hasOwnComponents(
+        doc('c', ['c', 'renderless-container', ['hero', 'm']], ['hero', 'js.hero'], markupOf('m'))
+      ),
       true
     )
+    assert.equal(hasOwnComponents(doc('hero', ['hero', 'js.hero'])), true)
   })
 
-  test("a tree of Drupal's markup alone is not, and neither is no tree", async () => {
+  test("a document of Drupal's markup alone is not, and neither is no document", async () => {
     const { hasOwnComponents } = await front()
-    const markup = { element: 'drupal-markup', slots: { default: '<p>Hero</p>' } }
     assert.equal(
-      hasOwnComponents({ element: 'renderless-container', slots: { default: [markup, markup] } }),
+      hasOwnComponents(
+        doc('c', ['c', 'renderless-container', ['a', 'b']], markupOf('a'), markupOf('b'))
+      ),
       false
     )
+    // An element nothing refers to is not on the page.
+    assert.equal(hasOwnComponents(doc('a', markupOf('a'), ['stray', 'js.hero'])), false)
+    assert.equal(hasOwnComponents({ root: '', elements: {} }), false)
     assert.equal(hasOwnComponents(null), false)
     assert.equal(hasOwnComponents('<p>Hero</p>'), false)
   })
 
-  test('the tree and the JSON:API page agree on whose a page is', async () => {
+  test('the document and the JSON:API page agree on whose a page is', async () => {
     const { hasOwnComponents, usesOwnComponents } = await front()
     const page = (...ids) => ({
       attributes: { components: ids.map((id) => ({ component_id: id })) },
     })
-    const tree = (...elements) => ({
-      element: 'renderless-container',
-      slots: { default: elements.map((element) => ({ element })) },
-    })
-    for (const [ids, elements] of [
-      [
-        ['js.hero', 'js.modules'],
-        ['js-hero', 'js-modules'],
-      ],
-      [
-        ['sdc.druxtjsorg.hero', 'js.modules'],
-        ['drupal-markup', 'js-modules'],
-      ],
-      [['sdc.druxtjsorg.hero'], ['drupal-markup']],
-    ]) {
-      assert.equal(
-        hasOwnComponents(tree(...elements)),
-        usesOwnComponents(page(...ids)),
-        ids.join(' ')
+    // Canvas answers a component of Drupal's as its markup.
+    const tree = (...ids) =>
+      doc(
+        'c',
+        ['c', 'renderless-container', ids.map((id, index) => `e${index}`)],
+        ...ids.map((id, index) =>
+          id.startsWith('js.') ? [`e${index}`, id] : markupOf(`e${index}`)
+        )
       )
+    for (const ids of [
+      ['js.hero', 'js.modules'],
+      ['sdc.druxtjsorg.hero', 'js.modules'],
+      ['sdc.druxtjsorg.hero'],
+    ]) {
+      assert.equal(hasOwnComponents(tree(...ids)), usesOwnComponents(page(...ids)), ids.join(' '))
     }
   })
 
@@ -268,8 +272,7 @@ describe("the front page's Canvas page", () => {
 
   test("a draft session draws any page from the tree, Drupal's components included", async () => {
     const { drawnFromTree } = await front()
-    const markup = { element: 'drupal-markup', slots: { default: '<p>Hero</p>' } }
-    const theirs = { content: { element: 'renderless-container', slots: { default: [markup] } } }
+    const theirs = { content: doc('c', ['c', 'renderless-container', ['m']], markupOf('m')) }
     assert.equal(drawnFromTree(theirs, { enabled: false }), false)
     assert.equal(drawnFromTree(theirs, undefined), false)
     // The editor's frame: only the tree is the draft, and can be selected.
@@ -299,5 +302,179 @@ describe("the front page's Canvas page", () => {
       (match) => match[1]
     )
     assert.deepEqual(listed, names.map((name) => `js.${name}`).sort())
+  })
+})
+
+describe('Canvas Headless rendering', () => {
+  const Vue = nuxt('vue')
+  const { createRenderer } = nuxt('vue-server-renderer')
+  // A stand-in for one of the site's components: its props, and each slot.
+  const stub = (props, slots = []) => ({
+    props,
+    render(h) {
+      return h('section', { attrs: { 'data-props': JSON.stringify(this.$props) } }, [
+        ...slots.map((slot) =>
+          h(
+            'div',
+            { attrs: { 'data-slot': slot } },
+            this.$scopedSlots[slot] ? this.$scopedSlots[slot]() : []
+          )
+        ),
+      ])
+    },
+  })
+  const components = {
+    hero: stub(['heading', 'noteLinkText'], ['actions', 'content']),
+    action: stub(['label']),
+  }
+  const draw = async (tree, preview = false) => {
+    const { default: CanvasComponentTree } = await import(
+      '../nuxt/modules/canvas-headless/CanvasComponentTree.js'
+    )
+    const html = await createRenderer().renderToString(
+      new Vue({ render: (h) => h(CanvasComponentTree, { props: { tree, preview, components } }) })
+    )
+    return html.replace(/&quot;/g, '"')
+  }
+  const comments = (html) => [...html.matchAll(/<!-- (\S+) -->/g)].map(([, text]) => text)
+
+  // As Canvas 1.13.0 answers a page of the site's hero with an action in it.
+  const page = doc(
+    'hero-uuid',
+    [
+      'hero-uuid',
+      'js.hero',
+      [],
+      { actions: ['action-uuid'] },
+      { heading: 'Druxt', note_link_text: 'support' },
+    ],
+    ['action-uuid', 'js.action', [], undefined, { label: 'Get started' }]
+  )
+
+  test("a page draws the site's components, with props as they declare them", async () => {
+    const html = await draw(page)
+    const [, props] = html.match(/<section data-props="(\{.*?\})" heading=/)
+    assert.deepEqual(JSON.parse(props), { heading: 'Druxt', noteLinkText: 'support' })
+    assert.match(html, /<div data-slot="actions"><section data-props="\{"label":"Get started"\}"/)
+    assert.deepEqual(comments(html), [])
+  })
+
+  test("in the editor each component, slot and the page's region has its markers", async () => {
+    assert.deepEqual(comments(await draw(page, true)), [
+      'canvas-region-start-content',
+      'canvas-start-hero-uuid',
+      'canvas-slot-start-hero-uuid/actions',
+      'canvas-start-action-uuid',
+      'canvas-end-action-uuid',
+      'canvas-slot-end-hero-uuid/actions',
+      'canvas-end-hero-uuid',
+      'canvas-region-end-content',
+    ])
+  })
+
+  test('an empty slot is a drop area in the editor, and nothing on the page', async () => {
+    const empty = doc(
+      'hero-uuid',
+      ['hero-uuid', 'js.hero', [], { content: ['el-0'] }],
+      ['el-0', 'canvas-slot-placeholder']
+    )
+    assert.match(
+      await draw(empty, true),
+      /canvas-slot-start-hero-uuid\/content --><div aria-hidden="true" class="canvas--slot-empty-placeholder"><\/div><!-- canvas-slot-end/
+    )
+    assert.doesNotMatch(await draw(empty), /placeholder/)
+    // A slot holding only a component's example markup is empty too.
+    const example = doc(
+      'hero-uuid',
+      ['hero-uuid', 'js.hero', [], { content: ['el-0'] }],
+      markupOf('el-0')
+    )
+    assert.match(await draw(example, true), /class="canvas--slot-empty-placeholder"/)
+    assert.match(await draw(example), /<p>Hero<\/p>/)
+  })
+
+  test("Drupal's markup renders as it is, and a marker only marks in the editor", async () => {
+    const tree = doc(
+      'm-uuid',
+      ['m-uuid', 'canvas-marker', ['el-0'], undefined, { markerId: 'title' }],
+      markupOf('el-0')
+    )
+    assert.match(await draw(tree), /<span style="display:contents;"><p>Hero<\/p><\/span>/)
+    assert.deepEqual(comments(await draw(tree)), [])
+    assert.deepEqual(comments(await draw(tree, true)), [
+      'canvas-region-start-content',
+      'canvas-start-m-uuid',
+      'canvas-end-m-uuid',
+      'canvas-region-end-content',
+    ])
+  })
+
+  test('a page with its own region is marked there, and an empty page is a drop area', async () => {
+    const chrome = doc(
+      'c',
+      ['c', 'renderless-container', ['header', 'r']],
+      markupOf('header', '<header></header>'),
+      ['r', 'canvas-preview-content-region']
+    )
+    const html = await draw(chrome, true)
+    assert.deepEqual(comments(html), ['canvas-region-start-content', 'canvas-region-end-content'])
+    assert.match(
+      html,
+      /<header><\/header><\/span><!-- canvas-region-start-content --><div aria-hidden="true" class="canvas--region-empty-placeholder">/
+    )
+    assert.match(await draw({ root: '', elements: {} }, true), /canvas--region-empty-placeholder/)
+    assert.equal(
+      await draw(null),
+      '<div data-server-rendered="true" class="canvas-component-tree"></div>'
+    )
+  })
+
+  test('a component the site does not have is left out, and says so', async () => {
+    const errors = []
+    const error = console.error
+    console.error = (message) => errors.push(message)
+    try {
+      assert.doesNotMatch(
+        await draw(doc('x-uuid', ['x-uuid', 'js.missing', ['el-0']], markupOf('el-0'))),
+        /Hero/
+      )
+    } finally {
+      console.error = error
+    }
+    assert.match(errors.join('\n'), /"missing" \(instance "x-uuid"\) is not registered/)
+  })
+})
+
+describe('Canvas Headless content', () => {
+  const sdk = async () => ({
+    core: await import(nuxt.resolve('@drupal-canvas/headless')),
+    jsonRender: await import(nuxt.resolve('@drupal-canvas/headless/json-render')),
+    own: () => ({ hero: true, action: true }),
+  })
+
+  test("Canvas's document is drawn as it came", async () => {
+    const tree = doc('hero-uuid', ['hero-uuid', 'js.hero'])
+    assert.deepEqual(toDocument(tree, await sdk()), tree)
+    assert.equal(toDocument(null, await sdk()), null)
+  })
+
+  test('an answer in the format before Canvas 1.13 is converted', async () => {
+    const legacy = {
+      element: 'js-hero',
+      props: { heading: 'Druxt', canvasUuid: 'hero-uuid' },
+      slots: {
+        actions: { element: 'js-action', props: { label: 'Go', canvasUuid: 'action-uuid' } },
+      },
+    }
+    const tree = toDocument(legacy, await sdk())
+    assert.equal(tree.root, 'hero-uuid')
+    assert.equal(tree.elements['hero-uuid'].type, 'js.hero')
+    assert.deepEqual(tree.elements['hero-uuid'].slots, { actions: ['action-uuid'] })
+    assert.deepEqual(tree.elements['action-uuid'].props, { label: 'Go' })
+  })
+
+  test('a document that is not one is refused on the server', async () => {
+    const { core, jsonRender, own } = await sdk()
+    assert.throws(() => toDocument({ root: 'missing', elements: {} }, { core, jsonRender, own }))
   })
 })
