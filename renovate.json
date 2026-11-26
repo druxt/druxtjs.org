@@ -13,7 +13,7 @@
       "enabled": false
     },
     {
-      "description": "The Druxt packages follow npm's `dev` tag until 0.25.0 is released, and a tag is not a version to update. Move them by hand.",
+      "description": "The Druxt packages release together, are pinned in both `dependencies` and `resolutions`, and druxt-views carries a patch. Move them together, by hand, with each Druxt release.",
       "matchManagers": ["npm"],
       "matchPackageNames": [
         "druxt",

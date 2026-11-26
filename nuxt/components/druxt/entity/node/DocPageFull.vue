@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import { worthRetrying } from '~/utils/resource-error'
+
 const layoutOf = (paragraph) => ((paragraph.attributes || {}).behavior_settings || {}).layout_paragraphs || {}
 
 /**
@@ -115,7 +117,7 @@ export default {
       // keys them by uuid, so switching version must re-fetch rather than read
       // the last view's copies. A versioned view reads each paragraph at the
       // revision the node names; the published view reads the default.
-      await Promise.all(this.refs.map((ref) => this.$store.dispatch('druxt/getResource', {
+      const answers = await Promise.all(this.refs.map((ref) => this.$store.dispatch('druxt/getResource', {
         type: ref.type,
         id: ref.id,
         query: this.versioned ? { resourceVersion: `id:${(ref.meta || {}).target_revision_id}` } : {},
@@ -126,8 +128,10 @@ export default {
       // A paragraph the store would not give back leaves a hole in the page,
       // which reads as a broken site rather than a failed fetch. One retry
       // covers a request that lost a race; after that, say so, even for one.
+      // A 403 or 404 is Drupal's answer, not a lost race, so it gets no retry.
       const unresolved = () => this.refs.filter((ref) => !this.stored(ref))
-      if (unresolved().length && !this.retried) {
+      const retryable = this.refs.filter((ref, i) => !this.stored(ref) && worthRetrying(answers[i]))
+      if (retryable.length && !this.retried) {
         this.retried = true
         return this.loadParagraphs()
       }

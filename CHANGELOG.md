@@ -18,6 +18,14 @@ Druxt 1.0.0.
   block components on all three, and views and the router on Mercury,
   whose pages are all Canvas pages.
 
+### Fixed
+
+- A troubleshooting issue that Drupal refuses or fails to return answers
+  with Drupal's status, 403, 404 or 500, rather than an empty page.
+- A documentation page no longer asks Drupal twice for a paragraph the
+  reader may not see or that is gone. Druxt 0.25.2 reports the 403 or 404,
+  and only a failed request is tried again.
+
 ## [0.21.0] - 2026-11-24
 
 ### Changed
