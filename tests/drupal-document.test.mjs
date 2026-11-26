@@ -9,7 +9,7 @@ import assert from 'node:assert/strict'
 
 import { readdirSync } from 'node:fs'
 
-const { PARAGRAPH_TYPES, fetchDrupalPage, nextSteps, pageQuery, sectionOf } = await import(
+const { PARAGRAPH_TYPES, fetchDrupalPage, nextSteps, pageQuery, refusal, sectionOf } = await import(
   '../nuxt/lib/drupal-document.js'
 )
 
@@ -88,6 +88,44 @@ describe('fetchDrupalPage', () => {
     assert.equal(
       await fetchDrupalPage(store({ entity: { type: 'taxonomy_term' } }), '/tags/x'),
       null
+    )
+  })
+
+  test("answers Drupal's refusal of the path with its status, not as a missing page", async () => {
+    // The router's route when Drupal refuses an expired sign-in's request.
+    const expired = { error: { statusCode: 401, message: 'Unauthorized' } }
+    assert.deepEqual(await fetchDrupalPage(store(expired), '/how-to/proxy'), {
+      error: { statusCode: 401, message: 'Unauthorized' },
+    })
+    const forbidden = { error: { statusCode: 403, message: 'Forbidden' } }
+    assert.equal((await fetchDrupalPage(store(forbidden), '/how-to/proxy')).error.statusCode, 403)
+    // A path Drupal has no page for is still not found.
+    assert.equal(
+      await fetchDrupalPage(store({ error: { statusCode: 404, message: 'Not Found' } }), '/nope'),
+      null
+    )
+  })
+
+  test("answers a refused read of the page with the store's error", async () => {
+    const refused = { error: { statusCode: 401, message: 'The access token is invalid' } }
+    assert.deepEqual(
+      await fetchDrupalPage(store(page, false, refused), '/tutorials/getting-started'),
+      {
+        error: { statusCode: 401, message: 'The access token is invalid' },
+      }
+    )
+  })
+
+  test('still throws for a read that failed for any other reason, and names the failure', async () => {
+    const down = { error: { statusCode: 500, message: 'connect ECONNREFUSED' } }
+    await assert.rejects(
+      fetchDrupalPage(store(page, false, down), '/tutorials/getting-started'),
+      /Drupal returned no node--doc_page for \/tutorials\/getting-started: 500 connect ECONNREFUSED/
+    )
+    // An empty resource, with no error to name.
+    await assert.rejects(
+      fetchDrupalPage(store(page, false, {}), '/tutorials/getting-started'),
+      /Drupal returned no node--doc_page/
     )
   })
 
@@ -266,11 +304,15 @@ describe('fetchDrupalPage, signed in, moving between pages', () => {
 })
 
 // A contributor may read only their own unpublished work, so Drupal refuses
-// the latest revision of somebody else's draft. The Druxt store turns that
-// refusal into an empty resource, which read as "no such page" and sent the
-// reader to the error page instead of the published page that is right there.
+// the latest revision of somebody else's draft. The Druxt store answers that
+// refusal with the failed document, `{ error: { statusCode: 403 } }`, which
+// read as "no such page" and sent the reader to the error page instead of the
+// published page that is right there.
 describe('fetchDrupalPage, when the working copy is refused', () => {
-  const denied = (uuid, editor, calls = []) => ({
+  const forbidden = {
+    error: { statusCode: 403, message: 'The current user is not allowed to view this revision.' },
+  }
+  const denied = (uuid, editor, calls = [], failure = forbidden) => ({
     $druxtSchema: schema,
     $auth: { loggedIn: true },
     state: { editor },
@@ -284,7 +326,7 @@ describe('fetchDrupalPage, when the working copy is refused', () => {
         return { route: { entity: { type: 'node', bundle: 'doc_page', uuid } }, redirect: false }
       }
       // Denied while a version is asked for; the published default is readable.
-      return payload.query.include ? node : {}
+      return payload.query.include ? node : failure
     },
   })
 
@@ -303,7 +345,30 @@ describe('fetchDrupalPage, when the working copy is refused', () => {
     )
   })
 
-  test('a page that is missing outright is still an error, not a silent blank', async () => {
+  test('falls back from a version Drupal has none at, too', async () => {
+    const editor = { version: 'working-copy', revisions: [], page: null }
+    const missing = {
+      error: { statusCode: 404, message: 'The requested revision does not exist.' },
+    }
+    const doc = await fetchDrupalPage(
+      denied('u-1', editor, [], missing),
+      '/tutorials/getting-started'
+    )
+    assert.equal(doc.title, 'Getting started')
+    assert.equal(editor.version, 'published')
+  })
+
+  test('keeps the version when its read failed for another reason, and says so', async () => {
+    const editor = { version: 'working-copy', revisions: [], page: null }
+    const down = { error: { statusCode: 500, message: 'connect ECONNREFUSED' } }
+    await assert.rejects(
+      () => fetchDrupalPage(denied('u-1', editor, [], down), '/tutorials/getting-started'),
+      /500 connect ECONNREFUSED/
+    )
+    assert.equal(editor.version, 'working-copy', 'an outage is not shown as the published page')
+  })
+
+  test('a page Drupal no longer holds is no page, rather than a failure', async () => {
     const editor = { version: 'published', revisions: [], page: null }
     const store = {
       $druxtSchema: schema,
@@ -313,9 +378,9 @@ describe('fetchDrupalPage, when the working copy is refused', () => {
       dispatch: async (action) =>
         action === 'druxtRouter/get'
           ? { route: { entity: { type: 'node', bundle: 'doc_page', uuid: 'u-9' } } }
-          : {},
+          : { error: { statusCode: 404, message: 'The requested resource does not exist.' } },
     }
-    await assert.rejects(() => fetchDrupalPage(store, '/gone'), /returned no node--doc_page/)
+    assert.equal(await fetchDrupalPage(store, '/gone'), null)
   })
 })
 
@@ -354,5 +419,15 @@ describe('sectionOf', () => {
   test('is the first segment', () => {
     assert.equal(sectionOf('/how-to/proxy'), 'how-to')
     assert.equal(sectionOf('/'), '')
+  })
+})
+
+describe('refusal', () => {
+  test('is the error for a 401 or 403, and null for anything else', () => {
+    assert.deepEqual(refusal({ statusCode: 401, message: 'x' }), { statusCode: 401, message: 'x' })
+    assert.deepEqual(refusal({ statusCode: '403' }), { statusCode: 403, message: '' })
+    for (const error of [undefined, null, {}, { statusCode: 404 }, { statusCode: 500 }, true]) {
+      assert.equal(refusal(error), null, JSON.stringify(error))
+    }
   })
 })

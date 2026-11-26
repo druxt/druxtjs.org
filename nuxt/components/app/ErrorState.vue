@@ -26,6 +26,7 @@
  * client-side error page and the statically served 404 stay one design.
  */
 import { notFoundEvent } from '~/lib/analytics'
+import { errorState } from '~/lib/error-states'
 
 export default {
   props: {
@@ -36,11 +37,9 @@ export default {
   data: () => ({ searchOpen: false }),
 
   computed: {
-    heading: ({ statusCode }) => (statusCode === 404 ? 'Page not found' : 'Something went wrong'),
+    heading: ({ statusCode }) => errorState(statusCode).heading,
 
-    message: ({ statusCode }) => (statusCode === 404
-      ? 'That page does not exist. It may have moved, or the link that brought you here may be out of date.'
-      : 'An unexpected error occurred while loading this page.'),
+    message: ({ statusCode }) => errorState(statusCode).message,
   },
 
   /** @returns {void} */

@@ -118,6 +118,21 @@ const leaveRevisionBehind = (store, uuid) => {
   store.commit('setEditorRevisions', [])
 }
 
+/** The statuses Drupal refuses a request with, rather than having no page. */
+const REFUSALS = [401, 403]
+
+/**
+ * Drupal's refusal of a request, as the page's error, or null for any other.
+ *
+ * @param {object} [error] - The router's or the store's error, `{ statusCode, message }`.
+ * @returns {{ statusCode: number, message: string }|null} The error to show.
+ */
+export const refusal = (error) => {
+  const statusCode = Number((error || {}).statusCode)
+  if (!REFUSALS.includes(statusCode)) return null
+  return { statusCode, message: String(error.message || '') }
+}
+
 /**
  * Resolves a path through the Druxt router, and loads the page it names.
  *
@@ -126,12 +141,19 @@ const leaveRevisionBehind = (store, uuid) => {
  * files come in the same request, and the Druxt store keeps each included
  * resource, so every nested DruxtEntity finds its data already loaded.
  *
+ * A path Drupal refuses to name, because the request's sign-in has expired
+ * or may not read it, is not a missing page: it is answered with Drupal's
+ * status, as `{ error }`, so the page says so rather than "not found".
+ *
  * @param {object} store - The Vuex store with the Druxt modules.
  * @param {string} path - The route path.
- * @returns {Promise<object|null>} The page, or null when no page has the path.
+ * @returns {Promise<object|null>} The page, `{ error }` when Drupal refused
+ *   the request, or null when no page has the path.
  */
 export const fetchDrupalPage = async (store, path) => {
   const { route, redirect } = (await store.dispatch('druxtRouter/get', path)) || {}
+  const refused = refusal((route || {}).error)
+  if (refused) return { error: refused }
   const entity = route && !route.error && route.entity
   if (!entity || entity.type !== 'node') return null
 
@@ -142,22 +164,33 @@ export const fetchDrupalPage = async (store, path) => {
   const editor = Boolean(store.$auth && store.$auth.loggedIn)
   if (editor) leaveRevisionBehind(store, entity.uuid)
   const versioned = editor && store.state.editor.version !== 'published'
+  // The store answers a failed request with the document and its `error`,
+  // `{ statusCode, message }`, as druxt 0.25.2 does.
+  let failed = null
   const read = async (wanted) => {
     const query = await pageQuery(store.$druxtSchema, { versioned: wanted })
     const resource = await store.dispatch('druxt/getResource', { type, id: entity.uuid, query, bypassCache: editor })
+    failed = (resource || {}).error || null
     return resource && (resource.data || resource)
   }
 
   let data = await read(versioned)
-  // Drupal refuses a revision this account may not read, and the Druxt store
-  // returns that as an empty resource. The published page is the one every
-  // reader may see, so it is shown instead of an error, and the toolbar is put
-  // back to the version being shown.
-  if (versioned && (!data || !data.attributes)) {
+  // Drupal refuses a revision this account may not read, or has none at the
+  // version asked for. The published page is the one every reader may see,
+  // so it is shown instead of an error, and the toolbar is put back to the
+  // version being shown. Any other failure is the page's, not the version's.
+  if (versioned && (!data || !data.attributes) && [403, 404].includes(Number((failed || {}).statusCode))) {
     store.commit('setEditorVersion', 'published')
     data = await read(false)
   }
-  if (!data || !data.attributes) throw new Error(`Drupal returned no ${type} for ${path}`)
+  if (!data || !data.attributes) {
+    const refusedPage = refusal(failed)
+    if (refusedPage) return { error: refusedPage }
+    // The path named a page that Drupal no longer holds, such as one deleted
+    // since the path was looked up: no page, as a path with none is.
+    if (Number((failed || {}).statusCode) === 404) return null
+    throw new Error(`Drupal returned no ${type} for ${path}${failed ? `: ${failed.statusCode} ${failed.message}` : ''}`)
+  }
 
   // What the editor toolbar needs to name and switch this page's revisions.
   if (editor) {
