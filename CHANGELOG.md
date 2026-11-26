@@ -18,6 +18,17 @@ Druxt 1.0.0.
   block components on all three, and views and the router on Mercury,
   whose pages are all Canvas pages.
 
+### Fixed
+
+- A redirect saved in Drupal now works on every path, through Druxt's own
+  router. A path no page claims goes to DruxtRouter's catch-all route, and a
+  section or module path with no page asks DruxtRouter too. Before, a
+  redirect from the root, from `/modules` or to the API reference showed
+  "Page not found".
+- A redirect saved in Drupal answers with Drupal's status, so a moved page
+  sends a 301 rather than a 302. The site applies the fix as a patch on
+  druxt-router 0.32.1 until a release has it.
+
 ## [0.21.0] - 2026-11-24
 
 ### Changed

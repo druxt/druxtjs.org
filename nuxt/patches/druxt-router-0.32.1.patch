@@ -1,0 +1,20 @@
+diff --git a/dist/components/DruxtRouter.vue b/dist/components/DruxtRouter.vue
+index b72bae0..b8e2845 100644
+--- a/dist/components/DruxtRouter.vue
++++ b/dist/components/DruxtRouter.vue
+@@ -78,9 +78,13 @@ export default {
+       return error(result.error)
+     }
+ 
+-    // Process redirect.
++    // Process redirect. A redirect saved in Drupal keeps the status Drupal
++    // gives it, so a moved page answers 301; the router's own redirects, to
++    // the canonical path, stay 302.
+     if (result.redirect) {
+-      redirect(result.redirect)
++      const [saved] = (result.route || {}).redirect || []
++      const status = saved && saved.to === result.redirect ? Number(saved.status) : 302
++      redirect(status >= 300 && status < 400 ? status : 302, result.redirect)
+     }
+   },
+ 

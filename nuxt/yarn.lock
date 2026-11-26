@@ -11449,6 +11449,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"druxt-router@patch:druxt-router@npm%3A0.32.1#./patches/druxt-router-0.32.1.patch::locator=druxtjs-org%40workspace%3A.":
+  version: 0.32.1
+  resolution: "druxt-router@patch:druxt-router@npm%3A0.32.1#./patches/druxt-router-0.32.1.patch::version=0.32.1&hash=3c9b75&locator=druxtjs-org%40workspace%3A."
+  dependencies:
+    drupal-jsonapi-params: ^2.3.2
+    druxt: ^0.25.1
+    url-parse: ^1.5.10
+  peerDependencies:
+    vue: ^2.7.14
+    vuex: ^3.6.2
+  checksum: d1d1be6c026b0d57d8d50384c802760001f3911d4e339823c0d7edeb923c1b1161c30614054f8af90fcd1287f31308889b91c157e0133e470ca4c9922cfabb40
+  languageName: node
+  linkType: hard
+
 "druxt-schema@npm:0.12.2":
   version: 0.12.2
   resolution: "druxt-schema@npm:0.12.2"
@@ -11586,7 +11600,7 @@ __metadata:
     druxt-entity: 0.29.2
     druxt-layout-paragraphs: 0.4.1
     druxt-menu: 0.22.2
-    druxt-router: 0.32.1
+    druxt-router: "patch:druxt-router@npm%3A0.32.1#./patches/druxt-router-0.32.1.patch"
     druxt-schema: 0.12.2
     druxt-site: 0.15.2
     druxt-views: "patch:druxt-views@npm%3A0.23.2#./patches/druxt-views-0.23.2.patch"
