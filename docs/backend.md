@@ -377,8 +377,10 @@ declare an input.
 `drupal/composer.json` patches `drupal/canvas` for
 [#3592360](https://www.drupal.org/project/canvas/issues/3592360). With Canvas
 enabled, a JSON:API collection of configuration entities answers 500 to a
-page offset, which Druxt's schema build sends for any collection longer than
-one page. Drop the patch when a Canvas release includes the fix.
+page offset. Since Druxt 0.25.2 the schema build survives that, by reading the
+displays again per entity type and per bundle, but every paged configuration
+collection still fails without the patch. Drop the patch when a Canvas release
+includes the fix.
 
 ### Previewing in Canvas through the site
 
