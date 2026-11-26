@@ -1,6 +1,7 @@
 <script>
 import { seoHead } from '~/utils/seo'
 import { ISSUE_TYPE, ISSUES_PATH, onIssuesPage, storedIssue } from '~/utils/issues'
+import { failedStatus } from '~/utils/resource-error'
 
 /** What the page's head needs from an issue. */
 const issueOf = (attributes = {}) => ({ title: attributes.title || '', description: attributes.field_description || '' })
@@ -11,6 +12,8 @@ const issueOf = (attributes = {}) => ({ title: attributes.title || '', descripti
  * It renders nothing; the Issues list opens the issue the route names. It
  * gives the page the issue's title and summary, answers 404 for a slug no
  * issue has, and follows Drupal's redirect from a renamed issue's old URL.
+ * When Drupal refuses or fails to return the issue itself, the page answers
+ * with Drupal's status rather than an empty page.
  *
  * Opening an issue from the list finds it among the issues the list
  * loaded, so the route changes at once and Nuxt's loading bar, which waits
@@ -31,6 +34,8 @@ export default {
       return error({ statusCode: 404, message: 'Issue not found' })
     }
     const resource = await store.dispatch('druxt/getResource', { type: ISSUE_TYPE, id: entity.uuid })
+    const status = failedStatus(resource)
+    if (status) return error({ statusCode: status, message: status === 404 ? 'Issue not found' : 'The issue could not be loaded' })
     return { issue: issueOf(((resource && (resource.data || resource)) || {}).attributes) }
   },
   head() {
