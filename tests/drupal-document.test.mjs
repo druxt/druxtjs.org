@@ -305,10 +305,14 @@ describe('fetchDrupalPage, signed in, moving between pages', () => {
 
 // A contributor may read only their own unpublished work, so Drupal refuses
 // the latest revision of somebody else's draft. The Druxt store answers that
-// refusal with no data, which read as "no such page" and sent the reader to
-// the error page instead of the published page that is right there.
+// refusal with the failed document, `{ error: { statusCode: 403 } }`, which
+// read as "no such page" and sent the reader to the error page instead of the
+// published page that is right there.
 describe('fetchDrupalPage, when the working copy is refused', () => {
-  const denied = (uuid, editor, calls = []) => ({
+  const forbidden = {
+    error: { statusCode: 403, message: 'The current user is not allowed to view this revision.' },
+  }
+  const denied = (uuid, editor, calls = [], failure = forbidden) => ({
     $druxtSchema: schema,
     $auth: { loggedIn: true },
     state: { editor },
@@ -322,7 +326,7 @@ describe('fetchDrupalPage, when the working copy is refused', () => {
         return { route: { entity: { type: 'node', bundle: 'doc_page', uuid } }, redirect: false }
       }
       // Denied while a version is asked for; the published default is readable.
-      return payload.query.include ? node : {}
+      return payload.query.include ? node : failure
     },
   })
 
@@ -341,7 +345,30 @@ describe('fetchDrupalPage, when the working copy is refused', () => {
     )
   })
 
-  test('a page that is missing outright is still an error, not a silent blank', async () => {
+  test('falls back from a version Drupal has none at, too', async () => {
+    const editor = { version: 'working-copy', revisions: [], page: null }
+    const missing = {
+      error: { statusCode: 404, message: 'The requested revision does not exist.' },
+    }
+    const doc = await fetchDrupalPage(
+      denied('u-1', editor, [], missing),
+      '/tutorials/getting-started'
+    )
+    assert.equal(doc.title, 'Getting started')
+    assert.equal(editor.version, 'published')
+  })
+
+  test('keeps the version when its read failed for another reason, and says so', async () => {
+    const editor = { version: 'working-copy', revisions: [], page: null }
+    const down = { error: { statusCode: 500, message: 'connect ECONNREFUSED' } }
+    await assert.rejects(
+      () => fetchDrupalPage(denied('u-1', editor, [], down), '/tutorials/getting-started'),
+      /500 connect ECONNREFUSED/
+    )
+    assert.equal(editor.version, 'working-copy', 'an outage is not shown as the published page')
+  })
+
+  test('a page Drupal no longer holds is no page, rather than a failure', async () => {
     const editor = { version: 'published', revisions: [], page: null }
     const store = {
       $druxtSchema: schema,
@@ -351,9 +378,9 @@ describe('fetchDrupalPage, when the working copy is refused', () => {
       dispatch: async (action) =>
         action === 'druxtRouter/get'
           ? { route: { entity: { type: 'node', bundle: 'doc_page', uuid: 'u-9' } } }
-          : {},
+          : { error: { statusCode: 404, message: 'The requested resource does not exist.' } },
     }
-    await assert.rejects(() => fetchDrupalPage(store, '/gone'), /returned no node--doc_page/)
+    assert.equal(await fetchDrupalPage(store, '/gone'), null)
   })
 })
 

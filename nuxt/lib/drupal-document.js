@@ -175,16 +175,20 @@ export const fetchDrupalPage = async (store, path) => {
   }
 
   let data = await read(versioned)
-  // Drupal refuses a revision this account may not read. The published page
-  // is the one every reader may see, so it is shown instead of an error, and
-  // the toolbar is put back to the version being shown.
-  if (versioned && (!data || !data.attributes)) {
+  // Drupal refuses a revision this account may not read, or has none at the
+  // version asked for. The published page is the one every reader may see,
+  // so it is shown instead of an error, and the toolbar is put back to the
+  // version being shown. Any other failure is the page's, not the version's.
+  if (versioned && (!data || !data.attributes) && [403, 404].includes(Number((failed || {}).statusCode))) {
     store.commit('setEditorVersion', 'published')
     data = await read(false)
   }
   if (!data || !data.attributes) {
     const refusedPage = refusal(failed)
     if (refusedPage) return { error: refusedPage }
+    // The path named a page that Drupal no longer holds, such as one deleted
+    // since the path was looked up: no page, as a path with none is.
+    if (Number((failed || {}).statusCode) === 404) return null
     throw new Error(`Drupal returned no ${type} for ${path}${failed ? `: ${failed.statusCode} ${failed.message}` : ''}`)
   }
 

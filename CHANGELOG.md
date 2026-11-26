@@ -24,6 +24,10 @@ Druxt 1.0.0.
   sign-in has expired", with a 401, rather than "Page not found". A page
   their account may not read says so, with a 403. A page that doesn't exist
   is still a 404.
+- A page Drupal no longer holds, such as one deleted since its path was
+  looked up, is "Page not found" rather than an error page. An editor's
+  version falls back to the published page only when Drupal refuses it or
+  has none, so an outage is no longer shown as the published page.
 
 ## [0.21.0] - 2026-11-24
 
